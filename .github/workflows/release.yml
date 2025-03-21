@@ -24,11 +24,6 @@ jobs:
           bundle config set path 'vendor/bundle'
           bundle install
 
-      - name: Update CocoaPods (for Xcode 15 compatibility)
-        run: |
-          sudo gem install cocoapods
-          pod --version
-
       - name: Extract Version from Tag
         id: version
         run: |
@@ -48,12 +43,19 @@ jobs:
           security set-keychain-settings -lut 7200 build.keychain
           security default-keychain -s build.keychain
 
+          # Disable keychain lock timeout to prevent hanging during signing
+          security set-keychain-settings -t 3600 -l build.keychain
+
           # Import the distribution certificate (with private key)
           security import dist.p12 -k build.keychain -P "$APPLE_DIST_CERT_PASS" -T /usr/bin/codesign
 
-          # Move provisioning profile to the correct location
+          # Add the keychain to the search list and set it to always allow access
+          security list-keychains -d user -s build.keychain > /dev/null 2>&1
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain > /dev/null 2>&1
+
+          # Move provisioning profile to the correct location with the expected name
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
-          cp app.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/"
+          cp app.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/netgrade-provisioning.mobileprovision"
         env:
           APPLE_DIST_CERT_P12: ${{ secrets.APPLE_DIST_CERT_P12 }}
           IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
@@ -63,3 +65,10 @@ jobs:
         run: |
           echo "Building with version: ${{ steps.version.outputs.version }}"
           bundle exec fastlane ios release version:${{ steps.version.outputs.version }}
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APP_IDENTIFIER: ${{ secrets.APP_IDENTIFIER }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}

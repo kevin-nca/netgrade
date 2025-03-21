@@ -52,16 +52,16 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/status-bar"
 
 SPEC CHECKSUMS:
-  Capacitor: 679f9673fdf30597493a6362a5d5bf233d46abc2
-  CapacitorApp: 0bc633b4eae40a1f32cd2834788fad3bc42da6a1
+  Capacitor: 69c7f687aabb8d85e543497411e40638b5cc08c0
+  CapacitorApp: f51c08c64df914fc934239fd1b3fc809d62a02f6
   CapacitorCommunitySqlite: 0299d20f4b00c2e6aa485a1d8932656753937b9b
   CapacitorCordova: f48c89f96c319101cd2f0ce8a2b7449b5fb8b3dd
-  CapacitorHaptics: fe689ade56ef20ec9b041a753c6da70c5d8ec9a9
-  CapacitorKeyboard: 2700f9b18687be021e28b5a09b59eb151a46d5e0
-  CapacitorStatusBar: b81d4fb5d4e0064c712018071b3ab4b810b39a63
+  CapacitorHaptics: 05d33e20e394b1977dfd2a00a2621e04098164c1
+  CapacitorKeyboard: 5bf4458dd989b56a60ea15c92cbca5fbfae6e9f9
+  CapacitorStatusBar: 9ed7f06318fd436917072a9bf60fda56d12c8bdb
   SQLCipher: ba9d0076041ed767c5bd3d3f77098318d04a403c
   ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
 
-PODFILE CHECKSUM: f44bc5ec959d7b958c2cbc033c29bc3d0b482fa0
+PODFILE CHECKSUM: 683f4801dc11afa0aa9611f03e849ec86b4a26d3
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
