@@ -2,7 +2,9 @@
 
 ## TODO
 
-- [ ] appInstanceId
+- [ ] Implement appInstanceId
+- [ ] Improve FormField implementation
+- [ ] Implement android release pipeline
 
 ## Overview
 
@@ -129,9 +131,25 @@ End-to-end tests are conducted using **Cypress**.
 
 Cypress tests are located in the `cypress/` directory.
 
+## CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration and deployment. The workflow is defined in `.github/workflows/release.yml`.
+
+### Required Secrets
+
+The following secrets need to be configured in the GitHub repository settings:
+
+- **APPLE_DIST_CERT_P12**: Base64-encoded Apple Distribution Certificate (.p12 file)
+- **APPLE_DIST_CERT_PASS**: Password for the Apple Distribution Certificate
+- **IOS_PROVISION_PROFILE**: Base64-encoded iOS Provisioning Profile
+- **APP_STORE_CONNECT_API_KEY_ID**: The key ID from your App Store Connect API key
+- **APP_STORE_CONNECT_ISSUER_ID**: The issuer ID from your App Store Connect API key
+- **APP_STORE_CONNECT_API_KEY_CONTENT**: The private key content from your App Store Connect API key
+
 ## Useful Links
 
 - **Ionic Framework Documentation**: [Ionic Docs](https://ionicframework.com/docs)
 - **Capacitor Documentation**:
   - [iOS Platform Guide](https://capacitorjs.com/docs/ios)
   - [Android Platform Guide](https://capacitorjs.com/docs/android)
+- **Fastlane Documentation**: [Fastlane Docs](https://docs.fastlane.tools/)
