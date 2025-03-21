@@ -1,0 +1,69 @@
+@import 'variable.css';
+
+.welcome-card {
+  background-color: var(--primary-color);
+  color: var(--button-text-color);
+  padding: var(--padding-medium);
+  border-radius: var(--border-radius);
+  margin: var(--padding-medium);
+}
+
+.ios .welcome-card {
+  margin-top: 60px;
+}
+
+.welcome-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.welcome-title {
+  font-size: var(--font-size-large);
+  font-weight: bold;
+}
+
+.profile-icon {
+  background-color: var(--icon-background);
+  border-radius: 50%;
+  width: var(--icon-size);
+  height: var(--icon-size);
+}
+
+.plus-button {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.onboarding-card {
+  margin: var(--margin-medium);
+  padding: var(--padding-medium);
+  border-radius: var(--border-radius);
+  background-color: var(--background-color);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.continue-button {
+  margin-top: var(--padding-medium);
+  background-color: var(--button-background);
+  color: var(--button-text-color);
+  border-radius: var(--button-border-radius);
+  font-size: var(--font-size-medium);
+  font-weight: bold;
+}
+
+.add-button {
+  margin-top: var(--padding-small);
+  background-color: var(--button-background);
+  color: var(--button-text-color);
+  border-radius: var(--button-border-radius);
+  font-size: var(--font-size-medium);
+  font-weight: bold;
+}
+
+.add-button:hover {
+  background-color: var(--secondary-color);
+  transform: scale(1.02);
+}

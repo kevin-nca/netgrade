@@ -1,0 +1,16 @@
+.header {
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: var(--padding-large);
+  border-radius: var(--border-radius-medium);
+}
+
+.header .title {
+  font-size: var(--font-size-large);
+  font-weight: bold;
+}
+
+.header .subtitle {
+  font-size: var(--font-size-medium);
+  margin-top: var(--margin-small);
+}

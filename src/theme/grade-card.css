@@ -1,0 +1,25 @@
+@import 'variable.css';
+
+.grades-overview-subtitle {
+  font-size: var(--font-size-large);
+  font-weight: bold;
+  color: var(--text-color);
+  margin: var(--margin-medium);
+  padding-left: var(--padding-medium);
+}
+
+.grade-card {
+  background-color: var(--background-color);
+  margin: var(--margin-small) var(--margin-medium);
+  border-radius: var(--border-radius-small);
+}
+
+.grade-card IonItem {
+  --padding-start: var(--padding-medium);
+  --padding-end: var(--padding-medium);
+}
+
+.grade-average {
+  font-size: var(--font-size-medium);
+  font-weight: bold;
+}

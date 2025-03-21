@@ -1,0 +1,28 @@
+:root {
+  --primary-color: #15529a;
+  --secondary-color: #024385;
+  --background-color: #ffffff;
+  --text-color: #333;
+  --error-color: #ff0000;
+  --icon-background: #d9d9d9;
+
+  --border-radius: 12px;
+  --border-radius-small: 8px;
+  --padding-small: 10px;
+  --padding-medium: 20px;
+  --padding-large: 30px;
+  --margin-small: 10px;
+  --margin-medium: 20px;
+  --margin-large: 30px;
+
+  --font-size-small: 14px;
+  --font-size-medium: 16px;
+  --font-size-large: 22px;
+  --font-size-title: 24px;
+
+  --button-background: blue;
+  --button-text-color: white;
+  --button-border-radius: 12px;
+
+  --icon-size: 40px;
+}
