@@ -31,5 +31,8 @@ jobs:
       - name: Build Project
         run: npm run build
 
+      - name: Start Dev Server
+        run: npm run dev & sleep 10
+
       - name: Run Cypress Tests
         run: npx cypress run

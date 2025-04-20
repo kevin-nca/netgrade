@@ -8,7 +8,6 @@ import {
   IonLabel,
   IonModal,
 } from '@ionic/react';
-import { v4 as uuidv4 } from 'uuid';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import FormField from '@/components/Form/FormField';
@@ -21,7 +20,7 @@ interface Subject {
 interface SubjectSelectionSlideUpProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  availableSubjects: string[];
+  availableSubjects: number[];
   isModule: boolean;
   subjectsOrModules: Subject[];
   addToSubjectsOrModules: (subject: Subject) => void;
@@ -57,7 +56,7 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
       !localSubjects.some((subject) => subject.name === newSubjectName)
     ) {
       const newSubject: Subject = {
-        id: uuidv4(),
+        id: '', // FIXME
         name: newSubjectName,
       };
       setLocalSubjects([...localSubjects, newSubject]);
@@ -85,7 +84,7 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
       <IonContent>
         <FormField
           value={searchText}
-          onChange={(e) => setSearchText(e.detail.value!)}
+          onChange={(e) => setSearchText(e.toString())} // FIXME
           placeholder={isModule ? 'Suche Module' : 'Suche Fächer'}
         />
 
@@ -113,7 +112,7 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
 
         <FormField
           value={newSubjectName}
-          onChange={(value) => setNewSubjectName(value)}
+          onChange={(value) => setNewSubjectName(String(value))} // FIXME
           placeholder={'Neues Fach hinzufügen'}
         />
         <Button handleEvent={handleAddSubject} text={'Hinzufügen'} />

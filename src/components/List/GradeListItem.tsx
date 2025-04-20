@@ -6,7 +6,7 @@ import {
   IonItemSliding,
   IonLabel,
 } from '@ionic/react';
-import { Grade } from '@/store/gradesSlice';
+import { Grade } from '@/db/entities';
 
 interface GradeListItemProps {
   grade: Grade;
@@ -25,11 +25,11 @@ const GradeListItem: React.FC<GradeListItemProps> = ({
     <IonItemSliding key={index}>
       <IonItem>
         <IonLabel>
-          <h2>Titel: {grade.examName}</h2>
+          <h2>Titel: {grade.exam.name}</h2>
           <p>Note: {grade.score}</p>
           <p>Gewichtung: {grade.weight}</p>
           <p>Datum: {new Date(grade.date).toLocaleDateString()}</p>
-          <p>Zählt: {grade.counts ? 'Ja' : 'Nein'}</p>
+          {/*<p>Zählt: {grade.counts ? 'Ja' : 'Nein'}</p>*/}
           <p>Kommentar: {grade.comment}</p>
         </IonLabel>
       </IonItem>

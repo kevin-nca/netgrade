@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+    # Runs when you publish a release in GitHub
+
+jobs:
+  build-and-upload:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install Dependencies
+        run: |
+          gem install bundler
+          bundle config set path 'vendor/bundle'
+          bundle install
+
+      - name: Update CocoaPods (for Xcode 15 compatibility)
+        run: |
+          sudo gem install cocoapods
+          pod --version
+
+      - name: Extract Version from Tag
+        id: version
+        run: |
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          VERSION="${TAG_NAME#v}"  # strips leading 'v' if any
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Import Certificate & Profile
+        run: |
+          # Decode and write files
+          echo "$APPLE_DIST_CERT_P12" | base64 --decode > dist.p12
+          echo "$IOS_PROVISION_PROFILE" | base64 --decode > app.mobileprovision
+
+          # Create a temporary keychain
+          security create-keychain -p "" build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-keychain-settings -lut 7200 build.keychain
+          security default-keychain -s build.keychain
+
+          # Import the distribution certificate (with private key)
+          security import dist.p12 -k build.keychain -P "$APPLE_DIST_CERT_PASS" -T /usr/bin/codesign
+
+          # Move provisioning profile to the correct location
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          cp app.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/"
+        env:
+          APPLE_DIST_CERT_P12: ${{ secrets.APPLE_DIST_CERT_P12 }}
+          IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
+          APPLE_DIST_CERT_PASS: ${{ secrets.APPLE_DIST_CERT_PASS }}
+
+      - name: Build and Upload to TestFlight
+        run: |
+          echo "Building with version: ${{ steps.version.outputs.version }}"
+          bundle exec fastlane ios release version:${{ steps.version.outputs.version }}

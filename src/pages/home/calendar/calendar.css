@@ -1,0 +1,116 @@
+.calendar-card {
+  margin: var(--padding-medium);
+  padding: var(--padding-large);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  border-radius: var(--border-radius);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.calendar-card:hover {
+  transform: scale(1.02);
+}
+
+.react-calendar {
+  width: 100%;
+  max-width: 450px;
+  background: var(--background-color);
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+  padding: var(--padding-medium);
+}
+
+.react-calendar__tile {
+  padding: var(--padding-small);
+  border-radius: var(--border-radius-small);
+  text-align: center;
+  font-size: var(--font-size-medium);
+  font-weight: bold;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.react-calendar__tile:hover {
+  background: var(--secondary-color);
+  color: var(--button-text-color);
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.react-calendar__tile--active {
+  background: var(--primary-color) !important;
+  color: var(--button-text-color);
+  font-weight: bold;
+  transform: scale(1.15);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.react-calendar__tile.event-day {
+  border: 3px solid var(--error-color);
+  position: relative;
+  border-radius: var(--border-radius-small);
+}
+
+.react-calendar__tile--active.event-day {
+  border: 3px solid var(--button-text-color);
+}
+
+.event-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--error-color);
+  border-radius: 50%;
+  margin: 6px auto 0;
+  box-shadow: 0 0 6px rgba(255, 0, 0, 0.8);
+}
+
+.selected-date-info {
+  margin: var(--padding-medium);
+  padding: var(--padding-medium);
+  background: var(--background-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  animation: fadeIn 0.4s ease-in-out;
+  transition: transform 0.3s ease-in-out;
+}
+
+.selected-date-info:hover {
+  transform: scale(1.02);
+}
+
+.selected-date-info h3 {
+  font-size: var(--font-size-title);
+  color: var(--primary-color);
+  margin-bottom: var(--padding-small);
+  font-weight: bold;
+}
+
+.selected-date-info ul {
+  list-style: none;
+  padding: 0;
+}
+
+.selected-date-info li {
+  background: var(--secondary-color);
+  color: var(--button-text-color);
+  padding: var(--padding-small);
+  border-radius: var(--border-radius-small);
+  margin-top: var(--padding-small);
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.selected-date-info li:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

@@ -1,5 +1,9 @@
 # NetGrade
 
+## TODO
+
+- [ ] appInstanceId
+
 ## Overview
 
 **NetGrade** is a Progressive Web App (PWA) designed to deliver a native-like experience on web and mobile platforms.
@@ -11,12 +15,14 @@
 | React 18        | Building user interfaces                                |
 | Ionic Framework | UI components for mobile and desktop apps               |
 | Capacitor       | Native runtime for web apps on mobile platforms devices |
-| Redux Toolkit   | State management with simplified Redux setup            |
 | Vite            | Fast build tool and development server                  |
 | Cypress         | End-to-end testing                                      |
 | Jest            | Unit testing framework                                  |
 | Prettier        | Code formatting                                         |
 | ESLint          | Linting and code quality checks                         |
+| TypeORM         | ORM                                                     |
+| SQLite          | SQL DB                                                  |
+| React-Query     | State Management                                        |
 
 ## Getting Started
 

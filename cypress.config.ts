@@ -7,5 +7,7 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
+    experimentalStudio: true,
+    includeShadowDom: true,
   },
 });
