@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { School } from './School';
-import { Exam } from '@/db/entities/Exam';
+import { Exam } from './Exam';
 
 @Entity('subject')
 export class Subject extends BaseEntity {

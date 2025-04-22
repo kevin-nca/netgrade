@@ -1,7 +1,7 @@
 import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { Exam } from './Exam';
-import { dateTransformer } from '@/db/utils';
+import { dateTransformer } from '../utils';
 
 @Entity('grade')
 export class Grade extends BaseEntity {

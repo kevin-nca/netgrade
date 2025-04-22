@@ -7,6 +7,9 @@ import localforage from 'localforage';
 // @ts-expect-error SQL.js is not typed
 import initSqlJs from 'sql.js';
 
+// Migrations
+import { Initdb1745319232244 } from './migrations/1745319232244-initdb';
+
 // Reference: https://github.com/sql-js/react-sqljs-demo/blob/master/src/App.js
 (window as { localforage?: typeof localforage }).localforage = localforage;
 // Make SQL.js available globally for TypeORM
@@ -52,9 +55,10 @@ const initializeNativeDb = async (): Promise<DataSourceOptions> => {
     database: DATABASE_NAME,
     entities: ENTITIES,
     synchronize: false, // DEV ONLY
-
-    migrationsRun: false,
     logging: ['error', 'warn', 'query'],
+    migrationsRun: true,
+    migrations: [Initdb1745319232244],
+    migrationsTableName: 'migrations',
     mode: 'no-encryption',
   };
 };
