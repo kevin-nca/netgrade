@@ -2,7 +2,7 @@ import { Entity, Column, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { Subject } from './Subject';
 import { Grade } from './Grade';
-import { dateTransformer } from '@/db/utils';
+import { dateTransformer } from '../utils';
 
 @Entity('exam')
 export class Exam extends BaseEntity {
