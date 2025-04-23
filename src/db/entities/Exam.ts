@@ -29,7 +29,7 @@ export class Exam extends BaseEntity {
 
   @ManyToOne(() => Subject, (subject) => subject.exams, {
     onDelete: 'CASCADE',
-    eager: true
+    eager: true,
   })
   @JoinColumn({ name: 'subjectId' })
   subject!: Subject;

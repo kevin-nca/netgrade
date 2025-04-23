@@ -25,7 +25,7 @@ export class Grade extends BaseEntity {
 
   @ManyToOne(() => Exam, (exam) => exam.grades, {
     nullable: false,
-    eager: true
+    eager: true,
   })
   @JoinColumn({ name: 'examId' })
   exam!: Exam;

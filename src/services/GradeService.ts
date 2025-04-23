@@ -22,12 +22,12 @@ export class GradeService {
       return await gradeRepo.find({
         relations: {
           exam: {
-            subject: true
-          }
+            subject: true,
+          },
         },
         order: {
-          date: 'DESC'
-        }
+          date: 'DESC',
+        },
       });
     } catch (error) {
       console.error('Failed to fetch grades:', error);
@@ -73,9 +73,9 @@ export class GradeService {
           where: { id: savedGrade.id },
           relations: {
             exam: {
-              subject: true
-            }
-          }
+              subject: true,
+            },
+          },
         });
 
         if (!finalGrade) {
@@ -110,9 +110,9 @@ export class GradeService {
         where: { id: updatedGradeData.id },
         relations: {
           exam: {
-            subject: true
-          }
-        }
+            subject: true,
+          },
+        },
       });
 
       if (!existingGrade) {
@@ -165,9 +165,9 @@ export class GradeService {
         where: { id },
         relations: {
           exam: {
-            subject: true
-          }
-        }
+            subject: true,
+          },
+        },
       });
     } catch (error) {
       console.error(`Failed to find grade with ID ${id}:`, error);
@@ -187,9 +187,9 @@ export class GradeService {
         where: { exam: { id: examId } },
         relations: {
           exam: {
-            subject: true
-          }
-        }
+            subject: true,
+          },
+        },
       });
     } catch (error) {
       console.error(`Failed to find grades for exam ID ${examId}:`, error);
@@ -233,9 +233,9 @@ export class GradeService {
           where: { id: gradeData.id },
           relations: {
             exam: {
-              subject: true
-            }
-          }
+              subject: true,
+            },
+          },
         });
 
         if (!existingGrade) {
@@ -256,9 +256,9 @@ export class GradeService {
           where: { id: savedGrade.id },
           relations: {
             exam: {
-              subject: true
-            }
-          }
+              subject: true,
+            },
+          },
         });
 
         if (!finalGrade) {

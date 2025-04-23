@@ -38,7 +38,7 @@ function HomePage() {
       (grade) =>
         grade.exam &&
         grade.exam.subject &&
-        grade.exam.subject.schoolId === schoolId
+        grade.exam.subject.schoolId === schoolId,
     );
     if (schoolGrades.length === 0) return null;
 
