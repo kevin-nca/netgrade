@@ -19,7 +19,16 @@ export class GradeService {
   static async fetchAll(): Promise<Grade[]> {
     try {
       const { grade: gradeRepo } = getRepositories();
-      return await gradeRepo.find({ relations: ['exam'] });
+      return await gradeRepo.find({
+        relations: {
+          exam: {
+            subject: true,
+          },
+        },
+        order: {
+          date: 'DESC',
+        },
+      });
     } catch (error) {
       console.error('Failed to fetch grades:', error);
       throw error;
