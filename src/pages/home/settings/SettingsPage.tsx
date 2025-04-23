@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   IonContent,
   IonItem,
@@ -6,100 +6,16 @@ import {
   IonList,
   IonPage,
   IonToggle,
-  useIonAlert,
-  useIonRouter,
 } from '@ionic/react';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import FormField from '@/components/Form/FormField';
 import { Routes } from '@/routes';
-import { getDataSource } from '@/db/data-source';
-import { useQueryClient } from '@tanstack/react-query';
+import { useSettingsService } from '@/services/SettingsService';
 
 const SettingsPage: React.FC = () => {
-  const [name, setName] = useState('Gabriele');
-  const [notification, setNotification] = useState(false);
-  const [language, setLanguage] = useState('de');
-  const [darkMode, setDarkMode] = useState(false);
-
-  const [presentAlert] = useIonAlert();
-  const router = useIonRouter();
-  const queryClient = useQueryClient();
-
-  const handleSave = () => {
-    // Save settings logic would go here
-    // For now, we just show a success message
-    presentAlert({
-      header: 'Einstellungen gespeichert',
-      message: 'Ihre Einstellungen wurden erfolgreich gespeichert.',
-      buttons: ['OK'],
-    });
-  };
-
-  const resetData = async () => {
-    presentAlert({
-      header: 'Daten zurücksetzen',
-      message:
-        'Möchten Sie wirklich alle Daten und Einstellungen zurücksetzen? Dies kann nicht rückgängig gemacht werden.',
-      buttons: [
-        { text: 'Abbrechen', role: 'cancel' },
-        {
-          text: 'Zurücksetzen',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              setName('');
-              setNotification(false);
-              setLanguage('de');
-              setDarkMode(false);
-
-              const dataSource = getDataSource();
-              await dataSource.transaction(async (transactionManager) => {
-                await transactionManager.query('DELETE FROM grade');
-                await transactionManager.query('DELETE FROM exam');
-                await transactionManager.query('DELETE FROM subject');
-                await transactionManager.query('DELETE FROM school');
-              });
-              await queryClient.invalidateQueries({ queryKey: ['grades'] });
-              await queryClient.invalidateQueries({ queryKey: ['exams'] });
-              await queryClient.invalidateQueries({ queryKey: ['subjects'] });
-              await queryClient.invalidateQueries({ queryKey: ['schools'] });
-
-              presentAlert({
-                header: 'Erfolgreich zurückgesetzt',
-                message: 'Alle Daten wurden erfolgreich gelöscht.',
-                buttons: [
-                  {
-                    text: 'OK',
-                    handler: () => {
-                      router.push(Routes.HOME, 'back');
-                    },
-                  },
-                ],
-              });
-            } catch (error) {
-              console.error('Error resetting data:', error);
-              presentAlert({
-                header: 'Fehler',
-                message:
-                  'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten.',
-                buttons: ['OK'],
-              });
-            }
-          },
-        },
-      ],
-    });
-  };
-
-  const handleForgotPassword = () => {
-    presentAlert({
-      header: 'Passwort ändern',
-      message:
-        'Eine E-Mail zur ändernung des Passworts wurde an Ihre registrierte E-Mail-Adresse gesendet.',
-      buttons: ['OK'],
-    });
-  };
+  const { settings, updateSetting, saveSettings, resetData, forgotPassword } =
+    useSettingsService();
 
   return (
     <IonPage>
@@ -112,16 +28,16 @@ const SettingsPage: React.FC = () => {
         <IonList>
           <FormField
             label="Benutzername"
-            value={name}
-            onChange={(value) => setName(String(value))}
+            value={settings.name}
+            onChange={(value) => updateSetting('name', String(value))}
             placeholder="Name eingeben"
             type="text"
           />
 
           <FormField
             label="Sprache"
-            value={language}
-            onChange={(value) => setLanguage(String(value))}
+            value={settings.language}
+            onChange={(value) => updateSetting('language', String(value))}
             placeholder="Sprache wählen"
             type="select"
             options={[
@@ -133,28 +49,30 @@ const SettingsPage: React.FC = () => {
           <IonItem>
             <IonLabel>Benachrichtigungen</IonLabel>
             <Button
-              handleEvent={() => setNotification(!notification)}
-              text={notification ? 'Aktiviert' : 'Deaktiviert'}
-              fill={notification ? 'solid' : 'outline'}
+              handleEvent={() =>
+                updateSetting('notification', !settings.notification)
+              }
+              text={settings.notification ? 'Aktiviert' : 'Deaktiviert'}
+              fill={settings.notification ? 'solid' : 'outline'}
             />
           </IonItem>
 
           <IonItem>
             <IonLabel>Dunkelmodus</IonLabel>
             <IonToggle
-              checked={darkMode}
-              onIonChange={(e) => setDarkMode(e.detail.checked)}
+              checked={settings.darkMode}
+              onIonChange={(e) => updateSetting('darkMode', e.detail.checked)}
             />
           </IonItem>
         </IonList>
-        <Button handleEvent={handleSave} text={'Speichern'} />
+        <Button handleEvent={saveSettings} text={'Speichern'} />
         <Button
           handleEvent={resetData}
           text={'Daten zurücksetzen'}
           color={'danger'}
         />
         <Button
-          handleEvent={handleForgotPassword}
+          handleEvent={forgotPassword}
           text={'Passwort ändern?'}
           color={'medium'}
           fill={'clear'}
