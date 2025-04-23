@@ -7,11 +7,14 @@ import {
   IonPage,
   IonToggle,
   useIonAlert,
+  useIonRouter,
 } from '@ionic/react';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import FormField from '@/components/Form/FormField';
 import { Routes } from '@/routes';
+import { getDataSource } from '@/db/data-source';
+import { useQueryClient } from '@tanstack/react-query';
 
 const SettingsPage: React.FC = () => {
   const [name, setName] = useState('Gabriele');
@@ -20,6 +23,8 @@ const SettingsPage: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
 
   const [presentAlert] = useIonAlert();
+  const router = useIonRouter();
+  const queryClient = useQueryClient();
 
   const handleSave = () => {
     // Save settings logic would go here
@@ -31,21 +36,56 @@ const SettingsPage: React.FC = () => {
     });
   };
 
-  const resetData = () => {
+  const resetData = async () => {
     presentAlert({
       header: 'Daten zurücksetzen',
       message:
-        'Möchten Sie wirklich alle Daten und Einstellungen zurücksetzen?',
+        'Möchten Sie wirklich alle Daten und Einstellungen zurücksetzen? Dies kann nicht rückgängig gemacht werden.',
       buttons: [
         { text: 'Abbrechen', role: 'cancel' },
         {
           text: 'Zurücksetzen',
           role: 'destructive',
-          handler: () => {
-            setName('');
-            setNotification(false);
-            setLanguage('de');
-            setDarkMode(false);
+          handler: async () => {
+            try {
+              setName('');
+              setNotification(false);
+              setLanguage('de');
+              setDarkMode(false);
+
+              const dataSource = getDataSource();
+              await dataSource.transaction(async (transactionManager) => {
+                await transactionManager.query('DELETE FROM grade');
+                await transactionManager.query('DELETE FROM exam');
+                await transactionManager.query('DELETE FROM subject');
+                await transactionManager.query('DELETE FROM school');
+              });
+              await queryClient.invalidateQueries({ queryKey: ['grades'] });
+              await queryClient.invalidateQueries({ queryKey: ['exams'] });
+              await queryClient.invalidateQueries({ queryKey: ['subjects'] });
+              await queryClient.invalidateQueries({ queryKey: ['schools'] });
+
+              presentAlert({
+                header: 'Erfolgreich zurückgesetzt',
+                message: 'Alle Daten wurden erfolgreich gelöscht.',
+                buttons: [
+                  {
+                    text: 'OK',
+                    handler: () => {
+                      router.push(Routes.HOME, 'back');
+                    },
+                  },
+                ],
+              });
+            } catch (error) {
+              console.error('Error resetting data:', error);
+              presentAlert({
+                header: 'Fehler',
+                message:
+                  'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten.',
+                buttons: ['OK'],
+              });
+            }
           },
         },
       ],
