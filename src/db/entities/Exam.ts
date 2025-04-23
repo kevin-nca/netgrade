@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { Subject } from './Subject';
 import { Grade } from './Grade';
@@ -27,17 +27,13 @@ export class Exam extends BaseEntity {
   @Column({ type: 'uuid' })
   subjectId!: string;
 
-  @ManyToOne(() => Subject, (subject) => subject.exams, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Subject, (subject) => subject.exams, {
+    onDelete: 'CASCADE',
+    eager: true
+  })
   @JoinColumn({ name: 'subjectId' })
   subject!: Subject;
 
-  @Column({ type: 'uuid', nullable: true })
-  gradeId!: string | null;
-
-  @OneToOne(() => Grade, (grade) => grade.exam, {
-    nullable: true,
-    onDelete: 'SET NULL',
-  })
-  @JoinColumn({ name: 'gradeId' })
-  grade!: Grade | null;
+  @OneToMany(() => Grade, (grade) => grade.exam)
+  grades!: Grade[];
 }

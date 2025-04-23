@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { Exam } from './Exam';
 import { dateTransformer } from '../utils';
@@ -20,8 +20,12 @@ export class Grade extends BaseEntity {
   })
   date!: Date;
 
-  @OneToOne(() => Exam, (exam) => exam.grade, {
+  @Column({ type: 'uuid' })
+  examId!: string;
+
+  @ManyToOne(() => Exam, (exam) => exam.grades, {
     nullable: false,
+    eager: true
   })
   @JoinColumn({ name: 'examId' })
   exam!: Exam;

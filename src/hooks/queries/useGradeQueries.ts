@@ -17,7 +17,9 @@ export const gradeKeys = {
 export const useGrades = () => {
   return useQuery({
     queryKey: gradeKeys.lists(),
-    queryFn: () => GradeService.fetchAll(),
+    queryFn: () => {
+      return GradeService.fetchAll();
+    },
   });
 };
 

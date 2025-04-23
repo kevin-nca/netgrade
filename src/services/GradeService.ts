@@ -19,7 +19,16 @@ export class GradeService {
   static async fetchAll(): Promise<Grade[]> {
     try {
       const { grade: gradeRepo } = getRepositories();
-      return await gradeRepo.find({ relations: ['exam'] });
+      return await gradeRepo.find({
+        relations: {
+          exam: {
+            subject: true
+          }
+        },
+        order: {
+          date: 'DESC'
+        }
+      });
     } catch (error) {
       console.error('Failed to fetch grades:', error);
       throw error;
@@ -62,7 +71,11 @@ export class GradeService {
         // Fetch the grade with its exam relationship
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
-          relations: ['exam'],
+          relations: {
+            exam: {
+              subject: true
+            }
+          }
         });
 
         if (!finalGrade) {
@@ -95,7 +108,11 @@ export class GradeService {
       // First, find the existing grade
       const existingGrade = await gradeRepo.findOne({
         where: { id: updatedGradeData.id },
-        relations: ['exam'],
+        relations: {
+          exam: {
+            subject: true
+          }
+        }
       });
 
       if (!existingGrade) {
@@ -146,7 +163,11 @@ export class GradeService {
       const { grade: gradeRepo } = getRepositories();
       return await gradeRepo.findOne({
         where: { id },
-        relations: ['exam'],
+        relations: {
+          exam: {
+            subject: true
+          }
+        }
       });
     } catch (error) {
       console.error(`Failed to find grade with ID ${id}:`, error);
@@ -164,7 +185,11 @@ export class GradeService {
       const { grade: gradeRepo } = getRepositories();
       return await gradeRepo.find({
         where: { exam: { id: examId } },
-        relations: ['exam'],
+        relations: {
+          exam: {
+            subject: true
+          }
+        }
       });
     } catch (error) {
       console.error(`Failed to find grades for exam ID ${examId}:`, error);
@@ -206,7 +231,11 @@ export class GradeService {
         // Find the existing grade
         const existingGrade = await transactionManager.findOne(Grade, {
           where: { id: gradeData.id },
-          relations: ['exam'],
+          relations: {
+            exam: {
+              subject: true
+            }
+          }
         });
 
         if (!existingGrade) {
@@ -225,7 +254,11 @@ export class GradeService {
         // Fetch the updated grade with its exam relationship
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
-          relations: ['exam'],
+          relations: {
+            exam: {
+              subject: true
+            }
+          }
         });
 
         if (!finalGrade) {
