@@ -7,23 +7,26 @@ import {
   IonPage,
   IonToggle,
   useIonAlert,
+  useIonRouter,
 } from '@ionic/react';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import FormField from '@/components/Form/FormField';
 import { Routes } from '@/routes';
+import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 
 const SettingsPage: React.FC = () => {
-  const [name, setName] = useState('Gabriele');
+  const [name, setName] = useState('');
   const [notification, setNotification] = useState(false);
   const [language, setLanguage] = useState('de');
   const [darkMode, setDarkMode] = useState(false);
 
   const [presentAlert] = useIonAlert();
+  const router = useIonRouter();
+
+  const resetAllDataMutation = useResetAllDataMutation();
 
   const handleSave = () => {
-    // Save settings logic would go here
-    // For now, we just show a success message
     presentAlert({
       header: 'Einstellungen gespeichert',
       message: 'Ihre Einstellungen wurden erfolgreich gespeichert.',
@@ -31,21 +34,46 @@ const SettingsPage: React.FC = () => {
     });
   };
 
-  const resetData = () => {
+  const resetData = async () => {
     presentAlert({
       header: 'Daten zurücksetzen',
       message:
-        'Möchten Sie wirklich alle Daten und Einstellungen zurücksetzen?',
+        'Möchten Sie wirklich alle Daten und Einstellungen zurücksetzen? Dies kann nicht rückgängig gemacht werden.',
       buttons: [
         { text: 'Abbrechen', role: 'cancel' },
         {
           text: 'Zurücksetzen',
           role: 'destructive',
-          handler: () => {
-            setName('');
-            setNotification(false);
-            setLanguage('de');
-            setDarkMode(false);
+          handler: async () => {
+            try {
+              await resetAllDataMutation.mutateAsync();
+
+              setName('');
+              setNotification(false);
+              setLanguage('de');
+              setDarkMode(false);
+
+              presentAlert({
+                header: 'Erfolgreich zurückgesetzt',
+                message: 'Alle Daten wurden erfolgreich gelöscht.',
+                buttons: [
+                  {
+                    text: 'OK',
+                    handler: () => {
+                      router.push(Routes.HOME, 'back');
+                    },
+                  },
+                ],
+              });
+            } catch (error) {
+              console.error('Error resetting data:', error);
+              presentAlert({
+                header: 'Fehler',
+                message:
+                  'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten.',
+                buttons: ['OK'],
+              });
+            }
           },
         },
       ],
