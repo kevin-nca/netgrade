@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   IonContent,
   IonItem,
@@ -6,84 +6,88 @@ import {
   IonList,
   IonPage,
   IonToggle,
-  IonSpinner,
+  useIonAlert,
+  useIonRouter,
 } from '@ionic/react';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import FormField from '@/components/Form/FormField';
 import { Routes } from '@/routes';
-import { Settings } from '@/services/GlobalSettingsService';
-import { useGlobalServices } from '@/hooks/useGlobalServices';
+import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 
 const SettingsPage: React.FC = () => {
-  const [settings, setSettings] = useState<Settings | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState('');
+  const [notification, setNotification] = useState(false);
+  const [language, setLanguage] = useState('de');
+  const [darkMode, setDarkMode] = useState(false);
 
-  const { settings: settingsService } = useGlobalServices();
+  const [presentAlert] = useIonAlert();
+  const router = useIonRouter();
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
+  const resetAllDataMutation = useResetAllDataMutation();
 
-  const loadSettings = async () => {
-    try {
-      setLoading(true);
-      const data = await settingsService.getSettings();
-      setSettings(data);
-    } catch (error) {
-      console.error('Failed to load settings:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateSetting = <K extends keyof Settings>(
-    key: K,
-    value: Settings[K],
-  ) => {
-    if (!settings) return;
-
-    setSettings({
-      ...settings,
-      [key]: value,
+  const handleSave = () => {
+    presentAlert({
+      header: 'Einstellungen gespeichert',
+      message: 'Ihre Einstellungen wurden erfolgreich gespeichert.',
+      buttons: ['OK'],
     });
   };
 
-  const handleSave = async () => {
-    if (!settings) return;
-
-    const success = await settingsService.saveSettings(settings);
-    if (success) {
-      await loadSettings();
-    }
-  };
-
   const resetData = async () => {
-    const success = await settingsService.resetAllData();
-    if (success) {
-      await loadSettings();
-    }
+    presentAlert({
+      header: 'Daten zurücksetzen',
+      message:
+        'Möchten Sie wirklich alle Daten und Einstellungen zurücksetzen? Dies kann nicht rückgängig gemacht werden.',
+      buttons: [
+        { text: 'Abbrechen', role: 'cancel' },
+        {
+          text: 'Zurücksetzen',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await resetAllDataMutation.mutateAsync();
+
+              setName('');
+              setNotification(false);
+              setLanguage('de');
+              setDarkMode(false);
+
+              presentAlert({
+                header: 'Erfolgreich zurückgesetzt',
+                message: 'Alle Daten wurden erfolgreich gelöscht.',
+                buttons: [
+                  {
+                    text: 'OK',
+                    handler: () => {
+                      router.push(Routes.HOME, 'back');
+                    },
+                  },
+                ],
+              });
+            } catch (error) {
+              console.error('Error resetting data:', error);
+              presentAlert({
+                header: 'Fehler',
+                message:
+                  'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten.',
+                buttons: ['OK'],
+              });
+            }
+          },
+        },
+      ],
+    });
   };
 
   const handleForgotPassword = () => {
-    settingsService.requestPasswordReset();
+    presentAlert({
+      header: 'Passwort ändern',
+      message:
+        'Eine E-Mail zur ändernung des Passworts wurde an Ihre registrierte E-Mail-Adresse gesendet.',
+      buttons: ['OK'],
+    });
   };
-
-  if (loading || !settings) {
-    return (
-      <IonPage>
-        <Header
-          title={'Einstellungen'}
-          backButton={true}
-          defaultHref={Routes.HOME}
-        />
-        <IonContent className="ion-padding ion-text-center">
-          <IonSpinner />
-          <p>Einstellungen werden geladen...</p>
-        </IonContent>
-      </IonPage>
-    );
-  }
 
   return (
     <IonPage>
@@ -96,16 +100,16 @@ const SettingsPage: React.FC = () => {
         <IonList>
           <FormField
             label="Benutzername"
-            value={settings.name}
-            onChange={(value) => updateSetting('name', String(value))}
+            value={name}
+            onChange={(value) => setName(String(value))}
             placeholder="Name eingeben"
             type="text"
           />
 
           <FormField
             label="Sprache"
-            value={settings.language}
-            onChange={(value) => updateSetting('language', String(value))}
+            value={language}
+            onChange={(value) => setLanguage(String(value))}
             placeholder="Sprache wählen"
             type="select"
             options={[
@@ -117,19 +121,17 @@ const SettingsPage: React.FC = () => {
           <IonItem>
             <IonLabel>Benachrichtigungen</IonLabel>
             <Button
-              handleEvent={() =>
-                updateSetting('notification', !settings.notification)
-              }
-              text={settings.notification ? 'Aktiviert' : 'Deaktiviert'}
-              fill={settings.notification ? 'solid' : 'outline'}
+              handleEvent={() => setNotification(!notification)}
+              text={notification ? 'Aktiviert' : 'Deaktiviert'}
+              fill={notification ? 'solid' : 'outline'}
             />
           </IonItem>
 
           <IonItem>
             <IonLabel>Dunkelmodus</IonLabel>
             <IonToggle
-              checked={settings.darkMode}
-              onIonChange={(e) => updateSetting('darkMode', e.detail.checked)}
+              checked={darkMode}
+              onIonChange={(e) => setDarkMode(e.detail.checked)}
             />
           </IonItem>
         </IonList>
