@@ -7,65 +7,47 @@ import {
   IonTitle,
   IonButtons,
   IonBackButton,
-  IonFooter,
-  IonButton,
   IonRefresher,
   IonRefresherContent,
-  IonSegment,
-  IonSegmentButton,
-  IonLabel,
   useIonAlert,
   useIonRouter,
+  useIonToast,
   RefresherEventDetail,
 } from '@ionic/react';
 import { Routes } from '@/routes';
 
-import ProfileTab from '@/components/Settings/ProfileTab';
-import SchoolsTab from '@/components/Settings/SchoolsTab';
-import AdvancedTab from '@/components/Settings/AdvancedTab';
-import AddSchoolModal from '@/components/Settings/AddSchoolModal';
-import IOSToast from '@/components/UI/IOSToast';
-import { useSettings } from '@/hooks/useSettings';
-import { useSchools, useAddSchool, useDeleteSchool } from '@/hooks/queries';
+import SchoolsTab from '@/pages/home/settings/components/SchoolsTab';
+import AdvancedTab from '@/pages/home/settings/components/AdvancedTab';
+import AddSchoolModal from '@/pages/home/settings/components/AddSchoolModal';
+import { useSchools, useAddSchool } from '@/hooks/queries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
-
-type SettingsTab = 'profile' | 'schools' | 'advanced';
+import { DialogService } from '@/services/DialogService';
 
 const SettingsPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
+  const [present] = useIonToast();
 
-  const {
-    settings,
-    updateSettings,
-    saveSettings,
-    resetSettings,
-    toastState,
-    showToast,
-  } = useSettings();
-  const {
-    data: schools = [],
-    error: schoolsError,
-    isLoading,
-    refetch,
-  } = useSchools();
+  const showToast = (message: string, isSuccess: boolean = true) => {
+    present({
+      message,
+      duration: 2000,
+      position: 'bottom',
+      color: isSuccess ? 'success' : 'danger',
+      buttons: [{ text: 'OK', role: 'cancel' }],
+    });
+  };
+
+  const { data: schools = [], refetch } = useSchools();
   const addSchoolMutation = useAddSchool();
-  const deleteSchoolMutation = useDeleteSchool();
   const resetAllDataMutation = useResetAllDataMutation();
 
   const [presentAlert] = useIonAlert();
   const router = useIonRouter();
 
-  const handleAddSchool = (schoolData: {
-    name: string;
-    type: string;
-    address: string;
-  }) => {
+  const handleAddSchool = (schoolData: { name: string }) => {
     addSchoolMutation.mutate(
       {
         name: schoolData.name.trim(),
-        type: schoolData.type?.trim() || undefined,
-        address: schoolData.address?.trim() || undefined,
       },
       {
         onSuccess: () => {
@@ -83,64 +65,25 @@ const SettingsPage: React.FC = () => {
     );
   };
 
-  const handleDeleteSchool = (schoolId: string) => {
-    presentAlert({
-      header: 'Schule löschen',
-      message: 'Möchten Sie diese Schule wirklich löschen?',
-      buttons: [
-        { text: 'Abbrechen', role: 'cancel' },
-        {
-          text: 'Löschen',
-          role: 'destructive',
-          handler: () => {
-            deleteSchoolMutation.mutate(schoolId, {
-              onSuccess: () => {
-                showToast('Schule erfolgreich gelöscht');
-                refetch();
-              },
-              onError: (error) => {
-                showToast(
-                  `Fehler: ${error instanceof Error ? error.message : String(error)}`,
-                  false,
-                );
-              },
-            });
-          },
-        },
-      ],
-    });
-  };
-
   const handleResetData = () => {
-    presentAlert({
-      header: 'Daten zurücksetzen',
-      message:
-        'Möchten Sie wirklich alle Daten zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.',
-      buttons: [
-        { text: 'Abbrechen', role: 'cancel' },
-        {
-          text: 'Zurücksetzen',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              await resetAllDataMutation.mutateAsync();
-              resetSettings();
-              showToast('Alle Daten wurden erfolgreich zurückgesetzt');
+    const performReset = async () => {
+      try {
+        await resetAllDataMutation.mutateAsync();
+        showToast('Alle Daten wurden erfolgreich zurückgesetzt');
 
-              setTimeout(() => {
-                router.push(Routes.HOME, 'root');
-              }, 1500);
-            } catch (error) {
-              console.error('Error resetting data:', error);
-              showToast(
-                'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten',
-                false,
-              );
-            }
-          },
-        },
-      ],
-    });
+        setTimeout(() => {
+          router.push(Routes.HOME, 'root');
+        }, 1500);
+      } catch (error) {
+        console.error('Error resetting data:', error);
+        showToast(
+          'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten',
+          false,
+        );
+      }
+    };
+    const alertOptions = DialogService.getResetDataConfirmation(performReset);
+    presentAlert(alertOptions);
   };
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
@@ -152,85 +95,33 @@ const SettingsPage: React.FC = () => {
   };
 
   return (
-    <IonPage className="ios-settings-page">
-      <IonHeader className="ion-no-border">
+    <IonPage>
+      <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
             <IonBackButton defaultHref={Routes.HOME} text="" />
           </IonButtons>
           <IonTitle>Einstellungen</IonTitle>
         </IonToolbar>
-        <IonToolbar className="segment-toolbar">
-          <div className="segment-container">
-            <IonSegment
-              value={activeTab}
-              onIonChange={(e) => setActiveTab(e.detail.value as SettingsTab)}
-              mode="ios"
-              className="custom-segment"
-            >
-              <IonSegmentButton value="profile" mode="ios">
-                <IonLabel>Profil</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="schools" mode="ios">
-                <IonLabel>Schulen</IonLabel>
-              </IonSegmentButton>
-              <IonSegmentButton value="advanced" mode="ios">
-                <IonLabel>Erweitert</IonLabel>
-              </IonSegmentButton>
-            </IonSegment>
-          </div>
-        </IonToolbar>
       </IonHeader>
 
-      <IonContent className="settings-content">
+      <IonContent>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
 
-        {activeTab === 'profile' && (
-          <ProfileTab settings={settings} onUpdate={updateSettings} />
-        )}
+        <SchoolsTab
+          schools={schools}
+          onAddSchool={() => setShowAddSchoolModal(true)}
+        />
 
-        {activeTab === 'schools' && (
-          <SchoolsTab
-            schools={schools}
-            isLoading={isLoading}
-            error={schoolsError}
-            onAddSchool={() => setShowAddSchoolModal(true)}
-            onDeleteSchool={handleDeleteSchool}
-          />
-        )}
-
-        {activeTab === 'advanced' && (
-          <AdvancedTab onSave={saveSettings} onReset={handleResetData} />
-        )}
+        <AdvancedTab onReset={handleResetData} />
       </IonContent>
-
-      {activeTab === 'profile' && (
-        <IonFooter className="ios-footer">
-          <IonToolbar>
-            <IonButton
-              expand="block"
-              onClick={saveSettings}
-              className="ios-button save-button"
-            >
-              Einstellungen speichern
-            </IonButton>
-          </IonToolbar>
-        </IonFooter>
-      )}
 
       <AddSchoolModal
         isOpen={showAddSchoolModal}
         onDismiss={() => setShowAddSchoolModal(false)}
         onSubmit={handleAddSchool}
-      />
-
-      <IOSToast
-        message={toastState.message}
-        isVisible={toastState.show}
-        onDismiss={() => showToast('', true)}
-        type={toastState.type}
       />
     </IonPage>
   );
