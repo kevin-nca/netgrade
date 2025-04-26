@@ -72,3 +72,4 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APP_IDENTIFIER: ${{ secrets.APP_IDENTIFIER }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
+          RELEASE_NOTES: ${{ github.event.release.body }}
