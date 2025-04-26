@@ -76,3 +76,70 @@ platform :ios do
     )
   end
 end
+
+platform :android do
+  desc "Build & upload Android app to Google Play Store"
+  lane :release do |options|
+    version = options[:version]
+    original_build_part = version.split("-").last
+    version_without_build = version.split("-").first
+
+    # Ensure build number is numeric for Google Play
+    # If it contains non-numeric characters (like alpha4), convert to a timestamp
+    if original_build_part && original_build_part.match(/[^0-9]/)
+      # Use current timestamp as numeric build number
+      build_number = Time.now.strftime("%Y%m%d%H%M").to_i
+      puts "Non-numeric build identifier detected: '#{original_build_part}'. Using timestamp as build number: #{build_number}"
+    else
+      build_number = original_build_part.to_i || 1
+      puts "Using numeric build number: #{build_number}"
+    end
+
+    puts "Version info: Marketing version = #{version_without_build}, Build number = #{build_number}"
+
+    # Build web assets & sync
+    Dir.chdir("..") do
+      sh("npm install")
+      sh("npm run build")
+      sh("bundle exec npx cap sync android")
+    end
+
+    # Update version and build number in build.gradle
+    android_set_version_name(
+      version_name: version_without_build,
+      gradle_file: "android/app/build.gradle"
+    )
+    android_set_version_code(
+      version_code: build_number,
+      gradle_file: "android/app/build.gradle"
+    )
+
+    # Build AAB (Android App Bundle)
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+
+    # Get changelog from environment variable set by GitHub Actions
+    # Provide a default message if the variable isn't set
+    release_notes_changelog = ENV['RELEASE_NOTES'] || "Build #{version} - No detailed release notes provided."
+
+    # Upload to Google Play
+    upload_to_play_store(
+      package_name: ENV["ANDROID_PACKAGE_NAME"],
+      json_key: ENV["GOOGLE_PLAY_JSON_KEY_FILE"],
+      aab: "android/app/build/outputs/bundle/release/app-release.aab",
+      track: "internal", # Can be 'internal', 'alpha', 'beta', 'production'
+      release_status: "completed",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      version_name: version_without_build,
+      version_code: build_number,
+      release_notes: {
+        'de-CH' => release_notes_changelog
+      }
+    )
+  end
+end

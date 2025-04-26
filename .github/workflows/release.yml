@@ -6,7 +6,8 @@ on:
     # Runs when you publish a release in GitHub
 
 jobs:
-  build-and-upload:
+  build-and-upload-ios:
+    name: Build and Upload iOS
     runs-on: macos-latest
 
     steps:
@@ -63,7 +64,7 @@ jobs:
 
       - name: Build and Upload to TestFlight
         run: |
-          echo "Building with version: ${{ steps.version.outputs.version }}"
+          echo "Building iOS with version: ${{ steps.version.outputs.version }}"
           bundle exec fastlane ios release version:${{ steps.version.outputs.version }}
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
@@ -72,4 +73,51 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APP_IDENTIFIER: ${{ secrets.APP_IDENTIFIER }}
           TEAM_ID: ${{ secrets.TEAM_ID }}
+          RELEASE_NOTES: ${{ github.event.release.body }}
+
+  build-and-upload-android:
+    name: Build and Upload Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install Dependencies
+        run: |
+          gem install bundler
+          bundle config set path 'vendor/bundle'
+          bundle install
+
+      - name: Extract Version from Tag
+        id: version
+        run: |
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          VERSION="${TAG_NAME#v}"  # strips leading 'v' if any
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Setup Google Play Key
+        run: |
+          echo "$GOOGLE_PLAY_JSON_KEY" > google-play-key.json
+        env:
+          GOOGLE_PLAY_JSON_KEY: ${{ secrets.GOOGLE_PLAY_JSON_KEY }}
+
+      - name: Build and Upload to Google Play
+        run: |
+          echo "Building Android with version: ${{ steps.version.outputs.version }}"
+          bundle exec fastlane android release version:${{ steps.version.outputs.version }}
+        env:
+          ANDROID_PACKAGE_NAME: ${{ secrets.ANDROID_PACKAGE_NAME }}
+          GOOGLE_PLAY_JSON_KEY_FILE: './google-play-key.json'
           RELEASE_NOTES: ${{ github.event.release.body }}
