@@ -9,13 +9,20 @@ import { setupIonicReact } from '@ionic/react';
 
 import App from './App';
 import { initializeDatabase } from '@/db/data-source';
+import { AppInfoService } from '@/services/AppInfoService';
 
 setupIonicReact();
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
+const appInfoService = AppInfoService.getInstance();
 
-initializeDatabase()
+appInfoService
+  .initialize()
+  .then(() => {
+    console.log('AppInfoService initialized successfully.');
+    return initializeDatabase();
+  })
   .then(() => {
     console.log('Database initialized successfully.');
     root.render(
