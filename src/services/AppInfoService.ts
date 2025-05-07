@@ -59,9 +59,16 @@ export class AppInfoService {
     const version = this.appInfo.version;
     const build = this.appInfo.build;
 
-    if (isNative && deviceId && platform && version && build) {
-      return `${deviceId}-${platform}-${version}-${build}`;
+    if (isNative) {
+      if (deviceId && platform && version && build) {
+        return `${deviceId}-${platform}-${version}-${build}`;
+      } else {
+        throw new Error(
+          'Missing required native info to build app instance ID',
+        );
+      }
     }
+
     return `web-${Date.now()}`;
   }
 }
