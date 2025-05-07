@@ -21,7 +21,6 @@ import AdvancedTab from '@/pages/home/settings/components/AdvancedTab';
 import AddSchoolModal from '@/pages/home/settings/components/AddSchoolModal';
 import { useSchools, useAddSchool } from '@/hooks/queries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
-import { DialogService } from '@/services/DialogService';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -82,7 +81,24 @@ const SettingsPage: React.FC = () => {
         );
       }
     };
-    const alertOptions = DialogService.getResetDataConfirmation(performReset);
+
+    const alertOptions = {
+      header: 'Daten zurücksetzen',
+      message:
+        'Möchten Sie wirklich alle Daten zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.',
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+        },
+        {
+          text: 'Zurücksetzen',
+          role: 'destructive',
+          handler: performReset,
+        },
+      ],
+    };
+
     presentAlert(alertOptions);
   };
 
