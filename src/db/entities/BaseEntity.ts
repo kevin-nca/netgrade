@@ -27,18 +27,16 @@ export abstract class BaseEntity {
   appInstanceId!: string;
 
   @BeforeInsert()
-  async setCreationDefaults(): Promise<void> {
-    this.appInstanceId = await this.generateAppInstanceId();
+  setCreationDefaults(): void {
+    this.appInstanceId = this.generateAppInstanceId();
   }
 
   @BeforeUpdate()
-  async updateDefaults(): Promise<void> {
-    this.appInstanceId = await this.generateAppInstanceId();
+  updateDefaults(): void {
+    this.appInstanceId = this.generateAppInstanceId();
   }
 
-  private async generateAppInstanceId(): Promise<string> {
-    const service = AppInfoService.getInstance();
-    await service.initialize();
-    return service.getAppInstanceId();
+  private generateAppInstanceId(): string {
+    return AppInfoService.getInstance().getAppInstanceId();
   }
 }
