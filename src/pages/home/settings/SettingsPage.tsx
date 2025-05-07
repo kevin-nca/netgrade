@@ -1,153 +1,144 @@
 import React, { useState } from 'react';
 import {
   IonContent,
-  IonItem,
-  IonLabel,
-  IonList,
   IonPage,
-  IonToggle,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonBackButton,
+  IonRefresher,
+  IonRefresherContent,
   useIonAlert,
   useIonRouter,
+  useIonToast,
+  RefresherEventDetail,
 } from '@ionic/react';
-import Button from '@/components/Button/Button';
-import Header from '@/components/Header/Header';
-import FormField from '@/components/Form/FormField';
 import { Routes } from '@/routes';
+
+import SchoolsTab from '@/pages/home/settings/components/SchoolsTab';
+import AdvancedTab from '@/pages/home/settings/components/AdvancedTab';
+import AddSchoolModal from '@/pages/home/settings/components/AddSchoolModal';
+import { useSchools, useAddSchool } from '@/hooks/queries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 
 const SettingsPage: React.FC = () => {
-  const [name, setName] = useState('');
-  const [notification, setNotification] = useState(false);
-  const [language, setLanguage] = useState('de');
-  const [darkMode, setDarkMode] = useState(false);
+  const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
+  const [present] = useIonToast();
+
+  const showToast = (message: string, isSuccess: boolean = true) => {
+    present({
+      message,
+      duration: 2000,
+      position: 'bottom',
+      color: isSuccess ? 'success' : 'danger',
+      buttons: [{ text: 'OK', role: 'cancel' }],
+    });
+  };
+
+  const { data: schools = [], refetch } = useSchools();
+  const addSchoolMutation = useAddSchool();
+  const resetAllDataMutation = useResetAllDataMutation();
 
   const [presentAlert] = useIonAlert();
   const router = useIonRouter();
 
-  const resetAllDataMutation = useResetAllDataMutation();
-
-  const handleSave = () => {
-    presentAlert({
-      header: 'Einstellungen gespeichert',
-      message: 'Ihre Einstellungen wurden erfolgreich gespeichert.',
-      buttons: ['OK'],
-    });
+  const handleAddSchool = (schoolData: { name: string }) => {
+    addSchoolMutation.mutate(
+      {
+        name: schoolData.name.trim(),
+      },
+      {
+        onSuccess: () => {
+          setShowAddSchoolModal(false);
+          showToast('Schule erfolgreich hinzugefügt');
+          refetch();
+        },
+        onError: (error) => {
+          showToast(
+            `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+            false,
+          );
+        },
+      },
+    );
   };
 
-  const resetData = async () => {
-    presentAlert({
+  const handleResetData = () => {
+    const performReset = async () => {
+      try {
+        await resetAllDataMutation.mutateAsync();
+        showToast('Alle Daten wurden erfolgreich zurückgesetzt');
+
+        setTimeout(() => {
+          router.push(Routes.HOME, 'root');
+        }, 1500);
+      } catch (error) {
+        console.error('Error resetting data:', error);
+        showToast(
+          'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten',
+          false,
+        );
+      }
+    };
+
+    const alertOptions = {
       header: 'Daten zurücksetzen',
       message:
-        'Möchten Sie wirklich alle Daten und Einstellungen zurücksetzen? Dies kann nicht rückgängig gemacht werden.',
+        'Möchten Sie wirklich alle Daten zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.',
       buttons: [
-        { text: 'Abbrechen', role: 'cancel' },
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+        },
         {
           text: 'Zurücksetzen',
           role: 'destructive',
-          handler: async () => {
-            try {
-              await resetAllDataMutation.mutateAsync();
-
-              setName('');
-              setNotification(false);
-              setLanguage('de');
-              setDarkMode(false);
-
-              presentAlert({
-                header: 'Erfolgreich zurückgesetzt',
-                message: 'Alle Daten wurden erfolgreich gelöscht.',
-                buttons: [
-                  {
-                    text: 'OK',
-                    handler: () => {
-                      router.push(Routes.HOME, 'back');
-                    },
-                  },
-                ],
-              });
-            } catch (error) {
-              console.error('Error resetting data:', error);
-              presentAlert({
-                header: 'Fehler',
-                message:
-                  'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten.',
-                buttons: ['OK'],
-              });
-            }
-          },
+          handler: performReset,
         },
       ],
-    });
+    };
+
+    presentAlert(alertOptions);
   };
 
-  const handleForgotPassword = () => {
-    presentAlert({
-      header: 'Passwort ändern',
-      message:
-        'Eine E-Mail zur ändernung des Passworts wurde an Ihre registrierte E-Mail-Adresse gesendet.',
-      buttons: ['OK'],
-    });
+  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
+    try {
+      await refetch();
+    } finally {
+      event.detail.complete();
+    }
   };
 
   return (
     <IonPage>
-      <Header
-        title={'Einstellungen'}
-        backButton={true}
-        defaultHref={Routes.HOME}
-      />
-      <IonContent fullscreen>
-        <IonList>
-          <FormField
-            label="Benutzername"
-            value={name}
-            onChange={(value) => setName(String(value))}
-            placeholder="Name eingeben"
-            type="text"
-          />
+      <IonHeader>
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref={Routes.HOME} text="" />
+          </IonButtons>
+          <IonTitle>Einstellungen</IonTitle>
+        </IonToolbar>
+      </IonHeader>
 
-          <FormField
-            label="Sprache"
-            value={language}
-            onChange={(value) => setLanguage(String(value))}
-            placeholder="Sprache wählen"
-            type="select"
-            options={[
-              { value: 'de', label: 'Deutsch' },
-              { value: 'en', label: 'Englisch' },
-            ]}
-          />
+      <IonContent>
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
 
-          <IonItem>
-            <IonLabel>Benachrichtigungen</IonLabel>
-            <Button
-              handleEvent={() => setNotification(!notification)}
-              text={notification ? 'Aktiviert' : 'Deaktiviert'}
-              fill={notification ? 'solid' : 'outline'}
-            />
-          </IonItem>
-
-          <IonItem>
-            <IonLabel>Dunkelmodus</IonLabel>
-            <IonToggle
-              checked={darkMode}
-              onIonChange={(e) => setDarkMode(e.detail.checked)}
-            />
-          </IonItem>
-        </IonList>
-        <Button handleEvent={handleSave} text={'Speichern'} />
-        <Button
-          handleEvent={resetData}
-          text={'Daten zurücksetzen'}
-          color={'danger'}
+        <SchoolsTab
+          schools={schools}
+          onAddSchool={() => setShowAddSchoolModal(true)}
         />
-        <Button
-          handleEvent={handleForgotPassword}
-          text={'Passwort ändern?'}
-          color={'medium'}
-          fill={'clear'}
-        />
+
+        <AdvancedTab onReset={handleResetData} />
       </IonContent>
+
+      <AddSchoolModal
+        isOpen={showAddSchoolModal}
+        onDismiss={() => setShowAddSchoolModal(false)}
+        onSubmit={handleAddSchool}
+      />
     </IonPage>
   );
 };
