@@ -5,7 +5,6 @@ import { createRoot } from 'react-dom/client';
 import './theme/theme.css';
 import './theme/variable.css';
 import './theme/ui-elements.css';
-import './theme/ios-settings.css';
 import { setupIonicReact } from '@ionic/react';
 
 import App from './App';
