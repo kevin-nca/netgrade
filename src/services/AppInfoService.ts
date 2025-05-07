@@ -1,6 +1,7 @@
 import { App, AppInfo } from '@capacitor/app';
 import { Device } from '@capacitor/device';
 import type { DeviceInfo, DeviceId } from '@capacitor/device';
+import { Capacitor } from '@capacitor/core';
 
 export class AppInfoService {
   private static instance: AppInfoService;
@@ -26,20 +27,17 @@ export class AppInfoService {
     if (this.isInitialized) return;
     if (this.initializationPromise) return this.initializationPromise;
 
-    this.initializationPromise = (async () => {
-      const appInfo = App.getInfo();
-      const deviceInfo = Device.getInfo();
-      const deviceId = Device.getId();
-
-      this.appInfo = await appInfo;
-      this.deviceInfo = await deviceInfo;
-      this.deviceId = await deviceId;
-
-      this.generatedAppInstanceId = this.buildAppInstanceId();
-      this.isInitialized = true;
-    })();
-
+    this.initializationPromise = this.initializeAsync();
     return this.initializationPromise;
+  }
+
+  private async initializeAsync(): Promise<void> {
+    this.appInfo = await App.getInfo();
+    this.deviceInfo = await Device.getInfo();
+    this.deviceId = await Device.getId();
+
+    this.generatedAppInstanceId = this.buildAppInstanceId();
+    this.isInitialized = true;
   }
 
   public getAppInstanceId(): string {
@@ -50,13 +48,20 @@ export class AppInfoService {
   }
 
   private buildAppInstanceId(): string {
-    const idObject = {
-      deviceId: this.deviceId?.identifier ?? 'unknown-device',
-      platform: this.deviceInfo?.platform ?? 'unknown-platform',
-      version: this.appInfo?.version ?? 'unknown-version',
-      build: this.appInfo?.build ?? 'unknown-build',
-    };
+    if (!this.deviceId || !this.deviceInfo || !this.appInfo) {
+      throw new Error('Missing required info to build app instance ID');
+    }
 
-    return JSON.stringify(idObject);
+    const isNative = Capacitor.isNativePlatform();
+
+    const deviceId = this.deviceId.identifier;
+    const platform = this.deviceInfo.platform;
+    const version = this.appInfo.version;
+    const build = this.appInfo.build;
+
+    if (isNative && deviceId && platform && version && build) {
+      return `${deviceId}-${platform}-${version}-${build}`;
+    }
+    return `web-${Date.now()}`;
   }
 }
