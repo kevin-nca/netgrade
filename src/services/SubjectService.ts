@@ -32,7 +32,6 @@ export class SubjectService {
       const { subject: subjectRepo } = getRepositories();
       const newSubject = subjectRepo.create({
         ...newSubjectData,
-        appInstanceId: null, // This was in the original code, keeping it for consistency
       });
       return await subjectRepo.save(newSubject);
     } catch (error) {

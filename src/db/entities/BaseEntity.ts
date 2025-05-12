@@ -8,6 +8,8 @@ import {
   VersionColumn,
 } from 'typeorm';
 
+import { AppInfo } from '@/AppInfo';
+
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -21,8 +23,8 @@ export abstract class BaseEntity {
   @VersionColumn()
   version!: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  appInstanceId!: string | null;
+  @Column({ type: 'varchar', length: 255 })
+  appInstanceId!: string;
 
   @BeforeInsert()
   setCreationDefaults(): void {
@@ -35,8 +37,6 @@ export abstract class BaseEntity {
   }
 
   private generateAppInstanceId(): string {
-    // TODO: Use a real appInstanceId that depends on the user's device, the app version, the commit hash, etc.
-    const randomSuffix = Math.random().toString(36).substring(2, 10);
-    return `customId-${randomSuffix}`;
+    return AppInfo.getAppInstanceId();
   }
 }

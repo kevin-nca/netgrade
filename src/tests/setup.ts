@@ -3,6 +3,11 @@ import { ENTITIES } from '@/db/data-source';
 import { Exam, Grade, School, Subject } from '@/db/entities';
 // @ts-expect-error SQL.js is not typed
 import initSqlJs from 'sql.js';
+import { AppInfo } from '@/AppInfo';
+
+beforeAll(async () => {
+  await AppInfo.initialize();
+});
 
 // Initialize a test database using SQL.js in memory
 export const initializeTestDatabase = async (): Promise<DataSource> => {
