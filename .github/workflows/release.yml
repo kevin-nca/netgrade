@@ -7,9 +7,17 @@ on:
 
 jobs:
   build-and-upload:
-    runs-on: macos-latest
+    runs-on: macos-15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.app/Contents/Developer
 
     steps:
+      - name: Select Xcode 16
+        run: sudo xcode-select -s /Applications/Xcode_16.app
+
+      - name: Confirm Xcode Version
+        run: xcodebuild -version
+
       - name: Check out
         uses: actions/checkout@v3
 
@@ -28,7 +36,7 @@ jobs:
         id: version
         run: |
           TAG_NAME="${{ github.event.release.tag_name }}"
-          VERSION="${TAG_NAME#v}"  # strips leading 'v' if any
+          VERSION="${TAG_NAME#v}" # strips leading 'v' if any
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Import Certificate & Profile
@@ -65,6 +73,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
+
       - name: Build and Upload to TestFlight
         run: |
           echo "Building with version: ${{ steps.version.outputs.version }}"
