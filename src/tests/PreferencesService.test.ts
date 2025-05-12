@@ -41,7 +41,7 @@ describe('PreferencesService', () => {
       // Assert
       expect(mockPreferencesSet).toHaveBeenCalledTimes(1);
       expect(mockPreferencesSet).toHaveBeenCalledWith({
-        key: PREFERENCE_KEYS.USER_NAME,
+        key: PREFERENCE_KEYS.userName,
         value: testName,
       });
     });
@@ -71,7 +71,7 @@ describe('PreferencesService', () => {
       expect(result).toBe(testName);
       expect(mockPreferencesGet).toHaveBeenCalledTimes(1);
       expect(mockPreferencesGet).toHaveBeenCalledWith({
-        key: PREFERENCE_KEYS.USER_NAME,
+        key: PREFERENCE_KEYS.userName,
       });
     });
 

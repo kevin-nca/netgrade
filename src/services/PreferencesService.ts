@@ -1,40 +1,62 @@
 import { Preferences } from '@capacitor/preferences';
 
-export const PREFERENCE_KEYS = {
-  USER_NAME: 'user_name',
-} as const;
+export type PreferenceKey = 'user_name';
+
+export interface AppPreferences {
+  userName: string | null;
+}
+
+export const PREFERENCE_KEYS: Record<keyof AppPreferences, PreferenceKey> = {
+  userName: 'user_name',
+};
 
 export class PreferencesService {
   /**
-   * Saves the user's name to Capacitor Preferences
-   * @param name - The user's name to save
-   * @returns Promise<void>
+   * Generic method to save a preference
    */
-  static async saveName(name: string): Promise<void> {
+  private static async setPreference<K extends keyof AppPreferences>(
+    key: K,
+    value: NonNullable<AppPreferences[K]>,
+  ): Promise<void> {
     try {
+      const storageKey = PREFERENCE_KEYS[key];
       await Preferences.set({
-        key: PREFERENCE_KEYS.USER_NAME,
-        value: name,
+        key: storageKey,
+        value: typeof value === 'string' ? value : JSON.stringify(value),
       });
     } catch (error) {
-      console.error('Failed to save user name:', error);
+      console.error(`Failed to save preference ${String(key)}:`, error);
       throw error;
     }
   }
 
   /**
-   * Retrieves the user's name from Capacitor Preferences
-   * @returns Promise<string | null> - A promise that resolves to the user's name or null if not found
+   * Generic method to get a preference
    */
-  static async getName(): Promise<string | null> {
+  private static async getPreference<K extends keyof AppPreferences>(
+    key: K,
+  ): Promise<AppPreferences[K]> {
     try {
-      const { value } = await Preferences.get({
-        key: PREFERENCE_KEYS.USER_NAME,
-      });
-      return value;
+      const storageKey = PREFERENCE_KEYS[key];
+      const { value } = await Preferences.get({ key: storageKey });
+      return value as AppPreferences[K];
     } catch (error) {
-      console.error('Failed to get user name:', error);
+      console.error(`Failed to get preference ${String(key)}:`, error);
       throw error;
     }
+  }
+
+  /**
+   * Saves the user's name to Capacitor Preferences
+   */
+  static async saveName(name: string): Promise<void> {
+    return this.setPreference('userName', name);
+  }
+
+  /**
+   * Retrieves the user's name from Capacitor Preferences
+   */
+  static async getName(): Promise<string | null> {
+    return this.getPreference('userName');
   }
 }
