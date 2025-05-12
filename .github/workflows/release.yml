@@ -3,13 +3,20 @@ name: Release
 on:
   release:
     types: [published]
-    # Runs when you publish a release in GitHub
 
 jobs:
   build-and-upload:
-    runs-on: macos-latest
+    runs-on: macos-15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.app/Contents/Developer
 
     steps:
+      - name: Select Xcode 16
+        run: sudo xcode-select -s /Applications/Xcode_16.app
+
+      - name: Confirm Xcode Version
+        run: xcodebuild -version
+
       - name: Check out
         uses: actions/checkout@v3
 
@@ -28,32 +35,25 @@ jobs:
         id: version
         run: |
           TAG_NAME="${{ github.event.release.tag_name }}"
-          VERSION="${TAG_NAME#v}"  # strips leading 'v' if any
+          VERSION="${TAG_NAME#v}"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Import Certificate & Profile
         run: |
-          # Decode and write files
           echo "$APPLE_DIST_CERT_P12" | base64 --decode > dist.p12
           echo "$IOS_PROVISION_PROFILE" | base64 --decode > app.mobileprovision
 
-          # Create a temporary keychain
           security create-keychain -p "" build.keychain
           security unlock-keychain -p "" build.keychain
           security set-keychain-settings -lut 7200 build.keychain
           security default-keychain -s build.keychain
-
-          # Disable keychain lock timeout to prevent hanging during signing
           security set-keychain-settings -t 3600 -l build.keychain
 
-          # Import the distribution certificate (with private key)
           security import dist.p12 -k build.keychain -P "$APPLE_DIST_CERT_PASS" -T /usr/bin/codesign
 
-          # Add the keychain to the search list and set it to always allow access
           security list-keychains -d user -s build.keychain > /dev/null 2>&1
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain > /dev/null 2>&1
 
-          # Move provisioning profile to the correct location with the expected name
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           cp app.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/netgrade-provisioning.mobileprovision"
         env:
@@ -65,6 +65,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
+
+      - name: Clean and Sync Capacitor Project
+        run: |
+          npm install
+          npm run build
+          npx cap sync ios
+          cd ios/App
+          pod install --repo-update
+
       - name: Build and Upload to TestFlight
         run: |
           echo "Building with version: ${{ steps.version.outputs.version }}"
