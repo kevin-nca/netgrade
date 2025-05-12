@@ -61,6 +61,10 @@ jobs:
           IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
           APPLE_DIST_CERT_PASS: ${{ secrets.APPLE_DIST_CERT_PASS }}
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
       - name: Build and Upload to TestFlight
         run: |
           echo "Building with version: ${{ steps.version.outputs.version }}"
