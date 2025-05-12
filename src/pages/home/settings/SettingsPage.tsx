@@ -18,6 +18,7 @@ import { Routes } from '@/routes';
 
 import SchoolsTab from '@/pages/home/settings/components/SchoolsTab';
 import AdvancedTab from '@/pages/home/settings/components/AdvancedTab';
+import UserTab from '@/pages/home/settings/components/UserTab';
 import AddSchoolModal from '@/pages/home/settings/components/AddSchoolModal';
 import { useSchools, useAddSchool } from '@/hooks/queries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
@@ -125,7 +126,7 @@ const SettingsPage: React.FC = () => {
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
-
+        <UserTab />
         <SchoolsTab
           schools={schools}
           onAddSchool={() => setShowAddSchoolModal(true)}
