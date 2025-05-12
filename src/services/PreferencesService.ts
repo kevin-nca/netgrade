@@ -1,8 +1,10 @@
 import { Preferences } from '@capacitor/preferences';
 
-export class UserService {
-  private static readonly USER_NAME_KEY = 'user_name';
+export const PREFERENCE_KEYS = {
+  USER_NAME: 'user_name',
+} as const;
 
+export class PreferencesService {
   /**
    * Saves the user's name to Capacitor Preferences
    * @param name - The user's name to save
@@ -11,7 +13,7 @@ export class UserService {
   static async saveName(name: string): Promise<void> {
     try {
       await Preferences.set({
-        key: this.USER_NAME_KEY,
+        key: PREFERENCE_KEYS.USER_NAME,
         value: name,
       });
     } catch (error) {
@@ -26,7 +28,7 @@ export class UserService {
    */
   static async getName(): Promise<string | null> {
     try {
-      const { value } = await Preferences.get({ key: this.USER_NAME_KEY });
+      const { value } = await Preferences.get({ key: PREFERENCE_KEYS.USER_NAME });
       return value;
     } catch (error) {
       console.error('Failed to get user name:', error);

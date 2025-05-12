@@ -1,15 +1,16 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { Preferences } from '@capacitor/preferences';
-import { UserService } from '@/services/UserService';
+import { PreferencesService, PREFERENCE_KEYS } from '@/services/PreferencesService';
 
 vi.mock('@capacitor/preferences', () => ({
   Preferences: {
     set: vi.fn(),
     get: vi.fn(),
+    clear: vi.fn(),
   },
 }));
 
-describe('UserService', () => {
+describe('PreferencesService', () => {
   const mockPreferencesSet = Preferences.set as unknown as ReturnType<typeof vi.fn>;
   const mockPreferencesGet = Preferences.get as unknown as ReturnType<typeof vi.fn>;
 
@@ -28,12 +29,12 @@ describe('UserService', () => {
       mockPreferencesSet.mockResolvedValue(undefined);
 
       // Act
-      await UserService.saveName(testName);
+      await PreferencesService.saveName(testName);
 
       // Assert
       expect(mockPreferencesSet).toHaveBeenCalledTimes(1);
       expect(mockPreferencesSet).toHaveBeenCalledWith({
-        key: 'user_name',
+        key: PREFERENCE_KEYS.USER_NAME,
         value: testName,
       });
     });
@@ -44,7 +45,7 @@ describe('UserService', () => {
       mockPreferencesSet.mockRejectedValue(testError);
 
       // Act & Assert
-      await expect(UserService.saveName('Test')).rejects.toThrow();
+      await expect(PreferencesService.saveName('Test')).rejects.toThrow();
 
       // Check that the error is logged
       const consoleSpy = vi.spyOn(console, 'error');
@@ -59,12 +60,12 @@ describe('UserService', () => {
       mockPreferencesGet.mockResolvedValue({ value: testName });
 
       // Act
-      const result = await UserService.getName();
+      const result = await PreferencesService.getName();
 
       // Assert
       expect(result).toBe(testName);
       expect(mockPreferencesGet).toHaveBeenCalledTimes(1);
-      expect(mockPreferencesGet).toHaveBeenCalledWith({ key: 'user_name' });
+      expect(mockPreferencesGet).toHaveBeenCalledWith({ key: PREFERENCE_KEYS.USER_NAME });
     });
 
     it('should return null when no name is stored', async () => {
@@ -72,7 +73,7 @@ describe('UserService', () => {
       mockPreferencesGet.mockResolvedValue({ value: null });
 
       // Act
-      const result = await UserService.getName();
+      const result = await PreferencesService.getName();
 
       // Assert
       expect(result).toBeNull();
@@ -84,7 +85,7 @@ describe('UserService', () => {
       mockPreferencesGet.mockRejectedValue(testError);
 
       // Act & Assert
-      await expect(UserService.getName()).rejects.toThrow();
+      await expect(PreferencesService.getName()).rejects.toThrow();
 
       // Check that the error is logged
       const consoleSpy = vi.spyOn(console, 'error');
