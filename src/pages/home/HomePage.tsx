@@ -18,7 +18,7 @@ import NavigationModal from '@/components/navigation/home/NavigationModal';
 import { add, calendar, settings } from 'ionicons/icons';
 import ExamList from '@/features/exams/ExamList';
 import Button from '@/components/Button/Button';
-import { useSchools, useGrades } from '@/hooks/queries';
+import { useSchools, useGrades, useUserName } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import { Grade } from '@/db/entities';
 
@@ -28,6 +28,7 @@ function HomePage() {
 
   const { data: schools = [] } = useSchools();
   const { data: grades = [] } = useGrades();
+  const { data: userName } = useUserName();
 
   const openSlideUp = () => setShowSlideUp(true);
 
@@ -55,7 +56,9 @@ function HomePage() {
       <IonContent fullscreen>
         <IonCard className="welcome-card">
           <div className="welcome-content">
-            <h2 className="welcome-title">Willkommen, Arlind</h2>
+            <h2 className="welcome-title">
+              Willkommen, {userName || 'Benutzer'}
+            </h2>
             <div className="profile-icon"></div>
           </div>
         </IonCard>
