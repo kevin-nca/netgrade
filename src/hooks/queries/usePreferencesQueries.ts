@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PreferencesService } from '@/services/PreferencesService';
+import { PreferencesService } from '@/services';
 
 export const preferencesKeys = {
   all: ['preferences'] as const,
