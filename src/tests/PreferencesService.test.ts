@@ -1,6 +1,9 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { Preferences } from '@capacitor/preferences';
-import { PreferencesService, PREFERENCE_KEYS } from '@/services/PreferencesService';
+import {
+  PreferencesService,
+  PREFERENCE_KEYS,
+} from '@/services/PreferencesService';
 
 vi.mock('@capacitor/preferences', () => ({
   Preferences: {
@@ -11,8 +14,12 @@ vi.mock('@capacitor/preferences', () => ({
 }));
 
 describe('PreferencesService', () => {
-  const mockPreferencesSet = Preferences.set as unknown as ReturnType<typeof vi.fn>;
-  const mockPreferencesGet = Preferences.get as unknown as ReturnType<typeof vi.fn>;
+  const mockPreferencesSet = Preferences.set as unknown as ReturnType<
+    typeof vi.fn
+  >;
+  const mockPreferencesGet = Preferences.get as unknown as ReturnType<
+    typeof vi.fn
+  >;
 
   beforeAll(() => {
     vi.clearAllMocks();
@@ -63,7 +70,9 @@ describe('PreferencesService', () => {
       // Assert
       expect(result).toBe(testName);
       expect(mockPreferencesGet).toHaveBeenCalledTimes(1);
-      expect(mockPreferencesGet).toHaveBeenCalledWith({ key: PREFERENCE_KEYS.USER_NAME });
+      expect(mockPreferencesGet).toHaveBeenCalledWith({
+        key: PREFERENCE_KEYS.USER_NAME,
+      });
     });
 
     it('should return null when no name is stored', async () => {
