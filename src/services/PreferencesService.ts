@@ -28,7 +28,9 @@ export class PreferencesService {
    */
   static async getName(): Promise<string | null> {
     try {
-      const { value } = await Preferences.get({ key: PREFERENCE_KEYS.USER_NAME });
+      const { value } = await Preferences.get({
+        key: PREFERENCE_KEYS.USER_NAME,
+      });
       return value;
     } catch (error) {
       console.error('Failed to get user name:', error);
