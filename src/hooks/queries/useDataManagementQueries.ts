@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { DataManagementService } from '@/services/DataManagementService';
+import { DataManagementService, ExportOptions } from '@/services/DataManagementService';
 
 export const useResetAllDataMutation = () => {
   const queryClient = useQueryClient();
@@ -13,6 +13,14 @@ export const useResetAllDataMutation = () => {
       await queryClient.invalidateQueries({ queryKey: ['exams'] });
       await queryClient.invalidateQueries({ queryKey: ['subjects'] });
       await queryClient.invalidateQueries({ queryKey: ['schools'] });
+    },
+  });
+};
+
+export const useExportData = () => {
+  return useMutation<string, Error, ExportOptions>({
+    mutationFn: async (options) => {
+      return await DataManagementService.exportData(options);
     },
   });
 };

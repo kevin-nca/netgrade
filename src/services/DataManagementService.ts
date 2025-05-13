@@ -1,6 +1,7 @@
 import { getDataSource, getRepositories } from '@/db/data-source';
+import * as XLSX from 'xlsx';
 
-export type ExportFormat = 'json' | 'csv';
+export type ExportFormat = 'json' | 'csv' | 'xlsx';
 
 export interface ExportOptions {
   format: ExportFormat;
@@ -27,42 +28,53 @@ export class DataManagementService {
   }
   static async exportData(options: ExportOptions): Promise<string> {
     try {
-      const data: Record<string, object[]> = {};
-      const { school, subject, exam, grade } = getRepositories();
+      const data: Record<string, object> = {};
+      const repositories = getRepositories();
 
       if (options.includeSchools) {
-        data.schools = await school.find();
+        data.schools = await repositories.school.find();
       }
-
       if (options.includeSubjects) {
-        data.subjects = await subject.find({
-          relations: ['school'],
-        });
+        data.subjects = await repositories.subject.find();
       }
-
       if (options.includeExams) {
-        data.exams = await exam.find({
-          relations: ['subject'],
-        });
+        data.exams = await repositories.exam.find();
       }
-
       if (options.includeGrades) {
-        data.grades = await grade.find({
-          relations: ['exam'],
-        });
+        data.grades = await repositories.grade.find();
       }
 
       switch (options.format) {
         case 'json':
           return JSON.stringify(data, null, 2);
         case 'csv':
-          return this.convertToCSV(data);
+        case 'xlsx': {
+          const workbook = XLSX.utils.book_new();
+
+          Object.entries(data).forEach(([key, value]) => {
+            if (Array.isArray(value) && value.length > 0) {
+              const worksheet = XLSX.utils.json_to_sheet(value);
+              XLSX.utils.book_append_sheet(workbook, worksheet, key);
+            }
+          });
+
+          if (options.format === 'csv') {
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            return XLSX.utils.sheet_to_csv(firstSheet);
+          } else {
+            const wbout = XLSX.write(workbook, {
+              type: 'base64',
+              bookType: 'xlsx',
+            });
+            return wbout;
+          }
+        }
         default:
           throw new Error(`Unsupported export format: ${options.format}`);
       }
     } catch (error) {
-      console.error('Failed to export data:', error);
-      throw error;
+      console.error('Error exporting data:', error);
+      throw new Error('Failed to export data');
     }
   }
 
