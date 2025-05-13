@@ -4,6 +4,7 @@ import { IonGrid, IonRow, IonCol } from '@ionic/react';
 import SettingsHeader from './SettingsHeader';
 import SettingsGroup from './SettingsGroup';
 import SettingsItem from './SettingsItem';
+
 interface AdvancedTabProps {
   onReset: () => void;
 }
@@ -37,4 +38,3 @@ const AdvancedTab: React.FC<AdvancedTabProps> = ({ onReset }) => {
 };
 
 export default AdvancedTab;
- 
