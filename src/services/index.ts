@@ -4,3 +4,4 @@ export * from './ExamService';
 export * from './GradeService';
 export * from './DataManagementService';
 export * from './PreferencesService';
+export * from './ExportService';
