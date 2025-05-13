@@ -11,7 +11,7 @@ import {
 } from '@ionic/react';
 import { checkmarkCircle, arrowForward } from 'ionicons/icons';
 import FormField from '@/components/Form/FormField';
-import { useSchools, useOnboardingAddSchool } from '@/hooks/queries';
+import { useSchools, useAddSchool } from '@/hooks/queries';
 
 interface SchoolStepProps {
   userName: string;
@@ -34,7 +34,7 @@ export const SchoolStep: React.FC<SchoolStepProps> = ({
     useState(selectedSchoolId);
 
   const { data: schools = [], refetch: refetchSchools } = useSchools();
-  const addSchoolMutation = useOnboardingAddSchool();
+  const addSchoolMutation = useAddSchool();
 
   const handleAddSchool = () => {
     if (!schoolName.trim()) {

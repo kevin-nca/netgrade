@@ -21,11 +21,7 @@ import { NameStep } from './steps/NameStep';
 import { SchoolStep } from './steps/SchoolStep';
 import { SubjectStep } from './steps/SubjectStep';
 
-import {
-  useUserName,
-  useSchools,
-  useCanCompleteOnboarding,
-} from '@/hooks/queries';
+import { useUserName, useSchools } from '@/hooks/queries';
 
 import { Routes } from '@/routes';
 
@@ -45,10 +41,9 @@ const OnboardingPage: React.FC = () => {
   const { data: savedUserName } = useUserName();
   const { data: schools = [] } = useSchools();
 
-  const canCompleteOnboarding = useCanCompleteOnboarding(
-    userName,
-    schools.length,
-  );
+  const canCompleteOnboarding = (): boolean => {
+    return !!userName && userName.trim().length > 0 && schools.length > 0;
+  };
 
   useEffect(() => {
     if (savedUserName) {
@@ -192,7 +187,7 @@ const OnboardingPage: React.FC = () => {
             expand="block"
             color="success"
             onClick={handleCompleteOnboarding}
-            disabled={!canCompleteOnboarding}
+            disabled={!canCompleteOnboarding()}
             className="ion-margin-horizontal"
             size="default"
           >

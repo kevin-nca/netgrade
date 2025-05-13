@@ -10,7 +10,7 @@ import {
 } from '@ionic/react';
 import { arrowForward } from 'ionicons/icons';
 import FormField from '@/components/Form/FormField';
-import { useOnboardingSaveUserName } from '@/hooks/queries';
+import { useSaveUserName } from '@/hooks/queries';
 
 interface NameStepProps {
   initialName: string;
@@ -27,7 +27,7 @@ export const NameStep: React.FC<NameStepProps> = ({
   showMessage,
 }) => {
   const [userName, setUserName] = useState(initialName);
-  const saveUserNameMutation = useOnboardingSaveUserName();
+  const saveUserNameMutation = useSaveUserName();
 
   const handleSaveName = () => {
     if (!userName.trim()) {

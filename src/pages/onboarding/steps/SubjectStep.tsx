@@ -11,7 +11,7 @@ import {
   IonInput,
 } from '@ionic/react';
 import { checkmarkCircle, add } from 'ionicons/icons';
-import { useOnboardingAddSubject, useSchoolSubjects } from '@/hooks/queries';
+import { useAddSubject, useSchoolSubjects } from '@/hooks/queries';
 import { School } from '@/db/entities';
 
 interface SubjectStepProps {
@@ -32,7 +32,7 @@ export const SubjectStep: React.FC<SubjectStepProps> = ({
 
   const { data: subjects = [], refetch: refetchSubjects } =
     useSchoolSubjects(selectedSchoolId);
-  const addSubjectMutation = useOnboardingAddSubject();
+  const addSubjectMutation = useAddSubject();
 
   const selectedSchool = schools.find((s) => s.id === selectedSchoolId);
 

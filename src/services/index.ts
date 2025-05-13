@@ -3,5 +3,4 @@ export * from './SubjectService';
 export * from './ExamService';
 export * from './GradeService';
 export * from './DataManagementService';
-export * from './OnboardingService';
 export * from './PreferencesService';
