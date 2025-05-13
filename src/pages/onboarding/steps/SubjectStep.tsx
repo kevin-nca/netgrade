@@ -11,7 +11,7 @@ import {
   IonInput,
 } from '@ionic/react';
 import { checkmarkCircle, add } from 'ionicons/icons';
-import { useAddSubject, useSchoolSubjects } from '@/hooks/queries';
+import { useAddSubject, useSchoolSubjects } from '@/hooks';
 import { School } from '@/db/entities';
 
 interface SubjectStepProps {

@@ -10,7 +10,7 @@ import {
 } from '@ionic/react';
 import { arrowForward } from 'ionicons/icons';
 import FormField from '@/components/Form/FormField';
-import { useSaveUserName } from '@/hooks/queries';
+import { useSaveUserName } from '@/hooks';
 
 interface NameStepProps {
   initialName: string;

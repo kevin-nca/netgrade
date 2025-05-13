@@ -11,7 +11,7 @@ import {
 } from '@ionic/react';
 import { checkmarkCircle, arrowForward } from 'ionicons/icons';
 import FormField from '@/components/Form/FormField';
-import { useSchools, useAddSchool } from '@/hooks/queries';
+import { useSchools, useAddSchool } from '@/hooks';
 
 interface SchoolStepProps {
   userName: string;
