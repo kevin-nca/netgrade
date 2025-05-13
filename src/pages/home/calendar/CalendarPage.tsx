@@ -11,7 +11,8 @@ import { Routes } from '@/routes';
 
 const CalendarPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const { data: exams = [], error, isLoading } = useExams();
+  const { data: allExams = [], error, isLoading } = useExams();
+  const upcomingExams = allExams.filter((exam) => !exam.isCompleted);
 
   const handleDateChange = (value: Value) => {
     if (value instanceof Date) {
@@ -28,16 +29,20 @@ const CalendarPage: React.FC = () => {
   };
 
   const eventsForSelectedDate = selectedDate
-    ? exams.filter((event: Exam) => isSameDay(event.date, selectedDate))
+    ? upcomingExams.filter((event: Exam) => isSameDay(event.date, selectedDate))
     : [];
 
   const tileClassName = ({ date }: { date: Date }): string => {
-    const hasEvent = exams.some((event: Exam) => isSameDay(event.date, date));
+    const hasEvent = upcomingExams.some((event: Exam) =>
+      isSameDay(event.date, date),
+    );
     return hasEvent ? 'event-day' : '';
   };
 
   const tileContent = ({ date }: { date: Date }): React.ReactNode => {
-    const hasEvent = exams.some((event: Exam) => isSameDay(event.date, date));
+    const hasEvent = upcomingExams.some((event: Exam) =>
+      isSameDay(event.date, date),
+    );
     return hasEvent ? <div className="event-dot"></div> : null;
   };
 
