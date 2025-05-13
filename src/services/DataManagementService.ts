@@ -27,7 +27,7 @@ export class DataManagementService {
   }
   static async exportData(options: ExportOptions): Promise<string> {
     try {
-      const data: Record<string, any> = {};
+      const data: Record<string, object[]> = {};
       const { school, subject, exam, grade } = getRepositories();
 
       if (options.includeSchools) {
@@ -66,7 +66,7 @@ export class DataManagementService {
     }
   }
 
-  private static escapeCSVValue(value: any): string {
+  private static escapeCSVValue(value: string | object): string {
     if (value === null || value === undefined) {
       return '""';
     }
@@ -78,7 +78,7 @@ export class DataManagementService {
     return `"${String(value).replace(/"/g, '""')}"`;
   }
 
-  private static convertToCSV(data: Record<string, any>): string {
+  private static convertToCSV(data: Record<string, object[]>): string {
     const sections: string[] = [];
 
     for (const [dataType, items] of Object.entries(data)) {
