@@ -46,14 +46,16 @@ describe('PreferencesService', () => {
       });
     });
 
-    it('should throw an error when Preferences.set fails', async () => {
+    it('should log error when Preferences.set fails', async () => {
       // Arrange
       const testError = new Error('Test error');
       mockPreferencesSet.mockRejectedValue(testError);
       const consoleSpy = vi.spyOn(console, 'error');
 
-      // Act & Assert
-      await expect(PreferencesService.saveName('Test')).rejects.toThrow();
+      // Act
+      await PreferencesService.saveName('Test');
+
+      // Assert
       expect(consoleSpy).toHaveBeenCalled();
     });
   });
@@ -86,15 +88,59 @@ describe('PreferencesService', () => {
       expect(result).toBeNull();
     });
 
-    it('should throw an error when Preferences.get fails', async () => {
+    it('should return null and log error when Preferences.get fails', async () => {
       // Arrange
       const testError = new Error('Test error');
       mockPreferencesGet.mockRejectedValue(testError);
       const consoleSpy = vi.spyOn(console, 'error');
 
-      // Act & Assert
-      await expect(PreferencesService.getName()).rejects.toThrow();
+      // Act
+      const result = await PreferencesService.getName();
+
+      // Assert
+      expect(result).toBeNull();
       expect(consoleSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('onboarding methods', () => {
+    it('should set onboarding completed status', async () => {
+      // Arrange
+      mockPreferencesSet.mockResolvedValue(undefined);
+
+      // Act
+      await PreferencesService.setOnboardingCompleted(true);
+
+      // Assert
+      expect(mockPreferencesSet).toHaveBeenCalledWith({
+        key: PREFERENCE_KEYS.onboardingCompleted,
+        value: 'true',
+      });
+    });
+
+    it('should get onboarding completed status', async () => {
+      // Arrange
+      mockPreferencesGet.mockResolvedValue({ value: 'true' });
+
+      // Act
+      const result = await PreferencesService.isOnboardingCompleted();
+
+      // Assert
+      expect(result).toBe(true);
+      expect(mockPreferencesGet).toHaveBeenCalledWith({
+        key: PREFERENCE_KEYS.onboardingCompleted,
+      });
+    });
+
+    it('should return false when onboarding status is not set', async () => {
+      // Arrange
+      mockPreferencesGet.mockResolvedValue({ value: null });
+
+      // Act
+      const result = await PreferencesService.isOnboardingCompleted();
+
+      // Assert
+      expect(result).toBe(false);
     });
   });
 });
