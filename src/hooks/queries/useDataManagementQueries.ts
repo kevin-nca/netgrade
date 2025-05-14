@@ -19,7 +19,13 @@ export function useDataManagementQueries() {
   });
 
   const exportDataMutation = useMutation({
-    mutationFn: async ({ school, options }: { school: School; options: ExportOptions }) => {
+    mutationFn: async ({
+      school,
+      options,
+    }: {
+      school: School;
+      options: ExportOptions;
+    }) => {
       return await DataManagementService.exportData(school, options);
     },
   });
