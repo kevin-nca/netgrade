@@ -12,30 +12,26 @@ import AddGradePage from '@/pages/home/grades/AddGradePage';
 import HomePage from '@/pages/home/HomePage';
 import EditExamPage from '@/pages/home/exams/EditExamPage';
 import { Routes } from '@/routes';
-import { PreferencesService } from '@/services/PreferencesService';
+import { useOnboardingCompleted } from '@/hooks/queries';
 
 export function AppRouter() {
-  const [isOnboarded, setIsOnboarded] = useState(false);
+  const { data: isOnboarded } = useOnboardingCompleted();
   const [, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      const status = await PreferencesService.isOnboardingCompleted();
-      setIsOnboarded(status);
+    if (isOnboarded !== undefined) {
       setIsInitialized(true);
-    };
-
-    checkOnboardingStatus();
-  }, []);
+    }
+  }, [isOnboarded]);
 
   return (
     <IonTabs>
       <IonRouterOutlet>
-        {isOnboarded ? (
-          <Redirect exact path={Routes.MAIN} to={Routes.HOME} />
-        ) : (
-          <Redirect exact path={Routes.MAIN} to={Routes.ONBOARDING} />
-        )}
+        <Redirect
+          exact
+          path={Routes.MAIN}
+          to={isOnboarded ? Routes.HOME : Routes.ONBOARDING}
+        />
         <Route exact path={Routes.ONBOARDING} component={OnboardingPage} />
         <Route exact path={Routes.SCHOOL} component={SchoolPage} />
         <Route exact path={Routes.HOME} component={HomePage} />

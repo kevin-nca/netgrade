@@ -1,9 +1,6 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { Preferences } from '@capacitor/preferences';
-import {
-  PreferencesService,
-  PREFERENCE_KEYS,
-} from '@/services/PreferencesService';
+import { PreferencesService } from '@/services/PreferencesService';
 
 vi.mock('@capacitor/preferences', () => ({
   Preferences: {
@@ -41,7 +38,7 @@ describe('PreferencesService', () => {
       // Assert
       expect(mockPreferencesSet).toHaveBeenCalledTimes(1);
       expect(mockPreferencesSet).toHaveBeenCalledWith({
-        key: PREFERENCE_KEYS.userName,
+        key: 'user_name',
         value: testName,
       });
     });
@@ -73,7 +70,7 @@ describe('PreferencesService', () => {
       expect(result).toBe(testName);
       expect(mockPreferencesGet).toHaveBeenCalledTimes(1);
       expect(mockPreferencesGet).toHaveBeenCalledWith({
-        key: PREFERENCE_KEYS.userName,
+        key: 'user_name',
       });
     });
 
@@ -113,7 +110,7 @@ describe('PreferencesService', () => {
 
       // Assert
       expect(mockPreferencesSet).toHaveBeenCalledWith({
-        key: PREFERENCE_KEYS.onboardingCompleted,
+        key: 'onboarding_completed',
         value: 'true',
       });
     });
@@ -128,7 +125,7 @@ describe('PreferencesService', () => {
       // Assert
       expect(result).toBe(true);
       expect(mockPreferencesGet).toHaveBeenCalledWith({
-        key: PREFERENCE_KEYS.onboardingCompleted,
+        key: 'onboarding_completed',
       });
     });
 

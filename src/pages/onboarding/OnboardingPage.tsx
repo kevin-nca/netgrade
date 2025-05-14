@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   IonPage,
   IonContent,
@@ -21,8 +21,11 @@ import { NameStep } from './steps/NameStep';
 import { SchoolStep } from './steps/SchoolStep';
 import { SubjectStep } from './steps/SubjectStep';
 
-import { useUserName, useSchools } from '@/hooks/queries';
-import { PreferencesService } from '@/services/PreferencesService';
+import {
+  useUserName,
+  useSchools,
+  useSetOnboardingCompleted,
+} from '@/hooks/queries';
 import { Routes } from '@/routes';
 
 const OnboardingPage: React.FC = () => {
@@ -40,8 +43,13 @@ const OnboardingPage: React.FC = () => {
   const history = useHistory();
   const { data: savedUserName } = useUserName();
   const { data: schools = [] } = useSchools();
+  const setOnboardingCompletedMutation = useSetOnboardingCompleted();
 
-  React.useEffect(() => {
+  const canCompleteOnboarding = (): boolean => {
+    return !!userName && userName.trim().length > 0 && schools.length > 0;
+  };
+
+  useEffect(() => {
     if (savedUserName) {
       setUserName(savedUserName);
       if (currentStep === 'name') {
@@ -49,10 +57,6 @@ const OnboardingPage: React.FC = () => {
       }
     }
   }, [savedUserName, currentStep]);
-
-  const canCompleteOnboarding = (): boolean => {
-    return !!userName && userName.trim().length > 0 && schools.length > 0;
-  };
 
   const showMessage = (
     message: string,
@@ -101,14 +105,19 @@ const OnboardingPage: React.FC = () => {
     }
   };
 
-  const handleCompleteOnboarding = async () => {
-    try {
-      await PreferencesService.setOnboardingCompleted(true);
-      history.push(Routes.HOME);
-    } catch (error) {
-      console.error('Failed to mark onboarding as completed:', error);
-      showMessage('Error occurred', 'danger');
-    }
+  const handleCompleteOnboarding = () => {
+    setOnboardingCompletedMutation.mutate(true, {
+      onSuccess: () => {
+        history.push(Routes.HOME);
+      },
+      onError: (error) => {
+        console.error('Failed to mark onboarding as completed:', error);
+        showMessage(
+          `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+          'danger',
+        );
+      },
+    });
   };
 
   const renderCurrentStep = () => {
