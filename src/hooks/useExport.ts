@@ -6,14 +6,13 @@ import { ExportOptions } from '@/types/export';
 export function useExport() {
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const dataManagementService = new DataManagementService();
 
   const exportData = async (school: School, options: ExportOptions) => {
     try {
       setIsExporting(true);
       setError(null);
 
-      const blob = await dataManagementService.exportData(school, options);
+      const blob = await DataManagementService.exportData(school, options);
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
