@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { IonRouterOutlet, IonTabs } from '@ionic/react';
 import { Redirect, Route } from 'react-router-dom';
 
@@ -11,12 +12,30 @@ import AddGradePage from '@/pages/home/grades/AddGradePage';
 import HomePage from '@/pages/home/HomePage';
 import EditExamPage from '@/pages/home/exams/EditExamPage';
 import { Routes } from '@/routes';
+import { PreferencesService } from '@/services/PreferencesService';
 
 export function AppRouter() {
+  const [isOnboarded, setIsOnboarded] = useState(false);
+  const [, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      const status = await PreferencesService.isOnboardingCompleted();
+      setIsOnboarded(status);
+      setIsInitialized(true);
+    };
+
+    checkOnboardingStatus();
+  }, []);
+
   return (
     <IonTabs>
       <IonRouterOutlet>
-        <Redirect exact path={Routes.MAIN} to={Routes.ONBOARDING} />
+        {isOnboarded ? (
+          <Redirect exact path={Routes.MAIN} to={Routes.HOME} />
+        ) : (
+          <Redirect exact path={Routes.MAIN} to={Routes.ONBOARDING} />
+        )}
         <Route exact path={Routes.ONBOARDING} component={OnboardingPage} />
         <Route exact path={Routes.SCHOOL} component={SchoolPage} />
         <Route exact path={Routes.HOME} component={HomePage} />
