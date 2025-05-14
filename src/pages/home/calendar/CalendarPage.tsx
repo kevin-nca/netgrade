@@ -25,7 +25,7 @@ import CalendarGrid from './components/CalendarGrid';
 import SelectedDateView from './components/SelectedDateView';
 import ExamListView from './components/ExamListView';
 
-import { useCalendar } from '@/hooks/queries/useCalendarQueries';
+import { useCalendar } from '@/pages/home/calendar/hook/useCalendar';
 
 const CalendarPage: React.FC = () => {
   const { data: allExams = [], error, isLoading, refetch } = useExams();

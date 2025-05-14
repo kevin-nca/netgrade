@@ -24,6 +24,7 @@ export const useCalendar = (exams: Exam[] = []) => {
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
 
   const upcomingExams = exams.filter((exam) => !exam.isCompleted);
+
   const changeMonth = (direction: 'prev' | 'next') => {
     setCurrentMonth(
       direction === 'prev'
