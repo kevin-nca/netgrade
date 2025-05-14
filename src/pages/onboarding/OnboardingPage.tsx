@@ -21,8 +21,11 @@ import { NameStep } from './steps/NameStep';
 import { SchoolStep } from './steps/SchoolStep';
 import { SubjectStep } from './steps/SubjectStep';
 
-import { useUserName, useSchools } from '@/hooks/queries';
-
+import {
+  useUserName,
+  useSchools,
+  useSetOnboardingCompleted,
+} from '@/hooks/queries';
 import { Routes } from '@/routes';
 
 const OnboardingPage: React.FC = () => {
@@ -40,6 +43,7 @@ const OnboardingPage: React.FC = () => {
   const history = useHistory();
   const { data: savedUserName } = useUserName();
   const { data: schools = [] } = useSchools();
+  const setOnboardingCompletedMutation = useSetOnboardingCompleted();
 
   const canCompleteOnboarding = (): boolean => {
     return !!userName && userName.trim().length > 0 && schools.length > 0;
@@ -102,7 +106,18 @@ const OnboardingPage: React.FC = () => {
   };
 
   const handleCompleteOnboarding = () => {
-    history.push(Routes.HOME);
+    setOnboardingCompletedMutation.mutate(true, {
+      onSuccess: () => {
+        history.push(Routes.HOME);
+      },
+      onError: (error) => {
+        console.error('Failed to mark onboarding as completed:', error);
+        showMessage(
+          `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+          'danger',
+        );
+      },
+    });
   };
 
   const renderCurrentStep = () => {

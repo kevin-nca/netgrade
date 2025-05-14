@@ -4,6 +4,8 @@ import { PreferencesService } from '@/services';
 export const preferencesKeys = {
   all: ['preferences'] as const,
   userName: () => [...preferencesKeys.all, 'userName'] as const,
+  onboardingCompleted: () =>
+    [...preferencesKeys.all, 'onboardingCompleted'] as const,
 };
 
 export const useUserName = () => {
@@ -20,6 +22,27 @@ export const useSaveUserName = () => {
     mutationFn: (name: string) => PreferencesService.saveName(name),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: preferencesKeys.userName() });
+    },
+  });
+};
+
+export const useOnboardingCompleted = () => {
+  return useQuery({
+    queryKey: preferencesKeys.onboardingCompleted(),
+    queryFn: () => PreferencesService.isOnboardingCompleted(),
+  });
+};
+
+export const useSetOnboardingCompleted = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (completed: boolean) =>
+      PreferencesService.setOnboardingCompleted(completed),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: preferencesKeys.onboardingCompleted(),
+      });
     },
   });
 };
