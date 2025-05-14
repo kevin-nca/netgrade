@@ -25,4 +25,20 @@
   --button-border-radius: 12px;
 
   --icon-size: 40px;
+
+  --calendar-background: #f6f7fd;
+  --calendar-text: #2f3542;
+  --calendar-text-muted: #a0a5b9;
+  --calendar-primary: var(--primary-color, #15529a);
+  --calendar-secondary: #3f9bf8;
+  --calendar-accent: #ff6b6b;
+  --calendar-day-bg: #ffffff;
+  --calendar-day-hover: #f0f2ff;
+  --calendar-day-selected: var(--primary-color, #15529a);
+  --calendar-today-border: var(--calendar-accent);
+  --calendar-radius-sm: 12px;
+  --calendar-radius-md: 18px;
+  --calendar-radius-lg: 24px;
+  --calendar-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --calendar-border: 1px solid rgba(0, 0, 0, 0.05);
 }
