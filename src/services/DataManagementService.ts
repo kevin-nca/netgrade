@@ -1,11 +1,86 @@
-import { getDataSource } from '@/db/data-source';
-import { School, Subject } from '@/db/entities';
+import { getDataSource, getRepositories } from '@/db/data-source';
+import { School, Subject, Exam, Grade } from '@/db/entities';
 import * as XLSX from 'xlsx';
-import { ExportData, ExportOptions, ExportSummary } from '@/types/export';
 
+/**
+ * Represents a grade in the export data
+ */
+export interface ExportGrade {
+  score: number;
+  weight: number;
+  comment: string;
+  date: Date;
+}
+
+/**
+ * Represents an exam in the export data
+ */
+export interface ExportExam {
+  name: string;
+  date: Date;
+  description: string;
+  weight: number;
+  isCompleted: boolean;
+  grade: ExportGrade | null;
+}
+
+/**
+ * Represents a subject in the export data
+ */
+export interface ExportSubject {
+  name: string;
+  teacher: string;
+  description: string;
+  weight: number;
+  exams: ExportExam[];
+}
+
+/**
+ * Represents a school in the export data
+ */
+export interface ExportSchool {
+  name: string;
+  address: string;
+}
+
+/**
+ * Represents summary statistics in the export data
+ */
+export interface ExportSummary {
+  perSubjectAverages: Record<string, number>;
+  overallAverage: number;
+  examsCompleted: number;
+  examsTotal: number;
+}
+
+/**
+ * The complete export data structure
+ */
+export interface ExportData {
+  school: ExportSchool;
+  subjects: ExportSubject[];
+  summaries: ExportSummary;
+}
+
+/**
+ * Supported export formats
+ */
 export type ExportFormat = 'json' | 'csv' | 'xlsx';
 
+/**
+ * Options for configuring the export
+ */
+export interface ExportOptions {
+  format: ExportFormat;
+  filename?: string;
+}
+
 export class DataManagementService {
+  /**
+   * Resets all data in the database by deleting all records from grade, exam, subject, and school tables.
+   * This operation is performed within a transaction to ensure data consistency.
+   * @throws {Error} If the reset operation fails
+   */
   static async resetAllData(): Promise<void> {
     try {
       const dataSource = getDataSource();
@@ -19,6 +94,60 @@ export class DataManagementService {
       console.error('Error resetting data:', error);
       throw error;
     }
+  }
+
+  /**
+   * Exports school data in the specified format (XLSX, CSV, or JSON).
+   * @param school - The school data to export
+   * @param options - Export configuration options including format and filename
+   * @returns A Blob containing the exported data
+   * @throws {Error} If the export operation fails or if an unsupported format is specified
+   */
+  static async exportData(
+    school: School,
+    options: ExportOptions,
+  ): Promise<Blob> {
+    const exportData = this.prepareExportData(school);
+
+    switch (options.format) {
+      case 'xlsx':
+        return this.exportToXLSX(exportData);
+      case 'csv':
+        return this.exportToCSV(exportData);
+      case 'json':
+        return new Blob([JSON.stringify(exportData, null, 2)], {
+          type: 'application/json',
+        });
+      default:
+        throw new Error(`Unsupported export format: ${options.format}`);
+    }
+  }
+
+  private static escapeCSVValue(value: string | object): string {
+    if (value === null || value === undefined) {
+      return '""';
+    }
+    if (typeof value === 'object') {
+      value = JSON.stringify(value);
+    }
+    return `"${String(value).replace(/"/g, '""')}"`;
+  }
+
+  private static convertToCSV(data: Record<string, object[]>): string {
+    const sections: string[] = [];
+    for (const [dataType, items] of Object.entries(data)) {
+      if (!Array.isArray(items) || items.length === 0) continue;
+      const sectionRows: string[] = [
+        dataType.toUpperCase(),
+        Object.keys(items[0]).join(','),
+      ];
+      for (const item of items) {
+        const row = Object.values(item).map(this.escapeCSVValue);
+        sectionRows.push(row.join(','));
+      }
+      sections.push(sectionRows.join('\n'));
+    }
+    return sections.join('\n\n');
   }
 
   private static calculateSubjectAverage(subject: Subject): number {
@@ -86,34 +215,82 @@ export class DataManagementService {
     };
   }
 
+  /**
+   * Prepares school data for export following a defined schema
+   * @param school - The school data to prepare for export
+   * @returns ExportData - The prepared data following the export schema
+   */
   private static prepareExportData(school: School): ExportData {
-    return {
-      school: {
-        name: school.name,
-        address: school.address,
-      },
-      subjects: school.subjects.map((subject) => ({
-        name: subject.name,
-        teacher: subject.teacher || '',
-        description: subject.description,
-        weight: subject.weight || 1,
-        exams: subject.exams.map((exam) => ({
-          name: exam.name,
-          date: exam.date,
-          description: exam.description,
+    if (!school) {
+      throw new Error('School data is required for export');
+    }
+
+    if (!school.subjects) {
+      school.subjects = [];
+    }
+
+    const subjects = school.subjects.map((subject) => ({
+      name: subject.name || 'Unnamed Subject',
+      teacher: subject.teacher || '',
+      description: subject.description || '',
+      weight: subject.weight || 1,
+      exams: (subject.exams || []).map((exam) => {
+        console.log('Exam data:', {
+          examId: exam.id,
+          examName: exam.name,
+          hasGrade: !!exam.grade,
+          gradeData: exam.grade,
+        });
+
+        return {
+          name: exam.name || 'Unnamed Exam',
+          date: exam.date || new Date(),
+          description: exam.description || '',
           weight: exam.weight || 1,
-          isCompleted: exam.isCompleted,
+          isCompleted: exam.isCompleted || false,
           grade: exam.grade
             ? {
-                score: exam.grade.score,
+                score: exam.grade.score || 0,
                 weight: exam.grade.weight || 1,
-                comment: exam.grade.comment,
-                date: exam.grade.date,
+                comment: exam.grade.comment || '',
+                date: exam.grade.date || new Date(),
               }
             : null,
-        })),
-      })),
-      summaries: this.generateSummaries(school),
+        };
+      }),
+    }));
+
+    const perSubjectAverages = subjects.reduce(
+      (acc, subject) => ({
+        ...acc,
+        [subject.name]: this.calculateSubjectAverage(subject),
+      }),
+      {} as Record<string, number>,
+    );
+
+    const examsTotal = subjects.reduce(
+      (sum, subject) => sum + subject.exams.length,
+      0,
+    );
+
+    const examsCompleted = subjects.reduce(
+      (sum, subject) =>
+        sum + subject.exams.filter((exam) => exam.isCompleted).length,
+      0,
+    );
+
+    return {
+      school: {
+        name: school.name || 'Unnamed School',
+        address: school.address || '',
+      },
+      subjects,
+      summaries: {
+        perSubjectAverages,
+        overallAverage: this.calculateOverallAverage(subjects),
+        examsCompleted,
+        examsTotal,
+      },
     };
   }
 
@@ -260,34 +437,10 @@ export class DataManagementService {
 
     const csvContent = rows
       .map((row) =>
-        row
-          .map((cell) =>
-            typeof cell === 'string' && cell.includes(',') ? `"${cell}"` : cell,
-          )
-          .join(','),
+        row.map((cell) => (cell.includes(',') ? `"${cell}"` : cell)).join(','),
       )
       .join('\n');
 
     return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  }
-
-  static async exportData(
-    school: School,
-    options: ExportOptions,
-  ): Promise<Blob> {
-    const exportData = this.prepareExportData(school);
-
-    switch (options.format) {
-      case 'xlsx':
-        return this.exportToXLSX(exportData);
-      case 'csv':
-        return this.exportToCSV(exportData);
-      case 'json':
-        return new Blob([JSON.stringify(exportData, null, 2)], {
-          type: 'application/json',
-        });
-      default:
-        throw new Error(`Unsupported export format: ${options.format}`);
-    }
   }
 }
