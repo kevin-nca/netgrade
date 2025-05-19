@@ -9,7 +9,16 @@ export class SchoolService {
   static async fetchAll(): Promise<School[]> {
     try {
       const { school: schoolRepo } = getRepositories();
-      return await schoolRepo.find({ order: { name: 'ASC' } });
+      return await schoolRepo.find({
+        order: { name: 'ASC' },
+        relations: {
+          subjects: {
+            exams: {
+              grade: true,
+            },
+          },
+        },
+      });
     } catch (error) {
       console.error('Failed to fetch schools:', error);
       throw error;
@@ -50,6 +59,13 @@ export class SchoolService {
       // First, find the existing school
       const existingSchool = await schoolRepo.findOne({
         where: { id: updatedSchoolData.id },
+        relations: {
+          subjects: {
+            exams: {
+              grade: true,
+            },
+          },
+        },
       });
       if (!existingSchool) {
         throw new Error(
@@ -97,7 +113,16 @@ export class SchoolService {
   static async findById(id: string): Promise<School | null> {
     try {
       const { school: schoolRepo } = getRepositories();
-      return await schoolRepo.findOne({ where: { id } });
+      return await schoolRepo.findOne({
+        where: { id },
+        relations: {
+          subjects: {
+            exams: {
+              grade: true,
+            },
+          },
+        },
+      });
     } catch (error) {
       console.error(`Failed to find school with ID ${id}:`, error);
       throw error;
