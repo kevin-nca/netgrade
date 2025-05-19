@@ -9,23 +9,31 @@ import {
   IonBackButton,
   IonRefresher,
   IonRefresherContent,
-  useIonAlert,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonButton,
+  IonIcon,
+  RefresherEventDetail,
   useIonRouter,
   useIonToast,
-  RefresherEventDetail,
+  IonAlert,
 } from '@ionic/react';
 import { Routes } from '@/routes';
+import { trashOutline } from 'ionicons/icons';
+import { useDataManagementQueries } from '@/hooks/queries/useDataManagementQueries';
 
 import SchoolsTab from '@/pages/home/settings/components/SchoolsTab';
 import AdvancedTab from '@/pages/home/settings/components/AdvancedTab';
 import UserTab from '@/pages/home/settings/components/UserTab';
 import AddSchoolModal from '@/pages/home/settings/components/AddSchoolModal';
 import { useSchools, useAddSchool } from '@/hooks/queries';
-import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const [present] = useIonToast();
+  const [showResetAlert, setShowResetAlert] = useState(false);
+  const { resetDataMutation } = useDataManagementQueries();
 
   const showToast = (message: string, isSuccess: boolean = true) => {
     present({
@@ -39,9 +47,6 @@ const SettingsPage: React.FC = () => {
 
   const { data: schools = [], refetch } = useSchools();
   const addSchoolMutation = useAddSchool();
-  const resetAllDataMutation = useResetAllDataMutation();
-
-  const [presentAlert] = useIonAlert();
   const router = useIonRouter();
 
   const handleAddSchool = (schoolData: { name: string }) => {
@@ -65,42 +70,22 @@ const SettingsPage: React.FC = () => {
     );
   };
 
-  const handleResetData = () => {
-    const performReset = async () => {
-      try {
-        await resetAllDataMutation.mutateAsync();
-        showToast('Alle Daten wurden erfolgreich zurückgesetzt');
+  const handleResetData = async () => {
+    try {
+      await resetDataMutation.mutateAsync();
+      setShowResetAlert(false);
+      showToast('Alle Daten wurden erfolgreich zurückgesetzt');
 
-        setTimeout(() => {
-          router.push(Routes.HOME, 'root');
-        }, 1500);
-      } catch (error) {
-        console.error('Error resetting data:', error);
-        showToast(
-          'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten',
-          false,
-        );
-      }
-    };
-
-    const alertOptions = {
-      header: 'Daten zurücksetzen',
-      message:
-        'Möchten Sie wirklich alle Daten zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.',
-      buttons: [
-        {
-          text: 'Abbrechen',
-          role: 'cancel',
-        },
-        {
-          text: 'Zurücksetzen',
-          role: 'destructive',
-          handler: performReset,
-        },
-      ],
-    };
-
-    presentAlert(alertOptions);
+      setTimeout(() => {
+        router.push(Routes.HOME, 'root');
+      }, 1500);
+    } catch (error) {
+      console.error('Error resetting data:', error);
+      showToast(
+        'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten',
+        false,
+      );
+    }
   };
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
@@ -132,13 +117,45 @@ const SettingsPage: React.FC = () => {
           onAddSchool={() => setShowAddSchoolModal(true)}
         />
 
-        <AdvancedTab onReset={handleResetData} />
+        <AdvancedTab 
+          onReset={() => setShowResetAlert(true)} 
+          school={schools[0]} 
+        />
+        <IonList>
+          <IonItem>
+            <IonLabel>Reset All Data</IonLabel>
+            <IonButton
+              fill="clear"
+              color="danger"
+              onClick={() => setShowResetAlert(true)}
+            >
+              <IonIcon slot="icon-only" icon={trashOutline} />
+            </IonButton>
+          </IonItem>
+        </IonList>
       </IonContent>
 
       <AddSchoolModal
         isOpen={showAddSchoolModal}
         onDismiss={() => setShowAddSchoolModal(false)}
         onSubmit={handleAddSchool}
+      />
+      <IonAlert
+        isOpen={showResetAlert}
+        onDidDismiss={() => setShowResetAlert(false)}
+        header="Daten zurücksetzen"
+        message="Möchten Sie wirklich alle Daten zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden."
+        buttons={[
+          {
+            text: 'Abbrechen',
+            role: 'cancel',
+          },
+          {
+            text: 'Zurücksetzen',
+            role: 'destructive',
+            handler: handleResetData,
+          },
+        ]}
       />
     </IonPage>
   );
