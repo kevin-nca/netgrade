@@ -20,8 +20,12 @@ export class Grade extends BaseEntity {
   })
   date!: Date;
 
+  @Column({ type: 'uuid' })
+  examId!: string;
+
   @OneToOne(() => Exam, (exam) => exam.grade, {
     nullable: false,
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'examId' })
   exam!: Exam;
