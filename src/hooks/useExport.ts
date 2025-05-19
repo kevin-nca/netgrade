@@ -1,13 +1,20 @@
 import { useState } from 'react';
 import { DataManagementService } from '@/services';
 import { School } from '@/db/entities';
-import { ExportOptions } from '@/types/export';
+import { ExportOptions } from '@/services/DataManagementService';
 
 export function useExport() {
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const exportData = async (school: School, options: ExportOptions) => {
+  const exportData = async (
+    school: School,
+    options: {
+      filename: string | undefined;
+      format: 'json' | 'csv' | 'xlsx';
+      includeSummaries: boolean;
+    },
+  ) => {
     try {
       setIsExporting(true);
       setError(null);
