@@ -1,18 +1,39 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { DataManagementService } from '@/services/DataManagementService';
+import {
+  DataManagementService,
+  ExportOptions,
+} from '@/services/DataManagementService';
+import { School } from '@/db/entities';
 
-export const useResetAllDataMutation = () => {
+export function useDataManagementQueries() {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, void, unknown>({
+  const resetDataMutation = useMutation({
     mutationFn: async () => {
-      await DataManagementService.resetAllData();
+      return await DataManagementService.resetAllData();
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['grades'] });
-      await queryClient.invalidateQueries({ queryKey: ['exams'] });
-      await queryClient.invalidateQueries({ queryKey: ['subjects'] });
-      await queryClient.invalidateQueries({ queryKey: ['schools'] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['schools'] });
+      queryClient.invalidateQueries({ queryKey: ['subjects'] });
+      queryClient.invalidateQueries({ queryKey: ['exams'] });
+      queryClient.invalidateQueries({ queryKey: ['grades'] });
     },
   });
-};
+
+  const exportDataMutation = useMutation({
+    mutationFn: async ({
+      school,
+      options,
+    }: {
+      school: School;
+      options: ExportOptions;
+    }) => {
+      return await DataManagementService.exportData(school, options);
+    },
+  });
+
+  return {
+    resetDataMutation,
+    exportDataMutation,
+  };
+}
