@@ -72,7 +72,10 @@ export type ExportFormat = 'json' | 'csv' | 'xlsx';
  */
 export interface ExportOptions {
   format: ExportFormat;
-  filename?: string;
+  includeSchools?: boolean;
+  includeSubjects?: boolean;
+  includeExams?: boolean;
+  includeGrades?: boolean;
 }
 
 export class DataManagementService {
