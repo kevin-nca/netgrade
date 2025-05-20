@@ -1,7 +1,8 @@
 import { getRepositories } from '@/db/data-source';
 import { School, Subject, Exam, Grade } from '@/db/entities';
+import * as XLSX from 'xlsx';
 
-export type ExportFormat = 'json' | 'csv';
+export type ExportFormat = 'json' | 'csv' | 'xlsx';
 
 export interface ExportOptions {
   format: ExportFormat;
@@ -15,9 +16,9 @@ export class ExportService {
   /**
    * Exports data based on the specified options
    * @param options - Export configuration options
-   * @returns Promise<string> - The exported data as a string
+   * @returns Promise<Blob> - The exported data as a Blob
    */
-  static async exportData(options: ExportOptions): Promise<string> {
+  static async exportData(options: ExportOptions): Promise<Blob> {
     try {
       const data: Record<string, any> = {};
       const { school, subject, exam, grade } = getRepositories();
@@ -46,9 +47,11 @@ export class ExportService {
 
       switch (options.format) {
         case 'json':
-          return JSON.stringify(data, null, 2);
+          return new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         case 'csv':
-          return this.convertToCSV(data);
+          return await this.exportToCSV(data);
+        case 'xlsx':
+          return await this.exportToXLSX(data);
         default:
           throw new Error(`Unsupported export format: ${options.format}`);
       }
@@ -59,46 +62,30 @@ export class ExportService {
   }
 
   /**
-   * Converts a value to a CSV-safe string
-   * @param value - The value to convert
-   * @returns string - The CSV-safe string
-   */
-  private static escapeCSVValue(value: any): string {
-    if (value === null || value === undefined) {
-      return '""';
-    }
-
-    if (typeof value === 'object') {
-      value = JSON.stringify(value);
-    }
-
-    return `"${String(value).replace(/"/g, '""')}"`;
-  }
-
-  /**
    * Converts the data object to CSV format
    * @param data - The data to convert
-   * @returns string - The CSV formatted data
+   * @returns Promise<Blob> - The CSV formatted data as a Blob
    */
-  private static convertToCSV(data: Record<string, any>): string {
-    const sections: string[] = [];
+  private static async exportToCSV(data: Record<string, any>): Promise<Blob> {
+    const worksheet = XLSX.utils.json_to_sheet(this.flattenData(data));
+    const csv = XLSX.utils.sheet_to_csv(worksheet);
+    return new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  }
 
+  private static async exportToXLSX(data: Record<string, any>): Promise<Blob> {
+    const worksheet = XLSX.utils.json_to_sheet(this.flattenData(data));
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Export');
+    const xlsxBuffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
+    return new Blob([xlsxBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  }
+
+  private static flattenData(data: Record<string, any>): any[] {
+    const rows: any[] = [];
     for (const [dataType, items] of Object.entries(data)) {
       if (!Array.isArray(items) || items.length === 0) continue;
-
-      const sectionRows: string[] = [
-        dataType.toUpperCase(),
-        Object.keys(items[0]).join(','),
-      ];
-
-      for (const item of items) {
-        const row = Object.values(item).map(this.escapeCSVValue);
-        sectionRows.push(row.join(','));
-      }
-
-      sections.push(sectionRows.join('\n'));
+      rows.push(...items.map(item => ({ type: dataType, ...item })));
     }
-
-    return sections.join('\n\n');
+    return rows;
   }
 }
