@@ -56,16 +56,8 @@ export class SchoolService {
     try {
       const { school: schoolRepo } = getRepositories();
 
-      // First, find the existing school
       const existingSchool = await schoolRepo.findOne({
         where: { id: updatedSchoolData.id },
-        relations: {
-          subjects: {
-            exams: {
-              grade: true,
-            },
-          },
-        },
       });
       if (!existingSchool) {
         throw new Error(
@@ -115,13 +107,6 @@ export class SchoolService {
       const { school: schoolRepo } = getRepositories();
       return await schoolRepo.findOne({
         where: { id },
-        relations: {
-          subjects: {
-            exams: {
-              grade: true,
-            },
-          },
-        },
       });
     } catch (error) {
       console.error(`Failed to find school with ID ${id}:`, error);
