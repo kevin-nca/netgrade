@@ -1,215 +1,109 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  IonPage,
+  IonCard,
   IonContent,
-  IonHeader,
-  IonToolbar,
+  IonItem,
+  IonList,
+  IonPage,
   IonTitle,
-  IonButton,
   IonToast,
-  IonProgressBar,
-  IonIcon,
-  IonChip,
-  IonLabel,
-  IonButtons,
-  IonFooter,
 } from '@ionic/react';
-import { arrowBack, personCircle } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-
-import { NameStep } from './steps/NameStep';
-import { SchoolStep } from './steps/SchoolStep';
-import { SubjectStep } from './steps/SubjectStep';
-
-import {
-  useUserName,
-  useSchools,
-  useSetOnboardingCompleted,
-} from '@/hooks/queries';
+import Button from '@/components/Button/Button';
+import Header from '@/components/Header/Header';
+import FormField from '@/components/Form/FormField';
+import { useSchools, useAddSchool } from '@/hooks/queries';
 import { Routes } from '@/routes';
 
 const OnboardingPage: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState<'name' | 'school' | 'subject'>(
-    'name',
-  );
-  const [userName, setUserName] = useState('');
-  const [selectedSchoolId, setSelectedSchoolId] = useState('');
+  const [schoolName, setSchoolName] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [toastColor, setToastColor] = useState<
-    'success' | 'danger' | 'warning'
-  >('success');
-
   const history = useHistory();
-  const { data: savedUserName } = useUserName();
-  const { data: schools = [] } = useSchools();
-  const setOnboardingCompletedMutation = useSetOnboardingCompleted();
 
-  const canCompleteOnboarding = (): boolean => {
-    return !!userName && userName.trim().length > 0 && schools.length > 0;
-  };
+  // Fetch schools using React Query
+  const { data: schools = [], error: schoolsError, isLoading } = useSchools();
 
-  useEffect(() => {
-    if (savedUserName) {
-      setUserName(savedUserName);
-      if (currentStep === 'name') {
-        setCurrentStep('school');
-      }
-    }
-  }, [savedUserName, currentStep]);
+  const addSchoolMutation = useAddSchool();
 
-  const showMessage = (
-    message: string,
-    color: 'success' | 'danger' | 'warning' = 'success',
-  ) => {
+  const showAndSetToastMessage = (message: string) => {
     setToastMessage(message);
-    setToastColor(color);
     setShowToast(true);
   };
 
-  const getProgress = (): number => {
-    switch (currentStep) {
-      case 'name':
-        return 0.33;
-      case 'school':
-        return 0.66;
-      case 'subject':
-        return 1;
-      default:
-        return 0;
+  const handleAddSchool = () => {
+    if (schoolName.trim()) {
+      addSchoolMutation.mutate(
+        { name: schoolName.trim() },
+        {
+          onSuccess: () => {
+            setSchoolName('');
+            showAndSetToastMessage('Schule erfolgreich hinzugefügt.');
+          },
+          onError: (error) => {
+            showAndSetToastMessage(
+              `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          },
+        },
+      );
+    } else {
+      showAndSetToastMessage('Bitte geben Sie einen Schulnamen ein.');
     }
   };
 
-  const getStepTitle = (): string => {
-    switch (currentStep) {
-      case 'name':
-        return 'Dein Name';
-      case 'school':
-        return 'Deine Schulen';
-      case 'subject':
-        return 'Deine Fächer';
-      default:
-        return '';
-    }
-  };
-
-  const goToNextStep = (step: 'name' | 'school' | 'subject') => {
-    setCurrentStep(step);
-  };
-
-  const handleBackStep = () => {
-    if (currentStep === 'school') {
-      setCurrentStep('name');
-    } else if (currentStep === 'subject') {
-      setCurrentStep('school');
-    }
-  };
-
-  const handleCompleteOnboarding = () => {
-    setOnboardingCompletedMutation.mutate(true, {
-      onSuccess: () => {
-        history.push(Routes.HOME);
-      },
-      onError: (error) => {
-        console.error('Failed to mark onboarding as completed:', error);
-        showMessage(
-          `Fehler: ${error instanceof Error ? error.message : String(error)}`,
-          'danger',
-        );
-      },
-    });
-  };
-
-  const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 'name':
-        return (
-          <NameStep
-            initialName={userName}
-            onNameSaved={(name) => {
-              setUserName(name);
-              showMessage('Name gespeichert');
-              goToNextStep('school');
-            }}
-            showMessage={showMessage}
-          />
-        );
-      case 'school':
-        return (
-          <SchoolStep
-            userName={userName}
-            selectedSchoolId={selectedSchoolId}
-            onSchoolSelected={(schoolId) => {
-              setSelectedSchoolId(schoolId);
-              goToNextStep('subject');
-            }}
-            showMessage={showMessage}
-          />
-        );
-      case 'subject':
-        return (
-          <SubjectStep
-            selectedSchoolId={selectedSchoolId}
-            schools={schools}
-            showMessage={showMessage}
-          />
-        );
-      default:
-        return null;
-    }
+  const handleContinue = () => {
+    history.push(Routes.HOME);
   };
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            {currentStep !== 'name' && (
-              <IonButton onClick={handleBackStep}>
-                <IonIcon icon={arrowBack} />
-              </IonButton>
+      <Header title={'Schulen hinzufügen'} backButton={false} />
+      <IonContent className="onboarding-container">
+        <IonCard className="onboarding-card">
+          <FormField
+            label={'Name der Schule'}
+            value={schoolName}
+            onChange={(value) => setSchoolName(String(value))}
+            placeholder={'Name der Schule eingeben'}
+          />
+          <Button
+            handleEvent={handleAddSchool}
+            text={'Hinzufügen'}
+            className="add-button"
+          />
+        </IonCard>
+
+        <IonCard className="onboarding-card">
+          <IonTitle size="small">Hinzugefügte Schulen</IonTitle>
+          <IonList>
+            {isLoading ? (
+              <IonItem>Schulen werden geladen...</IonItem>
+            ) : schoolsError ? (
+              <IonItem>Fehler beim Laden der Schulen.</IonItem>
+            ) : schools.length > 0 ? (
+              schools.map((school) => (
+                <IonItem key={school.id}>{school.name}</IonItem>
+              ))
+            ) : (
+              <IonItem>Keine Schulen hinzugefügt.</IonItem>
             )}
-          </IonButtons>
-
-          <IonTitle size="small">{getStepTitle()}</IonTitle>
-
-          {userName && currentStep !== 'name' && (
-            <IonChip slot="end" color="primary">
-              <IonIcon icon={personCircle} />
-              <IonLabel>{userName}</IonLabel>
-            </IonChip>
-          )}
-        </IonToolbar>
-        <IonProgressBar value={getProgress()} />
-      </IonHeader>
-
-      <IonContent className="ion-padding">
-        {renderCurrentStep()}
+          </IonList>
+        </IonCard>
+        <Button
+          handleEvent={handleContinue}
+          text={'Fortfahren'}
+          className="continue-button"
+        />
 
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}
           message={toastMessage}
           duration={2000}
-          color={toastColor}
-          position="bottom"
+          color="primary"
         />
       </IonContent>
-
-      <IonFooter>
-        <IonToolbar>
-          <IonButton
-            expand="block"
-            color="success"
-            onClick={handleCompleteOnboarding}
-            disabled={!canCompleteOnboarding()}
-            className="ion-margin-horizontal"
-            size="default"
-          >
-            Onboarding abschliessen
-          </IonButton>
-        </IonToolbar>
-      </IonFooter>
     </IonPage>
   );
 };

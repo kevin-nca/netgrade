@@ -1,6 +1,9 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { Preferences } from '@capacitor/preferences';
-import { PreferencesService } from '@/services/PreferencesService';
+import {
+  PreferencesService,
+  PREFERENCE_KEYS,
+} from '@/services/PreferencesService';
 
 vi.mock('@capacitor/preferences', () => ({
   Preferences: {
@@ -38,21 +41,19 @@ describe('PreferencesService', () => {
       // Assert
       expect(mockPreferencesSet).toHaveBeenCalledTimes(1);
       expect(mockPreferencesSet).toHaveBeenCalledWith({
-        key: 'user_name',
+        key: PREFERENCE_KEYS.userName,
         value: testName,
       });
     });
 
-    it('should log error when Preferences.set fails', async () => {
+    it('should throw an error when Preferences.set fails', async () => {
       // Arrange
       const testError = new Error('Test error');
       mockPreferencesSet.mockRejectedValue(testError);
       const consoleSpy = vi.spyOn(console, 'error');
 
-      // Act
-      await PreferencesService.saveName('Test');
-
-      // Assert
+      // Act & Assert
+      await expect(PreferencesService.saveName('Test')).rejects.toThrow();
       expect(consoleSpy).toHaveBeenCalled();
     });
   });
@@ -70,7 +71,7 @@ describe('PreferencesService', () => {
       expect(result).toBe(testName);
       expect(mockPreferencesGet).toHaveBeenCalledTimes(1);
       expect(mockPreferencesGet).toHaveBeenCalledWith({
-        key: 'user_name',
+        key: PREFERENCE_KEYS.userName,
       });
     });
 
@@ -85,59 +86,15 @@ describe('PreferencesService', () => {
       expect(result).toBeNull();
     });
 
-    it('should return null and log error when Preferences.get fails', async () => {
+    it('should throw an error when Preferences.get fails', async () => {
       // Arrange
       const testError = new Error('Test error');
       mockPreferencesGet.mockRejectedValue(testError);
       const consoleSpy = vi.spyOn(console, 'error');
 
-      // Act
-      const result = await PreferencesService.getName();
-
-      // Assert
-      expect(result).toBeNull();
+      // Act & Assert
+      await expect(PreferencesService.getName()).rejects.toThrow();
       expect(consoleSpy).toHaveBeenCalled();
-    });
-  });
-
-  describe('onboarding methods', () => {
-    it('should set onboarding completed status', async () => {
-      // Arrange
-      mockPreferencesSet.mockResolvedValue(undefined);
-
-      // Act
-      await PreferencesService.setOnboardingCompleted(true);
-
-      // Assert
-      expect(mockPreferencesSet).toHaveBeenCalledWith({
-        key: 'onboarding_completed',
-        value: 'true',
-      });
-    });
-
-    it('should get onboarding completed status', async () => {
-      // Arrange
-      mockPreferencesGet.mockResolvedValue({ value: 'true' });
-
-      // Act
-      const result = await PreferencesService.isOnboardingCompleted();
-
-      // Assert
-      expect(result).toBe(true);
-      expect(mockPreferencesGet).toHaveBeenCalledWith({
-        key: 'onboarding_completed',
-      });
-    });
-
-    it('should return false when onboarding status is not set', async () => {
-      // Arrange
-      mockPreferencesGet.mockResolvedValue({ value: null });
-
-      // Act
-      const result = await PreferencesService.isOnboardingCompleted();
-
-      // Assert
-      expect(result).toBe(false);
     });
   });
 });
