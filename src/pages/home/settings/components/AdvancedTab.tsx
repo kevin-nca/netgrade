@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { trashOutline, downloadOutline } from 'ionicons/icons';
-import { IonGrid, IonRow, IonCol, IonText } from '@ionic/react';
+import { IonText } from '@ionic/react';
 import SettingsHeader from './SettingsHeader';
 import SettingsGroup from './SettingsGroup';
 import SettingsItem from './SettingsItem';
