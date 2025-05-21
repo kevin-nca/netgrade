@@ -79,11 +79,6 @@ export interface ExportOptions {
 }
 
 export class DataManagementService {
-  /**
-   * Resets all data in the database by deleting all records from grade, exam, subject, and school tables.
-   * This operation is performed within a transaction to ensure data consistency.
-   * @throws {Error} If the reset operation fails
-   */
   static async resetAllData(): Promise<void> {
     try {
       const dataSource = getDataSource();
