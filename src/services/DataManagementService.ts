@@ -73,10 +73,6 @@ export type ExportFormat = 'json' | 'csv' | 'xlsx';
  */
 export interface ExportOptions {
   format: ExportFormat;
-  includeSchools?: boolean;
-  includeSubjects?: boolean;
-  includeExams?: boolean;
-  includeGrades?: boolean;
 }
 
 export class DataManagementService {
@@ -221,30 +217,7 @@ export class DataManagementService {
     data: ExportData,
     options: ExportOptions,
   ): ExportData {
-    const filteredData = { ...data };
-
-    if (!options.includeGrades) {
-      filteredData.subjects = filteredData.subjects.map((subject) => ({
-        ...subject,
-        exams: subject.exams.map((exam) => ({
-          ...exam,
-          grade: null,
-        })),
-      }));
-    }
-
-    if (!options.includeExams) {
-      filteredData.subjects = filteredData.subjects.map((subject) => ({
-        ...subject,
-        exams: [],
-      }));
-    }
-
-    if (!options.includeSubjects) {
-      filteredData.subjects = [];
-    }
-
-    return filteredData;
+    return data;
   }
 
   /**
