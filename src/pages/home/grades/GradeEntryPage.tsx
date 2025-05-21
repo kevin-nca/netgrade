@@ -12,6 +12,9 @@ import {
   useDeleteGrade,
   useUpdateExamAndGrade,
 } from '@/hooks/queries';
+import { validateGrade, validateWeight } from '@/utils/validation';
+import { useToast } from '@/hooks/useToast';
+import { useFormHandler } from '@/hooks/useFormHandler';
 import { Routes } from '@/routes';
 
 interface GradeFormData {
@@ -41,23 +44,19 @@ const GradeEntryPage: React.FC = () => {
     (grade: Grade) => grade.exam.subjectId === subjectId,
   );
 
-  const [formData, setFormData] = useState<GradeFormData>({
+  const initialFormData: GradeFormData = {
     id: null,
     examName: '',
     score: 0,
     weight: 1,
     date: null,
     comment: null,
-  });
-
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-
-  const showAndSetToastMessage = (message: string) => {
-    setToastMessage(message);
-    setShowToast(true);
   };
+
+  const { formData, setFormData, handleChange } =
+    useFormHandler<GradeFormData>(initialFormData);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const { showToast, toastMessage, setShowToast, showMessage } = useToast();
 
   // Set up mutation hooks
   const deleteGradeMutation = useDeleteGrade();
@@ -66,10 +65,10 @@ const GradeEntryPage: React.FC = () => {
   const handleDelete = (gradeId: string) => {
     deleteGradeMutation.mutate(gradeId, {
       onSuccess: () => {
-        showAndSetToastMessage('Note erfolgreich gelöscht.');
+        showMessage('Note erfolgreich gelöscht.');
       },
       onError: (error) => {
-        showAndSetToastMessage(
+        showMessage(
           `Fehler: ${error instanceof Error ? error.message : String(error)}`,
         );
       },
@@ -88,30 +87,23 @@ const GradeEntryPage: React.FC = () => {
     });
   };
 
-  const handleFormChange = <K extends keyof GradeFormData>(
-    field: K,
-    value: GradeFormData[K],
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
   const saveEdit = () => {
     if (editingId) {
       const grade = grades.find((grade: Grade) => grade.id === editingId)!;
 
       // Validate form data
       if (!formData.examName.trim()) {
-        showAndSetToastMessage('Bitte geben Sie einen Prüfungsnamen ein.');
+        showMessage('Bitte geben Sie einen Prüfungsnamen ein.');
         return;
       }
 
       if (formData.score < 1 || formData.score > 6) {
-        showAndSetToastMessage('Die Note muss zwischen 1 und 6 liegen.');
+        showMessage('Die Note muss zwischen 1 und 6 liegen.');
         return;
       }
 
       if (formData.weight < 0 || formData.weight > 1) {
-        showAndSetToastMessage('Die Gewichtung muss zwischen 0 und 1 liegen.');
+        showMessage('Die Gewichtung muss zwischen 0 und 1 liegen.');
         return;
       }
 
@@ -137,11 +129,11 @@ const GradeEntryPage: React.FC = () => {
         },
         {
           onSuccess: () => {
-            showAndSetToastMessage('Note erfolgreich aktualisiert.');
+            showMessage('Note erfolgreich aktualisiert.');
             setEditingId(null);
           },
           onError: (error) => {
-            showAndSetToastMessage(
+            showMessage(
               `Fehler: ${error instanceof Error ? error.message : String(error)}`,
             );
           },
@@ -154,41 +146,17 @@ const GradeEntryPage: React.FC = () => {
     setEditingId(null);
   };
 
-  const handleWeightValidation = (value: number) => {
-    if (value <= 0 || value > 1)
-      return 'Bitte eine Zahl zwischen 0 und 1 eingeben.';
-    if (
-      value.toString().includes('.') &&
-      value.toString().split('.')[1].length > 2
-    ) {
-      return 'Die Gewichtung darf maximal zwei Dezimalstellen haben.';
-    }
-    return null;
-  };
-
-  const handleGradeValidation = (value: number) => {
-    if (value < 1 || value > 6)
-      return 'Bitte eine Zahl zwischen 1 und 6 eingeben.';
-    if (
-      value.toString().includes('.') &&
-      value.toString().split('.')[1].length > 2
-    ) {
-      return 'Die Note darf maximal zwei Dezimalstellen haben.';
-    }
-    return null;
-  };
-
   const handleDateChange = (val: string | number | boolean) => {
     const newVal = typeof val === 'string' && val ? new Date(val) : null;
-    handleFormChange('date', newVal);
+    handleChange('date', newVal);
   };
 
   const handleCommentChange = (val: string | number | boolean) => {
-    handleFormChange('comment', val.toString());
+    handleChange('comment', val.toString());
   };
 
   const handleExamNameChange = (val: string | number | boolean) => {
-    handleFormChange('examName', val.toString());
+    handleChange('examName', val.toString());
   };
 
   return (
@@ -232,14 +200,14 @@ const GradeEntryPage: React.FC = () => {
             <ValidatedNumberInput
               label="Note"
               value={formData.score}
-              onChange={(val) => handleFormChange('score', val)}
-              validation={handleGradeValidation}
+              onChange={(val) => handleChange('score', val)}
+              validation={validateGrade}
             />
             <ValidatedNumberInput
               label="Gewichtung"
               value={formData.weight}
-              onChange={(val) => handleFormChange('weight', val)}
-              validation={handleWeightValidation}
+              onChange={(val) => handleChange('weight', val)}
+              validation={validateWeight}
             />
             <FormField
               label="Datum:"
