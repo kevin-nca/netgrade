@@ -74,8 +74,14 @@ export type ExportFormat = 'json' | 'csv' | 'xlsx';
 export interface ExportOptions {
   format: ExportFormat;
 }
+import { getDataSource } from '@/db/data-source';
+import { PreferencesService } from './PreferencesService';
 
 export class DataManagementService {
+  /**
+   * Resets all application data by deleting all database entries
+   * @returns Promise<void>
+   */
   static async resetAllData(): Promise<void> {
     try {
       const dataSource = getDataSource();
