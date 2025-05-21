@@ -1,6 +1,7 @@
 import { getDataSource, getRepositories } from '@/db/data-source';
 import { School, Subject, Exam, Grade } from '@/db/entities';
 import * as XLSX from 'xlsx';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 
 /**
  * Represents a grade in the export data
@@ -95,350 +96,332 @@ export class DataManagementService {
   }
 
   /**
-   * Exports school data in the specified format (XLSX, CSV, or JSON).
-   * @param school - The school data to export
-   * @param options - Export configuration options including format and filename
-   * @returns A Blob containing the exported data
-   * @throws {Error} If the export operation fails or if an unsupported format is specified
+   * Exports school data in the specified format
+   * @param school - The school to export
+   * @param options - Export options including format and content filters
+   * @returns Promise<string> - The path to the exported file
    */
   static async exportData(
     school: School,
     options: ExportOptions,
-  ): Promise<Blob> {
-    const exportData = this.prepareExportData(school);
-
-    switch (options.format) {
-      case 'xlsx':
-        return this.exportToXLSX(exportData);
-      case 'csv':
-        return this.exportToCSV(exportData);
-      case 'json':
-        return new Blob([JSON.stringify(exportData, null, 2)], {
-          type: 'application/json',
-        });
-      default:
-        throw new Error(`Unsupported export format: ${options.format}`);
+  ): Promise<string> {
+    try {
+      const exportData = this.prepareExportData(school);
+      const data = this.filterExportData(exportData, options);
+      const content = this.formatData(data, options.format);
+      const filename = this.generateFilename(school.name, options.format);
+      const path = await this.saveFile(content, filename, options.format);
+      return path;
+    } catch (error) {
+      console.error('Export failed:', error);
+      throw error;
     }
-  }
-
-  private static escapeCSVValue(value: string | object): string {
-    if (value === null || value === undefined) {
-      return '""';
-    }
-    if (typeof value === 'object') {
-      value = JSON.stringify(value);
-    }
-    return `"${String(value).replace(/"/g, '""')}"`;
-  }
-
-  private static convertToCSV(data: Record<string, object[]>): string {
-    const sections: string[] = [];
-    for (const [dataType, items] of Object.entries(data)) {
-      if (!Array.isArray(items) || items.length === 0) continue;
-      const sectionRows: string[] = [
-        dataType.toUpperCase(),
-        Object.keys(items[0]).join(','),
-      ];
-      for (const item of items) {
-        const row = Object.values(item).map(this.escapeCSVValue);
-        sectionRows.push(row.join(','));
-      }
-      sections.push(sectionRows.join('\n'));
-    }
-    return sections.join('\n\n');
-  }
-
-  private static calculateSubjectAverage(subject: Subject): number {
-    const grades = subject.exams
-      .filter((exam) => exam.grade)
-      .map((exam) => exam.grade!);
-
-    if (grades.length === 0) return 0;
-
-    const weightedSum = grades.reduce(
-      (sum, grade) => sum + grade.score * (grade.weight || 1),
-      0,
-    );
-    const weightSum = grades.reduce(
-      (sum, grade) => sum + (grade.weight || 1),
-      0,
-    );
-
-    return weightSum > 0 ? weightedSum / weightSum : 0;
-  }
-
-  private static calculateOverallAverage(subjects: Subject[]): number {
-    const subjectAverages = subjects.map((subject) => ({
-      average: this.calculateSubjectAverage(subject),
-      weight: subject.weight || 1,
-    }));
-
-    const weightedSum = subjectAverages.reduce(
-      (sum, { average, weight }) => sum + average * weight,
-      0,
-    );
-    const weightSum = subjectAverages.reduce(
-      (sum, { weight }) => sum + weight,
-      0,
-    );
-
-    return weightSum > 0 ? weightedSum / weightSum : 0;
-  }
-
-  private static generateSummaries(school: School): ExportSummary {
-    const subjects = school.subjects;
-    const perSubjectAverages = subjects.reduce(
-      (acc, subject) => ({
-        ...acc,
-        [subject.name]: this.calculateSubjectAverage(subject),
-      }),
-      {} as Record<string, number>,
-    );
-
-    const examsTotal = subjects.reduce(
-      (sum, subject) => sum + subject.exams.length,
-      0,
-    );
-    const examsCompleted = subjects.reduce(
-      (sum, subject) =>
-        sum + subject.exams.filter((exam) => exam.isCompleted).length,
-      0,
-    );
-
-    return {
-      perSubjectAverages,
-      overallAverage: this.calculateOverallAverage(subjects),
-      examsCompleted,
-      examsTotal,
-    };
   }
 
   /**
-   * Prepares school data for export following a defined schema
-   * @param school - The school data to prepare for export
-   * @returns ExportData - The prepared data following the export schema
+   * Prepares the data for export by transforming the school entity into the export format
+   * @param school - The school to prepare data for
+   * @returns ExportData - The prepared export data
    */
   private static prepareExportData(school: School): ExportData {
-    if (!school) {
-      throw new Error('School data is required for export');
-    }
-
-    if (!school.subjects) {
-      school.subjects = [];
-    }
-
     const subjects = school.subjects.map((subject) => ({
-      name: subject.name || 'Unnamed Subject',
-      teacher: subject.teacher || '',
-      description: subject.description || '',
-      weight: subject.weight || 1,
-      exams: (subject.exams || []).map((exam) => {
-        console.log('Exam data:', {
-          examId: exam.id,
-          examName: exam.name,
-          hasGrade: !!exam.grade,
-          gradeData: exam.grade,
-        });
-
-        return {
-          name: exam.name || 'Unnamed Exam',
-          date: exam.date || new Date(),
-          description: exam.description || '',
-          weight: exam.weight || 1,
-          isCompleted: exam.isCompleted || false,
-          grade: exam.grade
-            ? {
-                score: exam.grade.score || 0,
-                weight: exam.grade.weight || 1,
-                comment: exam.grade.comment || '',
-                date: exam.grade.date || new Date(),
-              }
-            : null,
-        };
-      }),
+      name: subject.name,
+      teacher: subject.teacher,
+      description: subject.description,
+      weight: subject.weight,
+      exams: (subject.exams || []).map((exam) => ({
+        name: exam.name,
+        date: exam.date,
+        description: exam.description,
+        weight: exam.weight,
+        isCompleted: exam.isCompleted,
+        grade: exam.grade
+          ? {
+              score: exam.grade.score,
+              weight: exam.grade.weight,
+              comment: exam.grade.comment || '',
+              date: exam.grade.date,
+            }
+          : null,
+      })),
     }));
-
-    const perSubjectAverages = subjects.reduce(
-      (acc, subject) => ({
-        ...acc,
-        [subject.name]: this.calculateSubjectAverage(subject),
-      }),
-      {} as Record<string, number>,
-    );
 
     const examsTotal = subjects.reduce(
       (sum, subject) => sum + subject.exams.length,
       0,
     );
-
     const examsCompleted = subjects.reduce(
       (sum, subject) =>
         sum + subject.exams.filter((exam) => exam.isCompleted).length,
       0,
     );
 
+    const perSubjectAverages: Record<string, number> = {};
+    let totalWeightedScore = 0;
+    let totalWeight = 0;
+
+    subjects.forEach((subject) => {
+      const subjectExams = subject.exams.filter(
+        (exam) => exam.isCompleted && exam.grade,
+      );
+      if (subjectExams.length > 0) {
+        const subjectScore =
+          subjectExams.reduce(
+            (sum, exam) => sum + (exam.grade?.score || 0) * (exam.weight || 1),
+            0,
+          ) / subjectExams.reduce((sum, exam) => sum + (exam.weight || 1), 0);
+        perSubjectAverages[subject.name] = subjectScore;
+        totalWeightedScore += subjectScore * (subject.weight || 1);
+        totalWeight += (subject.weight || 1);
+      }
+    });
+
     return {
       school: {
-        name: school.name || 'Unnamed School',
+        name: school.name,
         address: school.address || '',
       },
-      subjects,
+      subjects: subjects.map(subject => ({
+        name: subject.name,
+        teacher: subject.teacher || '',
+        description: subject.description || '',
+        weight: subject.weight || 1,
+        exams: subject.exams.map(exam => ({
+          name: exam.name,
+          date: exam.date,
+          description: exam.description || '',
+          weight: exam.weight || 1,
+          isCompleted: exam.isCompleted,
+          grade: exam.grade
+            ? {
+                score: exam.grade.score,
+                weight: exam.grade.weight,
+                comment: exam.grade.comment || '',
+                date: exam.grade.date,
+              }
+            : null,
+        })),
+      })),
       summaries: {
         perSubjectAverages,
-        overallAverage: this.calculateOverallAverage(subjects),
+        overallAverage: totalWeight > 0 ? totalWeightedScore / totalWeight : 0,
         examsCompleted,
         examsTotal,
       },
     };
   }
 
-  private static exportToXLSX(data: ExportData): Blob {
+  /**
+   * Filters the export data based on the provided options
+   * @param data - The data to filter
+   * @param options - The export options
+   * @returns ExportData - The filtered data
+   */
+  private static filterExportData(
+    data: ExportData,
+    options: ExportOptions,
+  ): ExportData {
+    const filteredData = { ...data };
+
+    if (!options.includeGrades) {
+      filteredData.subjects = filteredData.subjects.map((subject) => ({
+        ...subject,
+        exams: subject.exams.map((exam) => ({
+          ...exam,
+          grade: null,
+        })),
+      }));
+    }
+
+    if (!options.includeExams) {
+      filteredData.subjects = filteredData.subjects.map((subject) => ({
+        ...subject,
+        exams: [],
+      }));
+    }
+
+    if (!options.includeSubjects) {
+      filteredData.subjects = [];
+    }
+
+    return filteredData;
+  }
+
+  /**
+   * Formats the data according to the specified format
+   * @param data - The data to format
+   * @param format - The desired format
+   * @returns string - The formatted data
+   */
+  private static formatData(data: ExportData, format: ExportFormat): string {
+    switch (format) {
+      case 'json':
+        return JSON.stringify(data, null, 2);
+      case 'csv':
+        return this.convertToCSV(data);
+      case 'xlsx':
+        return this.convertToXLSX(data);
+      default:
+        throw new Error(`Unsupported format: ${format}`);
+    }
+  }
+
+  /**
+   * Converts the export data to CSV format
+   * @param data - The data to convert
+   * @returns string - The CSV data
+   */
+  private static convertToCSV(data: ExportData): string {
+    const rows: string[] = [];
+
+    rows.push('School Information');
+    rows.push(`Name,${data.school.name}`);
+    rows.push(`Address,${data.school.address}`);
+    rows.push('');
+
+    rows.push('Subjects');
+    rows.push('Name,Teacher,Description,Weight');
+    data.subjects.forEach((subject) => {
+      rows.push(
+        `${subject.name},${subject.teacher},${subject.description},${subject.weight}`,
+      );
+    });
+    rows.push('');
+
+    rows.push('Exams');
+    rows.push('Subject,Name,Date,Description,Weight,Completed,Score,Comment');
+    data.subjects.forEach((subject) => {
+      subject.exams.forEach((exam) => {
+        rows.push(
+          `${subject.name},${exam.name},${exam.date.toISOString()},${exam.description},${exam.weight},${exam.isCompleted},${exam.grade?.score || ''},${exam.grade?.comment || ''}`,
+        );
+      });
+    });
+    rows.push('');
+
+    rows.push('Summaries');
+    rows.push('Subject,Average');
+    Object.entries(data.summaries.perSubjectAverages).forEach(
+      ([subject, average]) => {
+        rows.push(`${subject},${average}`);
+      },
+    );
+    rows.push(`Overall Average,${data.summaries.overallAverage}`);
+    rows.push(`Exams Completed,${data.summaries.examsCompleted}`);
+    rows.push(`Total Exams,${data.summaries.examsTotal}`);
+
+    return rows.join('\n');
+  }
+
+  /**
+   * Converts the export data to XLSX format
+   * @param data - The data to convert
+   * @returns string - The XLSX data as base64
+   */
+  private static convertToXLSX(data: ExportData): string {
     const workbook = XLSX.utils.book_new();
 
     const schoolData = [
       ['School Information'],
       ['Name', data.school.name],
-      ['Address', data.school.address || ''],
+      ['Address', data.school.address],
     ];
     const schoolSheet = XLSX.utils.aoa_to_sheet(schoolData);
-    XLSX.utils.book_append_sheet(workbook, schoolSheet, 'School Info');
+    XLSX.utils.book_append_sheet(workbook, schoolSheet, 'School');
 
     const subjectsData = [
+      ['Name', 'Teacher', 'Description', 'Weight'],
+      ...data.subjects.map((subject) => [
+        subject.name,
+        subject.teacher,
+        subject.description,
+        subject.weight,
+      ]),
+    ];
+    const subjectsSheet = XLSX.utils.aoa_to_sheet(subjectsData);
+    XLSX.utils.book_append_sheet(workbook, subjectsSheet, 'Subjects');
+
+    const examsData = [
       [
         'Subject',
-        'Teacher',
-        'Description',
-        'Weight',
-        'Exam',
+        'Name',
         'Date',
         'Description',
         'Weight',
         'Completed',
-        'Grade',
-        'Grade Weight',
+        'Score',
         'Comment',
-        'Grade Date',
       ],
-    ];
-
-    data.subjects.forEach((subject) => {
-      subject.exams.forEach((exam, index) => {
-        subjectsData.push([
-          index === 0 ? subject.name : '',
-          index === 0 ? subject.teacher : '',
-          index === 0 ? subject.description || '' : '',
-          index === 0 ? String(subject.weight) : '',
+      ...data.subjects.flatMap((subject) =>
+        subject.exams.map((exam) => [
+          subject.name,
           exam.name,
-          exam.date.toISOString().split('T')[0],
-          exam.description || '',
-          String(exam.weight),
-          exam.isCompleted ? 'Yes' : 'No',
-          exam.grade ? String(exam.grade.score) : '',
-          exam.grade ? String(exam.grade.weight) : '',
+          exam.date,
+          exam.description,
+          exam.weight,
+          exam.isCompleted,
+          exam.grade?.score || '',
           exam.grade?.comment || '',
-          exam.grade?.date.toISOString().split('T')[0] || '',
-        ]);
-      });
-    });
-
-    const subjectsSheet = XLSX.utils.aoa_to_sheet(subjectsData);
-    XLSX.utils.book_append_sheet(workbook, subjectsSheet, 'Subjects & Exams');
-
-    const summaryData = [
-      ['Summary Information'],
-      ['Overall Average', String(data.summaries.overallAverage)],
-      ['Exams Completed', String(data.summaries.examsCompleted)],
-      ['Total Exams', String(data.summaries.examsTotal)],
-      [''],
-      ['Subject Averages'],
-      ['Subject', 'Average'],
+        ]),
+      ),
     ];
+    const examsSheet = XLSX.utils.aoa_to_sheet(examsData);
+    XLSX.utils.book_append_sheet(workbook, examsSheet, 'Exams');
 
-    Object.entries(data.summaries.perSubjectAverages).forEach(
-      ([subject, average]) => {
-        summaryData.push([subject, String(average)]);
-      },
-    );
+    const summariesData = [
+      ['Summaries'],
+      ['Subject', 'Average'],
+      ...Object.entries(data.summaries.perSubjectAverages).map(
+        ([subject, average]) => [subject, average],
+      ),
+      ['Overall Average', data.summaries.overallAverage],
+      ['Exams Completed', data.summaries.examsCompleted],
+      ['Total Exams', data.summaries.examsTotal],
+    ];
+    const summariesSheet = XLSX.utils.aoa_to_sheet(summariesData);
+    XLSX.utils.book_append_sheet(workbook, summariesSheet, 'Summaries');
 
-    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
-
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
-    });
-    return new Blob([excelBuffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    });
+    return XLSX.write(workbook, { type: 'base64', bookType: 'xlsx' });
   }
 
-  private static exportToCSV(data: ExportData): Blob {
-    const rows = [
-      ['School Information'],
-      ['Name', data.school.name],
-      ['Address', data.school.address || ''],
-      [''],
+  /**
+   * Generates a filename for the export
+   * @param schoolName - The name of the school
+   * @param format - The export format
+   * @returns string - The generated filename
+   */
+  private static generateFilename(
+    schoolName: string,
+    format: ExportFormat,
+  ): string {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const sanitizedName = schoolName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    return `${sanitizedName}_export_${timestamp}.${format}`;
+  }
 
-      [
-        'Subject',
-        'Teacher',
-        'Description',
-        'Weight',
-        'Exam',
-        'Date',
-        'Description',
-        'Weight',
-        'Completed',
-        'Grade',
-        'Grade Weight',
-        'Comment',
-        'Grade Date',
-      ],
-    ];
-
-    data.subjects.forEach((subject) => {
-      subject.exams.forEach((exam, index) => {
-        rows.push([
-          index === 0 ? subject.name : '',
-          index === 0 ? subject.teacher : '',
-          index === 0 ? subject.description || '' : '',
-          index === 0 ? String(subject.weight) : '',
-          exam.name,
-          exam.date.toISOString().split('T')[0],
-          exam.description || '',
-          String(exam.weight),
-          exam.isCompleted ? 'Yes' : 'No',
-          exam.grade ? String(exam.grade.score) : '',
-          exam.grade ? String(exam.grade.weight) : '',
-          exam.grade?.comment || '',
-          exam.grade?.date.toISOString().split('T')[0] || '',
-        ]);
+  /**
+   * Saves the file to the filesystem
+   * @param content - The file content
+   * @param filename - The name of the file
+   * @param format - The file format
+   * @returns Promise<string> - The path to the saved file
+   */
+  private static async saveFile(
+    content: string,
+    filename: string,
+    format: ExportFormat,
+  ): Promise<string> {
+    try {
+      const result = await Filesystem.writeFile({
+        path: filename,
+        data: content,
+        directory: Directory.Documents,
+        recursive: true,
       });
-    });
-
-    rows.push(
-      [''],
-      ['Summary Information'],
-      ['Overall Average', String(data.summaries.overallAverage)],
-      ['Exams Completed', String(data.summaries.examsCompleted)],
-      ['Total Exams', String(data.summaries.examsTotal)],
-      [''],
-      ['Subject Averages'],
-      ['Subject', 'Average'],
-    );
-
-    Object.entries(data.summaries.perSubjectAverages).forEach(
-      ([subject, average]) => {
-        rows.push([subject, String(average)]);
-      },
-    );
-
-    const csvContent = rows
-      .map((row) =>
-        row.map((cell) => (cell.includes(',') ? `"${cell}"` : cell)).join(','),
-      )
-      .join('\n');
-
-    return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      return result.uri;
+    } catch (error) {
+      console.error('Failed to save file:', error);
+      throw error;
+    }
   }
 }
