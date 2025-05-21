@@ -172,7 +172,7 @@ export class DataManagementService {
           ) / subjectExams.reduce((sum, exam) => sum + (exam.weight || 1), 0);
         perSubjectAverages[subject.name] = subjectScore;
         totalWeightedScore += subjectScore * (subject.weight || 1);
-        totalWeight += (subject.weight || 1);
+        totalWeight += subject.weight || 1;
       }
     });
 
@@ -181,12 +181,12 @@ export class DataManagementService {
         name: school.name,
         address: school.address || '',
       },
-      subjects: subjects.map(subject => ({
+      subjects: subjects.map((subject) => ({
         name: subject.name,
         teacher: subject.teacher || '',
         description: subject.description || '',
         weight: subject.weight || 1,
-        exams: subject.exams.map(exam => ({
+        exams: subject.exams.map((exam) => ({
           name: exam.name,
           date: exam.date,
           description: exam.description || '',
@@ -254,71 +254,6 @@ export class DataManagementService {
    * @returns string - The formatted data
    */
   private static formatData(data: ExportData, format: ExportFormat): string {
-    switch (format) {
-      case 'json':
-        return JSON.stringify(data, null, 2);
-      case 'csv':
-        return this.convertToCSV(data);
-      case 'xlsx':
-        return this.convertToXLSX(data);
-      default:
-        throw new Error(`Unsupported format: ${format}`);
-    }
-  }
-
-  /**
-   * Converts the export data to CSV format
-   * @param data - The data to convert
-   * @returns string - The CSV data
-   */
-  private static convertToCSV(data: ExportData): string {
-    const rows: string[] = [];
-
-    rows.push('School Information');
-    rows.push(`Name,${data.school.name}`);
-    rows.push(`Address,${data.school.address}`);
-    rows.push('');
-
-    rows.push('Subjects');
-    rows.push('Name,Teacher,Description,Weight');
-    data.subjects.forEach((subject) => {
-      rows.push(
-        `${subject.name},${subject.teacher},${subject.description},${subject.weight}`,
-      );
-    });
-    rows.push('');
-
-    rows.push('Exams');
-    rows.push('Subject,Name,Date,Description,Weight,Completed,Score,Comment');
-    data.subjects.forEach((subject) => {
-      subject.exams.forEach((exam) => {
-        rows.push(
-          `${subject.name},${exam.name},${exam.date.toISOString()},${exam.description},${exam.weight},${exam.isCompleted},${exam.grade?.score || ''},${exam.grade?.comment || ''}`,
-        );
-      });
-    });
-    rows.push('');
-
-    rows.push('Summaries');
-    rows.push('Subject,Average');
-    Object.entries(data.summaries.perSubjectAverages).forEach(
-      ([subject, average]) => {
-        rows.push(`${subject},${average}`);
-      },
-    );
-    rows.push(`Overall Average,${data.summaries.overallAverage}`);
-    rows.push(`Exams Completed,${data.summaries.examsCompleted}`);
-    rows.push(`Total Exams,${data.summaries.examsTotal}`);
-
-    return rows.join('\n');
-  }
-
-  /**
-   * Converts the export data to XLSX format
-   * @param data - The data to convert
-   * @returns string - The XLSX data as base64
-   */
-  private static convertToXLSX(data: ExportData): string {
     const workbook = XLSX.utils.book_new();
 
     const schoolData = [
@@ -381,7 +316,24 @@ export class DataManagementService {
     const summariesSheet = XLSX.utils.aoa_to_sheet(summariesData);
     XLSX.utils.book_append_sheet(workbook, summariesSheet, 'Summaries');
 
-    return XLSX.write(workbook, { type: 'base64', bookType: 'xlsx' });
+    switch (format) {
+      case 'json':
+        return JSON.stringify(data, null, 2);
+      case 'csv':
+        return (
+          XLSX.utils.sheet_to_csv(schoolSheet) +
+          '\n\n' +
+          XLSX.utils.sheet_to_csv(subjectsSheet) +
+          '\n\n' +
+          XLSX.utils.sheet_to_csv(examsSheet) +
+          '\n\n' +
+          XLSX.utils.sheet_to_csv(summariesSheet)
+        );
+      case 'xlsx':
+        return XLSX.write(workbook, { type: 'base64', bookType: 'xlsx' });
+      default:
+        throw new Error(`Unsupported format: ${format}`);
+    }
   }
 
   /**
