@@ -233,7 +233,10 @@ export class DataManagementService {
    * @param exportFormat - The desired format
    * @returns string - The formatted data
    */
-  private static formatData(data: ExportData, exportFormat: ExportFormat): string {
+  private static formatData(
+    data: ExportData,
+    exportFormat: ExportFormat,
+  ): string {
     const workbook = XLSX.utils.book_new();
 
     const schoolData = [
@@ -322,7 +325,10 @@ export class DataManagementService {
    * @param exportFormat - The desired format
    * @returns string - The generated filename
    */
-  private static generateFilename(schoolName: string, exportFormat: ExportFormat): string {
+  private static generateFilename(
+    schoolName: string,
+    exportFormat: ExportFormat,
+  ): string {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const sanitizedName = schoolName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     return `${sanitizedName}_export_${timestamp}.${exportFormat}`;
