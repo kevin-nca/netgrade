@@ -1,6 +1,6 @@
 import { PreferencesService } from './PreferencesService';
-import { getDataSource, getRepositories } from '@/db/data-source';
-import { School, Subject, Exam, Grade } from '@/db/entities';
+import { getDataSource } from '@/db/data-source';
+import { School } from '@/db/entities';
 import * as XLSX from 'xlsx';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 
@@ -73,7 +73,7 @@ export type ExportFormat = 'json' | 'csv' | 'xlsx';
  * Options for configuring the export
  */
 export interface ExportOptions {
-  format: ExportFormat;
+  format: 'xlsx';
 }
 
 export class DataManagementService {
@@ -114,8 +114,8 @@ export class DataManagementService {
   ): Promise<string> {
     try {
       const exportData = this.prepareExportData(school);
-      const data = this.filterExportData(exportData, options);
-      const content = this.formatData(data, options.format);
+      const data = this.filterExportData(exportData);
+      const content = this.formatData(data);
       const filename = this.generateFilename(school.name, options.format);
       const path = await this.saveFile(content, filename, options.format);
       return path;
@@ -221,13 +221,9 @@ export class DataManagementService {
   /**
    * Filters the export data based on the provided options
    * @param data - The data to filter
-   * @param options - The export options
    * @returns ExportData - The filtered data
    */
-  private static filterExportData(
-    data: ExportData,
-    options: ExportOptions,
-  ): ExportData {
+  private static filterExportData(data: ExportData): ExportData {
     return data;
   }
 
@@ -339,13 +335,11 @@ export class DataManagementService {
    * Saves the file to the filesystem
    * @param content - The file content
    * @param filename - The name of the file
-   * @param format - The file format
    * @returns Promise<string> - The path to the saved file
    */
   private static async saveFile(
     content: string,
     filename: string,
-    format: ExportFormat,
   ): Promise<string> {
     try {
       const result = await Filesystem.writeFile({
