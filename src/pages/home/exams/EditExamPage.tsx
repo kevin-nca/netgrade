@@ -9,6 +9,7 @@ import {
   IonLabel,
   IonModal,
 } from '@ionic/react';
+import { useForm } from '@tanstack/react-form';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import FormField from '@/components/Form/FormField';
@@ -20,14 +21,16 @@ import {
   useAddGradeWithExam,
   useSubjects,
 } from '@/hooks/queries';
-import { validateGrade, validateWeight } from '@/utils/validation';
+import {
+  validateGrade,
+  validateWeight,
+  percentageToDecimal,
+} from '@/utils/validation';
 import { useToast } from '@/hooks/useToast';
-import { useFormHandler } from '@/hooks/useFormHandler';
 import { Routes } from '@/routes';
 import { Subject } from '@/db/entities';
 
 interface ExamFormData {
-  id: string;
   title: string;
   date: string;
   subject: string;
@@ -51,91 +54,93 @@ const EditExamPage: React.FC = () => {
   const { data: exam, isLoading, error } = useExam(examId);
   const { data: subjects = [] } = useSubjects();
 
-  const initialExamFormData: ExamFormData = {
-    id: examId,
-    title: '',
-    date: '',
-    subject: '',
-    description: '',
-  };
-
-  const initialGradeFormData: GradeFormData = {
-    score: 0,
-    weight: 1.0,
-    comment: '',
-  };
-
-  const {
-    formData: examFormData,
-    setFormData: setExamFormData,
-    handleChange: handleExamFormChange,
-  } = useFormHandler<ExamFormData>(initialExamFormData);
-
-  const { formData: gradeFormData, handleChange: handleGradeFormChange } =
-    useFormHandler<GradeFormData>(initialGradeFormData);
-
   const { showToast, toastMessage, setShowToast, showMessage } = useToast();
   const [segmentValue, setSegmentValue] = useState<'details' | 'grade'>(
     'details',
   );
   const [showGradeConfirmModal, setShowGradeConfirmModal] = useState(false);
 
-  // Update form data when exam data is loaded
+  const examForm = useForm({
+    defaultValues: {
+      title: '',
+      date: '',
+      subject: '',
+      description: '',
+    } as ExamFormData,
+    onSubmit: async ({ value }) => {
+      const updatedExam = {
+        id: examId,
+        name: value.title.trim(),
+        date: new Date(value.date),
+        subjectId: value.subject,
+        description: value.description.trim(),
+      };
+
+      updateExamMutation.mutate(updatedExam, {
+        onSuccess: () => {
+          history.replace(Routes.HOME);
+        },
+        onError: (error) => {
+          console.error('Failed to update exam:', error);
+          showMessage(`Fehler: ${error.message}`);
+        },
+      });
+    },
+  });
+
+  const gradeForm = useForm({
+    defaultValues: {
+      score: 0,
+      weight: 100,
+      comment: '',
+    } as GradeFormData,
+    onSubmit: async ({ value }) => {
+      const gradeError = validateGrade(value.score);
+      if (gradeError) {
+        showMessage(gradeError);
+        return;
+      }
+
+      const weightError = validateWeight(value.weight);
+      if (weightError) {
+        showMessage(weightError);
+        return;
+      }
+
+      handleAddGrade(value);
+    },
+  });
   React.useEffect(() => {
     if (exam) {
-      setExamFormData({
-        id: exam.id,
-        title: exam.name,
-        date: exam.date.toISOString().split('T')[0],
-        subject: exam.subjectId,
-        description: exam.description || '',
-      });
+      examForm.setFieldValue('title', exam.name);
+      examForm.setFieldValue('date', exam.date.toISOString().split('T')[0]);
+      examForm.setFieldValue('subject', exam.subjectId);
+      examForm.setFieldValue('description', exam.description || '');
     }
-  }, [exam, setExamFormData]);
+  }, [exam, examForm]);
 
   const updateExamMutation = useUpdateExam();
   const addGradeWithExamMutation = useAddGradeWithExam();
   const deleteExamMutation = useDeleteExam();
 
-  const handleSave = () => {
-    const updatedExam = {
-      id: examFormData.id,
-      name: examFormData.title.trim(),
-      date: new Date(examFormData.date),
-      subjectId: examFormData.subject,
-      description: examFormData.description.trim(),
-    };
-
-    updateExamMutation.mutate(updatedExam, {
-      onSuccess: () => {
-        history.replace(Routes.HOME);
-      },
-      onError: (error) => {
-        console.error('Failed to update exam:', error);
-        showMessage(`Fehler: ${error.message}`);
-      },
-    });
-  };
-
-  const handleAddGrade = () => {
+  const handleAddGrade = (gradeData: GradeFormData) => {
     if (!exam) return;
 
-    if (gradeFormData.score < 1 || gradeFormData.score > 6) {
-      showMessage('Die Note muss zwischen 1 und 6 liegen.');
-      return;
-    }
-
-    if (gradeFormData.weight <= 0 || gradeFormData.weight > 1) {
-      showMessage('Die Gewichtung muss zwischen 0 und 1 liegen.');
-      return;
-    }
+    const examData = {
+      title: examForm.getFieldValue('title') || exam.name,
+      date:
+        examForm.getFieldValue('date') || exam.date.toISOString().split('T')[0],
+      subject: examForm.getFieldValue('subject') || exam.subjectId,
+      description:
+        examForm.getFieldValue('description') || exam.description || '',
+    };
 
     const updatedExam = {
-      id: examFormData.id,
-      name: examFormData.title.trim(),
-      date: new Date(examFormData.date),
-      subjectId: examFormData.subject,
-      description: examFormData.description.trim(),
+      id: examId,
+      name: examData.title.trim(),
+      date: new Date(examData.date),
+      subjectId: examData.subject,
+      description: examData.description.trim(),
       isCompleted: true,
     };
 
@@ -145,9 +150,9 @@ const EditExamPage: React.FC = () => {
           subjectId: exam.subjectId,
           examName: exam.name,
           date: exam.date,
-          score: gradeFormData.score,
-          weight: gradeFormData.weight,
-          comment: gradeFormData.comment.trim() || undefined,
+          score: gradeData.score,
+          weight: percentageToDecimal(gradeData.weight), // Convert percentage to decimal for storage
+          comment: gradeData.comment.trim() || undefined,
         };
 
         addGradeWithExamMutation.mutate(gradePayload, {
@@ -172,12 +177,13 @@ const EditExamPage: React.FC = () => {
   };
 
   const handleDelete = () => {
+    const currentTitle = examForm.getFieldValue('title') || exam?.name || '';
     if (
       window.confirm(
-        `Möchten Sie die Prüfung "${examFormData.title}" wirklich löschen?`,
+        `Möchten Sie die Prüfung "${currentTitle}" wirklich löschen?`,
       )
     ) {
-      deleteExamMutation.mutate(examFormData.id, {
+      deleteExamMutation.mutate(examId, {
         onSuccess: () => {
           history.replace(Routes.HOME);
         },
@@ -228,52 +234,76 @@ const EditExamPage: React.FC = () => {
         </IonSegment>
 
         {segmentValue === 'details' ? (
-          <>
-            <FormField
-              label={'Titel'}
-              value={examFormData.title}
-              onChange={(value) =>
-                handleExamFormChange('title', String(value) || '')
-              }
-              placeholder={'Titel bearbeiten'}
-            />
-            <FormField
-              label={'Datum'}
-              value={examFormData.date}
-              onChange={(value) =>
-                handleExamFormChange('date', String(value) || '')
-              }
-              type="date"
-            />
-            <FormField
-              label={'Fach'}
-              value={examFormData.subject}
-              onChange={(value) =>
-                handleExamFormChange('subject', String(value) || '')
-              }
-              type="select"
-              options={subjects.map((subject: Subject) => ({
-                value: subject.id,
-                label: subject.name,
-              }))}
-            />
-            <FormField
-              label={'Beschreibung'}
-              value={examFormData.description}
-              onChange={(value) =>
-                handleExamFormChange('description', String(value) || '')
-              }
-              placeholder={'Beschreibung bearbeiten'}
-            />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              examForm.handleSubmit();
+            }}
+          >
+            <examForm.Field name="title">
+              {(field) => (
+                <FormField
+                  label={'Titel'}
+                  value={field.state.value}
+                  onChange={(value) => field.handleChange(String(value) || '')}
+                  placeholder={'Titel bearbeiten'}
+                />
+              )}
+            </examForm.Field>
 
-            <Button handleEvent={handleSave} text={'Speichern'} />
-          </>
+            <examForm.Field name="date">
+              {(field) => (
+                <FormField
+                  label={'Datum'}
+                  value={field.state.value}
+                  onChange={(value) => field.handleChange(String(value) || '')}
+                  type="date"
+                />
+              )}
+            </examForm.Field>
+
+            <examForm.Field name="subject">
+              {(field) => (
+                <FormField
+                  label={'Fach'}
+                  value={field.state.value}
+                  onChange={(value) => field.handleChange(String(value) || '')}
+                  type="select"
+                  options={subjects.map((subject: Subject) => ({
+                    value: subject.id,
+                    label: subject.name,
+                  }))}
+                />
+              )}
+            </examForm.Field>
+
+            <examForm.Field name="description">
+              {(field) => (
+                <FormField
+                  label={'Beschreibung'}
+                  value={field.state.value}
+                  onChange={(value) => field.handleChange(String(value) || '')}
+                  placeholder={'Beschreibung bearbeiten'}
+                />
+              )}
+            </examForm.Field>
+
+            <Button
+              handleEvent={() => examForm.handleSubmit()}
+              text={'Speichern'}
+            />
+          </form>
         ) : (
-          <>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              gradeForm.handleSubmit();
+            }}
+          >
             <div className="ion-padding">
               <p>
                 Tragen Sie hier die Note für die Prüfung &#34;
-                {examFormData.title}&#34; ein:
+                {examForm.getFieldValue('title') || exam?.name}&#34; ein:
               </p>
               <p className="ion-padding-vertical ion-text-small">
                 Wenn Sie eine Note eintragen, wird die Prüfung aus den
@@ -281,34 +311,44 @@ const EditExamPage: React.FC = () => {
               </p>
             </div>
 
-            <ValidatedNumberInput
-              label="Note"
-              value={gradeFormData.score}
-              onChange={(val) => handleGradeFormChange('score', val)}
-              validation={validateGrade}
-            />
+            <gradeForm.Field name="score">
+              {(field) => (
+                <ValidatedNumberInput
+                  label="Note"
+                  value={field.state.value}
+                  onChange={(val) => field.handleChange(val)}
+                  validation={validateGrade}
+                />
+              )}
+            </gradeForm.Field>
 
-            <ValidatedNumberInput
-              label="Gewichtung"
-              value={gradeFormData.weight}
-              onChange={(val) => handleGradeFormChange('weight', val)}
-              validation={validateWeight}
-            />
+            <gradeForm.Field name="weight">
+              {(field) => (
+                <ValidatedNumberInput
+                  label="Gewichtung (%)"
+                  value={field.state.value}
+                  onChange={(val) => field.handleChange(val)}
+                  validation={validateWeight}
+                />
+              )}
+            </gradeForm.Field>
 
-            <FormField
-              label={'Kommentar:'}
-              value={gradeFormData.comment}
-              onChange={(value) =>
-                handleGradeFormChange('comment', String(value) || '')
-              }
-              placeholder={'Kommentar zur Note'}
-            />
+            <gradeForm.Field name="comment">
+              {(field) => (
+                <FormField
+                  label={'Kommentar:'}
+                  value={field.state.value}
+                  onChange={(value) => field.handleChange(String(value) || '')}
+                  placeholder={'Kommentar zur Note'}
+                />
+              )}
+            </gradeForm.Field>
 
             <Button
               handleEvent={() => setShowGradeConfirmModal(true)}
               text={'Note eintragen'}
             />
-          </>
+          </form>
         )}
 
         <IonToast
@@ -328,16 +368,20 @@ const EditExamPage: React.FC = () => {
             <h2>Sind Sie sicher?</h2>
             <p>
               Durch das Eintragen einer Note wird die Prüfung &#34;
-              {examFormData.title}&#34; als abgeschlossen markiert und aus der
-              Liste der anstehenden Prüfungen entfernt.
+              {examForm.getFieldValue('title') || exam?.name}&#34; als
+              abgeschlossen markiert und aus der Liste der anstehenden Prüfungen
+              entfernt.
             </p>
             <p className="ion-padding-top">
-              Note: {gradeFormData.score}
+              Note: {gradeForm.getFieldValue('score')}
               <br />
-              Gewichtung: {gradeFormData.weight}
+              Gewichtung: {gradeForm.getFieldValue('weight')}%
             </p>
             <div className="ion-padding-top">
-              <Button handleEvent={handleAddGrade} text={'Bestätigen'} />
+              <Button
+                handleEvent={() => gradeForm.handleSubmit()}
+                text={'Bestätigen'}
+              />
               <Button
                 handleEvent={() => setShowGradeConfirmModal(false)}
                 text={'Abbrechen'}

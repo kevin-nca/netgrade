@@ -11,8 +11,8 @@ export const validateGrade = (value: number): string | null => {
 };
 
 export const validateWeight = (value: number): string | null => {
-  if (value <= 0 || value > 1)
-    return 'Bitte eine Zahl zwischen 0 und 1 eingeben.';
+  if (value <= 0 || value > 100)
+    return 'Bitte eine Zahl zwischen 0 und 100 eingeben.';
   if (
     value.toString().includes('.') &&
     value.toString().split('.')[1].length > 2
@@ -20,4 +20,12 @@ export const validateWeight = (value: number): string | null => {
     return 'Die Gewichtung darf maximal zwei Dezimalstellen haben.';
   }
   return null;
+};
+
+export const percentageToDecimal = (percentage: number): number => {
+  return percentage / 100;
+};
+
+export const decimalToPercentage = (decimal: number): number => {
+  return decimal * 100;
 };
