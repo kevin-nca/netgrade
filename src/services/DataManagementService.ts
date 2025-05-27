@@ -115,9 +115,9 @@ export class DataManagementService {
     try {
       const exportData = this.prepareExportData(school);
       const data = this.filterExportData(exportData);
-      const content = this.formatData(data);
+      const content = this.formatData(data, options.format);
       const filename = this.generateFilename(school.name, options.format);
-      const path = await this.saveFile(content, filename, options.format);
+      const path = await this.saveFile(content, filename);
       return path;
     } catch (error) {
       console.error('Export failed:', error);
@@ -230,10 +230,10 @@ export class DataManagementService {
   /**
    * Formats the data according to the specified format
    * @param data - The data to format
-   * @param format - The desired format
+   * @param exportFormat - The desired format
    * @returns string - The formatted data
    */
-  private static formatData(data: ExportData, format: ExportFormat): string {
+  private static formatData(data: ExportData, exportFormat: ExportFormat): string {
     const workbook = XLSX.utils.book_new();
 
     const schoolData = [
@@ -296,7 +296,7 @@ export class DataManagementService {
     const summariesSheet = XLSX.utils.aoa_to_sheet(summariesData);
     XLSX.utils.book_append_sheet(workbook, summariesSheet, 'Summaries');
 
-    switch (format) {
+    switch (exportFormat) {
       case 'json':
         return JSON.stringify(data, null, 2);
       case 'csv':
@@ -312,23 +312,20 @@ export class DataManagementService {
       case 'xlsx':
         return XLSX.write(workbook, { type: 'base64', bookType: 'xlsx' });
       default:
-        throw new Error(`Unsupported format: ${format}`);
+        throw new Error(`Unsupported format: ${exportFormat}`);
     }
   }
 
   /**
    * Generates a filename for the export
    * @param schoolName - The name of the school
-   * @param format - The export format
+   * @param exportFormat - The desired format
    * @returns string - The generated filename
    */
-  private static generateFilename(
-    schoolName: string,
-    format: ExportFormat,
-  ): string {
+  private static generateFilename(schoolName: string, exportFormat: ExportFormat): string {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const sanitizedName = schoolName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    return `${sanitizedName}_export_${timestamp}.${format}`;
+    return `${sanitizedName}_export_${timestamp}.${exportFormat}`;
   }
 
   /**
