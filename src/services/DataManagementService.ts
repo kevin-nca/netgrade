@@ -73,7 +73,8 @@ export type ExportFormat = 'json' | 'csv' | 'xlsx';
  * Options for configuring the export
  */
 export interface ExportOptions {
-  format: 'xlsx';
+  format: ExportFormat;
+  filename?: string;
 }
 
 export class DataManagementService {
@@ -106,19 +107,31 @@ export class DataManagementService {
    * Exports school data in the specified format
    * @param school - The school to export
    * @param options - Export options including format and content filters
-   * @returns Promise<string> - The path to the exported file
+   * * @returns Promise<Blob> - The exported file as a blob
    */
   static async exportData(
     school: School,
     options: ExportOptions,
-  ): Promise<string> {
+  ): Promise<Blob> {
     try {
       const exportData = this.prepareExportData(school);
       const data = this.filterExportData(exportData);
       const content = this.formatData(data, options.format);
-      const filename = this.generateFilename(school.name, options.format);
-      const path = await this.saveFile(content, filename);
-      return path;
+      if (options.format === 'xlsx') {
+        const base64Data = content;
+        const binaryString = atob(base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        return new Blob([bytes], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+      } else {
+        return new Blob([content], {
+          type: options.format === 'json' ? 'application/json' : 'text/csv',
+        });
+      }
     } catch (error) {
       console.error('Export failed:', error);
       throw error;

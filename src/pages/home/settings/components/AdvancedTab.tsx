@@ -6,6 +6,7 @@ import SettingsGroup from './SettingsGroup';
 import SettingsItem from './SettingsItem';
 import { ExportDialog } from '@/components/Export/ExportDialog';
 import { School } from '@/db/entities';
+import { useExportData } from '@/hooks/queries/useDataManagementQueries';
 
 interface AdvancedTabProps {
   onReset: () => void;
@@ -14,6 +15,7 @@ interface AdvancedTabProps {
 
 const AdvancedTab: React.FC<AdvancedTabProps> = ({ onReset, school }) => {
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const exportDataMutation = useExportData();
 
   return (
     <>
@@ -42,6 +44,7 @@ const AdvancedTab: React.FC<AdvancedTabProps> = ({ onReset, school }) => {
         isOpen={showExportDialog}
         onClose={() => setShowExportDialog(false)}
         school={school}
+        onExport={exportDataMutation.mutate}
       />
     </>
   );

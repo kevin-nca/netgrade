@@ -21,7 +21,7 @@ import {
 } from '@ionic/react';
 import { Routes } from '@/routes';
 import { trashOutline } from 'ionicons/icons';
-import { useDataManagementQueries } from '@/hooks/queries/useDataManagementQueries';
+import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 
 import SchoolsTab from '@/pages/home/settings/components/SchoolsTab';
 import AdvancedTab from '@/pages/home/settings/components/AdvancedTab';
@@ -33,7 +33,7 @@ const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const [present] = useIonToast();
   const [showResetAlert, setShowResetAlert] = useState(false);
-  const { resetDataMutation } = useDataManagementQueries();
+  const resetDataMutation = useResetAllDataMutation();
 
   const showToast = (message: string, isSuccess: boolean = true) => {
     present({
@@ -117,9 +117,9 @@ const SettingsPage: React.FC = () => {
           onAddSchool={() => setShowAddSchoolModal(true)}
         />
 
-        <AdvancedTab 
-          onReset={() => setShowResetAlert(true)} 
-          school={schools[0]} 
+        <AdvancedTab
+          onReset={() => setShowResetAlert(true)}
+          school={schools[0]}
         />
         <IonList>
           <IonItem>

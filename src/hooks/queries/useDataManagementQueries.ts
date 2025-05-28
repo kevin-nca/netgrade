@@ -5,35 +5,37 @@ import {
 } from '@/services/DataManagementService';
 import { School } from '@/db/entities';
 
-export function useDataManagementQueries() {
+export const useResetAllDataMutation = () => {
   const queryClient = useQueryClient();
 
-  const resetDataMutation = useMutation({
+  return useMutation<void, Error, void, unknown>({
     mutationFn: async () => {
-      return await DataManagementService.resetAllData();
+      await DataManagementService.resetAllData();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['schools'] });
-      queryClient.invalidateQueries({ queryKey: ['subjects'] });
-      queryClient.invalidateQueries({ queryKey: ['exams'] });
-      queryClient.invalidateQueries({ queryKey: ['grades'] });
-    },
-  });
-
-  const exportDataMutation = useMutation({
-    mutationFn: async ({
-      school,
-      options,
-    }: {
-      school: School;
-      options: ExportOptions;
-    }) => {
-      return await DataManagementService.exportData(school, options);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['grades'] });
+      await queryClient.invalidateQueries({ queryKey: ['exams'] });
+      await queryClient.invalidateQueries({ queryKey: ['subjects'] });
+      await queryClient.invalidateQueries({ queryKey: ['schools'] });
     },
   });
+};
 
-  return {
-    resetDataMutation,
-    exportDataMutation,
-  };
-}
+export const useExportData = () => {
+  return useMutation<string, Error, { school: School; options: ExportOptions }>(
+    {
+      mutationFn: async ({ school, options }) => {
+        const blob = await DataManagementService.exportData(school, options);
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = options.filename || `school-data.${options.format}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        return url;
+      },
+    },
+  );
+};

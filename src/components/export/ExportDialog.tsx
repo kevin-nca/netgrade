@@ -13,26 +13,30 @@ import {
   IonButton,
   IonButtons,
   IonIcon,
-  IonLoading,
   IonToast,
   IonCard,
   IonCardContent,
   IonText,
 } from '@ionic/react';
 import { close, downloadOutline } from 'ionicons/icons';
-import { useExportData } from '@/hooks/queries/useExportQueries';
-import { ExportFormat } from '@/services/DataManagementService';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { ExportFormat, ExportOptions } from '@/services/DataManagementService';
+import { School } from '@/db/entities';
 
 interface ExportDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  school: School;
+  onExport: (data: { school: School; options: ExportOptions }) => void;
 }
 
 export const ExportDialog: React.FC<ExportDialogProps> = ({
   isOpen,
   onClose,
+  school,
+  onExport,
 }) => {
-  const [format, setFormat] = useState<ExportFormat>('json');
+  const [format, setFormat] = useState<ExportFormat>('xlsx');
   const [includeSchools, setIncludeSchools] = useState(true);
   const [includeSubjects, setIncludeSubjects] = useState(true);
   const [includeExams, setIncludeExams] = useState(true);
@@ -40,32 +44,36 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
-  const exportMutation = useExportData();
-
   const handleExport = async () => {
     try {
-      const data = await exportMutation.mutateAsync({
-        format,
-        includeSchools,
-        includeSubjects,
-        includeExams,
-        includeGrades,
+      const result = await onExport({
+        school,
+        options: {
+          format,
+          filename: `school-data.${format}`,
+          includeSchools,
+          includeSubjects,
+          includeExams,
+          includeGrades,
+        },
       });
 
-      const blob = new Blob([data], {
-        type: format === 'json' ? 'application/json' : 'text/csv',
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `netgrade-export-${new Date().toISOString()}.${format}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      if (result && result.data) {
+        const fileName = `school-data-${new Date().toISOString().split('T')[0]}.${format}`;
+        await Filesystem.writeFile({
+          path: fileName,
+          data: result.data,
+          directory: Directory.Documents,
+          recursive: true,
+        });
+
+        setToastMessage('Export erfolgreich gespeichert!');
+        setShowToast(true);
+      }
 
       onClose();
     } catch (error) {
+      console.error('Export failed:', error);
       setToastMessage('Export fehlgeschlagen. Bitte versuchen Sie es erneut.');
       setShowToast(true);
     }
@@ -105,6 +113,10 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                     className="ion-margin-top"
                   >
                     <IonItem lines="none">
+                      <IonLabel>Excel (XLSX)</IonLabel>
+                      <IonRadio value="xlsx" />
+                    </IonItem>
+                    <IonItem lines="none">
                       <IonLabel>JSON</IonLabel>
                       <IonRadio value="json" />
                     </IonItem>
@@ -115,7 +127,6 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                   </IonRadioGroup>
                 </IonLabel>
               </IonItem>
-
               <IonItem className="ion-margin-bottom">
                 <IonLabel className="ion-text-wrap">
                   <h2>Daten auswählen</h2>
@@ -161,7 +172,6 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
           <IonButton
             expand="block"
             onClick={handleExport}
-            disabled={exportMutation.isPending}
             className="ion-margin-top"
           >
             <IonIcon icon={downloadOutline} slot="start" />
@@ -170,17 +180,13 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         </div>
       </IonContent>
 
-      <IonLoading
-        isOpen={exportMutation.isPending}
-        message="Daten werden exportiert..."
-      />
       <IonToast
         isOpen={showToast}
         onDidDismiss={() => setShowToast(false)}
         message={toastMessage}
         duration={3000}
         position="bottom"
-        color="danger"
+        color={toastMessage.includes('fehlgeschlagen') ? 'danger' : 'success'}
       />
     </>
   );
