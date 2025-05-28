@@ -170,7 +170,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 
       <IonLoading
         isOpen={exportMutation.isPending}
-        message="Daten werden exportiert..."
+        message="Daten werden exportiert...."
       />
       <IonToast
         isOpen={showToast}
