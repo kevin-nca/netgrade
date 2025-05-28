@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { trashOutline, downloadOutline } from 'ionicons/icons';
-import { IonText } from '@ionic/react';
+import { IonText, IonItem, IonIcon, IonLabel } from '@ionic/react';
 import SettingsHeader from './SettingsHeader';
 import SettingsGroup from './SettingsGroup';
 import SettingsItem from './SettingsItem';
 import { ExportDialog } from '@/components/Export/ExportDialog';
 import { School } from '@/db/entities';
-import { useExportData } from '@/hooks/queries/useDataManagementQueries';
 
 interface AdvancedTabProps {
   onReset: () => void;
@@ -14,8 +13,7 @@ interface AdvancedTabProps {
 }
 
 const AdvancedTab: React.FC<AdvancedTabProps> = ({ onReset, school }) => {
-  const [showExportDialog, setShowExportDialog] = useState(false);
-  const exportDataMutation = useExportData();
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   return (
     <>
@@ -27,11 +25,10 @@ const AdvancedTab: React.FC<AdvancedTabProps> = ({ onReset, school }) => {
         <IonText color="medium" className="ion-padding-horizontal">
           <p>Hier können Sie Ihre Daten exportieren oder zurücksetzen.</p>
         </IonText>
-        <SettingsItem
-          icon={downloadOutline}
-          label="Daten exportieren"
-          onClick={() => setShowExportDialog(true)}
-        />
+        <IonItem button onClick={() => setIsExportDialogOpen(true)}>
+          <IonIcon icon={downloadOutline} slot="start" />
+          <IonLabel>Daten exportieren</IonLabel>
+        </IonItem>
         <SettingsItem
           icon={trashOutline}
           label="Alle Daten zurücksetzen"
@@ -41,10 +38,9 @@ const AdvancedTab: React.FC<AdvancedTabProps> = ({ onReset, school }) => {
       </SettingsGroup>
 
       <ExportDialog
-        isOpen={showExportDialog}
-        onClose={() => setShowExportDialog(false)}
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
         school={school}
-        onExport={exportDataMutation.mutate}
       />
     </>
   );
