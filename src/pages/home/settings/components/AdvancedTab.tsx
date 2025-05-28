@@ -4,7 +4,7 @@ import { IonText, IonItem, IonIcon, IonLabel } from '@ionic/react';
 import SettingsHeader from './SettingsHeader';
 import SettingsGroup from './SettingsGroup';
 import SettingsItem from './SettingsItem';
-import { ExportDialog } from '@/components/Export/ExportDialog';
+import { ExportDialog } from '@/components/export/ExportDialog';
 import { School } from '@/db/entities';
 
 interface AdvancedTabProps {
