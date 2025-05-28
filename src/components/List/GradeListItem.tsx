@@ -7,6 +7,7 @@ import {
   IonLabel,
 } from '@ionic/react';
 import { Grade } from '@/db/entities';
+import { decimalToPercentage } from '@/utils/validation';
 
 interface GradeListItemProps {
   grade: Grade;
@@ -21,13 +22,15 @@ const GradeListItem: React.FC<GradeListItemProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const weightPercentage = decimalToPercentage(grade.weight);
+
   return (
     <IonItemSliding key={index}>
       <IonItem>
         <IonLabel>
           <h2>Titel: {grade.exam.name}</h2>
           <p>Note: {grade.score}</p>
-          <p>Gewichtung: {grade.weight}</p>
+          <p>Gewichtung: {weightPercentage}%</p>
           <p>Datum: {new Date(grade.date).toLocaleDateString()}</p>
           {/*<p>Zählt: {grade.counts ? 'Ja' : 'Nein'}</p>*/}
           <p>Kommentar: {grade.comment}</p>
