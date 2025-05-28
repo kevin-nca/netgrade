@@ -83,7 +83,10 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         <IonCard className="ion-no-margin">
           <IonCardContent>
             <IonText color="medium" className="ion-padding-bottom">
-              <p>Wählen Sie das Format und die Daten aus, die Sie exportieren möchten.</p>
+              <p>
+                Wählen Sie das Format und die Daten aus, die Sie exportieren
+                möchten.
+              </p>
             </IonText>
 
             <IonList lines="none" className="ion-padding-vertical">
@@ -126,7 +129,9 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                       <IonLabel>Fächer</IonLabel>
                       <IonCheckbox
                         checked={includeSubjects}
-                        onIonChange={(e) => setIncludeSubjects(e.detail.checked)}
+                        onIonChange={(e) =>
+                          setIncludeSubjects(e.detail.checked)
+                        }
                       />
                     </IonItem>
                     <IonItem lines="none">
