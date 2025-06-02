@@ -31,7 +31,7 @@ export const useExportData = () => {
         });
 
         return true;
-      } else {
+      } 
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -42,7 +42,6 @@ export const useExportData = () => {
         window.URL.revokeObjectURL(url);
 
         return true;
-      }
     },
   });
 };
