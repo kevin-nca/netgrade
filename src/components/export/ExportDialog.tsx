@@ -23,6 +23,7 @@ import { close, downloadOutline } from 'ionicons/icons';
 import { useExportData } from '@/hooks/queries/useDataManagementQueries';
 import { ExportFormat } from '@/services/DataManagementService';
 import { School } from '@/db/entities';
+import { useUserName } from '@/hooks/queries';
 
 interface ExportDialogProps {
   isOpen: boolean;
@@ -44,13 +45,18 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
   const [toastMessage, setToastMessage] = useState('');
 
   const exportMutation = useExportData();
+  const { data: userName } = useUserName();
+
   const handleExport = async () => {
     try {
+      const timestamp = new Date().toISOString().split('T')[0];
+      const username = userName ? `${userName}-` : '';
+      
       await exportMutation.mutateAsync({
         school,
         options: {
           format,
-          filename: `netgrade-export-${new Date().toISOString()}.${format}`,
+          filename: `netgrade-${username}${timestamp}.${format}`,
           includeSchools,
           includeSubjects,
           includeExams,
