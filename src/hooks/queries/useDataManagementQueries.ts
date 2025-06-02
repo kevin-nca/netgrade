@@ -24,7 +24,11 @@ export const useResetAllDataMutation = () => {
 };
 
 export const useExportData = () => {
-  return useMutation<boolean, Error, { school: School; options: ExportOptions }>({
+  return useMutation<
+    boolean,
+    Error,
+    { school: School; options: ExportOptions }
+  >({
     mutationFn: async ({ school, options }) => {
       const data = await DataManagementService.exportData(school, options);
       const blob = new Blob([data], { type: 'application/octet-stream' });
@@ -32,12 +36,12 @@ export const useExportData = () => {
       if (Capacitor.isNativePlatform()) {
         const base64Data = await blobToBase64(blob);
         const fileName = options.filename || `school-data.${options.format}`;
-        
+
         await Filesystem.writeFile({
           path: fileName,
           data: base64Data,
           directory: Directory.Documents,
-          recursive: true
+          recursive: true,
         });
 
         return true;
