@@ -21,7 +21,7 @@ import {
 } from '@ionic/react';
 import { Routes } from '@/routes';
 import { trashOutline } from 'ionicons/icons';
-import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
+import { useResetAllDataMutation } from '@/hooks';
 
 import SchoolsTab from '@/pages/home/settings/components/SchoolsTab';
 import AdvancedTab from '@/pages/home/settings/components/AdvancedTab';
