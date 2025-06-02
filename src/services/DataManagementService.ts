@@ -118,7 +118,19 @@ export class DataManagementService {
     options: ExportOptions,
   ): Promise<Blob> {
     try {
-      const exportData = this.prepareExportData(school);
+      const dataSource = getDataSource();
+      const schoolWithSubjects = await dataSource
+        .getRepository(School)
+        .findOne({
+          where: { id: school.id },
+          relations: ['subjects', 'subjects.exams', 'subjects.exams.grade'],
+        });
+
+      if (!schoolWithSubjects) {
+        throw new Error('School not found');
+      }
+
+      const exportData = this.prepareExportData(schoolWithSubjects);
       const data = this.filterExportData(exportData);
       const content = this.formatData(data, options.format);
       if (options.format === 'xlsx') {
