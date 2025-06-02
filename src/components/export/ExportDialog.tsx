@@ -51,7 +51,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     try {
       const timestamp = new Date().toISOString().split('T')[0];
       const username = userName ? `${userName}-` : '';
-      
+
       await exportMutation.mutateAsync({
         school,
         options: {
@@ -68,9 +68,9 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     } catch (error) {
       console.error('Export failed:', error);
       setToastMessage(
-        error instanceof Error 
+        error instanceof Error
           ? `Export fehlgeschlagen: ${error.message}`
-          : 'Export fehlgeschlagen. Bitte versuchen Sie es erneut.'
+          : 'Export fehlgeschlagen. Bitte versuchen Sie es erneut.',
       );
       setShowToast(true);
     }
