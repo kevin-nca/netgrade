@@ -65,8 +65,13 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
       });
 
       onClose();
-    } catch {
-      setToastMessage('Export fehlgeschlagen. Bitte versuchen Sie es erneut.');
+    } catch (error) {
+      console.error('Export failed:', error);
+      setToastMessage(
+        error instanceof Error 
+          ? `Export fehlgeschlagen: ${error.message}`
+          : 'Export fehlgeschlagen. Bitte versuchen Sie es erneut.'
+      );
       setShowToast(true);
     }
   };
