@@ -2,10 +2,13 @@ import React from 'react';
 import { IonInput, IonItem, IonLabel, IonToast } from '@ionic/react';
 
 interface ValidatedNumberInputProps {
-  label: string;
+  label?: string;
   value: number;
   onChange: (value: number) => void;
   validation: (value: number) => string | null;
+  step?: string;
+  min?: string;
+  max?: string;
 }
 
 const ValidatedNumberInput: React.FC<ValidatedNumberInputProps> = ({
@@ -13,6 +16,9 @@ const ValidatedNumberInput: React.FC<ValidatedNumberInputProps> = ({
   value,
   onChange,
   validation,
+  step = '1',
+  min,
+  max,
 }) => {
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
@@ -38,9 +44,26 @@ const ValidatedNumberInput: React.FC<ValidatedNumberInputProps> = ({
 
   return (
     <>
-      <IonItem>
-        <IonLabel position="stacked">{label}</IonLabel>
-        <IonInput type="number" value={value} onIonChange={handleInputChange} />
+      <IonItem
+        style={{
+          '--border-width': '0px',
+          '--border-style': 'none',
+          '--border-color': 'transparent',
+          '--inner-border-width': '0px',
+          '--show-full-highlight': '0',
+          '--show-inset-highlight': '0',
+          '--highlight-height': '0px',
+        }}
+      >
+        {label && <IonLabel position="stacked">{label}</IonLabel>}
+        <IonInput
+          type="number"
+          value={value}
+          onIonChange={handleInputChange}
+          step={step}
+          min={min}
+          max={max}
+        />
       </IonItem>
       <IonToast
         isOpen={!!errorMessage}

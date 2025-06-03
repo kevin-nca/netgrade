@@ -10,7 +10,7 @@ import OnboardingPage from '@/pages/onboarding/OnboardingPage';
 import SchoolPage from '@/pages/home/school/SchoolPage';
 import AddGradePage from '@/pages/home/grades/AddGradePage';
 import HomePage from '@/pages/home/HomePage';
-import EditExamPage from '@/pages/home/exams/EditExamPage';
+import EditExamPage from '@/pages/home/exams/EditExamPage/EditExamPage';
 import { Routes } from '@/routes';
 import { useOnboardingCompleted } from '@/hooks/queries';
 
