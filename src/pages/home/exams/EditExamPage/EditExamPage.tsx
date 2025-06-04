@@ -36,7 +36,8 @@ import {
   scaleOutline,
   documentTextOutline,
 } from 'ionicons/icons';
-import { useForm } from '@tanstack/react-form';
+import { DeepRecord, useForm } from '@tanstack/react-form';
+import type { Updater } from '@tanstack/react-form';
 import {
   useExam,
   useUpdateExam,
@@ -336,18 +337,34 @@ const EditExamPage: React.FC = () => {
               </IonLabel>
             </IonSegmentButton>
           </IonSegment>
-
           {segmentValue === 'details' ? (
             <ExamDetailsForm
-              examForm={examForm}
+              formValues={examForm.state.values as ExamFormData}
+              onFieldChange={(field, value) =>
+                examForm.setFieldValue(
+                  field as keyof ExamFormData,
+                  value as Updater<
+                    DeepRecord<ExamFormData>[keyof ExamFormData]
+                  >,
+                )
+              }
               subjects={subjects}
               isSubmitting={updateExamMutation.isPending}
+              onSubmit={examForm.handleSubmit}
             />
           ) : (
             <GradeForm
-              gradeForm={gradeForm}
+              formValues={gradeForm.state.values as GradeFormData}
+              onFieldChange={(field, value) =>
+                gradeForm.setFieldValue(
+                  field as keyof GradeFormData,
+                  value as Updater<
+                    DeepRecord<GradeFormData>[keyof GradeFormData]
+                  >,
+                )
+              }
               getGradeColor={getGradeColor}
-              onSubmit={() => gradeForm.handleSubmit()}
+              onSubmit={gradeForm.handleSubmit}
             />
           )}
         </div>

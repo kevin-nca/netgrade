@@ -16,7 +16,7 @@ const ValidatedNumberInput: React.FC<ValidatedNumberInputProps> = ({
   value,
   onChange,
   validation,
-  step = '1',
+  step,
   min,
   max,
 }) => {
@@ -44,18 +44,19 @@ const ValidatedNumberInput: React.FC<ValidatedNumberInputProps> = ({
 
   return (
     <>
-      <IonItem
-        style={{
-          '--border-width': '0px',
-          '--border-style': 'none',
-          '--border-color': 'transparent',
-          '--inner-border-width': '0px',
-          '--show-full-highlight': '0',
-          '--show-inset-highlight': '0',
-          '--highlight-height': '0px',
-        }}
-      >
-        {label && <IonLabel position="stacked">{label}</IonLabel>}
+      {label ? (
+        <IonItem>
+          <IonLabel position="stacked">{label}</IonLabel>
+          <IonInput
+            type="number"
+            value={value}
+            onIonChange={handleInputChange}
+            step={step}
+            min={min}
+            max={max}
+          />
+        </IonItem>
+      ) : (
         <IonInput
           type="number"
           value={value}
@@ -64,7 +65,7 @@ const ValidatedNumberInput: React.FC<ValidatedNumberInputProps> = ({
           min={min}
           max={max}
         />
-      </IonItem>
+      )}
       <IonToast
         isOpen={!!errorMessage}
         onDidDismiss={() => setErrorMessage(null)}

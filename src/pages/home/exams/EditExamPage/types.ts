@@ -1,5 +1,3 @@
-import { FormApi } from '@tanstack/react-form';
-
 export interface ExamFormData {
   title: string;
   date: string;
@@ -16,6 +14,3 @@ export interface GradeFormData {
 export interface ExamParams {
   examId: string;
 }
-
-export type ExamFormApi = FormApi<ExamFormData>; //todo muss anderst gelöst werden
-export type GradeFormApi = FormApi<GradeFormData>;

@@ -23,22 +23,25 @@ import {
 } from 'ionicons/icons';
 import ValidatedNumberInput from '@/components/Form/validated-number-input/validatedNumberInput';
 import { validateGrade, validateWeight } from '@/utils/validation';
-import { GradeFormApi, GradeFormData } from '../types';
+import { GradeFormData } from '../types';
 import styles from '../styles/GradeForm.module.css';
 
 interface GradeFormProps {
-  gradeForm: GradeFormApi;
+  formValues: GradeFormData;
+  onFieldChange: <K extends keyof GradeFormData>(
+    field: K,
+    value: GradeFormData[K],
+  ) => void;
   getGradeColor: (grade: number) => string;
   onSubmit: () => void;
 }
 
 export const GradeForm: React.FC<GradeFormProps> = ({
-  gradeForm,
+  formValues,
+  onFieldChange,
   getGradeColor,
   onSubmit,
 }) => {
-  const formValues = gradeForm.state.values as GradeFormData;
-
   const currentScore = formValues.score;
   const currentWeight = formValues.weight;
 
@@ -48,24 +51,24 @@ export const GradeForm: React.FC<GradeFormProps> = ({
   const handleScoreChange = useCallback(
     (value: number) => {
       setLocalScore(value);
-      gradeForm.setFieldValue('score', value);
+      onFieldChange('score', value);
     },
-    [gradeForm],
+    [onFieldChange],
   );
 
   const handleWeightChange = useCallback(
     (value: number) => {
       setLocalWeight(value);
-      gradeForm.setFieldValue('weight', value);
+      onFieldChange('weight', value);
     },
-    [gradeForm],
+    [onFieldChange],
   );
 
   const handleCommentChange = useCallback(
     (value: string) => {
-      gradeForm.setFieldValue('comment', value || '');
+      onFieldChange('comment', value || '');
     },
-    [gradeForm],
+    [onFieldChange],
   );
 
   return (

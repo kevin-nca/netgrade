@@ -21,41 +21,42 @@ import {
   saveOutline,
 } from 'ionicons/icons';
 import { Subject } from '@/db/entities';
-import { ExamFormApi, ExamFormData } from '../types';
+import { ExamFormData } from '../types';
 import styles from '../styles/FormCommon.module.css';
 
 interface ExamDetailsFormProps {
-  examForm: ExamFormApi;
+  formValues: ExamFormData;
+  onFieldChange: <K extends keyof ExamFormData>(
+    field: K,
+    value: ExamFormData[K],
+  ) => void;
   subjects: Subject[];
   isSubmitting: boolean;
+  onSubmit: () => void;
 }
 
 export const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
-  examForm,
+  formValues,
+  onFieldChange,
   subjects,
   isSubmitting,
+  onSubmit,
 }) => {
   const handleTitleChange = (value: string) => {
-    examForm.setFieldValue('title', value || '');
+    onFieldChange('title', value || '');
   };
 
   const handleDateChange = (value: string) => {
-    examForm.setFieldValue('date', value || '');
+    onFieldChange('date', value || '');
   };
 
   const handleSubjectChange = (value: string) => {
-    examForm.setFieldValue('subject', value);
+    onFieldChange('subject', value);
   };
 
   const handleDescriptionChange = (value: string) => {
-    examForm.setFieldValue('description', value || '');
+    onFieldChange('description', value || '');
   };
-
-  const handleSubmit = () => {
-    examForm.handleSubmit();
-  };
-
-  const formValues = examForm.state.values as ExamFormData;
 
   return (
     <IonCard className={styles.formCard}>
@@ -168,7 +169,7 @@ export const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
         <IonButton
           expand="block"
           className={styles.formButton}
-          onClick={handleSubmit}
+          onClick={onSubmit}
           disabled={isSubmitting}
         >
           {isSubmitting ? (
