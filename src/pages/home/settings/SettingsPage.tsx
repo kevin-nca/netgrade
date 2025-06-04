@@ -132,7 +132,7 @@ const SettingsPage: React.FC = () => {
           onAddSchool={() => setShowAddSchoolModal(true)}
         />
 
-        <AdvancedTab onReset={handleResetData} />
+        <AdvancedTab onReset={handleResetData} school={schools[0]} />
       </IonContent>
 
       <AddSchoolModal
