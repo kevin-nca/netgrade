@@ -114,7 +114,6 @@ export class DataManagementService {
    * * @returns Promise<Blob> - The exported file as a blob
    */
   static async exportData(
-    school: School,
     options: ExportOptions,
   ): Promise<Blob> {
     try {
