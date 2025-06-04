@@ -60,17 +60,19 @@ platform :ios do
       in_house: false # optional but may be required if using match/sigh
     )
 
-    # Create a changelog that shows the original version string
-    changelog_text = if original_build_part && original_build_part.match(/[^0-9]/)
-      "Version #{version_without_build} (#{original_build_part}) - Build #{build_number}"
-    else
-      "Version #{version_without_build} (Build #{build_number})"
-    end
+    # Get changelog from environment variable set by GitHub Actions
+    # Provide a default message if the variable isn't set
+    release_notes_changelog = ENV['RELEASE_NOTES'] || "Build #{version} - No detailed release notes provided."
+
 
     upload_to_testflight(
+      api_key: api_key,
       skip_waiting_for_build_processing: true,
-      changelog: changelog_text,
-      api_key: api_key
+      changelog: release_notes_changelog,
+      expire_previous_builds: true,
+      uses_non_exempt_encryption: false,
+      distribute_external: true,
+      groups: ["internal", "nca"]
     )
   end
 end
