@@ -27,7 +27,7 @@ export const useExportData = () => {
   return useMutation<
     boolean,
     Error,
-    { school: School; options: ExportOptions }
+    { options: ExportOptions }
   >({
     mutationFn: async ({ school, options }) => {
       const data = await DataManagementService.exportData(school, options);
