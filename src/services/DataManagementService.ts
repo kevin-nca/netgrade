@@ -75,10 +75,6 @@ export type ExportFormat = 'json' | 'csv' | 'xlsx';
 export interface ExportOptions {
   format: ExportFormat;
   filename?: string;
-  includeSchools: boolean;
-  includeSubjects: boolean;
-  includeExams: boolean;
-  includeGrades: boolean;
 }
 
 export class DataManagementService {
@@ -121,7 +117,6 @@ export class DataManagementService {
       const schoolWithSubjects = await dataSource
         .getRepository(School)
         .findOne({
-          where: { id: school.id },
           relations: ['subjects', 'subjects.exams', 'subjects.exams.grade'],
         });
 
