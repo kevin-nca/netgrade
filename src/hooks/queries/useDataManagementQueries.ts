@@ -24,11 +24,7 @@ export const useResetAllDataMutation = () => {
 };
 
 export const useExportData = () => {
-  return useMutation<
-    boolean,
-    Error,
-    { options: ExportOptions }
-  >({
+  return useMutation<boolean, Error, { options: ExportOptions }>({
     mutationFn: async ({ school, options }) => {
       const data = await DataManagementService.exportData(school, options);
       const blob = new Blob([data], { type: 'application/octet-stream' });

@@ -109,9 +109,7 @@ export class DataManagementService {
    * @param options - Export options including format and content filters
    * * @returns Promise<Blob> - The exported file as a blob
    */
-  static async exportData(
-    options: ExportOptions,
-  ): Promise<Blob> {
+  static async exportData(options: ExportOptions): Promise<Blob> {
     try {
       const dataSource = getDataSource();
       const schoolWithSubjects = await dataSource
