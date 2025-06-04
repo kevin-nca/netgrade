@@ -28,7 +28,6 @@ import { useUserName } from '@/hooks/queries';
 interface ExportDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  school: School;
 }
 
 export const ExportDialog: React.FC<ExportDialogProps> = ({
