@@ -20,7 +20,7 @@ import {
   IonLoading,
 } from '@ionic/react';
 import { close, downloadOutline } from 'ionicons/icons';
-import { useExportData } from '@/hooks/queries/useDataManagementQueries';
+import { useExportData } from '@/hooks';
 import { ExportFormat } from '@/services/DataManagementService';
 import { School } from '@/db/entities';
 import { useUserName } from '@/hooks';
