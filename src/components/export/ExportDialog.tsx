@@ -23,7 +23,7 @@ import { close, downloadOutline } from 'ionicons/icons';
 import { useExportData } from '@/hooks/queries/useDataManagementQueries';
 import { ExportFormat } from '@/services/DataManagementService';
 import { School } from '@/db/entities';
-import { useUserName } from '@/hooks/queries';
+import { useUserName } from '@/hooks';
 
 interface ExportDialogProps {
   isOpen: boolean;
