@@ -2,10 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   DataManagementService,
   ExportOptions,
+  ExportFormat,
 } from '@/services/DataManagementService';
 import { School } from '@/db/entities';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+
+export type { ExportFormat };
 
 export const useResetAllDataMutation = () => {
   const queryClient = useQueryClient();
@@ -24,11 +27,7 @@ export const useResetAllDataMutation = () => {
 };
 
 export const useExportData = () => {
-  return useMutation<
-    boolean,
-    Error,
-    { options: ExportOptions }
-  >({
+  return useMutation<boolean, Error, { options: ExportOptions }>({
     mutationFn: async ({ school, options }) => {
       const data = await DataManagementService.exportData(school, options);
       const blob = new Blob([data], { type: 'application/octet-stream' });
