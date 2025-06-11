@@ -30,7 +30,16 @@ export const useOnboardingCompleted = () => {
   return useQuery({
     queryKey: preferencesKeys.onboardingCompleted(),
     queryFn: () => PreferencesService.isOnboardingCompleted(),
-    initialData: false,
+    initialData: () => {
+      try {
+        const value = localStorage.getItem(
+          'CapacitorStorage.onboarding_completed',
+        );
+        return value === 'true';
+      } catch {
+        return false;
+      }
+    },
   });
 };
 
