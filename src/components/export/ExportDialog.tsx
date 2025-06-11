@@ -280,42 +280,6 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
             </IonButton>
           </div>
 
-          {isNative && (
-            <IonCard className="ion-margin-top">
-              <IonCardContent>
-                <IonText color="primary">
-                  <h3>Verfügbare Optionen</h3>
-                  <p>
-                    Das System zeigt automatisch alle verfügbaren
-                    Sharing-Optionen an:
-                  </p>
-                  <ul className="ion-margin-start">
-                    <li>
-                      <strong>AirDrop:</strong> Direkte Übertragung zu anderen
-                      Apple-Geräten
-                    </li>
-                    <li>
-                      <strong>E-Mail & Nachrichten:</strong> Versand als
-                      Dateianhang
-                    </li>
-                    <li>
-                      <strong>Messenger-Apps:</strong> WhatsApp, Telegram,
-                      Signal
-                    </li>
-                    <li>
-                      <strong>Cloud-Dienste:</strong> iCloud, Dropbox, Google
-                      Drive
-                    </li>
-                    <li>
-                      <strong>Andere Apps:</strong> Alle installierten Apps mit
-                      Excel-Unterstützung
-                    </li>
-                  </ul>
-                </IonText>
-              </IonCardContent>
-            </IonCard>
-          )}
-
           {!isNative && (
             <IonCard className="ion-margin-top">
               <IonCardContent>
