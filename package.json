@@ -16,6 +16,7 @@
     "android": "cap open android"
   },
   "dependencies": {
+    "@awesome-cordova-plugins/social-sharing": "^8.0.0",
     "@capacitor-community/sqlite": "^7.0.0",
     "@capacitor/android": "^7.2.0",
     "@capacitor/app": "^7.0.1",
@@ -34,7 +35,9 @@
     "@tanstack/react-query": "^5.74.4",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
+    "cordova-plugin-x-socialsharing": "^6.0.4",
     "date-fns": "^4.1.0",
+    "es6-promise-plugin": "^4.2.2",
     "ionicons": "^7.4.0",
     "localforage": "^1.10.0",
     "react": "^18.2.0",

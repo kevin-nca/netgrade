@@ -27,34 +27,14 @@ export const useResetAllDataMutation = () => {
 };
 
 export const useExportData = () => {
-  return useMutation<boolean, Error, { options: ExportOptions }>({
-    mutationFn: async ({ school, options }) => {
-      const data = await DataManagementService.exportData(school, options);
-      const blob = new Blob([data], { type: 'application/octet-stream' });
+  const queryClient = useQueryClient();
 
-      if (Capacitor.isNativePlatform()) {
-        const base64Data = await blobToBase64(blob);
-        const fileName = options.filename || `school-data.${options.format}`;
-
-        await Filesystem.writeFile({
-          path: fileName,
-          data: base64Data,
-          directory: Directory.Documents,
-          recursive: true,
-        });
-
-        return true;
-      }
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = options.filename || `school-data.${options.format}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      return true;
+  return useMutation({
+    mutationFn: async (params: { options: ExportOptions }) => {
+      return DataManagementService.exportData(params.options);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['schools'] });
     },
   });
 };
