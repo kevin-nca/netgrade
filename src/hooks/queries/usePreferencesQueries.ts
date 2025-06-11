@@ -30,6 +30,7 @@ export const useOnboardingCompleted = () => {
   return useQuery({
     queryKey: preferencesKeys.onboardingCompleted(),
     queryFn: () => PreferencesService.isOnboardingCompleted(),
+    initialData: false,
   });
 };
 
