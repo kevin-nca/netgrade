@@ -10,7 +10,6 @@ import {
   IonRefresher,
   IonRefresherContent,
   useIonAlert,
-  useIonRouter,
   useIonToast,
   RefresherEventDetail,
 } from '@ionic/react';
@@ -42,7 +41,6 @@ const SettingsPage: React.FC = () => {
   const resetAllDataMutation = useResetAllDataMutation();
 
   const [presentAlert] = useIonAlert();
-  const router = useIonRouter();
 
   const handleAddSchool = (schoolData: { name: string }) => {
     addSchoolMutation.mutate(
