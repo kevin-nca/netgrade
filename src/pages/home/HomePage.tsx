@@ -17,7 +17,7 @@ import {
 } from '@ionic/react';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import { add, calendar, settings } from 'ionicons/icons';
-import ExamList from '@/features/exams/ExamList';
+import ExamList from '@/features/exams/ExamList/ExamList';
 import Button from '@/components/Button/Button';
 import { useSchools, useGrades, useUserName } from '@/hooks/queries';
 import { Routes } from '@/routes';
