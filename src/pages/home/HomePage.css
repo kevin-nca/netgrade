@@ -1,0 +1,219 @@
+.page-background {
+  --background: var(--ion-color-light);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.welcome-card {
+  margin: 16px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-secondary) 100%);
+  color: white;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+.welcome-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-subtitle {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.profile-icon {
+  width: 48px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.profile-icon:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.grades-overview-subtitle {
+  margin: 32px 16px 16px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grades-overview-subtitle::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 24px;
+  background: var(--ion-color-primary);
+  border-radius: 2px;
+}
+
+.grade-card {
+  margin: 12px 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --background: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.grade-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.grade-card ion-item {
+  --padding-start: 20px;
+  --padding-end: 20px;
+  --min-height: 70px;
+  --background: transparent;
+}
+
+.grade-card ion-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+.grade-average {
+  font-weight: 700;
+  color: var(--ion-color-primary);
+  font-size: 1.1rem;
+  padding: 4px 12px;
+  background: rgba(var(--ion-color-primary-rgb), 0.1);
+  border-radius: 20px;
+}
+
+.footer-toolbar {
+  --background: white;
+  --border-color: rgba(0, 0, 0, 0.1);
+  padding: 12px 0;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+}
+
+
+
+.footer-button:hover {
+  --color: var(--ion-color-primary);
+  transform: scale(1.1);
+}
+
+.home-button {
+  --background: var(--ion-color-primary);
+  --background-activated: var(--ion-color-primary-shade);
+  --background-hover: var(--ion-color-primary-tint);
+  --box-shadow: 0 6px 16px rgba(var(--ion-color-primary-rgb), 0.4);
+  width: 64px;
+  height: 64px;
+  transition: all 0.3s ease;
+}
+
+.home-button:hover {
+  transform: scale(1.1) rotate(90deg);
+  --box-shadow: 0 8px 20px rgba(var(--ion-color-primary-rgb), 0.5);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.home-button:hover {
+  animation: pulse 1s infinite;
+}
+
+@media (min-width: 768px) {
+  .welcome-card {
+    margin: 24px auto;
+    max-width: 800px;
+    padding: 32px;
+  }
+
+  .welcome-title {
+    font-size: 2rem;
+  }
+
+  .grade-card {
+    margin: 12px auto;
+    max-width: 800px;
+  }
+
+  .grades-overview-subtitle {
+    margin: 32px auto 16px;
+    max-width: 800px;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  background: white;
+  border-radius: 16px;
+  margin: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.empty-state-icon {
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+  color: var(--ion-color-primary);
+  opacity: 0.8;
+}
+
+.empty-state-message {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--ion-color-medium);
+  font-weight: 500;
+}
+
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
