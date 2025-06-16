@@ -52,7 +52,6 @@ interface ToastState {
 export const ExportDialog: React.FC<ExportDialogProps> = ({
   isOpen,
   onClose,
-  school,
 }) => {
   const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
   const [customFilename, setCustomFilename] = useState<string>('');
@@ -69,12 +68,14 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
   const isNative = Capacitor.isNativePlatform();
 
   useEffect(() => {
-    if (school) {
-      setSelectedSchoolId(school.id);
-    }
-  }, [school]);
+    const generateDefaultFilename = () => {
+      const timestamp = new Date().toISOString().split('T')[0];
+      const username = userName ? `${userName}-` : '';
+      const selectedSchool = schools?.find((s) => s.id === selectedSchoolId);
+      const schoolName = selectedSchool?.name ? `${selectedSchool.name}-` : '';
+      return `netgrade-${schoolName}${username}${timestamp}`;
+    };
 
-  useEffect(() => {
     const newFilename = generateDefaultFilename();
     setCustomFilename(newFilename.replace('.xlsx', ''));
   }, [selectedSchoolId, userName, schools]);
@@ -84,14 +85,6 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     color: ToastState['color'] = 'danger',
   ) => {
     setToast({ show: true, message, color });
-  };
-
-  const generateDefaultFilename = () => {
-    const timestamp = new Date().toISOString().split('T')[0];
-    const username = userName ? `${userName}-` : '';
-    const selectedSchool = schools?.find((s) => s.id === selectedSchoolId);
-    const schoolName = selectedSchool?.name ? `${selectedSchool.name}-` : '';
-    return `netgrade-${schoolName}${username}${timestamp}`;
   };
 
   const getFinalFilename = () => {

@@ -4,11 +4,11 @@ import { Exam } from '@/db/entities/Exam';
 
 export interface AddExamAndGradePayload {
   subjectId: string;
-  examName: string; // For Exam.name
-  date: Date; // For both Exam.date and Grade.date
-  score: number; // For Grade.score
-  weight: number; // For Grade.weight (also used for Exam.weight if desired)
-  comment?: string; // For Grade.comment
+  examName: string;
+  date: Date;
+  score: number;
+  weight: number;
+  comment?: string;
 }
 
 export class GradeService {
@@ -44,40 +44,49 @@ export class GradeService {
     try {
       const dataSource = getDataSource();
 
-      // Use a transaction to ensure both exam and grade are created atomically
       return await dataSource.transaction(async (transactionManager) => {
-        // Create the exam
-        const newExamData: Partial<Exam> = {
-          name: payload.examName,
-          date: payload.date,
-          subjectId: payload.subjectId,
-          weight: payload.weight,
-          isCompleted: true,
-        };
-        const newExam = transactionManager.create(Exam, newExamData);
-        const savedExam = await transactionManager.save(newExam);
-
-        // Create the grade and link it to the exam
+        const existingExam = await transactionManager.findOne(Exam, {
+          where: {
+            name: payload.examName,
+            date: payload.date,
+            subjectId: payload.subjectId,
+          },
+        });
+        let savedExam: Exam;
+        if (existingExam) {
+          console.log(`Updating existing exam: ${payload.examName}`);
+          existingExam.isCompleted = true;
+          existingExam.weight = payload.weight;
+          savedExam = await transactionManager.save(existingExam);
+        } else {
+          console.log(`Creating new exam: ${payload.examName}`);
+          const newExamData: Partial<Exam> = {
+            name: payload.examName,
+            date: payload.date,
+            subjectId: payload.subjectId,
+            weight: payload.weight,
+            isCompleted: true,
+          };
+          const newExam = transactionManager.create(Exam, newExamData);
+          savedExam = await transactionManager.save(newExam);
+        }
         const newGradeData: Partial<Grade> = {
           score: payload.score,
           weight: payload.weight,
           comment: payload.comment ?? null,
           date: payload.date,
-          exam: savedExam, // Link the grade to the exam
         };
         const newGrade = transactionManager.create(Grade, newGradeData);
         const savedGrade = await transactionManager.save(newGrade);
-
-        // Fetch the grade with its exam relationship
+        savedExam.gradeId = savedGrade.id;
+        await transactionManager.save(savedExam);
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
-          relations: ['exam'],
+          relations: ['exam', 'exam.subject'],
         });
 
         if (!finalGrade) {
-          throw new Error(
-            'Failed to retrieve the saved grade with its exam relationship.',
-          );
+          throw new Error('Failed to retrieve saved grade with relations.');
         }
 
         return finalGrade;
@@ -101,7 +110,6 @@ export class GradeService {
     try {
       const { grade: gradeRepo } = getRepositories();
 
-      // First, find the existing grade
       const existingGrade = await gradeRepo.findOne({
         where: { id: updatedGradeData.id },
         relations: ['exam'],
@@ -113,7 +121,6 @@ export class GradeService {
         );
       }
 
-      // Merge the updated data with the existing grade
       const mergedGrade = gradeRepo.create({
         ...existingGrade,
         ...updatedGradeData,
@@ -133,12 +140,26 @@ export class GradeService {
    */
   static async delete(gradeId: string): Promise<string> {
     try {
-      const { grade: gradeRepo } = getRepositories();
-      const deleteResult = await gradeRepo.delete(gradeId);
-      if (deleteResult.affected === 0) {
-        throw new Error(`Grade with ID ${gradeId} not found for deletion.`);
-      }
-      return gradeId;
+      const dataSource = getDataSource();
+
+      return await dataSource.transaction(async (transactionManager) => {
+        const grade = await transactionManager.findOne(Grade, {
+          where: { id: gradeId },
+          relations: ['exam'],
+        });
+
+        if (!grade) {
+          throw new Error(`Grade with ID ${gradeId} not found for deletion.`);
+        }
+
+        if (grade.exam) {
+          grade.exam.gradeId = null;
+          await transactionManager.save(grade.exam);
+        }
+        await transactionManager.delete(Grade, gradeId);
+
+        return gradeId;
+      });
     } catch (error) {
       console.error('Failed to delete grade:', error);
       throw error;
@@ -196,7 +217,7 @@ export class GradeService {
 
       // Use a transaction to ensure both exam and grade are updated atomically
       return await dataSource.transaction(async (transactionManager) => {
-        // First, find the existing exam
+        // Update exam
         const existingExam = await transactionManager.findOne(Exam, {
           where: { id: examData.id },
         });
@@ -212,7 +233,7 @@ export class GradeService {
         });
         await transactionManager.save(mergedExam);
 
-        // Find the existing grade
+        // Update grade
         const existingGrade = await transactionManager.findOne(Grade, {
           where: { id: gradeData.id },
           relations: ['exam'],
@@ -231,16 +252,14 @@ export class GradeService {
         });
         const savedGrade = await transactionManager.save(mergedGrade);
 
-        // Fetch the updated grade with its exam relationship
+        // Return with relations
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
           relations: ['exam'],
         });
 
         if (!finalGrade) {
-          throw new Error(
-            'Failed to retrieve the updated grade with its exam relationship.',
-          );
+          throw new Error('Failed to retrieve updated grade with relations.');
         }
 
         return finalGrade;

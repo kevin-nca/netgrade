@@ -35,9 +35,14 @@ function HomePage() {
   const calculateSchoolAverage = (schoolId: string, grades: Grade[]) => {
     if (!grades || grades.length === 0) return null;
 
-    const schoolGrades = grades.filter(
-      (grade) => grade.exam.subject.schoolId === schoolId,
-    );
+    const schoolGrades = grades.filter((grade) => {
+      if (!grade?.exam?.subject) {
+        console.warn('Grade missing exam or subject relation:', grade);
+        return false;
+      }
+      return grade.exam.subject.schoolId === schoolId;
+    });
+
     if (schoolGrades.length === 0) return null;
 
     const totalScore = schoolGrades.reduce(
