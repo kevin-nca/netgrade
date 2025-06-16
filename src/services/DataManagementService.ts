@@ -3,6 +3,7 @@ import { getDataSource } from '@/db/data-source';
 import { School } from '@/db/entities';
 import * as XLSX from 'xlsx';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { calculateWeightedAverage } from '@/utils/gradeCalculations';
 
 /**
  * Represents a grade in the export data
@@ -164,24 +165,31 @@ export class DataManagementService {
     );
 
     const perSubjectAverages: Record<string, number> = {};
-    let totalWeightedScore = 0;
-    let totalWeight = 0;
+    const subjectScores: Array<{ score: number; weight: number }> = [];
 
     subjects.forEach((subject) => {
       const subjectExams = subject.exams.filter(
         (exam) => exam.isCompleted && exam.grade,
       );
       if (subjectExams.length > 0) {
-        const subjectScore =
-          subjectExams.reduce(
-            (sum, exam) => sum + (exam.grade?.score || 0) * (exam.weight || 1),
-            0,
-          ) / subjectExams.reduce((sum, exam) => sum + (exam.weight || 1), 0);
-        perSubjectAverages[subject.name] = subjectScore;
-        totalWeightedScore += subjectScore * (subject.weight || 1);
-        totalWeight += subject.weight || 1;
+        const subjectScore = calculateWeightedAverage(
+          subjectExams.map((exam) => ({
+            score: exam.grade?.score || 0,
+            weight: exam.weight || 1,
+          })),
+        );
+
+        if (subjectScore !== null) {
+          perSubjectAverages[subject.name] = subjectScore;
+          subjectScores.push({
+            score: subjectScore,
+            weight: subject.weight || 1,
+          });
+        }
       }
     });
+
+    const overallAverage = calculateWeightedAverage(subjectScores);
 
     return {
       school: {
@@ -211,7 +219,7 @@ export class DataManagementService {
       })),
       summaries: {
         perSubjectAverages,
-        overallAverage: totalWeight > 0 ? totalWeightedScore / totalWeight : 0,
+        overallAverage: overallAverage || 0,
         examsCompleted,
         examsTotal,
       },

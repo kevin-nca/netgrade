@@ -25,6 +25,7 @@ import {
   useDeleteSubject,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
+import { calculateWeightedAverage } from '@/utils/gradeCalculations';
 
 interface SubjectToAdd {
   name: string;
@@ -61,15 +62,13 @@ const SchoolPage: React.FC = () => {
       (grade) => grade.exam.subjectId === subject.id,
     );
     if (subjectGrades.length === 0) return null;
-    const totalScore = subjectGrades.reduce(
-      (acc, grade) => acc + Number(grade.score) * Number(grade.weight),
-      0,
+
+    return calculateWeightedAverage(
+      subjectGrades.map((grade) => ({
+        score: grade.score,
+        weight: grade.weight,
+      })),
     );
-    const totalWeight = subjectGrades.reduce(
-      (acc, grade) => acc + Number(grade.weight),
-      0,
-    );
-    return totalWeight > 0 ? totalScore / totalWeight : null;
   };
 
   const addSubjectMutation = useAddSubject();

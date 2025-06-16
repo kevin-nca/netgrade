@@ -21,6 +21,7 @@ import Button from '@/components/Button/Button';
 import { useSchools, useGrades, useUserName } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import { Grade } from '@/db/entities';
+import { calculateWeightedAverage } from '@/utils/gradeCalculations';
 
 function HomePage() {
   const [showSlideUp, setShowSlideUp] = useState(false);
@@ -40,15 +41,14 @@ function HomePage() {
     );
     if (schoolGrades.length === 0) return null;
 
-    const totalScore = schoolGrades.reduce(
-      (acc, grade) => acc + grade.score * grade.weight,
-      0,
+    const average = calculateWeightedAverage(
+      schoolGrades.map((grade) => ({
+        score: grade.score,
+        weight: grade.weight,
+      })),
     );
-    const totalWeight = schoolGrades.reduce(
-      (acc, grade) => acc + grade.weight,
-      0,
-    );
-    return totalWeight ? (totalScore / totalWeight).toFixed(1) : null;
+
+    return average !== null ? average.toString() : null;
   };
 
   return (

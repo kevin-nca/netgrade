@@ -398,7 +398,7 @@ const EditExamPage: React.FC = () => {
                     className={`${styles.gradeCircle} ${styles[getGradeColor(gradeFormValues.score)]}`}
                   >
                     <span className={styles.gradeValue}>
-                      {gradeFormValues.score.toFixed(1)}
+                      {gradeFormValues.score.toString()}
                     </span>
                   </div>
                 </div>

@@ -5,6 +5,7 @@ import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Grade } from '@/db/entities/Grade';
 import { Exam } from '@/db/entities/Exam';
 import { School, Subject } from '@/db/entities';
+import { calculateWeightedAverage } from '@/utils/gradeCalculations';
 
 describe('GradeService', () => {
   let dataSource: DataSource;
@@ -168,25 +169,18 @@ describe('GradeService', () => {
     const allGrades = await GradeService.fetchAll();
     expect(allGrades.length).toBeGreaterThan(2);
 
-    // Calculate weighted average (just as an example of a more complex test)
     const mathGrades = allGrades.filter(
       (grade) => grade.exam && grade.exam.name.includes('Math Exam'),
     );
 
     expect(mathGrades.length).toBe(2);
 
-    // Verify we can calculate a weighted average
-    const totalWeightedScore = mathGrades.reduce(
-      (sum, grade) => sum + grade.score * grade.weight,
-      0,
+    const weightedAverage = calculateWeightedAverage(
+      mathGrades.map((grade) => ({
+        score: grade.score,
+        weight: grade.weight,
+      })),
     );
-
-    const totalWeight = mathGrades.reduce(
-      (sum, grade) => sum + grade.weight,
-      0,
-    );
-
-    const weightedAverage = totalWeightedScore / totalWeight;
 
     // With scores 80 (weight 1) and 90 (weight 2), weighted average should be 86.67
     expect(weightedAverage).toBeCloseTo(86.67, 1);

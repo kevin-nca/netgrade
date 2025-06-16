@@ -1,11 +1,8 @@
+import { isValidGrade } from './gradeCalculations';
+
 export const validateGrade = (value: number): string | null => {
-  if (value < 1 || value > 6)
-    return 'Bitte eine Zahl zwischen 1 und 6 eingeben.';
-  if (
-    value.toString().includes('.') &&
-    value.toString().split('.')[1].length > 2
-  ) {
-    return 'Die Note darf maximal zwei Dezimalstellen haben.';
+  if (!isValidGrade(value)) {
+    return 'Bitte eine Zahl zwischen 1 und 6 mit maximal zwei Dezimalstellen eingeben.';
   }
   return null;
 };
