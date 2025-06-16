@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import ExamCard from '@/features/exams/ExamCard';
-import { IonContent, IonLabel, IonModal } from '@ionic/react';
+import { IonContent, IonLabel, IonModal, IonIcon } from '@ionic/react';
+import { calendarOutline } from 'ionicons/icons';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import { Exam } from '@/db/entities';
 import { useExams } from '@/hooks/queries';
+import './ExamList.css';
 
 const ExamList: React.FC = () => {
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
@@ -19,7 +21,15 @@ const ExamList: React.FC = () => {
   return (
     <div>
       {upcomingExams.length === 0 ? (
-        <p>Keine Prüfungen vorhanden.</p>
+        <div className="empty-state">
+          <IonIcon 
+            icon={calendarOutline} 
+            className="empty-state-icon"
+          />
+          <p className="empty-state-message">
+            Du hast aktuell keine anstehenden Prüfungen
+          </p>
+        </div>
       ) : (
         upcomingExams.map((exam: Exam) => (
           <ExamCard key={exam.id} exam={exam} />
@@ -52,4 +62,4 @@ const ExamList: React.FC = () => {
   );
 };
 
-export default ExamList;
+export default ExamList; 

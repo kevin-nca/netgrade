@@ -1,0 +1,15 @@
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--ion-color-medium);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state-message {
+  margin: 0;
+  font-size: 1.1rem;
+} 
