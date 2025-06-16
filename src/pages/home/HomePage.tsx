@@ -1,5 +1,6 @@
 import '@/theme/ui-elements.css';
 import '@/theme/grade-card.css';
+import './HomePage.css';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
@@ -15,7 +16,14 @@ import {
   IonToolbar,
 } from '@ionic/react';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
-import { add, calendar, settings } from 'ionicons/icons';
+import {
+  add,
+  calendar,
+  settings,
+  personCircleOutline,
+  schoolOutline,
+  timeOutline,
+} from 'ionicons/icons';
 import ExamList from '@/features/exams/ExamList/ExamList';
 import Button from '@/components/Button/Button';
 import { useSchools, useGrades, useUserName } from '@/hooks/queries';
@@ -76,7 +84,7 @@ function HomePage() {
                   history.push(Routes.SCHOOL.replace(':schoolId', school.id))
                 }
               >
-                <IonLabel>{school.name}</IonLabel>{' '}
+                <IonLabel>{school.name}</IonLabel>
                 <IonLabel slot="end" className="grade-average">
                   {average !== null ? `${average} Ø` : '-'}
                 </IonLabel>
