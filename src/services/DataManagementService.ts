@@ -371,15 +371,11 @@ export class DataManagementService {
     const subjects: ExportSubject[] = school.subjects.map((subject) => {
       const exams: ExportExam[] = subject.exams.map((exam) => {
         let gradeData: ExportGrade | null = null;
-        if (
-          exam.grade &&
-          exam.grade.score !== null &&
-          exam.grade.score !== undefined
-        ) {
+        if (exam.grade) {
           gradeData = {
-            score: exam.grade.score,
-            weight: exam.grade.weight,
-            comment: exam.grade.comment || '',
+            score: exam.grade.score ?? 0,
+            weight: exam.grade.weight ?? 1,
+            comment: exam.grade.comment ?? '',
             date: exam.grade.date,
           };
         }
@@ -387,8 +383,8 @@ export class DataManagementService {
         return {
           name: exam.name,
           date: exam.date,
-          description: exam.description || '',
-          weight: exam.weight || 1,
+          description: exam.description ?? '',
+          weight: exam.weight ?? 1,
           isCompleted: exam.isCompleted,
           grade: gradeData,
         };
@@ -396,9 +392,9 @@ export class DataManagementService {
 
       return {
         name: subject.name,
-        teacher: subject.teacher || '',
-        description: subject.description || '',
-        weight: subject.weight || 1,
+        teacher: subject.teacher ?? '',
+        description: subject.description ?? '',
+        weight: subject.weight ?? 1,
         exams: exams,
       };
     });
