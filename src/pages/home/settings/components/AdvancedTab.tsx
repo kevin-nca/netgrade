@@ -5,14 +5,12 @@ import SettingsHeader from './SettingsHeader';
 import SettingsGroup from './SettingsGroup';
 import SettingsItem from './SettingsItem';
 import { ExportDialog } from '@/components/export/ExportDialog';
-import { School } from '@/db/entities';
 
 interface AdvancedTabProps {
   onReset: () => void;
-  school: School;
 }
 
-const AdvancedTab: React.FC<AdvancedTabProps> = ({ onReset, school }) => {
+const AdvancedTab: React.FC<AdvancedTabProps> = ({ onReset }) => {
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
 
   return (
@@ -40,7 +38,6 @@ const AdvancedTab: React.FC<AdvancedTabProps> = ({ onReset, school }) => {
       <ExportDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
-        school={school}
       />
     </>
   );
