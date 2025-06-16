@@ -1,0 +1,122 @@
+/* Form Card Stile */
+.formCard {
+  margin: 12px;
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.formCardHeader {
+  padding: 16px;
+  background: #15529a;
+  color: white;
+  border-bottom: none;
+}
+
+.formCardTitle {
+  font-size: 18px;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: white;
+}
+
+.formCardContent {
+  padding: 8px 12px;
+  background: #f9f9fc;
+}
+
+.formCardFooter {
+  padding: 12px 16px;
+  background: #f9f9fc;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Form Elements */
+.formItemGroup {
+  margin: 8px 0;
+}
+
+.formItemDivider {
+  min-height: 34px;
+  padding: 6px 8px;
+  background: transparent;
+  border-bottom: none;
+  --ion-item-border-color: transparent;
+}
+
+.formItemIcon {
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+ion-label.formItemLabel {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #15529a !important;
+  margin-bottom: 2px !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1.2 !important;
+  display: block !important;
+}
+
+.formItem {
+  --border-width: 0;
+  --background: white;
+  --border-radius: 10px;
+  --padding-start: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2px;
+}
+
+.formInput {
+  font-size: 14px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --placeholder-color: #a0a0b0;
+  --placeholder-opacity: 0.6;
+  color: #444;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Form Button Style */
+.formButton {
+  margin: 0;
+  height: 40px;
+  font-size: 14px;
+  --border-radius: 10px;
+  --box-shadow: 0 2px 6px rgba(21, 82, 154, 0.25);
+  --background: #15529a;
+}
+
+.buttonContent {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonContentSave {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.saveIcon {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.spinner {
+  height: 16px;
+  width: 16px;
+  margin-right: 8px;
+  opacity: 0.9;
+}

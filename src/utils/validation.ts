@@ -11,7 +11,7 @@ export const validateGrade = (value: number): string | null => {
 };
 
 export const validateWeight = (value: number): string | null => {
-  if (value <= 0 || value > 100)
+  if (value < 0 || value > 100)
     return 'Bitte eine Zahl zwischen 0 und 100 eingeben.';
   if (
     value.toString().includes('.') &&
