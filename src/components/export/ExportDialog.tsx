@@ -4,7 +4,6 @@ import {
   IonHeader,
   IonTitle,
   IonToolbar,
-  IonList,
   IonItem,
   IonLabel,
   IonRadioGroup,
@@ -13,13 +12,22 @@ import {
   IonButtons,
   IonIcon,
   IonToast,
-  IonCard,
-  IonCardContent,
-  IonText,
   IonLoading,
   IonModal,
+  IonRippleEffect,
+  IonPage,
+  IonInput,
 } from '@ionic/react';
-import { close, downloadOutline, shareOutline } from 'ionicons/icons';
+import {
+  close,
+  shareOutline,
+  downloadOutline,
+  sparklesSharp,
+  documentTextOutline,
+  calendarOutline,
+  personOutline,
+  pencilOutline,
+} from 'ionicons/icons';
 import { useExportData } from '@/hooks/queries/useDataManagementQueries';
 import { useUserName } from '@/hooks';
 import { useSchools } from '@/hooks/queries/useSchoolQueries';
@@ -27,6 +35,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
 import { School } from '@/db/entities';
+import './ExportDialog.css';
 
 interface ExportDialogProps {
   isOpen: boolean;
@@ -46,6 +55,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
   school,
 }) => {
   const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
+  const [customFilename, setCustomFilename] = useState<string>('');
   const [toast, setToast] = useState<ToastState>({
     show: false,
     message: '',
@@ -64,6 +74,11 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     }
   }, [school]);
 
+  useEffect(() => {
+    const newFilename = generateDefaultFilename();
+    setCustomFilename(newFilename.replace('.xlsx', ''));
+  }, [selectedSchoolId, userName, schools]);
+
   const showToast = (
     message: string,
     color: ToastState['color'] = 'danger',
@@ -71,12 +86,19 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     setToast({ show: true, message, color });
   };
 
-  const generateFilename = () => {
+  const generateDefaultFilename = () => {
     const timestamp = new Date().toISOString().split('T')[0];
     const username = userName ? `${userName}-` : '';
     const selectedSchool = schools?.find((s) => s.id === selectedSchoolId);
     const schoolName = selectedSchool?.name ? `${selectedSchool.name}-` : '';
-    return `netgrade-${schoolName}${username}${timestamp}.xlsx`;
+    return `netgrade-${schoolName}${username}${timestamp}`;
+  };
+
+  const getFinalFilename = () => {
+    const cleanFilename = customFilename.trim();
+    return cleanFilename.endsWith('.xlsx')
+      ? cleanFilename
+      : `${cleanFilename}.xlsx`;
   };
 
   const downloadFileWeb = (data: Blob, filename: string) => {
@@ -120,24 +142,16 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         data: base64Data,
         directory: Directory.Documents,
         recursive: true,
-        encoding: undefined, // Binary data
+        encoding: undefined,
       });
-
-      console.log(`File saved: ${properFilename}`);
-
-      const fileInfo = await Filesystem.stat({
+      await Filesystem.stat({
         path: properFilename,
         directory: Directory.Documents,
       });
-
-      console.log('File info:', fileInfo);
-
       const fileUri = await Filesystem.getUri({
         path: properFilename,
         directory: Directory.Documents,
       });
-
-      console.log('File URI:', fileUri.uri);
 
       await Share.share({
         title: 'NetGrade Export',
@@ -152,12 +166,6 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
       console.error('Share failed:', error);
 
       if (error instanceof Error) {
-        console.error('Error details:', {
-          message: error.message,
-          name: error.name,
-          stack: error.stack,
-        });
-
         if (
           error.message.includes('cancelled') ||
           error.message.includes('canceled')
@@ -190,8 +198,13 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
       return;
     }
 
+    if (!customFilename.trim()) {
+      showToast('Bitte geben Sie einen Dateinamen ein.');
+      return;
+    }
+
     try {
-      const filename = generateFilename();
+      const filename = getFinalFilename();
 
       const result = await exportMutation.mutateAsync({
         options: {
@@ -216,89 +229,231 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     }
   };
 
+  const selectedSchool = schools?.find((s) => s.id === selectedSchoolId);
+
+  const getSchoolIconClass = (schoolId: string, index: number) => {
+    const baseClass = 'school-icon';
+    if (selectedSchoolId === schoolId) {
+      return `${baseClass} school-icon-selected`;
+    }
+    return `${baseClass} school-icon-${index % 4}`;
+  };
+
+  const isExportButtonEnabled = selectedSchoolId && customFilename.trim();
+
   return (
     <>
-      <IonModal isOpen={isOpen} onDidDismiss={onClose}>
-        <IonHeader className="ion-no-border">
-          <IonToolbar>
-            <IonTitle className="ion-text-center">Daten exportieren</IonTitle>
-            <IonButtons slot="end">
-              <IonButton onClick={onClose} fill="clear">
-                <IonIcon icon={close} slot="icon-only" />
-              </IonButton>
-            </IonButtons>
-          </IonToolbar>
-        </IonHeader>
+      <IonModal
+        isOpen={isOpen}
+        onDidDismiss={onClose}
+        breakpoints={[0, 0.25, 0.5, 0.75, 1]}
+        initialBreakpoint={0.75}
+        backdropBreakpoint={0.5}
+        className="export-modal"
+      >
+        <IonPage className="export-page">
+          <IonHeader className="liquid-glass-bg export-header">
+            <IonToolbar className="export-toolbar">
+              <IonButtons slot="start">
+                <IonButton
+                  onClick={onClose}
+                  fill="clear"
+                  className="header-close-button"
+                >
+                  <IonIcon
+                    icon={close}
+                    slot="icon-only"
+                    className="header-close-icon"
+                  />
+                </IonButton>
+              </IonButtons>
 
-        <IonContent className="ion-padding">
-          <IonCard className="ion-no-margin">
-            <IonCardContent>
-              <IonText color="medium" className="ion-padding-bottom">
-                <p>
-                  Wählen Sie die Schule aus, deren Daten Sie exportieren
-                  möchten.
-                  {!isNative && ' Die Datei wird direkt heruntergeladen.'}
-                  {isNative &&
-                    ' Nach dem Export können Sie die Datei über die verfügbaren Apps teilen.'}
-                </p>
-              </IonText>
+              <IonTitle className="header-title">Daten exportieren</IonTitle>
 
-              <IonList lines="none" className="ion-padding-vertical">
-                <IonItem className="ion-margin-bottom">
-                  <IonLabel className="ion-text-wrap">
-                    <h2>Schule</h2>
-                    <IonRadioGroup
-                      value={selectedSchoolId}
-                      onIonChange={(e) => setSelectedSchoolId(e.detail.value)}
-                      className="ion-margin-top"
+              <IonButtons slot="end">
+                <IonButton fill="clear" className="header-dummy-button">
+                  <IonIcon
+                    icon={close}
+                    slot="icon-only"
+                    className="header-close-icon"
+                  />
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+
+          <IonContent className="export-content" scrollY={true}>
+            <div className="content-wrapper">
+              <div className="header-section">
+                <div className="gradient-orb" />
+                <div className="header-content">
+                  <div className="header-flex">
+                    <div className="header-icon-wrapper">
+                      <IonIcon icon={sparklesSharp} className="header-icon" />
+                    </div>
+                    <div className="header-text">
+                      <h1>Excel-Export</h1>
+                      <p>Erstelle eine Datensicherung</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="school-section">
+                <h2 className="section-title">Schule auswählen</h2>
+
+                <IonRadioGroup
+                  value={selectedSchoolId}
+                  onIonChange={(e) => setSelectedSchoolId(e.detail.value)}
+                >
+                  {schools?.map((school, index) => (
+                    <div
+                      key={school.id}
+                      className={`school-item-wrapper ${selectedSchoolId === school.id ? 'glass-card' : ''}`}
                     >
-                      {schools?.map((school) => (
-                        <IonItem key={school.id} lines="none">
-                          <IonLabel>{school.name}</IonLabel>
-                          <IonRadio value={school.id} />
-                        </IonItem>
-                      ))}
-                    </IonRadioGroup>
-                  </IonLabel>
-                </IonItem>
-              </IonList>
-            </IonCardContent>
-          </IonCard>
+                      <IonItem
+                        lines="none"
+                        className="school-item ion-activatable"
+                        onClick={() => setSelectedSchoolId(school.id)}
+                      >
+                        <IonRippleEffect />
+                        <div
+                          slot="start"
+                          className={getSchoolIconClass(school.id, index)}
+                        >
+                          <span className="school-icon-letter">
+                            {school.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <IonLabel className="school-label">
+                          <h3>{school.name}</h3>
+                        </IonLabel>
+                        <IonRadio
+                          slot="end"
+                          value={school.id}
+                          className="school-radio"
+                        />
+                      </IonItem>
+                    </div>
+                  ))}
+                </IonRadioGroup>
+              </div>
 
-          <div className="ion-padding">
-            <IonButton
-              expand="block"
-              onClick={handleExport}
-              disabled={exportMutation.isPending || !selectedSchoolId}
-              className="ion-margin-top"
-            >
-              <IonIcon
-                icon={isNative ? shareOutline : downloadOutline}
-                slot="start"
-              />
-              {isNative ? 'Exportieren und teilen' : 'Herunterladen'}
-            </IonButton>
-          </div>
+              {selectedSchoolId && (
+                <div className="filename-section">
+                  <h2 className="section-title">Dateiname</h2>
 
-          {!isNative && (
-            <IonCard className="ion-margin-top">
-              <IonCardContent>
-                <IonText color="warning">
-                  <p>
-                    <strong>Hinweis:</strong> Im Webbrowser wird die Datei
-                    direkt heruntergeladen. Erweiterte Sharing-Funktionen sind
-                    nur in der mobilen App verfügbar.
-                  </p>
-                </IonText>
-              </IonCardContent>
-            </IonCard>
-          )}
-        </IonContent>
+                  <div className="filename-input filename-input-wrapper">
+                    <IonItem lines="none" className="filename-item">
+                      <div slot="start" className="filename-icon-wrapper">
+                        <IonIcon
+                          icon={pencilOutline}
+                          className="filename-icon"
+                        />
+                      </div>
+                      <IonInput
+                        value={customFilename}
+                        placeholder="Dateiname eingeben..."
+                        onIonInput={(e) => setCustomFilename(e.detail.value!)}
+                        className="filename-input-field"
+                      />
+                      <div slot="end" className="filename-extension">
+                        .xlsx
+                      </div>
+                    </IonItem>
+                  </div>
+                </div>
+              )}
 
-        <IonLoading
-          isOpen={exportMutation.isPending}
-          message="Export wird durchgeführt..."
-        />
+              <div className="export-button-section">
+                <IonButton
+                  expand="block"
+                  onClick={handleExport}
+                  disabled={exportMutation.isPending || !isExportButtonEnabled}
+                  className={`export-button ${isExportButtonEnabled ? 'glass-button export-button-enabled' : 'export-button-disabled'}`}
+                >
+                  <IonIcon
+                    icon={isNative ? shareOutline : downloadOutline}
+                    slot="start"
+                    className="export-button-icon"
+                  />
+                  {isNative ? 'Exportieren und teilen' : 'Jetzt herunterladen'}
+                </IonButton>
+              </div>
+
+              {selectedSchool && customFilename.trim() && (
+                <div className="glass-card details-card">
+                  <div className="shimmer-effect shimmer-overlay" />
+
+                  <h3 className="details-title">Export-Details</h3>
+
+                  <div className="details-list">
+                    <div className="detail-item">
+                      <div className="detail-icon-wrapper detail-icon-wrapper-file">
+                        <IonIcon
+                          icon={documentTextOutline}
+                          className="detail-icon detail-icon-file"
+                        />
+                      </div>
+                      <div className="detail-content">
+                        <p className="detail-label">Dateiformat</p>
+                        <p className="detail-value">Excel (.xlsx)</p>
+                      </div>
+                    </div>
+
+                    {userName && (
+                      <div className="detail-item">
+                        <div className="detail-icon-wrapper detail-icon-wrapper-user">
+                          <IonIcon
+                            icon={personOutline}
+                            className="detail-icon detail-icon-user"
+                          />
+                        </div>
+                        <div className="detail-content">
+                          <p className="detail-label">Benutzer</p>
+                          <p className="detail-value">{userName}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="detail-item">
+                      <div className="detail-icon-wrapper detail-icon-wrapper-date">
+                        <IonIcon
+                          icon={calendarOutline}
+                          className="detail-icon detail-icon-date"
+                        />
+                      </div>
+                      <div className="detail-content">
+                        <p className="detail-label">Datum</p>
+                        <p className="detail-value">
+                          {new Date().toLocaleDateString('de-DE', {
+                            day: '2-digit',
+                            month: 'long',
+                            year: 'numeric',
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="detail-pill filename-pill">
+                    <p className="filename-pill-label">Dateiname</p>
+                    <p className="filename-pill-value">{getFinalFilename()}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="bottom-spacer" />
+            </div>
+          </IonContent>
+
+          <IonLoading
+            isOpen={exportMutation.isPending}
+            message="Exportiere Daten... Einen Moment bitte"
+            spinner="crescent"
+            cssClass="loading-glass export-loading"
+          />
+        </IonPage>
       </IonModal>
 
       <IonToast
@@ -308,6 +463,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         duration={3000}
         position="bottom"
         color={toast.color}
+        cssClass={`glass-toast glass-toast-${toast.color}`}
       />
     </>
   );
