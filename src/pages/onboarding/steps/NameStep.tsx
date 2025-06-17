@@ -11,6 +11,7 @@ import {
 import { arrowForward } from 'ionicons/icons';
 import FormField from '@/components/Form/FormField';
 import { useSaveUserName } from '@/hooks';
+import { Layout } from '@/components/Layout/Layout';
 
 interface NameStepProps {
   initialName: string;
@@ -49,29 +50,30 @@ export const NameStep: React.FC<NameStepProps> = ({
   };
 
   return (
-    <IonCard className="ion-no-margin">
-      <IonCardContent className="ion-padding">
-        <IonRow>
-          <IonCol>
-            <IonText className="ion-text-center">
-              <h4>Willkommen!</h4>
-              <p>Wie heisst du?</p>
-            </IonText>
-          </IonCol>
-        </IonRow>
+    <Layout>
+      <IonCard className="ion-no-margin">
+        <IonCardContent className="ion-padding">
+          <IonRow>
+            <IonCol>
+              <IonText className="ion-text-center">
+                <h4>Willkommen!</h4>
+                <p>Wie heisst du?</p>
+              </IonText>
+            </IonCol>
+          </IonRow>
 
-        <FormField
-          label=""
-          value={userName}
-          onChange={(value) => setUserName(String(value))}
-          placeholder="Namen eingeben"
-        />
+          <FormField
+            label=""
+            value={userName}
+            onChange={(value) => setUserName(String(value))}
+            placeholder="Namen eingeben"
+          />
 
-        <IonRow className="ion-margin-top">
-          <IonCol className="ion-text-end">
+          <div className="ion-padding-top">
             <IonButton
+              expand="block"
               onClick={handleSaveName}
-              size="default"
+              size="small"
               disabled={saveUserNameMutation.isPending}
             >
               {saveUserNameMutation.isPending
@@ -79,9 +81,9 @@ export const NameStep: React.FC<NameStepProps> = ({
                 : 'Weiter'}
               <IonIcon slot="end" icon={arrowForward} />
             </IonButton>
-          </IonCol>
-        </IonRow>
-      </IonCardContent>
-    </IonCard>
+          </div>
+        </IonCardContent>
+      </IonCard>
+    </Layout>
   );
 };
