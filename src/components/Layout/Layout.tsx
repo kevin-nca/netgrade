@@ -1,23 +1,46 @@
 import React from 'react';
-import { IonContent } from '@ionic/react';
+import { IonContent, IonPage } from '@ionic/react';
+import { useIonRouter } from '@ionic/react';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const router = useIonRouter();
+
   return (
-    <IonContent
-      className="ion-padding"
-      scrollY={false}
-      style={{
-        '--padding-top': '16px',
-        '--padding-bottom': '16px',
-        '--padding-start': '16px',
-        '--padding-end': '16px',
-      }}
-    >
-      {children}
-    </IonContent>
+    <IonPage>
+      <IonContent
+        className="ion-padding"
+        scrollY={false}
+        style={{
+          '--padding-top': '16px',
+          '--padding-bottom': '16px',
+          '--padding-start': '16px',
+          '--padding-end': '16px',
+          '--background': 'var(--ion-color-light)',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+        onIonSwipe={(e) => {
+          if (e.direction === 'right') {
+            router.back();
+          }
+        }}
+      >
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            position: 'relative',
+          }}
+        >
+          {children}
+        </div>
+      </IonContent>
+    </IonPage>
   );
 }; 
