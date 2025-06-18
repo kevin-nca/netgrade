@@ -59,7 +59,6 @@ export class GradeService {
           existingExam.weight = payload.weight;
           savedExam = await transactionManager.save(existingExam);
         } else {
-          console.log(`Creating new exam: ${payload.examName}`);
           const newExamData: Partial<Exam> = {
             name: payload.examName,
             date: payload.date,
