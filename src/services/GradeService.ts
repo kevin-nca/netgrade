@@ -139,26 +139,12 @@ export class GradeService {
    */
   static async delete(gradeId: string): Promise<string> {
     try {
-      const dataSource = getDataSource();
-
-      return await dataSource.transaction(async (transactionManager) => {
-        const grade = await transactionManager.findOne(Grade, {
-          where: { id: gradeId },
-          relations: ['exam'],
-        });
-
-        if (!grade) {
-          throw new Error(`Grade with ID ${gradeId} not found for deletion.`);
-        }
-
-        if (grade.exam) {
-          grade.exam.gradeId = null;
-          await transactionManager.save(grade.exam);
-        }
-        await transactionManager.delete(Grade, gradeId);
-
-        return gradeId;
-      });
+      const { grade: gradeRepo } = getRepositories();
+      const deleteResult = await gradeRepo.delete(gradeId);
+      if (deleteResult.affected === 0) {
+        throw new Error(`Grade with ID ${gradeId} not found for deletion.`);
+      }
+      return gradeId;
     } catch (error) {
       console.error('Failed to delete grade:', error);
       throw error;
