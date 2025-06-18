@@ -3,7 +3,6 @@ import {
   DataManagementService,
   ExportOptions,
 } from '@/services/DataManagementService';
-import { School } from '@/db/entities';
 
 export const useResetAllDataMutation = () => {
   const queryClient = useQueryClient();
@@ -20,13 +19,10 @@ export const useResetAllDataMutation = () => {
     },
   });
 };
-
 export const useExportData = () => {
-  return useMutation<string, Error, { school: School; options: ExportOptions }>(
-    {
-      mutationFn: async ({ school, options }) => {
-        return await DataManagementService.exportData(school, options);
-      },
+  return useMutation<Blob, Error, { options: ExportOptions }>({
+    mutationFn: async ({ options }) => {
+      return await DataManagementService.exportData(options);
     },
-  );
+  });
 };

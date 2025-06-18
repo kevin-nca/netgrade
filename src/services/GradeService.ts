@@ -4,11 +4,11 @@ import { Exam } from '@/db/entities/Exam';
 
 export interface AddExamAndGradePayload {
   subjectId: string;
-  examName: string; // For Exam.name
-  date: Date; // For both Exam.date and Grade.date
-  score: number; // For Grade.score
-  weight: number; // For Grade.weight (also used for Exam.weight if desired)
-  comment?: string; // For Grade.comment
+  examName: string;
+  date: Date;
+  score: number;
+  weight: number;
+  comment?: string;
 }
 
 export class GradeService {
@@ -139,12 +139,26 @@ export class GradeService {
    */
   static async delete(gradeId: string): Promise<string> {
     try {
-      const { grade: gradeRepo } = getRepositories();
-      const deleteResult = await gradeRepo.delete(gradeId);
-      if (deleteResult.affected === 0) {
-        throw new Error(`Grade with ID ${gradeId} not found for deletion.`);
-      }
-      return gradeId;
+      const dataSource = getDataSource();
+
+      return await dataSource.transaction(async (transactionManager) => {
+        const grade = await transactionManager.findOne(Grade, {
+          where: { id: gradeId },
+          relations: ['exam'],
+        });
+
+        if (!grade) {
+          throw new Error(`Grade with ID ${gradeId} not found for deletion.`);
+        }
+
+        if (grade.exam) {
+          grade.exam.gradeId = null;
+          await transactionManager.save(grade.exam);
+        }
+        await transactionManager.delete(Grade, gradeId);
+
+        return gradeId;
+      });
     } catch (error) {
       console.error('Failed to delete grade:', error);
       throw error;
