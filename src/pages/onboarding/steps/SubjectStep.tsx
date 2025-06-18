@@ -13,6 +13,7 @@ import {
 import { checkmarkCircle, add } from 'ionicons/icons';
 import { useAddSubject, useSchoolSubjects } from '@/hooks';
 import { School } from '@/db/entities';
+import { Layout } from '@/components/Layout/Layout';
 
 interface SubjectStepProps {
   selectedSchoolId: string;
@@ -73,60 +74,62 @@ export const SubjectStep: React.FC<SubjectStepProps> = ({
   };
 
   return (
-    <IonCard className="ion-no-margin">
-      <IonCardContent className="ion-padding">
-        <IonItem lines="none" className="ion-no-padding ion-margin-bottom">
-          <IonLabel>
-            <h5>Schule: {selectedSchool?.name}</h5>
-          </IonLabel>
-        </IonItem>
+    <Layout>
+      <IonCard className="ion-no-margin">
+        <IonCardContent className="ion-padding">
+          <IonItem lines="none" className="ion-no-padding ion-margin-bottom">
+            <IonLabel>
+              <h5>Schule: {selectedSchool?.name}</h5>
+            </IonLabel>
+          </IonItem>
 
-        <IonItem lines="none" className="ion-no-padding">
-          <IonInput
-            value={newSubjectName}
-            onIonChange={(e) => setNewSubjectName(e.detail.value || '')}
-            placeholder="Neues Fach eingeben"
-            className="ion-margin-end"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && newSubjectName.trim()) {
-                handleAddSubject();
-              }
-            }}
-            disabled={addSubjectMutation.isPending}
-          />
-          <IonButton
-            slot="end"
-            size="small"
-            onClick={handleAddSubject}
-            disabled={!newSubjectName.trim() || addSubjectMutation.isPending}
-          >
-            {addSubjectMutation.isPending ? '...' : <IonIcon icon={add} />}
-          </IonButton>
-        </IonItem>
+          <IonItem lines="none" className="ion-no-padding">
+            <IonInput
+              value={newSubjectName}
+              onIonChange={(e) => setNewSubjectName(e.detail.value || '')}
+              placeholder="Neues Fach eingeben"
+              className="ion-margin-end"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newSubjectName.trim()) {
+                  handleAddSubject();
+                }
+              }}
+              disabled={addSubjectMutation.isPending}
+            />
+            <IonButton
+              slot="end"
+              size="small"
+              onClick={handleAddSubject}
+              disabled={!newSubjectName.trim() || addSubjectMutation.isPending}
+            >
+              {addSubjectMutation.isPending ? '...' : <IonIcon icon={add} />}
+            </IonButton>
+          </IonItem>
 
-        <IonText className="ion-margin-top">
-          <h5>Deine Fächer:</h5>
-        </IonText>
-
-        {subjects.length > 0 ? (
-          <IonList className="ion-no-padding">
-            {subjects.map((subject) => (
-              <IonItem
-                key={subject.id}
-                lines="inset"
-                className="ion-no-padding"
-              >
-                <IonLabel>{subject.name}</IonLabel>
-                <IonIcon icon={checkmarkCircle} slot="end" color="success" />
-              </IonItem>
-            ))}
-          </IonList>
-        ) : (
-          <IonText color="medium" className="ion-padding-top">
-            <p>Noch keine Fächer für diese Schule</p>
+          <IonText className="ion-margin-top">
+            <h5>Deine Fächer:</h5>
           </IonText>
-        )}
-      </IonCardContent>
-    </IonCard>
+
+          {subjects.length > 0 ? (
+            <IonList className="ion-no-padding">
+              {subjects.map((subject) => (
+                <IonItem
+                  key={subject.id}
+                  lines="inset"
+                  className="ion-no-padding"
+                >
+                  <IonLabel>{subject.name}</IonLabel>
+                  <IonIcon icon={checkmarkCircle} slot="end" color="success" />
+                </IonItem>
+              ))}
+            </IonList>
+          ) : (
+            <IonText color="medium" className="ion-padding-top">
+              <p>Noch keine Fächer für diese Schule</p>
+            </IonText>
+          )}
+        </IonCardContent>
+      </IonCard>
+    </Layout>
   );
 };

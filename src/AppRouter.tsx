@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { IonRouterOutlet, IonTabs } from '@ionic/react';
 import { Redirect, Route } from 'react-router-dom';
+import { setupNavigation } from '@/services/navigation';
 
 import GradeEntryPage from '@/pages/home/grades/GradeEntryPage';
 import CalendarPage from '@/pages/home/calendar/CalendarPage';
@@ -17,6 +18,8 @@ import { useOnboardingCompleted } from '@/hooks/queries';
 export function AppRouter() {
   const { data: isOnboarded } = useOnboardingCompleted();
   const [, setIsInitialized] = useState(false);
+  const routerOutletRef = useRef<HTMLIonRouterOutletElement>(null);
+  const { handleSwipe } = setupNavigation(routerOutletRef);
 
   useEffect(() => {
     if (isOnboarded !== undefined) {
@@ -24,9 +27,40 @@ export function AppRouter() {
     }
   }, [isOnboarded]);
 
+  useEffect(() => {
+    const routerOutlet = routerOutletRef.current;
+    if (!routerOutlet) return;
+
+    const handleSwipeGesture = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const detail = customEvent.detail as { direction: 'forward' | 'backward' };
+      if (detail.direction === 'forward') {
+        handleSwipe('forward');
+      } else if (detail.direction === 'backward') {
+        handleSwipe('backward');
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        handleSwipe('backward');
+      } else if (e.key === 'ArrowRight') {
+        handleSwipe('forward');
+      }
+    };
+
+    routerOutlet.addEventListener('ionSwipe', handleSwipeGesture);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      routerOutlet.removeEventListener('ionSwipe', handleSwipeGesture);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleSwipe]);
+
   return (
     <IonTabs>
-      <IonRouterOutlet>
+      <IonRouterOutlet ref={routerOutletRef}>
         <Redirect
           exact
           path={Routes.MAIN}
