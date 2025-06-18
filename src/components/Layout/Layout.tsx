@@ -24,11 +24,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           display: 'flex',
           flexDirection: 'column',
         }}
-        onIonSwipe={(e) => {
-          if (e.direction === 'right') {
-            router.back();
-          }
-        }}
       >
         <div
           style={{
@@ -43,4 +38,4 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </IonContent>
     </IonPage>
   );
-}; 
+};
