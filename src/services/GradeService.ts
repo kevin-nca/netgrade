@@ -4,11 +4,11 @@ import { Exam } from '@/db/entities/Exam';
 
 export interface AddExamAndGradePayload {
   subjectId: string;
-  examName: string;
-  date: Date;
-  score: number;
-  weight: number;
-  comment?: string;
+  examName: string; // For Exam.name
+  date: Date; // For both Exam.date and Grade.date
+  score: number; // For Grade.score
+  weight: number; // For Grade.weight (also used for Exam.weight if desired)
+  comment?: string; // For Grade.comment
 }
 
 export class GradeService {
