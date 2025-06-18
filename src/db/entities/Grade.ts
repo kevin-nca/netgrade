@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, OneToOne } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { Exam } from './Exam';
 import { dateTransformer } from '../utils';
@@ -23,6 +23,5 @@ export class Grade extends BaseEntity {
   @OneToOne(() => Exam, (exam) => exam.grade, {
     nullable: false,
   })
-  @JoinColumn({ name: 'examId' })
   exam!: Exam;
 }

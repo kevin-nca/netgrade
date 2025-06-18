@@ -44,40 +44,48 @@ export class GradeService {
     try {
       const dataSource = getDataSource();
 
-      // Use a transaction to ensure both exam and grade are created atomically
       return await dataSource.transaction(async (transactionManager) => {
-        // Create the exam
-        const newExamData: Partial<Exam> = {
-          name: payload.examName,
-          date: payload.date,
-          subjectId: payload.subjectId,
-          weight: payload.weight,
-          isCompleted: true,
-        };
-        const newExam = transactionManager.create(Exam, newExamData);
-        const savedExam = await transactionManager.save(newExam);
-
-        // Create the grade and link it to the exam
+        const existingExam = await transactionManager.findOne(Exam, {
+          where: {
+            name: payload.examName,
+            date: payload.date,
+            subjectId: payload.subjectId,
+          },
+        });
+        let savedExam: Exam;
+        if (existingExam) {
+          console.log(`Updating existing exam: ${payload.examName}`);
+          existingExam.isCompleted = true;
+          existingExam.weight = payload.weight;
+          savedExam = await transactionManager.save(existingExam);
+        } else {
+          const newExamData: Partial<Exam> = {
+            name: payload.examName,
+            date: payload.date,
+            subjectId: payload.subjectId,
+            weight: payload.weight,
+            isCompleted: true,
+          };
+          const newExam = transactionManager.create(Exam, newExamData);
+          savedExam = await transactionManager.save(newExam);
+        }
         const newGradeData: Partial<Grade> = {
           score: payload.score,
           weight: payload.weight,
           comment: payload.comment ?? null,
           date: payload.date,
-          exam: savedExam, // Link the grade to the exam
         };
         const newGrade = transactionManager.create(Grade, newGradeData);
         const savedGrade = await transactionManager.save(newGrade);
-
-        // Fetch the grade with its exam relationship
+        savedExam.gradeId = savedGrade.id;
+        await transactionManager.save(savedExam);
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
-          relations: ['exam'],
+          relations: ['exam', 'exam.subject'],
         });
 
         if (!finalGrade) {
-          throw new Error(
-            'Failed to retrieve the saved grade with its exam relationship.',
-          );
+          throw new Error('Failed to retrieve saved grade with relations.');
         }
 
         return finalGrade;
@@ -101,7 +109,6 @@ export class GradeService {
     try {
       const { grade: gradeRepo } = getRepositories();
 
-      // First, find the existing grade
       const existingGrade = await gradeRepo.findOne({
         where: { id: updatedGradeData.id },
         relations: ['exam'],
@@ -113,7 +120,6 @@ export class GradeService {
         );
       }
 
-      // Merge the updated data with the existing grade
       const mergedGrade = gradeRepo.create({
         ...existingGrade,
         ...updatedGradeData,
@@ -196,7 +202,7 @@ export class GradeService {
 
       // Use a transaction to ensure both exam and grade are updated atomically
       return await dataSource.transaction(async (transactionManager) => {
-        // First, find the existing exam
+        // Update exam
         const existingExam = await transactionManager.findOne(Exam, {
           where: { id: examData.id },
         });
@@ -212,7 +218,7 @@ export class GradeService {
         });
         await transactionManager.save(mergedExam);
 
-        // Find the existing grade
+        // Update grade
         const existingGrade = await transactionManager.findOne(Grade, {
           where: { id: gradeData.id },
           relations: ['exam'],
@@ -231,16 +237,14 @@ export class GradeService {
         });
         const savedGrade = await transactionManager.save(mergedGrade);
 
-        // Fetch the updated grade with its exam relationship
+        // Return with relations
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
           relations: ['exam'],
         });
 
         if (!finalGrade) {
-          throw new Error(
-            'Failed to retrieve the updated grade with its exam relationship.',
-          );
+          throw new Error('Failed to retrieve updated grade with relations.');
         }
 
         return finalGrade;
