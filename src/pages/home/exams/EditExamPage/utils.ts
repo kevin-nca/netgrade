@@ -1,3 +1,5 @@
+import { DecimalWrapper } from '@/utils/decimalWrapper';
+
 export const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('de-CH', {
     year: 'numeric',
@@ -7,8 +9,9 @@ export const formatDate = (date: Date) => {
 };
 
 export const getGradeColor = (score: number): string => {
-  if (score >= 5.5) return 'success'; //todo sollte der user selbst entscheiden können zB in den Einstellungen, speichern mit Preferences
-  if (score >= 4.5) return 'primary';
-  if (score >= 4) return 'warning';
+  const decimalScore = DecimalWrapper.from(score);
+  if (decimalScore.greaterThanOrEqualTo(5.5)) return 'success';
+  if (decimalScore.greaterThanOrEqualTo(4.5)) return 'primary';
+  if (decimalScore.greaterThanOrEqualTo(4)) return 'warning';
   return 'danger';
 };

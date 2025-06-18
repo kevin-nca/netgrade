@@ -41,14 +41,12 @@ function HomePage() {
     );
     if (schoolGrades.length === 0) return null;
 
-    const average = calculateWeightedAverage(
+    return calculateWeightedAverage(
       schoolGrades.map((grade) => ({
         score: grade.score,
         weight: grade.weight,
       })),
     );
-
-    return average !== null ? average.toString() : null;
   };
 
   return (

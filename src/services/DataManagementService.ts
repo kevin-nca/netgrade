@@ -180,9 +180,9 @@ export class DataManagementService {
         );
 
         if (subjectScore !== null) {
-          perSubjectAverages[subject.name] = subjectScore;
+          perSubjectAverages[subject.name] = parseFloat(subjectScore);
           subjectScores.push({
-            score: subjectScore,
+            score: parseFloat(subjectScore),
             weight: subject.weight || 1,
           });
         }
@@ -219,7 +219,7 @@ export class DataManagementService {
       })),
       summaries: {
         perSubjectAverages,
-        overallAverage: overallAverage || 0,
+        overallAverage: overallAverage ? parseFloat(overallAverage) : 0,
         examsCompleted,
         examsTotal,
       },

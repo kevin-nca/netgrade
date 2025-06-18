@@ -57,7 +57,7 @@ const SchoolPage: React.FC = () => {
     );
   };
 
-  const calculateAverage = (subject: Subject): number | null => {
+  const calculateAverage = (subject: Subject): string | null => {
     const subjectGrades = grades.filter(
       (grade) => grade.exam.subjectId === subject.id,
     );
@@ -135,7 +135,7 @@ const SchoolPage: React.FC = () => {
                   <span style={{ float: 'right' }}>
                     Durchschnitt:{' '}
                     {calculateAverage(subject) !== null
-                      ? calculateAverage(subject)?.toFixed(2)
+                      ? calculateAverage(subject)
                       : 'Keine Noten'}
                   </span>
                 </IonLabel>

@@ -84,4 +84,11 @@ export class DecimalWrapper {
   isZero(): boolean {
     return this.value.isZero();
   }
+
+  /**
+   * Converts the decimal to a string with 2 decimal places
+   */
+  toString(): string {
+    return this.value.toFixed(2);
+  }
 } 

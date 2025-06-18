@@ -3,11 +3,11 @@ import { DecimalWrapper } from './decimalWrapper';
 /**
  * Calculates the weighted average of grades using decimal.js for precise arithmetic
  * @param grades Array of objects containing score and weight
- * @returns The weighted average as a number, or null if no grades
+ * @returns The weighted average as a string with 2 decimal places, or null if no grades
  */
 export const calculateWeightedAverage = (
   grades: Array<{ score: number; weight: number }>,
-): number | null => {
+): string | null => {
   if (!grades || grades.length === 0) return null;
 
   try {
@@ -24,7 +24,7 @@ export const calculateWeightedAverage = (
 
     if (totalWeight.isZero()) return null;
 
-    return totalWeightedScore.dividedBy(totalWeight).toNumber();
+    return totalWeightedScore.dividedBy(totalWeight).toString();
   } catch (error) {
     console.error('Error calculating weighted average:', error);
     return null;
@@ -51,15 +51,15 @@ export const isValidGrade = (grade: number): boolean => {
 };
 
 /**
- * Formats a grade to have at most 2 decimal places
+ * Formats a grade to have exactly 2 decimal places
  * @param grade The grade to format
- * @returns The formatted grade as a number
+ * @returns The formatted grade as a string
  */
-export const formatGrade = (grade: number): number => {
+export const formatGrade = (grade: number): string => {
   try {
-    return DecimalWrapper.from(grade).toDecimalPlaces(2).toNumber();
+    return DecimalWrapper.from(grade).toString();
   } catch (error) {
     console.error('Error formatting grade:', error);
-    return grade;
+    return grade.toString();
   }
 };
