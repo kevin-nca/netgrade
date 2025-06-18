@@ -10,7 +10,6 @@ import {
   IonRefresher,
   IonRefresherContent,
   useIonAlert,
-  useIonRouter,
   useIonToast,
   RefresherEventDetail,
 } from '@ionic/react';
@@ -42,7 +41,6 @@ const SettingsPage: React.FC = () => {
   const resetAllDataMutation = useResetAllDataMutation();
 
   const [presentAlert] = useIonAlert();
-  const router = useIonRouter();
 
   const handleAddSchool = (schoolData: { name: string }) => {
     addSchoolMutation.mutate(
@@ -72,7 +70,7 @@ const SettingsPage: React.FC = () => {
         showToast('Alle Daten wurden erfolgreich zurückgesetzt');
 
         setTimeout(() => {
-          router.push(Routes.HOME, 'root');
+          window.location.replace(Routes.ONBOARDING);
         }, 1500);
       } catch (error) {
         console.error('Error resetting data:', error);
@@ -83,24 +81,15 @@ const SettingsPage: React.FC = () => {
       }
     };
 
-    const alertOptions = {
+    presentAlert({
       header: 'Daten zurücksetzen',
       message:
         'Möchten Sie wirklich alle Daten zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.',
       buttons: [
-        {
-          text: 'Abbrechen',
-          role: 'cancel',
-        },
-        {
-          text: 'Zurücksetzen',
-          role: 'destructive',
-          handler: performReset,
-        },
+        { text: 'Abbrechen', role: 'cancel' },
+        { text: 'Zurücksetzen', role: 'destructive', handler: performReset },
       ],
-    };
-
-    presentAlert(alertOptions);
+    });
   };
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
