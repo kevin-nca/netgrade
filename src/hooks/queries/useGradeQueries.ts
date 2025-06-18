@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { GradeService, AddExamAndGradePayload } from '@/services/GradeService';
 import { Grade } from '@/db/entities/Grade';
+import { Exam } from '@/db/entities';
 
 // Query keys
 export const gradeKeys = {
@@ -95,7 +96,7 @@ export const useUpdateExamAndGrade = () => {
       examData,
       gradeData,
     }: {
-      examData: Partial<import('@/db/entities').Exam> & { id: string };
+      examData: Partial<Exam> & { id: string };
       gradeData: Partial<Grade> & { id: string };
     }) => GradeService.updateExamAndGrade(examData, gradeData),
     onSuccess: (updatedGrade) => {
