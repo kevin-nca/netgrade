@@ -22,10 +22,7 @@ const ExamList: React.FC = () => {
     <div>
       {upcomingExams.length === 0 ? (
         <div className="empty-state">
-          <IonIcon 
-            icon={calendarOutline} 
-            className="empty-state-icon"
-          />
+          <IonIcon icon={calendarOutline} className="empty-state-icon" />
           <p className="empty-state-message">
             Du hast aktuell keine anstehenden Prüfungen
           </p>
@@ -62,4 +59,4 @@ const ExamList: React.FC = () => {
   );
 };
 
-export default ExamList; 
+export default ExamList;
