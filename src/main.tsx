@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import './ionic';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -11,7 +12,10 @@ import App from './App';
 import { initializeDatabase } from '@/db/data-source';
 import { AppInfo } from '@/AppInfo';
 
-setupIonicReact();
+setupIonicReact({
+  animated: true,
+  swipeBackEnabled: true,
+});
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
