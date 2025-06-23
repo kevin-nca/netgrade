@@ -16,11 +16,7 @@ import {
   IonToolbar,
 } from '@ionic/react';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
-import {
-  add,
-  calendar,
-  settings
-} from 'ionicons/icons';
+import { add, calendar, settings } from 'ionicons/icons';
 import ExamList from '@/features/exams/ExamList/ExamList';
 import Button from '@/components/Button/Button';
 import { useSchools, useGrades, useUserName } from '@/hooks/queries';
@@ -98,7 +94,7 @@ function HomePage() {
             vertical="bottom"
             horizontal="center"
             slot="fixed"
-            className={`plus-button ${showSlideUp ? 'hidden' : ''}`}
+            className="plus-button"
           >
             <IonFabButton onClick={openSlideUp}>
               <IonIcon icon={add} />
@@ -117,7 +113,6 @@ function HomePage() {
             slot={'start'}
             className="footer-button"
           />
-
           <Button
             handleEvent={() => history.push(Routes.SETTINGS)}
             text={<IonIcon icon={settings} />}
