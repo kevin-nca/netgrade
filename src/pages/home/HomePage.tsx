@@ -114,6 +114,7 @@ function HomePage() {
             slot={'start'}
             className="footer-button"
           />
+
           <Button
             handleEvent={() => history.push(Routes.SETTINGS)}
             text={<IonIcon icon={settings} />}
