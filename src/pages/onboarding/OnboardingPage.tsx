@@ -27,6 +27,7 @@ import {
   useSetOnboardingCompleted,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
+import { Layout } from '@/components/Layout/Layout';
 
 const OnboardingPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<'name' | 'school' | 'subject'>(
@@ -183,8 +184,8 @@ const OnboardingPage: React.FC = () => {
         <IonProgressBar value={getProgress()} />
       </IonHeader>
 
-      <IonContent className="ion-padding">
-        {renderCurrentStep()}
+      <IonContent>
+        <Layout>{renderCurrentStep()}</Layout>
 
         <IonToast
           isOpen={showToast}
