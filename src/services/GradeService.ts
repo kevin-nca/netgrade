@@ -4,11 +4,11 @@ import { Exam } from '@/db/entities/Exam';
 
 export interface AddExamAndGradePayload {
   subjectId: string;
-  examName: string; // For Exam.name
-  date: Date; // For both Exam.date and Grade.date
-  score: number; // For Grade.score
-  weight: number; // For Grade.weight (also used for Exam.weight if desired)
-  comment?: string; // For Grade.comment
+  examName: string;
+  date: Date;
+  score: number;
+  weight: number;
+  comment?: string;
 }
 
 export class GradeService {
@@ -22,7 +22,9 @@ export class GradeService {
       return await gradeRepo.find({
         relations: {
           exam: {
-            subject: true,
+            subject: {
+              school: true,
+            },
           },
         },
         order: {
@@ -52,9 +54,9 @@ export class GradeService {
             subjectId: payload.subjectId,
           },
         });
+
         let savedExam: Exam;
         if (existingExam) {
-          console.log(`Updating existing exam: ${payload.examName}`);
           existingExam.isCompleted = true;
           existingExam.weight = payload.weight;
           savedExam = await transactionManager.save(existingExam);
@@ -81,7 +83,11 @@ export class GradeService {
         await transactionManager.save(savedExam);
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
-          relations: ['exam', 'exam.subject'],
+          relations: {
+            exam: {
+              subject: true,
+            },
+          },
         });
 
         if (!finalGrade) {
@@ -111,7 +117,9 @@ export class GradeService {
 
       const existingGrade = await gradeRepo.findOne({
         where: { id: updatedGradeData.id },
-        relations: ['exam'],
+        relations: {
+          exam: true,
+        },
       });
 
       if (!existingGrade) {
@@ -161,7 +169,9 @@ export class GradeService {
       const { grade: gradeRepo } = getRepositories();
       return await gradeRepo.findOne({
         where: { id },
-        relations: ['exam'],
+        relations: {
+          exam: true,
+        },
       });
     } catch (error) {
       console.error(`Failed to find grade with ID ${id}:`, error);
@@ -178,8 +188,12 @@ export class GradeService {
     try {
       const { grade: gradeRepo } = getRepositories();
       return await gradeRepo.find({
-        where: { exam: { id: examId } },
-        relations: ['exam'],
+        where: {
+          exam: { id: examId },
+        },
+        relations: {
+          exam: true,
+        },
       });
     } catch (error) {
       console.error(`Failed to find grades for exam ID ${examId}:`, error);
@@ -221,7 +235,9 @@ export class GradeService {
         // Update grade
         const existingGrade = await transactionManager.findOne(Grade, {
           where: { id: gradeData.id },
-          relations: ['exam'],
+          relations: {
+            exam: true,
+          },
         });
 
         if (!existingGrade) {
@@ -240,7 +256,9 @@ export class GradeService {
         // Return with relations
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
-          relations: ['exam'],
+          relations: {
+            exam: true,
+          },
         });
 
         if (!finalGrade) {
