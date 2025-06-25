@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   DataManagementService,
   ExportOptions,
+  ExportResult,
 } from '@/services/DataManagementService';
 
 export const useResetAllDataMutation = () => {
@@ -20,7 +21,7 @@ export const useResetAllDataMutation = () => {
   });
 };
 export const useExportData = () => {
-  return useMutation<Blob, Error, { options: ExportOptions }>({
+  return useMutation<ExportResult, Error, { options: ExportOptions }>({
     mutationFn: async ({ options }) => {
       return await DataManagementService.exportData(options);
     },

@@ -31,10 +31,14 @@ import {
 import { useExportData } from '@/hooks/queries/useDataManagementQueries';
 import { useUserName } from '@/hooks';
 import { useSchools } from '@/hooks/queries/useSchoolQueries';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
 import { School } from '@/db/entities';
+import {
+  generateExportFilename,
+  ensureXlsxExtension,
+  validateFilename,
+  getExportToastColor,
+} from '@/utils/export';
 import './ExportDialog.css';
 
 interface ExportDialogProps {
@@ -52,8 +56,11 @@ interface ToastState {
 export const ExportDialog: React.FC<ExportDialogProps> = ({
   isOpen,
   onClose,
+  school,
 }) => {
-  const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(null);
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(
+    school?.id || null,
+  );
   const [customFilename, setCustomFilename] = useState<string>('');
   const [toast, setToast] = useState<ToastState>({
     show: false,
@@ -63,21 +70,17 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 
   const exportMutation = useExportData();
   const { data: userName } = useUserName();
-  const { data: schools } = useSchools();
+  const { data: schools = [] } = useSchools();
 
   const isNative = Capacitor.isNativePlatform();
 
   useEffect(() => {
-    const generateDefaultFilename = () => {
-      const timestamp = new Date().toISOString().split('T')[0];
-      const username = userName ? `${userName}-` : '';
-      const selectedSchool = schools?.find((s) => s.id === selectedSchoolId);
-      const schoolName = selectedSchool?.name ? `${selectedSchool.name}-` : '';
-      return `netgrade-${schoolName}${username}${timestamp}`;
-    };
-
-    const newFilename = generateDefaultFilename();
-    setCustomFilename(newFilename.replace('.xlsx', ''));
+    const selectedSchool = schools?.find((s) => s.id === selectedSchoolId);
+    const filename = generateExportFilename(
+      selectedSchool?.name,
+      userName || undefined,
+    );
+    setCustomFilename(filename);
   }, [selectedSchoolId, userName, schools]);
 
   const showToast = (
@@ -87,102 +90,8 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     setToast({ show: true, message, color });
   };
 
-  const getFinalFilename = () => {
-    const cleanFilename = customFilename.trim();
-    return cleanFilename.endsWith('.xlsx')
-      ? cleanFilename
-      : `${cleanFilename}.xlsx`;
-  };
-
-  const downloadFileWeb = (data: Blob, filename: string) => {
-    try {
-      const url = URL.createObjectURL(data);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      showToast('Export erfolgreich heruntergeladen.', 'success');
-      onClose();
-    } catch (error) {
-      console.error('Download failed:', error);
-      showToast('Download fehlgeschlagen.');
-    }
-  };
-
-  const saveFileAndShare = async (data: Blob, filename: string) => {
-    try {
-      const reader = new FileReader();
-      const base64Data = await new Promise<string>((resolve, reject) => {
-        reader.onloadend = () => {
-          const base64 = reader.result as string;
-          const base64Clean = base64.split(',')[1];
-          resolve(base64Clean);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(data);
-      });
-
-      const properFilename = filename.endsWith('.xlsx')
-        ? filename
-        : `${filename}.xlsx`;
-
-      await Filesystem.writeFile({
-        path: properFilename,
-        data: base64Data,
-        directory: Directory.Documents,
-        recursive: true,
-        encoding: undefined,
-      });
-      await Filesystem.stat({
-        path: properFilename,
-        directory: Directory.Documents,
-      });
-      const fileUri = await Filesystem.getUri({
-        path: properFilename,
-        directory: Directory.Documents,
-      });
-
-      await Share.share({
-        title: 'NetGrade Export',
-        text: 'NetGrade-Datenexport als Excel-Datei.',
-        url: fileUri.uri,
-        dialogTitle: 'NetGrade Export teilen',
-      });
-
-      showToast('Datei erfolgreich geteilt.', 'success');
-      onClose();
-    } catch (error) {
-      console.error('Share failed:', error);
-
-      if (error instanceof Error) {
-        if (
-          error.message.includes('cancelled') ||
-          error.message.includes('canceled')
-        ) {
-          showToast('Vorgang abgebrochen. Datei wurde gespeichert.', 'warning');
-        } else if (
-          error.message.includes('file') ||
-          error.message.includes('File')
-        ) {
-          showToast(
-            'Datei konnte nicht geöffnet werden. Versuchen Sie es erneut.',
-            'warning',
-          );
-        } else {
-          showToast(
-            'Datei wurde gespeichert, Teilen war nicht möglich.',
-            'warning',
-          );
-        }
-      } else {
-        showToast('Unbekannter Fehler beim Teilen.', 'warning');
-      }
-      onClose();
-    }
+  const getFinalFilename = (): string => {
+    return ensureXlsxExtension(customFilename);
   };
 
   const handleExport = async () => {
@@ -191,8 +100,9 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
       return;
     }
 
-    if (!customFilename.trim()) {
-      showToast('Bitte geben Sie einen Dateinamen ein.');
+    const filenameError = validateFilename(customFilename);
+    if (filenameError) {
+      showToast(filenameError);
       return;
     }
 
@@ -207,10 +117,10 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         },
       });
 
-      if (!isNative) {
-        downloadFileWeb(result, filename);
-      } else {
-        await saveFileAndShare(result, filename);
+      showToast(result.message, getExportToastColor(result.success));
+
+      if (result.success) {
+        onClose();
       }
     } catch (error) {
       console.error('Export failed:', error);
@@ -330,6 +240,12 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                     </div>
                   ))}
                 </IonRadioGroup>
+
+                {schools.length === 0 && (
+                  <div className="empty-state">
+                    <p>Keine Schulen vorhanden</p>
+                  </div>
+                )}
               </div>
 
               {selectedSchoolId && (
