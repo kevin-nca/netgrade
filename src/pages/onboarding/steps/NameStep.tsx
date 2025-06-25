@@ -76,7 +76,7 @@ export const NameStep: React.FC<NameStepProps> = ({
               className={styles.nextButton}
             >
               {saveUserNameMutation.isPending
-                ? 'Wird gespeichert...'
+                ? 'Wird gespeichert....'
                 : 'Weiter'}
               <IonIcon slot="end" icon={arrowForward} />
             </IonButton>
