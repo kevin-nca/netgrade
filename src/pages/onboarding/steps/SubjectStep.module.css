@@ -6,7 +6,7 @@
   padding: 2.2rem 1.2rem 1.2rem 1.2rem;
   background: var(--background-color);
   border-radius: var(--border-radius);
-  box-shadow: 0 8px 32px rgba(21, 82, 154, 0.10);
+  box-shadow: 0 8px 32px rgba(21, 82, 154, 0.1);
   max-width: 430px;
   margin: 2.5rem auto 0 auto;
   border: 1px solid var(--primary-color);
@@ -45,9 +45,11 @@
   border-radius: var(--border-radius-small);
   border: 1.5px solid var(--primary-color);
   background: #fff;
-  box-shadow: 0 2px 8px rgba(21,82,154,0.07);
+  box-shadow: 0 2px 8px rgba(21, 82, 154, 0.07);
   outline: none;
-  transition: border 0.18s, box-shadow 0.18s;
+  transition:
+    border 0.18s,
+    box-shadow 0.18s;
   max-width: 420px;
   width: 100%;
   display: block;
@@ -55,7 +57,7 @@
 }
 .input:focus {
   border: 1.5px solid var(--secondary-color);
-  box-shadow: 0 4px 16px rgba(21,82,154,0.13);
+  box-shadow: 0 4px 16px rgba(21, 82, 154, 0.13);
 }
 
 .addButton {
@@ -64,8 +66,10 @@
   font-size: var(--font-size-medium);
   background: var(--button-background);
   color: var(--button-text-color);
-  box-shadow: 0 2px 12px rgba(21,82,154,0.10);
-  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 2px 12px rgba(21, 82, 154, 0.1);
+  transition:
+    background 0.2s,
+    transform 0.1s;
 
   min-width: 48px;
   max-width: 120px;
@@ -99,9 +103,12 @@
 .subjectItem {
   background: #fff;
   border-radius: var(--border-radius);
-  box-shadow: 0 2px 8px rgba(21,82,154,0.07);
+  box-shadow: 0 2px 8px rgba(21, 82, 154, 0.07);
   border: 2px solid transparent;
-  transition: border 0.18s, box-shadow 0.18s, background 0.18s;
+  transition:
+    border 0.18s,
+    box-shadow 0.18s,
+    background 0.18s;
   min-height: 48px;
   display: flex;
   align-items: center;
@@ -124,8 +131,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .noSubjects {

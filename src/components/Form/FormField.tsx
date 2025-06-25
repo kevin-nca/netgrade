@@ -22,6 +22,7 @@ interface FormFieldProps {
   type?: 'text' | 'number' | 'date' | 'toggle' | 'select';
   options?: SelectOption[];
   disabled?: boolean;
+  inputProps?: { className: string; autoFocus: boolean; maxLength: number };
 }
 
 const FormField: React.FC<FormFieldProps> = ({

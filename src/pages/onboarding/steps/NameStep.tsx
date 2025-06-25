@@ -61,7 +61,7 @@ export const NameStep: React.FC<NameStepProps> = ({
               onChange={(value) => setUserName(String(value))}
               placeholder="Namen eingeben"
               inputProps={{
-                className: styles.input,
+                className: 'styles.input',
                 autoFocus: true,
                 maxLength: 32,
               }}

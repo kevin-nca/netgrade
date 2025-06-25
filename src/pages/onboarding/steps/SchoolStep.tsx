@@ -108,37 +108,40 @@ export const SchoolStep: React.FC<SchoolStepProps> = ({
             <h5>Verfügbare Schulen:</h5>
           </IonText>
 
-        <div className={styles.schoolList}>
-          {schools.length > 0 ? (
-            schools.map((school) => (
-              <div
-                key={school.id}
-                className={`${styles.schoolItem} ${localSelectedSchoolId === school.id ? styles.selected : ''}`}
-                onClick={() => handleSchoolClick(school.id)}
-                tabIndex={0}
-                role="button"
-                aria-pressed={localSelectedSchoolId === school.id}
-              >
+          <div className={styles.schoolList}>
+            {schools.length > 0 ? (
+              schools.map((school) => (
+                <div
+                  key={school.id}
+                  className={`${styles.schoolItem} ${localSelectedSchoolId === school.id ? styles.selected : ''}`}
+                  onClick={() => handleSchoolClick(school.id)}
+                  tabIndex={0}
+                  role="button"
+                  aria-pressed={localSelectedSchoolId === school.id}
+                >
+                  <IonIcon
+                    icon={schoolOutline}
+                    className={`${styles.schoolIcon} ${localSelectedSchoolId === school.id ? styles.schoolIconSelected : ''}`}
+                  />
+                  <span>{school.name}</span>
+                  {localSelectedSchoolId === school.id && (
+                    <IonIcon
+                      icon={checkmarkCircle}
+                      className={styles.checkmarkIcon}
+                    />
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className={styles.noSchools}>
                 <IonIcon
                   icon={schoolOutline}
-                  className={`${styles.schoolIcon} ${localSelectedSchoolId === school.id ? styles.schoolIconSelected : ''}`}
+                  className={styles.noSchoolsIcon}
                 />
-                <span>{school.name}</span>
-                {localSelectedSchoolId === school.id && (
-                  <IonIcon
-                    icon={checkmarkCircle}
-                    className={styles.checkmarkIcon}
-                  />
-                )}
+                <span>Noch keine Schulen</span>
               </div>
-            ))
-          ) : (
-            <div className={styles.noSchools}>
-              <IonIcon icon={schoolOutline} className={styles.noSchoolsIcon} />
-              <span>Noch keine Schulen</span>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
           {localSelectedSchoolId && (
             <IonButton
