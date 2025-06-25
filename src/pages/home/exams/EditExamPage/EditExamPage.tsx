@@ -56,6 +56,7 @@ import { GradeForm } from './components/GradeForm';
 import { formatDate, getGradeColor } from './utils';
 import { ExamFormData, GradeFormData, ExamParams } from './types';
 import styles from './EditExamPage.module.css';
+import { Layout } from '@/components/Layout/Layout';
 
 const EditExamPage: React.FC = () => {
   const { examId } = useParams<ExamParams>();
@@ -218,18 +219,20 @@ const EditExamPage: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonContent>
-          <div className={styles.container}>
-            <IonCard className={styles.loadingCard}>
-              <IonCardContent>
-                <IonSkeletonText animated className={styles.skeletonTitle} />
-                <IonSkeletonText animated className={styles.skeletonText} />
-                <IonSkeletonText
-                  animated
-                  className={styles.skeletonTextShort}
-                />
-              </IonCardContent>
-            </IonCard>
-          </div>
+          <Layout>
+            <div className={styles.container}>
+              <IonCard className={styles.loadingCard}>
+                <IonCardContent>
+                  <IonSkeletonText animated className={styles.skeletonTitle} />
+                  <IonSkeletonText animated className={styles.skeletonText} />
+                  <IonSkeletonText
+                    animated
+                    className={styles.skeletonTextShort}
+                  />
+                </IonCardContent>
+              </IonCard>
+            </div>
+          </Layout>
         </IonContent>
       </IonPage>
     );
@@ -247,28 +250,30 @@ const EditExamPage: React.FC = () => {
           </IonToolbar>
         </IonHeader>
         <IonContent>
-          <div className={styles.container}>
-            <IonCard className={styles.errorCard}>
-              <IonCardHeader>
-                <IonCardTitle className={styles.errorCardTitle}>
-                  <IonIcon icon={alertCircleOutline} />
-                  Fehler beim Laden
-                </IonCardTitle>
-              </IonCardHeader>
-              <IonCardContent>
-                <p className={styles.errorCardText}>{error.message}</p>
-                <IonButton
-                  expand="block"
-                  fill="solid"
-                  color="light"
-                  className="modern-button"
-                  onClick={() => history.replace(Routes.HOME)}
-                >
-                  Zurück zur Übersicht
-                </IonButton>
-              </IonCardContent>
-            </IonCard>
-          </div>
+          <Layout>
+            <div className={styles.container}>
+              <IonCard className={styles.errorCard}>
+                <IonCardHeader>
+                  <IonCardTitle className={styles.errorCardTitle}>
+                    <IonIcon icon={alertCircleOutline} />
+                    Fehler beim Laden
+                  </IonCardTitle>
+                </IonCardHeader>
+                <IonCardContent>
+                  <p className={styles.errorCardText}>{error.message}</p>
+                  <IonButton
+                    expand="block"
+                    fill="solid"
+                    color="light"
+                    className="modern-button"
+                    onClick={() => history.replace(Routes.HOME)}
+                  >
+                    Zurück zur Übersicht
+                  </IonButton>
+                </IonCardContent>
+              </IonCard>
+            </div>
+          </Layout>
         </IonContent>
       </IonPage>
     );
@@ -291,219 +296,224 @@ const EditExamPage: React.FC = () => {
       </IonHeader>
 
       <IonContent>
-        <div className={styles.container}>
-          {exam && (
-            <IonCard className={styles.headerCard}>
-              <IonCardHeader className={styles.headerCardContent}>
-                <IonCardTitle className={styles.headerCardTitle}>
-                  {examFormValues.title || exam.name}
-                </IonCardTitle>
-                <IonCardSubtitle className={styles.headerCardSubtitle}>
-                  <div className={styles.headerCardInfo}>
-                    <div className={styles.headerCardInfoRow}>
-                      <IonIcon icon={calendarOutline} />
-                      {formatDate(new Date(examFormValues.date || exam.date))}
-                    </div>
-                    <div className={styles.headerCardInfoRow}>
-                      <IonIcon icon={schoolOutline} />
-                      {subjects.find(
-                        (s) =>
-                          s.id === (examFormValues.subject || exam.subjectId),
-                      )?.name || 'Unbekanntes Fach'}
-                    </div>
-                  </div>
-                </IonCardSubtitle>
-              </IonCardHeader>
-            </IonCard>
-          )}
-
-          <IonSegment
-            value={segmentValue}
-            onIonChange={(e) =>
-              setSegmentValue(e.detail.value as 'details' | 'grade')
-            }
-            className={styles.segment}
-          >
-            <IonSegmentButton value="details" className={styles.segmentButton}>
-              <IonLabel className={styles.segmentLabel}>
-                <IonIcon icon={createOutline} />
-                Details
-              </IonLabel>
-            </IonSegmentButton>
-            <IonSegmentButton value="grade" className={styles.segmentButton}>
-              <IonLabel className={styles.segmentLabel}>
-                <IonIcon icon={trophyOutline} />
-                Note
-              </IonLabel>
-            </IonSegmentButton>
-          </IonSegment>
-          {segmentValue === 'details' ? (
-            <ExamDetailsForm
-              formValues={examForm.state.values as ExamFormData}
-              onFieldChange={(field, value) =>
-                examForm.setFieldValue(
-                  field as keyof ExamFormData,
-                  value as Updater<
-                    DeepRecord<ExamFormData>[keyof ExamFormData]
-                  >,
-                )
-              }
-              subjects={subjects}
-              isSubmitting={updateExamMutation.isPending}
-              onSubmit={examForm.handleSubmit}
-            />
-          ) : (
-            <GradeForm
-              formValues={gradeForm.state.values as GradeFormData}
-              onFieldChange={(field, value) =>
-                gradeForm.setFieldValue(
-                  field as keyof GradeFormData,
-                  value as Updater<
-                    DeepRecord<GradeFormData>[keyof GradeFormData]
-                  >,
-                )
-              }
-              getGradeColor={getGradeColor}
-              onSubmit={gradeForm.handleSubmit}
-            />
-          )}
-        </div>
-
-        {/* Grade Confirmation Modal */}
-        <IonModal
-          isOpen={showGradeConfirmModal}
-          onDidDismiss={() => setShowGradeConfirmModal(false)}
-          className={styles.modal}
-        >
-          <div className={styles.modalContent}>
-            <div className={styles.modalHeader}>
-              <button
-                className={styles.closeButton}
-                onClick={() => setShowGradeConfirmModal(false)}
-              >
-                <IonIcon
-                  icon={closeCircleOutline}
-                  className={styles.closeIcon}
-                />
-              </button>
-              <h2 className={styles.modalTitle}>Note bestätigen</h2>
-              <p className={styles.modalSubtitle}>
-                Überprüfe deine Eingaben vor dem Speichern
-              </p>
-            </div>
-            <div className={styles.contentContainer}>
-              <div className={`${styles.gradeCard} ${styles.animateIn}`}>
-                <div className={styles.gradeDisplay}>
-                  <div
-                    className={`${styles.gradeCircle} ${styles[getGradeColor(gradeFormValues.score)]}`}
-                  >
-                    <span className={styles.gradeValue}>
-                      {gradeFormValues.score.toFixed(1)}
-                    </span>
-                  </div>
-                </div>
-                <p className={styles.gradeLabel}>Deine Note</p>
-              </div>
-              <div className={styles.infoGrid}>
-                <div className={styles.infoCard}>
-                  <div className={styles.infoCardHeader}>
-                    <div className={styles.infoIcon}>
-                      <IonIcon icon={documentTextOutline} />
-                    </div>
-                    <span className={styles.infoLabel}>Prüfung</span>
-                  </div>
-                  <div className={styles.infoValue}>
-                    {examFormValues.title || exam?.name}
-                  </div>
-                </div>
-                <div className={styles.infoCard}>
-                  <div className={styles.infoCardHeader}>
-                    <div className={styles.infoIcon}>
-                      <IonIcon icon={scaleOutline} />
-                    </div>
-                    <span className={styles.infoLabel}>Gewichtung</span>
-                  </div>
-                  <div className={styles.infoValue}>
-                    {gradeFormValues.weight}%
-                  </div>
-                </div>
-                {gradeFormValues.comment && (
-                  <div className={`${styles.infoCard} ${styles.commentCard}`}>
-                    <div className={styles.infoCardHeader}>
-                      <div className={styles.infoIcon}>
-                        <IonIcon icon={chatbubbleOutline} />
+        <Layout>
+          <div className={styles.container}>
+            {exam && (
+              <IonCard className={styles.headerCard}>
+                <IonCardHeader className={styles.headerCardContent}>
+                  <IonCardTitle className={styles.headerCardTitle}>
+                    {examFormValues.title || exam.name}
+                  </IonCardTitle>
+                  <IonCardSubtitle className={styles.headerCardSubtitle}>
+                    <div className={styles.headerCardInfo}>
+                      <div className={styles.headerCardInfoRow}>
+                        <IonIcon icon={calendarOutline} />
+                        {formatDate(new Date(examFormValues.date || exam.date))}
                       </div>
-                      <span className={styles.infoLabel}>Kommentar</span>
+                      <div className={styles.headerCardInfoRow}>
+                        <IonIcon icon={schoolOutline} />
+                        {subjects.find(
+                          (s) =>
+                            s.id === (examFormValues.subject || exam.subjectId),
+                        )?.name || 'Unbekanntes Fach'}
+                      </div>
                     </div>
-                    <p className={styles.commentText}>
-                      &#34;{gradeFormValues.comment}&#34;
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+                  </IonCardSubtitle>
+                </IonCardHeader>
+              </IonCard>
+            )}
 
-            <div className={styles.actionContainer}>
-              <div className={styles.buttonGroup}>
+            <IonSegment
+              value={segmentValue}
+              onIonChange={(e) =>
+                setSegmentValue(e.detail.value as 'details' | 'grade')
+              }
+              className={styles.segment}
+            >
+              <IonSegmentButton
+                value="details"
+                className={styles.segmentButton}
+              >
+                <IonLabel className={styles.segmentLabel}>
+                  <IonIcon icon={createOutline} />
+                  Details
+                </IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="grade" className={styles.segmentButton}>
+                <IonLabel className={styles.segmentLabel}>
+                  <IonIcon icon={trophyOutline} />
+                  Note
+                </IonLabel>
+              </IonSegmentButton>
+            </IonSegment>
+            {segmentValue === 'details' ? (
+              <ExamDetailsForm
+                formValues={examForm.state.values as ExamFormData}
+                onFieldChange={(field, value) =>
+                  examForm.setFieldValue(
+                    field as keyof ExamFormData,
+                    value as Updater<
+                      DeepRecord<ExamFormData>[keyof ExamFormData]
+                    >,
+                  )
+                }
+                subjects={subjects}
+                isSubmitting={updateExamMutation.isPending}
+                onSubmit={examForm.handleSubmit}
+              />
+            ) : (
+              <GradeForm
+                formValues={gradeForm.state.values as GradeFormData}
+                onFieldChange={(field, value) =>
+                  gradeForm.setFieldValue(
+                    field as keyof GradeFormData,
+                    value as Updater<
+                      DeepRecord<GradeFormData>[keyof GradeFormData]
+                    >,
+                  )
+                }
+                getGradeColor={getGradeColor}
+                onSubmit={gradeForm.handleSubmit}
+              />
+            )}
+          </div>
+
+          {/* Grade Confirmation Modal */}
+          <IonModal
+            isOpen={showGradeConfirmModal}
+            onDidDismiss={() => setShowGradeConfirmModal(false)}
+            className={styles.modal}
+          >
+            <div className={styles.modalContent}>
+              <div className={styles.modalHeader}>
                 <button
-                  className={styles.confirmButton}
-                  onClick={handleAddGrade}
-                  disabled={addGradeWithExamMutation.isPending}
-                >
-                  {addGradeWithExamMutation.isPending ? (
-                    <>
-                      <div className={styles.spinner} />
-                      Wird gespeichert...
-                    </>
-                  ) : (
-                    <>
-                      <IonIcon
-                        icon={checkmarkCircleOutline}
-                        className={styles.buttonIcon}
-                      />
-                      Speichern
-                    </>
-                  )}
-                </button>
-                <button
-                  className={styles.cancelButton}
+                  className={styles.closeButton}
                   onClick={() => setShowGradeConfirmModal(false)}
                 >
-                  Abbrechen
+                  <IonIcon
+                    icon={closeCircleOutline}
+                    className={styles.closeIcon}
+                  />
                 </button>
+                <h2 className={styles.modalTitle}>Note bestätigen</h2>
+                <p className={styles.modalSubtitle}>
+                  Überprüfe deine Eingaben vor dem Speichern
+                </p>
+              </div>
+              <div className={styles.contentContainer}>
+                <div className={`${styles.gradeCard} ${styles.animateIn}`}>
+                  <div className={styles.gradeDisplay}>
+                    <div
+                      className={`${styles.gradeCircle} ${styles[getGradeColor(gradeFormValues.score)]}`}
+                    >
+                      <span className={styles.gradeValue}>
+                        {gradeFormValues.score.toFixed(1)}
+                      </span>
+                    </div>
+                  </div>
+                  <p className={styles.gradeLabel}>Deine Note</p>
+                </div>
+                <div className={styles.infoGrid}>
+                  <div className={styles.infoCard}>
+                    <div className={styles.infoCardHeader}>
+                      <div className={styles.infoIcon}>
+                        <IonIcon icon={documentTextOutline} />
+                      </div>
+                      <span className={styles.infoLabel}>Prüfung</span>
+                    </div>
+                    <div className={styles.infoValue}>
+                      {examFormValues.title || exam?.name}
+                    </div>
+                  </div>
+                  <div className={styles.infoCard}>
+                    <div className={styles.infoCardHeader}>
+                      <div className={styles.infoIcon}>
+                        <IonIcon icon={scaleOutline} />
+                      </div>
+                      <span className={styles.infoLabel}>Gewichtung</span>
+                    </div>
+                    <div className={styles.infoValue}>
+                      {gradeFormValues.weight}%
+                    </div>
+                  </div>
+                  {gradeFormValues.comment && (
+                    <div className={`${styles.infoCard} ${styles.commentCard}`}>
+                      <div className={styles.infoCardHeader}>
+                        <div className={styles.infoIcon}>
+                          <IonIcon icon={chatbubbleOutline} />
+                        </div>
+                        <span className={styles.infoLabel}>Kommentar</span>
+                      </div>
+                      <p className={styles.commentText}>
+                        &#34;{gradeFormValues.comment}&#34;
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.actionContainer}>
+                <div className={styles.buttonGroup}>
+                  <button
+                    className={styles.confirmButton}
+                    onClick={handleAddGrade}
+                    disabled={addGradeWithExamMutation.isPending}
+                  >
+                    {addGradeWithExamMutation.isPending ? (
+                      <>
+                        <div className={styles.spinner} />
+                        Wird gespeichert...
+                      </>
+                    ) : (
+                      <>
+                        <IonIcon
+                          icon={checkmarkCircleOutline}
+                          className={styles.buttonIcon}
+                        />
+                        Speichern
+                      </>
+                    )}
+                  </button>
+                  <button
+                    className={styles.cancelButton}
+                    onClick={() => setShowGradeConfirmModal(false)}
+                  >
+                    Abbrechen
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </IonModal>
-        {/* Delete Alert */}
-        <IonAlert
-          isOpen={showDeleteAlert}
-          onDidDismiss={() => setShowDeleteAlert(false)}
-          header="Prüfung löschen?"
-          message={`Möchtest du die Prüfung "${examFormValues.title || exam?.name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
-          buttons={[
-            {
-              text: 'Abbrechen',
-              role: 'cancel',
-              handler: () => setShowDeleteAlert(false),
-            },
-            {
-              text: 'Löschen',
-              role: 'destructive',
-              handler: handleDelete,
-            },
-          ]}
-        />
+          </IonModal>
+          {/* Delete Alert */}
+          <IonAlert
+            isOpen={showDeleteAlert}
+            onDidDismiss={() => setShowDeleteAlert(false)}
+            header="Prüfung löschen?"
+            message={`Möchtest du die Prüfung "${examFormValues.title || exam?.name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
+            buttons={[
+              {
+                text: 'Abbrechen',
+                role: 'cancel',
+                handler: () => setShowDeleteAlert(false),
+              },
+              {
+                text: 'Löschen',
+                role: 'destructive',
+                handler: handleDelete,
+              },
+            ]}
+          />
 
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={toastMessage}
-          duration={2000}
-          position="top"
-          color={toastColor}
-          animated
-        />
+          <IonToast
+            isOpen={showToast}
+            onDidDismiss={() => setShowToast(false)}
+            message={toastMessage}
+            duration={2000}
+            position="top"
+            color={toastColor}
+            animated
+          />
+        </Layout>
       </IonContent>
     </IonPage>
   );

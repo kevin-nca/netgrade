@@ -22,6 +22,7 @@ import Button from '@/components/Button/Button';
 import { useSchools, useGrades, useUserName } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import { Grade } from '@/db/entities';
+import { Layout } from '@/components/Layout/Layout';
 
 function HomePage() {
   const [showSlideUp, setShowSlideUp] = useState(false);
@@ -55,54 +56,55 @@ function HomePage() {
   return (
     <IonPage className="page-background">
       <IonContent fullscreen>
-        <IonCard className="welcome-card">
-          <div className="welcome-content">
-            <h2 className="welcome-title">
-              Willkommen, {userName || 'Benutzer'}
-            </h2>
-            <div className="profile-icon"></div>
-          </div>
-        </IonCard>
+        <Layout>
+          <IonCard className="welcome-card">
+            <div className="welcome-content">
+              <h2 className="welcome-title">
+                Willkommen, {userName || 'Benutzer'}
+              </h2>
+              <div className="profile-icon"></div>
+            </div>
+          </IonCard>
 
-        <h2 className="grades-overview-subtitle">Notenübersicht</h2>
+          <h2 className="grades-overview-subtitle">Notenübersicht</h2>
 
-        {schools.map((school) => {
-          const average = calculateSchoolAverage(school.id, grades);
-          return (
-            <IonCard key={school.id} className="grade-card">
-              <IonItem
-                button
-                detail
-                onClick={() =>
-                  history.push(Routes.SCHOOL.replace(':schoolId', school.id))
-                }
-              >
-                <IonLabel>{school.name}</IonLabel>
-                <IonLabel slot="end" className="grade-average">
-                  {average !== null ? `${average} Ø` : '-'}
-                </IonLabel>
-              </IonItem>
-            </IonCard>
-          );
-        })}
+          {schools.map((school) => {
+            const average = calculateSchoolAverage(school.id, grades);
+            return (
+              <IonCard key={school.id} className="grade-card">
+                <IonItem
+                  button
+                  detail
+                  onClick={() =>
+                    history.push(Routes.SCHOOL.replace(':schoolId', school.id))
+                  }
+                >
+                  <IonLabel>{school.name}</IonLabel>{' '}
+                  <IonLabel slot="end" className="grade-average">
+                    {average !== null ? `${average} Ø` : '-'}
+                  </IonLabel>
+                </IonItem>
+              </IonCard>
+            );
+          })}
 
-        <h2 className="grades-overview-subtitle">Anstehende Prüfungen</h2>
-        <ExamList />
-
-        <IonFab
-          vertical="bottom"
-          horizontal="center"
-          slot="fixed"
-          className={`plus-button ${showSlideUp ? 'hidden' : ''}`}
-        >
-          <IonFabButton onClick={openSlideUp}>
-            <IonIcon icon={add} />
-          </IonFabButton>
-        </IonFab>
-
+          <h2 className="grades-overview-subtitle">Anstehende Prüfungen</h2>
+          <ExamList />
+        </Layout>
+        {!showSlideUp && (
+          <IonFab
+            vertical="bottom"
+            horizontal="center"
+            slot="fixed"
+            className={`plus-button ${showSlideUp ? 'hidden' : ''}`}
+          >
+            <IonFabButton onClick={openSlideUp}>
+              <IonIcon icon={add} />
+            </IonFabButton>
+          </IonFab>
+        )}
         <NavigationModal isOpen={showSlideUp} setIsOpen={setShowSlideUp} />
       </IonContent>
-
       <IonFooter>
         <IonToolbar className="footer-toolbar">
           <Button

@@ -21,6 +21,7 @@ import {
 } from '@/utils/validation';
 import { useToast } from '@/hooks/useToast';
 import { Routes } from '@/routes';
+import { Layout } from '@/components/Layout/Layout';
 
 interface GradeFormData {
   examName: string;
@@ -152,115 +153,117 @@ const GradeEntryPage: React.FC = () => {
     <IonPage>
       <Header title="Notenübersicht" backButton defaultHref={Routes.HOME} />
       <IonContent>
-        {gradesLoading ? (
-          <div className="ion-padding ion-text-center">
-            <p>Noten werden geladen...</p>
-          </div>
-        ) : gradesError ? (
-          <div className="ion-padding ion-text-center">
-            <p>Fehler beim Laden der Noten.</p>
-          </div>
-        ) : grades.length === 0 ? (
-          <div className="ion-padding ion-text-center">
-            <p>Keine Noten gefunden.</p>
-          </div>
-        ) : (
-          <IonList>
-            {grades.map((grade) => (
-              <GradeListItem
-                key={grade.id}
-                grade={grade}
-                onEdit={() => startEdit(grade)}
-                onDelete={() => handleDelete(grade.id)}
-              />
-            ))}
-          </IonList>
-        )}
+        <Layout>
+          {gradesLoading ? (
+            <div className="ion-padding ion-text-center">
+              <p>Noten werden geladen...</p>
+            </div>
+          ) : gradesError ? (
+            <div className="ion-padding ion-text-center">
+              <p>Fehler beim Laden der Noten.</p>
+            </div>
+          ) : grades.length === 0 ? (
+            <div className="ion-padding ion-text-center">
+              <p>Keine Noten gefunden.</p>
+            </div>
+          ) : (
+            <IonList>
+              {grades.map((grade) => (
+                <GradeListItem
+                  key={grade.id}
+                  grade={grade}
+                  onEdit={() => startEdit(grade)}
+                  onDelete={() => handleDelete(grade.id)}
+                />
+              ))}
+            </IonList>
+          )}
 
-        <IonModal isOpen={editingId !== null}>
-          <Header title="Note bearbeiten" backButton={false} />
-          <IonContent>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                gradeForm.handleSubmit();
-              }}
-            >
-              <gradeForm.Field name="examName">
-                {(field) => (
-                  <FormField
-                    label="Titel:"
-                    value={field.state.value}
-                    onChange={(val) => field.handleChange(String(val))}
-                    type="text"
-                  />
-                )}
-              </gradeForm.Field>
+          <IonModal isOpen={editingId !== null}>
+            <Header title="Note bearbeiten" backButton={false} />
+            <IonContent>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  gradeForm.handleSubmit();
+                }}
+              >
+                <gradeForm.Field name="examName">
+                  {(field) => (
+                    <FormField
+                      label="Titel:"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(String(val))}
+                      type="text"
+                    />
+                  )}
+                </gradeForm.Field>
 
-              <gradeForm.Field name="score">
-                {(field) => (
-                  <ValidatedNumberInput
-                    label="Note"
-                    value={field.state.value}
-                    onChange={(val) => field.handleChange(val)}
-                    validation={validateGrade}
-                  />
-                )}
-              </gradeForm.Field>
+                <gradeForm.Field name="score">
+                  {(field) => (
+                    <ValidatedNumberInput
+                      label="Note"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(val)}
+                      validation={validateGrade}
+                    />
+                  )}
+                </gradeForm.Field>
 
-              <gradeForm.Field name="weight">
-                {(field) => (
-                  <ValidatedNumberInput
-                    label="Gewichtung (%)"
-                    value={field.state.value}
-                    onChange={(val) => field.handleChange(val)}
-                    validation={validateWeight}
-                  />
-                )}
-              </gradeForm.Field>
+                <gradeForm.Field name="weight">
+                  {(field) => (
+                    <ValidatedNumberInput
+                      label="Gewichtung (%)"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(val)}
+                      validation={validateWeight}
+                    />
+                  )}
+                </gradeForm.Field>
 
-              <gradeForm.Field name="date">
-                {(field) => (
-                  <FormField
-                    label="Datum:"
-                    value={field.state.value}
-                    onChange={(val) => field.handleChange(String(val))}
-                    type="date"
-                  />
-                )}
-              </gradeForm.Field>
+                <gradeForm.Field name="date">
+                  {(field) => (
+                    <FormField
+                      label="Datum:"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(String(val))}
+                      type="date"
+                    />
+                  )}
+                </gradeForm.Field>
 
-              <gradeForm.Field name="comment">
-                {(field) => (
-                  <FormField
-                    label="Kommentar:"
-                    value={field.state.value}
-                    onChange={(val) => field.handleChange(String(val))}
-                    type="text"
-                  />
-                )}
-              </gradeForm.Field>
+                <gradeForm.Field name="comment">
+                  {(field) => (
+                    <FormField
+                      label="Kommentar:"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(String(val))}
+                      type="text"
+                    />
+                  )}
+                </gradeForm.Field>
 
-              <Button
-                handleEvent={() => gradeForm.handleSubmit()}
-                text="Speichern"
-              />
-              <Button
-                handleEvent={cancelEdit}
-                text="Abbrechen"
-                color="medium"
-              />
-            </form>
-          </IonContent>
-        </IonModal>
+                <Button
+                  handleEvent={() => gradeForm.handleSubmit()}
+                  text="Speichern"
+                />
+                <Button
+                  handleEvent={cancelEdit}
+                  text="Abbrechen"
+                  color="medium"
+                />
+              </form>
+            </IonContent>
+          </IonModal>
 
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={toastMessage}
-          duration={2000}
-          color="danger"
-        />
+          <IonToast
+            isOpen={showToast}
+            onDidDismiss={() => setShowToast(false)}
+            message={toastMessage}
+            duration={2000}
+            color="danger"
+          />
+        </Layout>
       </IonContent>
     </IonPage>
   );
