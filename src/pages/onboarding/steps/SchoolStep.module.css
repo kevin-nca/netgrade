@@ -141,6 +141,22 @@
   font-size: 2.2rem;
   color: #c7d2fe;
 }
+.schoolIcon {
+  margin-right: 10px;
+  font-size: 22px;
+  color: #a1a1aa;
+}
+
+.schoolIconSelected {
+  color: #6366f1;
+}
+
+.checkmarkIcon {
+  position: absolute;
+  right: 16px;
+  color: #6366f1;
+  font-size: 24px;
+}
 
 .proceedButton {
   margin-top: 2rem;
@@ -172,4 +188,4 @@
     grid-template-columns: 1fr;
     gap: 0.7rem;
   }
-} 
+}
