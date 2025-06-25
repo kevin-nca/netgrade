@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { GradeService, AddExamAndGradePayload } from '@/services/GradeService';
 import { Grade } from '@/db/entities/Grade';
+import { examKeys } from '@/hooks';
 import { Exam } from '@/db/entities';
 
 // Query keys
@@ -21,23 +22,6 @@ export const useGrades = () => {
     queryFn: () => GradeService.fetchAll(),
   });
 };
-
-export const useGrade = (id: string) => {
-  return useQuery({
-    queryKey: gradeKeys.detail(id),
-    queryFn: () => GradeService.findById(id),
-    enabled: !!id,
-  });
-};
-
-export const useExamGrades = (examId: string) => {
-  return useQuery({
-    queryKey: gradeKeys.examGrades(examId),
-    queryFn: () => GradeService.findByExamId(examId),
-    enabled: !!examId,
-  });
-};
-
 export const useAddGradeWithExam = () => {
   const queryClient = useQueryClient();
 
@@ -47,29 +31,7 @@ export const useAddGradeWithExam = () => {
     onSuccess: () => {
       // Invalidate and refetch grades list
       queryClient.invalidateQueries({ queryKey: gradeKeys.lists() });
-    },
-  });
-};
-
-export const useUpdateGrade = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (gradeData: Partial<Grade> & { id: string }) =>
-      GradeService.update(gradeData),
-    onSuccess: (updatedGrade) => {
-      // Update the grade in the cache
-      queryClient.invalidateQueries({
-        queryKey: gradeKeys.detail(updatedGrade.id),
-      });
-      // Invalidate and refetch grades list
-      queryClient.invalidateQueries({ queryKey: gradeKeys.lists() });
-      // If the grade is associated with an exam, invalidate that query too
-      if (updatedGrade.exam?.id) {
-        queryClient.invalidateQueries({
-          queryKey: gradeKeys.examGrades(updatedGrade.exam.id),
-        });
-      }
+      queryClient.invalidateQueries({ queryKey: examKeys.all });
     },
   });
 };
@@ -112,10 +74,7 @@ export const useUpdateExamAndGrade = () => {
           queryKey: gradeKeys.examGrades(updatedGrade.exam.id),
         });
       }
-      // Also invalidate exam queries
-      queryClient.invalidateQueries({
-        queryKey: ['exams'],
-      });
+      queryClient.invalidateQueries({ queryKey: examKeys.all });
     },
   });
 };

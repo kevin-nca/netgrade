@@ -1,8 +1,14 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
-import { DataManagementService } from '@/services/DataManagementService';
+import {
+  DataManagementService,
+  ExportError,
+} from '@/services/DataManagementService';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Exam, Grade, School, Subject } from '@/db/entities';
+
+global.URL.createObjectURL = vi.fn(() => 'blob:mocked-url');
+global.URL.revokeObjectURL = vi.fn();
 
 describe('DataManagementService', () => {
   let dataSource: DataSource;
@@ -54,5 +60,38 @@ describe('DataManagementService', () => {
     vi.spyOn(dataSourceModule, 'getDataSource').mockReturnValue(dataSource);
 
     await expect(DataManagementService.resetAllData()).rejects.toThrow();
+  });
+
+  describe('exportData', () => {
+    beforeAll(async () => {
+      await seedTestData(dataSource);
+    });
+
+    it('should export school data as XLSX', async () => {
+      const schoolRepo = dataSource.getRepository(School);
+      const school = await schoolRepo.findOne({ where: {} });
+      expect(school).toBeTruthy();
+      const result = await DataManagementService.exportData({
+        format: 'xlsx',
+        filename: 'export.xlsx',
+        schoolId: school!.id,
+      });
+
+      expect(result).toEqual({
+        success: true,
+        message: 'Export erfolgreich heruntergeladen.',
+        filename: 'export.xlsx',
+      });
+    });
+
+    it('should throw error for invalid school', async () => {
+      await expect(
+        DataManagementService.exportData({
+          format: 'xlsx',
+          filename: 'export.xlsx',
+          schoolId: 'invalid-id',
+        }),
+      ).rejects.toThrow(ExportError);
+    });
   });
 });
