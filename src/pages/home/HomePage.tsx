@@ -1,5 +1,6 @@
 import '@/theme/ui-elements.css';
 import '@/theme/grade-card.css';
+
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
@@ -76,7 +77,7 @@ function HomePage() {
                   history.push(Routes.SCHOOL.replace(':schoolId', school.id))
                 }
               >
-                <IonLabel>{school.name}</IonLabel>{' '}
+                <IonLabel>{school.name}</IonLabel>
                 <IonLabel slot="end" className="grade-average">
                   {average !== null ? `${average} Ø` : '-'}
                 </IonLabel>
@@ -88,18 +89,17 @@ function HomePage() {
         <h2 className="grades-overview-subtitle">Anstehende Prüfungen</h2>
         <ExamList />
 
-        {!showSlideUp && (
-          <IonFab
-            vertical="bottom"
-            horizontal="center"
-            slot="fixed"
-            className="plus-button"
-          >
-            <IonFabButton onClick={openSlideUp}>
-              <IonIcon icon={add} />
-            </IonFabButton>
-          </IonFab>
-        )}
+        <IonFab
+          vertical="bottom"
+          horizontal="center"
+          slot="fixed"
+          className={`plus-button ${showSlideUp ? 'hidden' : ''}`}
+        >
+          <IonFabButton onClick={openSlideUp}>
+            <IonIcon icon={add} />
+          </IonFabButton>
+        </IonFab>
+
         <NavigationModal isOpen={showSlideUp} setIsOpen={setShowSlideUp} />
       </IonContent>
 
@@ -112,17 +112,6 @@ function HomePage() {
             slot={'start'}
             className="footer-button"
           />
-
-          <IonFab
-            vertical="bottom"
-            horizontal="center"
-            slot="fixed"
-            style={{ marginBottom: '-70px' }}
-          >
-            <IonFabButton className="home-button" onClick={openSlideUp}>
-              <IonIcon icon={add} />
-            </IonFabButton>
-          </IonFab>
 
           <Button
             handleEvent={() => history.push(Routes.SETTINGS)}
