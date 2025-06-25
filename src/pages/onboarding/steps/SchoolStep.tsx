@@ -125,15 +125,12 @@ export const SchoolStep: React.FC<SchoolStepProps> = ({
         </IonList>
 
         {localSelectedSchoolId && (
-          <IonButton
-            expand="block"
-            onClick={handleProceed}
-            className="ion-margin-top"
-            size="small"
-          >
-            Fächer hinzufügen
-            <IonIcon slot="end" icon={arrowForward} />
-          </IonButton>
+          <div className="ion-padding-top">
+            <IonButton expand="block" onClick={handleProceed} size="small">
+              Fächer hinzufügen
+              <IonIcon slot="end" icon={arrowForward} />
+            </IonButton>
+          </div>
         )}
       </IonCardContent>
     </IonCard>

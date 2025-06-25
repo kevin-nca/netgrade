@@ -67,20 +67,17 @@ export const NameStep: React.FC<NameStepProps> = ({
           placeholder="Namen eingeben"
         />
 
-        <IonRow className="ion-margin-top">
-          <IonCol className="ion-text-end">
-            <IonButton
-              onClick={handleSaveName}
-              size="default"
-              disabled={saveUserNameMutation.isPending}
-            >
-              {saveUserNameMutation.isPending
-                ? 'Wird gespeichert...'
-                : 'Weiter'}
-              <IonIcon slot="end" icon={arrowForward} />
-            </IonButton>
-          </IonCol>
-        </IonRow>
+        <div className="ion-padding-top">
+          <IonButton
+            expand="block"
+            onClick={handleSaveName}
+            size="small"
+            disabled={saveUserNameMutation.isPending}
+          >
+            {saveUserNameMutation.isPending ? 'Wird gespeichert...' : 'Weiter'}
+            <IonIcon slot="end" icon={arrowForward} />
+          </IonButton>
+        </div>
       </IonCardContent>
     </IonCard>
   );
