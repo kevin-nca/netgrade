@@ -2,16 +2,19 @@ import React, { useState } from 'react';
 import {
   IonCard,
   IonCardContent,
-  IonItem,
-  IonLabel,
   IonButton,
   IonIcon,
-  IonList,
   IonText,
 } from '@ionic/react';
-import { checkmarkCircle, arrowForward } from 'ionicons/icons';
+import {
+  checkmarkCircle,
+  arrowForward,
+  personCircleOutline,
+  schoolOutline,
+} from 'ionicons/icons';
 import FormField from '@/components/Form/FormField';
 import { useSchools, useAddSchool } from '@/hooks';
+import styles from './SchoolStep.module.css';
 import { Layout } from '@/components/Layout/Layout';
 
 interface SchoolStepProps {
@@ -73,68 +76,95 @@ export const SchoolStep: React.FC<SchoolStepProps> = ({
 
   return (
     <Layout>
-      <IonCard className="ion-no-margin">
+      <IonCard className={`ion-no-margin ${styles.container}`}>
         <IonCardContent className="ion-padding">
-          <IonItem lines="none" className="ion-no-padding ion-margin-bottom">
-            <IonLabel>
-              <h5>Hallo, {userName}</h5>
-            </IonLabel>
-          </IonItem>
+          <div className={styles.header}>
+            <div className={styles.avatar}>
+              <IonIcon icon={personCircleOutline} />
+            </div>
+            <span>Hallo, {userName}</span>
+          </div>
 
-          <FormField
-            label="Neue Schule"
-            value={schoolName}
-            onChange={(value) => setSchoolName(String(value))}
-            placeholder="Name der Schule"
-          />
+          <div className={styles.formField}>
+            <FormField
+              label="Neue Schule"
+              value={schoolName}
+              onChange={(value) => setSchoolName(String(value))}
+              placeholder="Name der Schule"
+            />
+          </div>
 
           <IonButton
+            expand="block"
             onClick={handleAddSchool}
             disabled={!schoolName.trim() || addSchoolMutation.isPending}
-            className="ion-margin-top"
+            size="large"
+            className={styles.addButton}
           >
             {addSchoolMutation.isPending ? 'Wird hinzugefügt...' : 'Hinzufügen'}
           </IonButton>
 
-          <IonText className="ion-margin-top">
+          <IonText className={styles.schoolsTitle}>
             <h5>Verfügbare Schulen:</h5>
           </IonText>
 
-          <IonList className="ion-no-padding">
+          <div className={styles.schoolList}>
             {schools.length > 0 ? (
               schools.map((school) => (
-                <IonItem
+                <div
                   key={school.id}
-                  className="ion-no-padding"
-                  lines="inset"
+                  className={`${styles.schoolItem} ${localSelectedSchoolId === school.id ? styles.selected : ''}`}
                   onClick={() => handleSchoolClick(school.id)}
-                  button
-                  detail={localSelectedSchoolId === school.id}
+                  tabIndex={0}
+                  role="button"
+                  aria-pressed={localSelectedSchoolId === school.id}
                 >
-                  <IonLabel>{school.name}</IonLabel>
+                  <IonIcon
+                    icon={schoolOutline}
+                    style={{
+                      marginRight: 10,
+                      fontSize: 22,
+                      color:
+                        localSelectedSchoolId === school.id
+                          ? '#6366f1'
+                          : '#a1a1aa',
+                    }}
+                  />
+                  <span>{school.name}</span>
                   {localSelectedSchoolId === school.id && (
                     <IonIcon
                       icon={checkmarkCircle}
-                      slot="end"
-                      color="primary"
+                      style={{
+                        position: 'absolute',
+                        right: 16,
+                        color: '#6366f1',
+                        fontSize: 24,
+                      }}
                     />
                   )}
-                </IonItem>
+                </div>
               ))
             ) : (
-              <IonItem lines="none">
-                <IonLabel color="medium">Noch keine Schulen</IonLabel>
-              </IonItem>
+              <div className={styles.noSchools}>
+                <IonIcon
+                  icon={schoolOutline}
+                  className={styles.noSchoolsIcon}
+                />
+                <span>Noch keine Schulen</span>
+              </div>
             )}
-          </IonList>
+          </div>
 
           {localSelectedSchoolId && (
-            <div className="ion-padding-top">
-              <IonButton expand="block" onClick={handleProceed} size="small">
-                Fächer hinzufügen
-                <IonIcon slot="end" icon={arrowForward} />
-              </IonButton>
-            </div>
+            <IonButton
+              expand="block"
+              onClick={handleProceed}
+              className={styles.proceedButton}
+              size="large"
+            >
+              Fächer hinzufügen
+              <IonIcon slot="end" icon={arrowForward} />
+            </IonButton>
           )}
         </IonCardContent>
       </IonCard>

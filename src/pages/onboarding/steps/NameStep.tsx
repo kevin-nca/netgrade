@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import {
-  IonCard,
-  IonCardContent,
-  IonRow,
-  IonCol,
-  IonText,
-  IonButton,
-  IonIcon,
-} from '@ionic/react';
-import { arrowForward } from 'ionicons/icons';
+import { IonCard, IonCardContent, IonButton, IonIcon } from '@ionic/react';
+import { arrowForward, personCircleOutline } from 'ionicons/icons';
 import FormField from '@/components/Form/FormField';
+import styles from './NameStep.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { useSaveUserName } from '@/hooks/queries';
 
@@ -51,30 +44,36 @@ export const NameStep: React.FC<NameStepProps> = ({
 
   return (
     <Layout>
-      <IonCard className="ion-no-margin">
-        <IonCardContent className="ion-padding">
-          <IonRow>
-            <IonCol>
-              <IonText className="ion-text-center">
-                <h4>Willkommen!</h4>
-                <p>Wie heisst du?</p>
-              </IonText>
-            </IonCol>
-          </IonRow>
+      <IonCard className={`ion-no-margin ${styles.container}`}>
+        <IonCardContent>
+          <div className={styles.header}>
+            <div className={styles.avatar}>
+              <IonIcon icon={personCircleOutline} />
+            </div>
+            <h4 className={styles.title}>Willkommen!</h4>
+            <p className={styles.subtitle}>Wie heisst du?</p>
+          </div>
 
-          <FormField
-            label=""
-            value={userName}
-            onChange={(value) => setUserName(String(value))}
-            placeholder="Namen eingeben"
-          />
+          <div className={styles.formField}>
+            <FormField
+              label=""
+              value={userName}
+              onChange={(value) => setUserName(String(value))}
+              placeholder="Namen eingeben"
+              inputProps={{
+                className: styles.input,
+                autoFocus: true,
+                maxLength: 32,
+              }}
+            />
+          </div>
 
-          <div className="ion-padding-top">
+          <div className={styles.buttonRow}>
             <IonButton
-              expand="block"
               onClick={handleSaveName}
-              size="small"
+              size="large"
               disabled={saveUserNameMutation.isPending}
+              className={styles.nextButton}
             >
               {saveUserNameMutation.isPending
                 ? 'Wird gespeichert...'
