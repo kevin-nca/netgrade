@@ -198,18 +198,20 @@ const OnboardingPage: React.FC = () => {
       </IonContent>
 
       <IonFooter>
-        <IonToolbar>
-          <IonButton
-            expand="block"
-            color="success"
-            onClick={handleCompleteOnboarding}
-            disabled={!canCompleteOnboarding()}
-            className="ion-margin-horizontal"
-            size="default"
-          >
-            Onboarding abschliessen
-          </IonButton>
-        </IonToolbar>
+        {currentStep === 'subject' && (
+          <IonToolbar>
+            <IonButton
+              expand="block"
+              color="primary"
+              onClick={handleCompleteOnboarding}
+              disabled={!canCompleteOnboarding()}
+              className="ion-margin-horizontal"
+              size="default"
+            >
+              Onboarding abschliessen
+            </IonButton>
+          </IonToolbar>
+        )}
       </IonFooter>
     </IonPage>
   );
