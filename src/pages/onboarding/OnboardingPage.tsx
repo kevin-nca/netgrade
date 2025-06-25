@@ -6,7 +6,6 @@ import {
   IonToolbar,
   IonTitle,
   IonButton,
-  IonToast,
   IonProgressBar,
   IonIcon,
   IonChip,
@@ -184,19 +183,7 @@ const OnboardingPage: React.FC = () => {
         <IonProgressBar value={getProgress()} />
       </IonHeader>
 
-      <IonContent>
-        <Layout>{renderCurrentStep()}</Layout>
-
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={toastMessage}
-          duration={2000}
-          color={toastColor}
-          position="bottom"
-        />
-      </IonContent>
-
+      <IonContent className="ion-padding">{renderCurrentStep()}</IonContent>
       <IonFooter>
         {currentStep === 'subject' && (
           <IonToolbar>
