@@ -15,7 +15,7 @@ import { Layout } from '@/components/Layout/Layout';
 interface SubjectStepProps {
   selectedSchoolId: string;
   schools: School[];
-  showMessage: (
+  showMessage?: (
     message: string,
     color?: 'success' | 'danger' | 'warning',
   ) => void;
@@ -42,7 +42,7 @@ export const SubjectStep: React.FC<SubjectStepProps> = ({
 
   const handleAddSubject = () => {
     if (!newSubjectName.trim()) {
-      showMessage('Bitte gib einen Fachnamen ein', 'warning');
+      showMessage?.('Bitte gib einen Fachnamen ein', 'warning');
       return;
     }
 
@@ -58,10 +58,10 @@ export const SubjectStep: React.FC<SubjectStepProps> = ({
         onSuccess: () => {
           setNewSubjectName('');
           refetchSubjects();
-          showMessage('Fach hinzugefügt');
+          showMessage?.('Fach hinzugefügt');
         },
         onError: (error) => {
-          showMessage(
+          showMessage?.(
             `Fehler: ${error instanceof Error ? error.message : String(error)}`,
             'danger',
           );

@@ -9,7 +9,7 @@ import { useSaveUserName } from '@/hooks/queries';
 interface NameStepProps {
   initialName: string;
   onNameSaved: (name: string) => void;
-  showMessage: (
+  showMessage?: (
     message: string,
     color?: 'success' | 'danger' | 'warning',
   ) => void;
@@ -25,7 +25,7 @@ export const NameStep: React.FC<NameStepProps> = ({
 
   const handleSaveName = () => {
     if (!userName.trim()) {
-      showMessage('Bitte gib deinen Namen ein', 'warning');
+      showMessage?.('Bitte gib deinen Namen ein', 'warning');
       return;
     }
 
@@ -34,7 +34,7 @@ export const NameStep: React.FC<NameStepProps> = ({
         onNameSaved(userName.trim());
       },
       onError: (error) => {
-        showMessage(
+        showMessage?.(
           `Fehler: ${error instanceof Error ? error.message : String(error)}`,
           'danger',
         );

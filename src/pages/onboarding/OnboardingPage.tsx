@@ -26,7 +26,6 @@ import {
   useSetOnboardingCompleted,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
-import { Layout } from '@/components/Layout/Layout';
 
 const OnboardingPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<'name' | 'school' | 'subject'>(
@@ -34,12 +33,6 @@ const OnboardingPage: React.FC = () => {
   );
   const [userName, setUserName] = useState('');
   const [selectedSchoolId, setSelectedSchoolId] = useState('');
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastColor, setToastColor] = useState<
-    'success' | 'danger' | 'warning'
-  >('success');
-
   const history = useHistory();
   const { data: savedUserName } = useUserName();
   const { data: schools = [] } = useSchools();
@@ -57,15 +50,6 @@ const OnboardingPage: React.FC = () => {
       }
     }
   }, [savedUserName, currentStep]);
-
-  const showMessage = (
-    message: string,
-    color: 'success' | 'danger' | 'warning' = 'success',
-  ) => {
-    setToastMessage(message);
-    setToastColor(color);
-    setShowToast(true);
-  };
 
   const getProgress = (): number => {
     switch (currentStep) {
@@ -112,10 +96,6 @@ const OnboardingPage: React.FC = () => {
       },
       onError: (error) => {
         console.error('Failed to mark onboarding as completed:', error);
-        showMessage(
-          `Fehler: ${error instanceof Error ? error.message : String(error)}`,
-          'danger',
-        );
       },
     });
   };
@@ -128,10 +108,8 @@ const OnboardingPage: React.FC = () => {
             initialName={userName}
             onNameSaved={(name) => {
               setUserName(name);
-              showMessage('Name gespeichert');
               goToNextStep('school');
             }}
-            showMessage={showMessage}
           />
         );
       case 'school':
@@ -143,16 +121,11 @@ const OnboardingPage: React.FC = () => {
               setSelectedSchoolId(schoolId);
               goToNextStep('subject');
             }}
-            showMessage={showMessage}
           />
         );
       case 'subject':
         return (
-          <SubjectStep
-            selectedSchoolId={selectedSchoolId}
-            schools={schools}
-            showMessage={showMessage}
-          />
+          <SubjectStep selectedSchoolId={selectedSchoolId} schools={schools} />
         );
       default:
         return null;

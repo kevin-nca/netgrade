@@ -21,7 +21,7 @@ interface SchoolStepProps {
   userName: string;
   selectedSchoolId: string;
   onSchoolSelected: (schoolId: string) => void;
-  showMessage: (
+  showMessage?: (
     message: string,
     color?: 'success' | 'danger' | 'warning',
   ) => void;
@@ -42,7 +42,7 @@ export const SchoolStep: React.FC<SchoolStepProps> = ({
 
   const handleAddSchool = () => {
     if (!schoolName.trim()) {
-      showMessage('Bitte gib einen Schulnamen ein', 'warning');
+      showMessage?.('Bitte gib einen Schulnamen ein', 'warning');
       return;
     }
 
@@ -52,10 +52,10 @@ export const SchoolStep: React.FC<SchoolStepProps> = ({
         onSuccess: () => {
           setSchoolName('');
           refetchSchools();
-          showMessage('Schule hinzugefügt');
+          showMessage?.('Schule hinzugefügt');
         },
         onError: (error) => {
-          showMessage(
+          showMessage?.(
             `Fehler: ${error instanceof Error ? error.message : String(error)}`,
             'danger',
           );
