@@ -26,7 +26,7 @@ export type ExportFormat = 'xlsx';
 export interface ExportOptions {
   format: ExportFormat;
   filename: string;
-  schoolId: string;
+  schoolId: string | 'all';
 }
 
 /**
@@ -68,30 +68,50 @@ export class DataManagementService {
 
   /**
    * Main export method that handles all platforms
-   * @param options - Export options including format, filename, and schoolId
+   * @param options - Export options including format, filename, and schoolId ('all' for all schools)
    * @returns Promise<ExportResult> - Result of the export operation
    */
   static async exportData(options: ExportOptions): Promise<ExportResult> {
     try {
       const { school: schoolRepo } = getRepositories();
 
-      const school = await schoolRepo.findOne({
-        where: { id: options.schoolId },
-        relations: {
-          subjects: {
-            exams: {
-              grade: true,
+      let schools: School[];
+
+      if (options.schoolId === 'all') {
+        schools = await schoolRepo.find({
+          relations: {
+            subjects: {
+              exams: {
+                grade: true,
+              },
             },
           },
-        },
-      });
+          order: { name: 'ASC' },
+        });
 
-      if (!school) {
-        throw new ExportError('Schule nicht gefunden.', 'INVALID_DATA');
+        if (schools.length === 0) {
+          throw new ExportError('Keine Schulen gefunden.', 'INVALID_DATA');
+        }
+      } else {
+        const school = await schoolRepo.findOne({
+          where: { id: options.schoolId },
+          relations: {
+            subjects: {
+              exams: {
+                grade: true,
+              },
+            },
+          },
+        });
+
+        if (!school) {
+          throw new ExportError('Schule nicht gefunden.', 'INVALID_DATA');
+        }
+
+        schools = [school];
       }
 
-      const content = this.formatData(school, options.format);
-
+      const content = this.formatData(schools, options.format);
       const blob = this.createBlob(content, options.format);
 
       if (Capacitor.isNativePlatform()) {
@@ -264,27 +284,200 @@ export class DataManagementService {
   }
 
   /**
-   * Formats the school data according to the specified format
-   * @param school - The school entity with all relations loaded
+   * Formats the schools data according to the specified format
+   * @param schools - Array of school entities with all relations loaded
    * @param exportFormat - The desired format
    * @returns string - The formatted data
    */
   private static formatData(
-    school: School,
+    schools: School[],
     exportFormat: ExportFormat,
   ): string {
     switch (exportFormat) {
       case 'xlsx':
-        return this.formatAsXlsx(school);
+        return this.formatAsXlsx(schools);
       default:
         throw new Error(`Unsupported format: ${exportFormat}`);
     }
   }
 
   /**
-   * Format data as XLSX
+   * Format data as XLSX for single or multiple schools
    */
-  private static formatAsXlsx(school: School): string {
+  private static formatAsXlsx(schools: School[]): string {
+    const workbook = XLSX.utils.book_new();
+
+    if (schools.length === 1) {
+      return this.formatSingleSchoolAsXlsx(schools[0]);
+    }
+
+    const overviewData = [
+      ['NetGrade Datenexport - Alle Schulen'],
+      ['Exportiert am:', new Date().toLocaleDateString('de-DE')],
+      ['Anzahl Schulen:', schools.length.toString()],
+      [''],
+      [
+        'Schule',
+        'Anzahl Fächer',
+        'Anzahl Prüfungen',
+        'Abgeschlossene Prüfungen',
+        'Durchschnittsnote',
+      ],
+      ...schools.map((school) => {
+        const totalSubjects = school.subjects.length;
+        const totalExams = school.subjects.reduce(
+          (sum, subject) => sum + subject.exams.length,
+          0,
+        );
+        const completedExams = school.subjects.reduce(
+          (sum, subject) =>
+            sum + subject.exams.filter((exam) => exam.isCompleted).length,
+          0,
+        );
+
+        const completedGrades = school.subjects.flatMap((subject) =>
+          subject.exams
+            .filter((exam) => exam.isCompleted && exam.grade)
+            .map((exam) => exam.grade!),
+        );
+
+        const averageGrade =
+          completedGrades.length > 0
+            ? (
+                completedGrades.reduce(
+                  (sum, grade) => sum + grade.score * grade.weight,
+                  0,
+                ) /
+                completedGrades.reduce((sum, grade) => sum + grade.weight, 0)
+              ).toFixed(2)
+            : '-';
+
+        return [
+          school.name,
+          totalSubjects.toString(),
+          totalExams.toString(),
+          completedExams.toString(),
+          averageGrade,
+        ];
+      }),
+    ];
+
+    const overviewSheet = XLSX.utils.aoa_to_sheet(overviewData);
+    XLSX.utils.book_append_sheet(workbook, overviewSheet, 'Übersicht');
+
+    const allSchoolsData = [
+      ['Schule', 'Name', 'Adresse', 'Typ', 'Erstellt am'],
+      ...schools.map((school) => [
+        school.name,
+        school.name,
+        school.address || '',
+        school.type || '',
+        school.createdAt.toLocaleDateString('de-DE'),
+      ]),
+    ];
+    const allSchoolsSheet = XLSX.utils.aoa_to_sheet(allSchoolsData);
+    XLSX.utils.book_append_sheet(workbook, allSchoolsSheet, 'Alle Schulen');
+
+    const allSubjectsData = [
+      ['Schule', 'Fach', 'Lehrer', 'Beschreibung', 'Gewichtung', 'Erstellt am'],
+      ...schools.flatMap((school) =>
+        school.subjects.map((subject) => [
+          school.name,
+          subject.name,
+          subject.teacher || '',
+          subject.description || '',
+          subject.weight || 1,
+          subject.createdAt.toLocaleDateString('de-DE'),
+        ]),
+      ),
+    ];
+    const allSubjectsSheet = XLSX.utils.aoa_to_sheet(allSubjectsData);
+    XLSX.utils.book_append_sheet(workbook, allSubjectsSheet, 'Alle Fächer');
+
+    const allExamsData = [
+      [
+        'Schule',
+        'Fach',
+        'Prüfung',
+        'Datum',
+        'Beschreibung',
+        'Gewichtung',
+        'Abgeschlossen',
+        'Note',
+        'Gewichtung Note',
+        'Kommentar',
+      ],
+      ...schools.flatMap((school) =>
+        school.subjects.flatMap((subject) =>
+          subject.exams.map((exam) => [
+            school.name,
+            subject.name,
+            exam.name,
+            exam.date.toISOString().split('T')[0],
+            exam.description || '',
+            exam.weight || 1,
+            exam.isCompleted ? 'Ja' : 'Nein',
+            exam.grade?.score || '',
+            exam.grade?.weight || '',
+            exam.grade?.comment || '',
+          ]),
+        ),
+      ),
+    ];
+    const allExamsSheet = XLSX.utils.aoa_to_sheet(allExamsData);
+    XLSX.utils.book_append_sheet(workbook, allExamsSheet, 'Alle Prüfungen');
+    schools.forEach((school) => {
+      const schoolSummary = this.calculateSummaries([school]);
+      const schoolData = [
+        [`${school.name} - Detailansicht`],
+        [''],
+        ['Schulinformationen'],
+        ['Name', school.name],
+        ['Adresse', school.address || ''],
+        ['Typ', school.type || ''],
+        [''],
+        ['Zusammenfassung'],
+        ['Gesamtdurchschnitt', schoolSummary.overallAverage.toFixed(2)],
+        ['Abgeschlossene Prüfungen', schoolSummary.examsCompleted.toString()],
+        ['Gesamte Prüfungen', schoolSummary.examsTotal.toString()],
+        [''],
+        ['Fach', 'Durchschnitt'],
+        ...Object.entries(schoolSummary.perSubjectAverages).map(
+          ([subject, average]) => [subject, average.toFixed(2)],
+        ),
+      ];
+
+      const schoolSheet = XLSX.utils.aoa_to_sheet(schoolData);
+      const sheetName = school.name.substring(0, 25).replace(/[[\]\\/?*]/g, '');
+      XLSX.utils.book_append_sheet(workbook, schoolSheet, sheetName);
+    });
+
+    const totalSummary = this.calculateSummaries(schools);
+    const summaryData = [
+      ['NetGrade Gesamtzusammenfassung'],
+      [''],
+      ['Gesamtstatistiken'],
+      ['Anzahl Schulen', schools.length.toString()],
+      ['Gesamtdurchschnitt', totalSummary.overallAverage.toFixed(2)],
+      ['Abgeschlossene Prüfungen', totalSummary.examsCompleted.toString()],
+      ['Gesamte Prüfungen', totalSummary.examsTotal.toString()],
+      [''],
+      ['Durchschnitt pro Schule'],
+      ...schools.map((school) => {
+        const schoolSummary = this.calculateSummaries([school]);
+        return [school.name, schoolSummary.overallAverage.toFixed(2)];
+      }),
+    ];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Zusammenfassung');
+
+    return XLSX.write(workbook, { type: 'base64', bookType: 'xlsx' });
+  }
+
+  /**
+   * Format single school as XLSX (behält die alte Struktur bei)
+   */
+  private static formatSingleSchoolAsXlsx(school: School): string {
     const workbook = XLSX.utils.book_new();
 
     const schoolData = [
@@ -336,7 +529,7 @@ export class DataManagementService {
     const examsSheet = XLSX.utils.aoa_to_sheet(examsData);
     XLSX.utils.book_append_sheet(workbook, examsSheet, 'Exams');
 
-    const summaries = this.calculateSummaries(school);
+    const summaries = this.calculateSummaries([school]);
     const summariesData = [
       ['Summaries'],
       [''],
@@ -356,33 +549,40 @@ export class DataManagementService {
   }
 
   /**
-   * Calculate summary statistics for the school
+   * Calculate summary statistics for one or multiple schools
    */
-  private static calculateSummaries(school: School) {
+  private static calculateSummaries(schools: School[]) {
     const perSubjectAverages: Record<string, number> = {};
     let totalWeightedScore = 0;
     let totalWeight = 0;
     let examsCompleted = 0;
     let examsTotal = 0;
 
-    school.subjects.forEach((subject) => {
-      const completedExams = subject.exams.filter(
-        (exam) => exam.isCompleted && exam.grade,
-      );
-      examsTotal += subject.exams.length;
-      examsCompleted += completedExams.length;
+    schools.forEach((school) => {
+      school.subjects.forEach((subject) => {
+        const completedExams = subject.exams.filter(
+          (exam) => exam.isCompleted && exam.grade,
+        );
+        examsTotal += subject.exams.length;
+        examsCompleted += completedExams.length;
 
-      if (completedExams.length > 0) {
-        const subjectScore =
-          completedExams.reduce(
-            (sum, exam) => sum + exam.grade!.score * (exam.weight || 1),
-            0,
-          ) / completedExams.reduce((sum, exam) => sum + (exam.weight || 1), 0);
+        if (completedExams.length > 0) {
+          const subjectScore =
+            completedExams.reduce(
+              (sum, exam) => sum + exam.grade!.score * (exam.weight || 1),
+              0,
+            ) /
+            completedExams.reduce((sum, exam) => sum + (exam.weight || 1), 0);
 
-        perSubjectAverages[subject.name] = subjectScore;
-        totalWeightedScore += subjectScore * (subject.weight || 1);
-        totalWeight += subject.weight || 1;
-      }
+          const subjectKey =
+            schools.length > 1
+              ? `${school.name} - ${subject.name}`
+              : subject.name;
+          perSubjectAverages[subjectKey] = subjectScore;
+          totalWeightedScore += subjectScore * (subject.weight || 1);
+          totalWeight += subject.weight || 1;
+        }
+      });
     });
 
     return {
