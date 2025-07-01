@@ -57,7 +57,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         className="ion-padding"
         scrollY={false}
         style={{
-          '--padding-top': '16px',
+          '--padding-top': '0',
           '--padding-bottom': '16px',
           '--padding-start': '16px',
           '--padding-end': '16px',
