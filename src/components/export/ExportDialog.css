@@ -302,6 +302,21 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.school-icon-all {
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.school-icon-all.school-icon-selected {
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+}
+
+.all-schools-icon {
+  font-size: 22px;
+  color: #ffffff;
+}
+
 .school-icon-letter {
   font-size: 22px;
   font-weight: 600;
@@ -476,6 +491,10 @@
   background: rgba(255, 149, 0, 0.1);
 }
 
+.detail-icon-wrapper-school {
+  background: rgba(142, 68, 173, 0.1);
+}
+
 .detail-icon {
   font-size: 20px;
 }
@@ -490,6 +509,10 @@
 
 .detail-icon-date {
   color: #ff9500;
+}
+
+.detail-icon-school {
+  color: #8e44ad;
 }
 
 .detail-content {
@@ -534,6 +557,57 @@
   margin: 0;
   word-break: break-all;
   font-weight: 500;
+}
+
+.export-info-card {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(142, 68, 173, 0.1) 0%,
+    rgba(155, 89, 182, 0.05) 100%
+  );
+  border: 1px solid rgba(142, 68, 173, 0.2);
+}
+
+.info-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.info-card-icon {
+  font-size: 20px;
+  color: #8e44ad;
+}
+
+.info-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #8e44ad;
+}
+
+.info-card-content p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.info-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.info-list li {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 6px;
+}
+
+.info-list li:last-child {
+  margin-bottom: 0;
 }
 
 /* Bottom Spacer */

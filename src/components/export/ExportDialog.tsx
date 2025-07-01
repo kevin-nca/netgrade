@@ -27,6 +27,8 @@ import {
   calendarOutline,
   personOutline,
   pencilOutline,
+  layersOutline,
+  schoolOutline,
 } from 'ionicons/icons';
 import { useExportData } from '@/hooks/queries/useDataManagementQueries';
 import { useUserName } from '@/hooks';
@@ -75,12 +77,20 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
   const isNative = Capacitor.isNativePlatform();
 
   useEffect(() => {
-    const selectedSchool = schools?.find((s) => s.id === selectedSchoolId);
-    const filename = generateExportFilename(
-      selectedSchool?.name,
-      userName || undefined,
-    );
-    setCustomFilename(filename);
+    if (selectedSchoolId === 'all') {
+      const filename = generateExportFilename(
+        'alle-schulen',
+        userName || undefined,
+      );
+      setCustomFilename(filename);
+    } else {
+      const selectedSchool = schools?.find((s) => s.id === selectedSchoolId);
+      const filename = generateExportFilename(
+        selectedSchool?.name,
+        userName || undefined,
+      );
+      setCustomFilename(filename);
+    }
   }, [selectedSchoolId, userName, schools]);
 
   const showToast = (
@@ -96,7 +106,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 
   const handleExport = async () => {
     if (!selectedSchoolId) {
-      showToast('Bitte wählen Sie eine Schule aus.');
+      showToast('Bitte wählen Sie eine Option aus.');
       return;
     }
 
@@ -132,14 +142,20 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     }
   };
 
-  const selectedSchool = schools?.find((s) => s.id === selectedSchoolId);
-
   const getSchoolIconClass = (schoolId: string, index: number) => {
     const baseClass = 'school-icon';
     if (selectedSchoolId === schoolId) {
       return `${baseClass} school-icon-selected`;
     }
     return `${baseClass} school-icon-${index % 4}`;
+  };
+
+  const getAllSchoolsIconClass = () => {
+    const baseClass = 'school-icon school-icon-all';
+    if (selectedSchoolId === 'all') {
+      return `${baseClass} school-icon-selected`;
+    }
+    return baseClass;
   };
 
   const isExportButtonEnabled = selectedSchoolId && customFilename.trim();
@@ -203,13 +219,45 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
               </div>
 
               <div className="school-section">
-                <h2 className="section-title">Schule auswählen</h2>
+                <h2 className="section-title">Export-Option wählen</h2>
 
                 <IonRadioGroup
                   value={selectedSchoolId}
                   onIonChange={(e) => setSelectedSchoolId(e.detail.value)}
                 >
-                  {schools?.map((school, index) => (
+                  {/* Alle Schulen Option */}
+                  <div
+                    className={`school-item-wrapper ${selectedSchoolId === 'all' ? 'glass-card' : ''}`}
+                  >
+                    <IonItem
+                      lines="none"
+                      className="school-item ion-activatable"
+                      onClick={() => setSelectedSchoolId('all')}
+                    >
+                      <IonRippleEffect />
+                      <div slot="start" className={getAllSchoolsIconClass()}>
+                        <IonIcon
+                          icon={layersOutline}
+                          className="all-schools-icon"
+                        />
+                      </div>
+                      <IonLabel className="school-label">
+                        <h3>Alle Schulen</h3>
+                        <p>
+                          Exportiert alle {schools.length} Schulen in einer
+                          Datei
+                        </p>
+                      </IonLabel>
+                      <IonRadio
+                        slot="end"
+                        value="all"
+                        className="school-radio"
+                      />
+                    </IonItem>
+                  </div>
+
+                  {/* Einzelne Schulen */}
+                  {schools.map((school, index) => (
                     <div
                       key={school.id}
                       className={`school-item-wrapper ${selectedSchoolId === school.id ? 'glass-card' : ''}`}
@@ -230,6 +278,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                         </div>
                         <IonLabel className="school-label">
                           <h3>{school.name}</h3>
+                          <p>Nur diese Schule exportieren</p>
                         </IonLabel>
                         <IonRadio
                           slot="end"
@@ -290,7 +339,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                 </IonButton>
               </div>
 
-              {selectedSchool && customFilename.trim() && (
+              {selectedSchoolId && customFilename.trim() && (
                 <div className="glass-card details-card">
                   <div className="shimmer-effect shimmer-overlay" />
 
@@ -307,6 +356,28 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                       <div className="detail-content">
                         <p className="detail-label">Dateiformat</p>
                         <p className="detail-value">Excel (.xlsx)</p>
+                      </div>
+                    </div>
+
+                    <div className="detail-item">
+                      <div className="detail-icon-wrapper detail-icon-wrapper-school">
+                        <IonIcon
+                          icon={
+                            selectedSchoolId === 'all'
+                              ? layersOutline
+                              : schoolOutline
+                          }
+                          className="detail-icon detail-icon-school"
+                        />
+                      </div>
+                      <div className="detail-content">
+                        <p className="detail-label">Export-Umfang</p>
+                        <p className="detail-value">
+                          {selectedSchoolId === 'all'
+                            ? `Alle ${schools.length} Schulen`
+                            : schools.find((s) => s.id === selectedSchoolId)
+                                ?.name || 'Einzelne Schule'}
+                        </p>
                       </div>
                     </div>
 
@@ -349,6 +420,29 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                     <p className="filename-pill-label">Dateiname</p>
                     <p className="filename-pill-value">{getFinalFilename()}</p>
                   </div>
+
+                  {selectedSchoolId === 'all' && (
+                    <div className="export-info-card">
+                      <div className="info-card-header">
+                        <IonIcon
+                          icon={layersOutline}
+                          className="info-card-icon"
+                        />
+                        <span className="info-card-title">
+                          Multi-School Export
+                        </span>
+                      </div>
+                      <div className="info-card-content">
+                        <p>Diese Excel-Datei enthält:</p>
+                        <ul className="info-list">
+                          <li>Übersicht aller Schulen</li>
+                          <li>Zusammengefasste Daten</li>
+                          <li>Separate Sheets pro Schule</li>
+                          <li>Gesamtstatistiken</li>
+                        </ul>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
