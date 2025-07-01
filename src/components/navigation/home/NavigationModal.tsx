@@ -26,7 +26,7 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
   return (
     <IonModal
       isOpen={isOpen}
-      onDidDismiss={closeModal}
+      onWillDismiss={closeModal}
       breakpoints={[0, 0.5, 1]}
       initialBreakpoint={0.8}
     >
