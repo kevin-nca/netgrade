@@ -45,6 +45,7 @@ const SettingsPage: React.FC = () => {
   const [nameInput, setNameInput] = useState('');
   const [schoolNameInput, setSchoolNameInput] = useState('');
   const [showNameEditModal, setShowNameEditModal] = useState(false);
+  const [appVersion] = useState('');
   const [present] = useIonToast();
 
   const { data: schools = [], refetch } = useSchools();
@@ -308,14 +309,17 @@ const SettingsPage: React.FC = () => {
           </div>
 
           {/* App Version */}
-          <div className="app-version">
-            <p className="version-text">NetGrade v1.0.0</p>
-          </div>
+          {appVersion && (
+            <div className="app-version">
+              <p className="version-text">{appVersion}</p>
+            </div>
+          )}
 
           <div style={{ height: '80px' }} />
         </div>
       </IonContent>
 
+      {/* Name Edit Modal */}
       <IonModal
         isOpen={showNameEditModal}
         onDidDismiss={handleCancelNameEdit}
