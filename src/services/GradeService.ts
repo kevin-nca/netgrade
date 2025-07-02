@@ -76,6 +76,7 @@ export class GradeService {
           weight: payload.weight,
           comment: payload.comment ?? null,
           date: payload.date,
+          examId: savedExam.id,
         };
         const newGrade = transactionManager.create(Grade, newGradeData);
         const savedGrade = await transactionManager.save(newGrade);
