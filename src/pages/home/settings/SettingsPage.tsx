@@ -131,7 +131,7 @@ const SettingsPage: React.FC = () => {
               setTimeout(() => {
                 window.location.replace(Routes.ONBOARDING);
               }, 1500);
-            } catch (error) {
+            } catch {
               showToast(
                 'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten',
                 false,
