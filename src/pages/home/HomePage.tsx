@@ -236,15 +236,21 @@ function HomePage() {
                     }
                   >
                     <div className="exam-card-content">
-                      <div className="exam-icon-wrapper">
-                        <IonIcon icon={bookOutline} className="exam-icon" />
-                      </div>
-                      <div className="exam-info">
-                        <h4 className="exam-title">{exam.name}</h4>
-                        <div className="exam-meta">
-                          <div className="exam-date">
-                            <IonIcon icon={timeOutline} className="meta-icon" />
-                            <span>{formatDate(exam.date)}</span>
+                      <div className="exam-icon-and-info">
+                        <div className="exam-icon-wrapper">
+                          <IonIcon icon={bookOutline} className="exam-icon" />
+                        </div>
+
+                        <div className="exam-info">
+                          <h4 className="exam-title">{exam.name}</h4>
+                          <div className="exam-meta">
+                            <div className="exam-date">
+                              <IonIcon
+                                icon={timeOutline}
+                                className="meta-icon"
+                              />
+                              <span>{formatDate(exam.date)}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
