@@ -20,21 +20,31 @@ import {
   timeOutline,
   homeOutline,
 } from 'ionicons/icons';
-import { useSchools, useGrades, useUserName, useExams } from '@/hooks/queries';
+import {
+  useSchools,
+  useGrades,
+  useUserName,
+  useExams,
+  useAddSchool,
+} from '@/hooks/queries';
 import { Routes } from '@/routes';
 import { Grade } from '@/db/entities';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
+import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import './HomePage.css';
 
 function HomePage() {
   const [showNavigationModal, setShowNavigationModal] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+  const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
+  const [schoolNameInput, setSchoolNameInput] = useState('');
   const history = useHistory();
 
   const { data: schools = [], refetch: refetchSchools } = useSchools();
   const { data: grades = [], refetch: refetchGrades } = useGrades();
   const { data: userName } = useUserName();
   const { data: allExams = [], refetch: refetchExams } = useExams();
+  const addSchoolMutation = useAddSchool();
 
   const upcomingExams = allExams
     .filter((exam) => !exam.isCompleted)
@@ -86,6 +96,24 @@ function HomePage() {
     });
   };
 
+  const handleAddSchool = () => {
+    if (schoolNameInput.trim()) {
+      addSchoolMutation.mutate(
+        { name: schoolNameInput.trim() },
+        {
+          onSuccess: () => {
+            setShowAddSchoolModal(false);
+            setSchoolNameInput('');
+            refetchSchools();
+          },
+          onError: (error) => {
+            console.error('Fehler beim Hinzufügen:', error);
+          },
+        },
+      );
+    }
+  };
+
   return (
     <IonPage className="home-page">
       <IonContent className="home-content" scrollY={true}>
@@ -94,25 +122,20 @@ function HomePage() {
         </IonRefresher>
 
         <div className="content-wrapper">
-          {/* Header Section */}
           <div className="header-section">
             <div className="gradient-orb" />
-
             <div className="profile-card glass-card">
               <div className="shimmer-effect" />
-
               <div className="profile-content">
                 <div className="profile-avatar">
                   {userName ? userName.charAt(0).toUpperCase() : 'U'}
                 </div>
-
                 <div className="profile-info">
                   <h1 className="profile-greeting">
                     {getGreeting()}
                     {userName ? `, ${userName}` : ''}
                   </h1>
                 </div>
-
                 <div
                   className="profile-settings-button"
                   onClick={() => history.push(Routes.SETTINGS)}
@@ -123,13 +146,12 @@ function HomePage() {
             </div>
           </div>
 
-          {/* Schools Section */}
           <div className="main-section">
             <div className="section-header">
               <h2 className="section-title">Schulen</h2>
               <div
                 className="header-action-button"
-                onClick={() => history.push(Routes.SETTINGS)}
+                onClick={() => setShowAddSchoolModal(true)}
               >
                 <IonIcon icon={add} className="action-icon" />
               </div>
@@ -192,7 +214,6 @@ function HomePage() {
             </div>
           </div>
 
-          {/* Upcoming Exams Section */}
           <div className="main-section">
             <div className="section-header">
               <h2 className="section-title">Prüfungen</h2>
@@ -218,7 +239,6 @@ function HomePage() {
                       <div className="exam-icon-wrapper">
                         <IonIcon icon={bookOutline} className="exam-icon" />
                       </div>
-
                       <div className="exam-info">
                         <h4 className="exam-title">{exam.name}</h4>
                         <div className="exam-meta">
@@ -228,7 +248,6 @@ function HomePage() {
                           </div>
                         </div>
                       </div>
-
                       <div className="exam-priority">
                         <div className="priority-dot" />
                       </div>
@@ -246,7 +265,6 @@ function HomePage() {
             </div>
           </div>
 
-          {/* Bottom Spacer */}
           <div className="bottom-spacer" />
         </div>
 
@@ -256,7 +274,18 @@ function HomePage() {
         />
       </IonContent>
 
-      {/* Tab Bar Navigation */}
+      <AddSchoolModal
+        isOpen={showAddSchoolModal}
+        onClose={() => {
+          setShowAddSchoolModal(false);
+          setSchoolNameInput('');
+        }}
+        schoolName={schoolNameInput}
+        setSchoolName={setSchoolNameInput}
+        onAdd={handleAddSchool}
+        isLoading={addSchoolMutation.isPending}
+      />
+
       <div className="tab-bar">
         <div className="tab-bar-content">
           <div
