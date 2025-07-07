@@ -358,6 +358,14 @@
 .exam-card-content {
   display: flex;
   align-items: center;
+  width: 95%;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.exam-icon-and-info {
+  display: flex;
+
   gap: 10px;
 }
 
@@ -398,6 +406,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  margin: 0;
 }
 
 .exam-date {
@@ -421,6 +430,7 @@
 .priority-dot {
   width: 6px;
   height: 6px;
+  right: 0;
   border-radius: 50%;
   background: #ff9500;
   box-shadow: 0 1px 4px rgba(255, 149, 0, 0.3);
