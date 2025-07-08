@@ -26,7 +26,6 @@ import {
   settingsOutline,
   informationCircleOutline,
   createOutline,
-  pencilOutline,
 } from 'ionicons/icons';
 import { Routes } from '@/routes';
 import { ExportDialog } from '@/components/export/ExportDialog';
@@ -37,6 +36,7 @@ import {
   useSaveUserName,
 } from '@/hooks/queries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
+import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import './SettingsPage.css';
 
 const SettingsPage: React.FC = () => {
@@ -47,14 +47,13 @@ const SettingsPage: React.FC = () => {
   const [showNameEditModal, setShowNameEditModal] = useState(false);
   const [appVersion] = useState('');
   const [present] = useIonToast();
+  const [presentAlert] = useIonAlert();
 
   const { data: schools = [], refetch } = useSchools();
   const { data: userName } = useUserName();
   const addSchoolMutation = useAddSchool();
   const saveUserNameMutation = useSaveUserName();
   const resetAllDataMutation = useResetAllDataMutation();
-
-  const [presentAlert] = useIonAlert();
 
   useEffect(() => {
     if (userName) {
@@ -96,9 +95,7 @@ const SettingsPage: React.FC = () => {
   const handleAddSchool = () => {
     if (schoolNameInput.trim()) {
       addSchoolMutation.mutate(
-        {
-          name: schoolNameInput.trim(),
-        },
+        { name: schoolNameInput.trim() },
         {
           onSuccess: () => {
             setShowAddSchoolModal(false);
@@ -117,35 +114,31 @@ const SettingsPage: React.FC = () => {
     }
   };
 
-  const handleCancelAddSchool = () => {
-    setSchoolNameInput('');
-    setShowAddSchoolModal(false);
-  };
-
   const handleResetData = () => {
-    const performReset = async () => {
-      try {
-        await resetAllDataMutation.mutateAsync();
-        showToast('Alle Daten wurden erfolgreich zurückgesetzt');
-        setTimeout(() => {
-          window.location.replace(Routes.ONBOARDING);
-        }, 1500);
-      } catch (error) {
-        console.error('Error resetting data:', error);
-        showToast(
-          'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten',
-          false,
-        );
-      }
-    };
-
     presentAlert({
       header: 'Daten zurücksetzen',
       message:
         'Möchten Sie wirklich alle Daten zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.',
       buttons: [
         { text: 'Abbrechen', role: 'cancel' },
-        { text: 'Zurücksetzen', role: 'destructive', handler: performReset },
+        {
+          text: 'Zurücksetzen',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await resetAllDataMutation.mutateAsync();
+              showToast('Alle Daten wurden erfolgreich zurückgesetzt');
+              setTimeout(() => {
+                window.location.replace(Routes.ONBOARDING);
+              }, 1500);
+            } catch {
+              showToast(
+                'Beim Zurücksetzen der Daten ist ein Fehler aufgetreten',
+                false,
+              );
+            }
+          },
+        },
       ],
     });
   };
@@ -179,25 +172,20 @@ const SettingsPage: React.FC = () => {
         </IonRefresher>
 
         <div className="content-wrapper">
-          {/* Profile Section */}
           <div className="profile-section">
             <div className="gradient-orb" />
-
             <div className="profile-card glass-card">
               <div className="shimmer-effect" />
-
               <div className="profile-content">
                 <div className="profile-avatar">
                   {userName ? userName.charAt(0).toUpperCase() : 'U'}
                 </div>
-
                 <div className="profile-info">
                   <h1 className="profile-name">{userName || 'Benutzer'}</h1>
                   <p className="profile-subtitle">
                     Verwalte deine App-Einstellungen
                   </p>
                 </div>
-
                 <div
                   className="profile-edit-button"
                   onClick={() => setShowNameEditModal(true)}
@@ -211,7 +199,6 @@ const SettingsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Schools Section */}
           <div className="settings-section">
             <div className="section-header">
               <h2 className="section-title">Deine Schulen</h2>
@@ -255,7 +242,6 @@ const SettingsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Actions Section */}
           <div className="settings-section">
             <div className="section-header">
               <h2 className="section-title">Aktionen</h2>
@@ -296,7 +282,6 @@ const SettingsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Info Section */}
           <div className="info-card glass-card">
             <IonIcon icon={informationCircleOutline} className="info-icon" />
             <div className="info-text">
@@ -308,7 +293,6 @@ const SettingsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* App Version */}
           {appVersion && (
             <div className="app-version">
               <p className="version-text">{appVersion}</p>
@@ -319,7 +303,18 @@ const SettingsPage: React.FC = () => {
         </div>
       </IonContent>
 
-      {/* Name Edit Modal */}
+      <AddSchoolModal
+        isOpen={showAddSchoolModal}
+        onClose={() => {
+          setShowAddSchoolModal(false);
+          setSchoolNameInput('');
+        }}
+        schoolName={schoolNameInput}
+        setSchoolName={setSchoolNameInput}
+        onAdd={handleAddSchool}
+        isLoading={addSchoolMutation.isPending}
+      />
+
       <IonModal
         isOpen={showNameEditModal}
         onDidDismiss={handleCancelNameEdit}
@@ -331,7 +326,6 @@ const SettingsPage: React.FC = () => {
         <IonPage className="modal-page">
           <IonHeader className="modal-header">
             <IonToolbar className="modal-toolbar">
-              <IonButtons slot="start"></IonButtons>
               <IonTitle className="modal-title">Namen bearbeiten</IonTitle>
             </IonToolbar>
           </IonHeader>
@@ -397,95 +391,6 @@ const SettingsPage: React.FC = () => {
                     {saveUserNameMutation.isPending
                       ? 'Speichert...'
                       : 'Speichern'}
-                  </button>
-                </div>
-              </div>
-
-              <div className="modal-bottom-spacer" />
-            </div>
-          </IonContent>
-        </IonPage>
-      </IonModal>
-
-      {/* Add School Modal */}
-      <IonModal
-        isOpen={showAddSchoolModal}
-        onDidDismiss={handleCancelAddSchool}
-        breakpoints={[0, 0.25, 0.5, 0.75, 1]}
-        initialBreakpoint={0.75}
-        backdropBreakpoint={0.5}
-        className="settings-modal"
-      >
-        <IonPage className="modal-page">
-          <IonHeader className="modal-header">
-            <IonToolbar className="modal-toolbar">
-              <IonButtons slot="start"></IonButtons>
-              <IonTitle className="modal-title">Neue Schule</IonTitle>
-              <IonButtons></IonButtons>
-            </IonToolbar>
-          </IonHeader>
-
-          <IonContent className="modal-content" scrollY={true}>
-            <div className="modal-content-wrapper">
-              <div className="modal-header-section">
-                <div className="modal-gradient-orb" />
-                <div className="modal-header-content">
-                  <div className="modal-header-flex">
-                    <div className="modal-icon-wrapper">
-                      <IonIcon icon={schoolOutline} className="modal-icon" />
-                    </div>
-                    <div className="modal-text">
-                      <h1>Schule hinzufügen</h1>
-                      <p>Erstelle eine neue Schule</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-input-section">
-                <h2 className="modal-section-title">Schulname eingeben</h2>
-
-                <div className="modal-input-wrapper glass-input">
-                  <IonItem lines="none" className="modal-input-item">
-                    <div slot="start" className="modal-input-icon-wrapper">
-                      <IonIcon
-                        icon={pencilOutline}
-                        className="modal-input-icon"
-                      />
-                    </div>
-                    <IonInput
-                      value={schoolNameInput}
-                      placeholder="Name der Schule..."
-                      onIonChange={(e) =>
-                        setSchoolNameInput(e.detail.value || '')
-                      }
-                      className="modal-input-field"
-                      clearInput
-                      autoFocus
-                    />
-                  </IonItem>
-                </div>
-              </div>
-
-              <div className="modal-button-section">
-                <div className="modal-buttons">
-                  <button
-                    onClick={handleCancelAddSchool}
-                    className="modal-button cancel"
-                    disabled={addSchoolMutation.isPending}
-                  >
-                    Abbrechen
-                  </button>
-                  <button
-                    onClick={handleAddSchool}
-                    disabled={
-                      !schoolNameInput.trim() || addSchoolMutation.isPending
-                    }
-                    className="modal-button save"
-                  >
-                    {addSchoolMutation.isPending
-                      ? 'Speichert...'
-                      : 'Hinzufügen'}
                   </button>
                 </div>
               </div>
