@@ -128,9 +128,9 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -144,9 +144,10 @@
   background: rgba(255, 255, 255, 0.4);
 }
 
-.settings-icon {
-  font-size: 16px;
-  color: #000000;
+.profile-icon {
+  color: #007aff;
+  width: 36px;
+  height: 36px;
 }
 
 /* Main Sections */
@@ -625,7 +626,7 @@
     color: rgba(255, 255, 255, 0.6);
   }
 
-  .settings-icon,
+  .profile-icon,
   .school-chevron {
     color: rgba(255, 255, 255, 0.8);
   }

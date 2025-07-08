@@ -19,6 +19,7 @@ import {
   statsChartOutline,
   timeOutline,
   homeOutline,
+  personCircleOutline,
 } from 'ionicons/icons';
 import { useSchools, useGrades, useUserName, useExams } from '@/hooks/queries';
 import { Routes } from '@/routes';
@@ -117,7 +118,10 @@ function HomePage() {
                   className="profile-settings-button"
                   onClick={() => history.push(Routes.SETTINGS)}
                 >
-                  <IonIcon icon={settings} className="settings-icon" />
+                  <IonIcon
+                    icon={personCircleOutline}
+                    className="profile-icon"
+                  />
                 </div>
               </div>
             </div>
