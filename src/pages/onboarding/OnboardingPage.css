@@ -1,0 +1,301 @@
+.onboarding-page {
+  background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+}
+
+.onboarding-content {
+  --background: transparent;
+}
+
+.onboarding-container {
+  padding: 16px 20px 20px;
+  max-width: 100%;
+  min-height: 100vh;
+}
+
+.onboarding-header {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: none;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  --ion-background-color: transparent;
+}
+
+.onboarding-toolbar {
+  --background: transparent;
+  --border-width: 0;
+  padding: 8px 4px;
+  min-height: 56px;
+}
+
+.back-button {
+  --color: #000000;
+  --background-hover: rgba(0, 0, 0, 0.05);
+  --border-radius: 12px;
+  margin-left: 8px;
+  width: 40px;
+  height: 40px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+.back-icon {
+  font-size: 20px;
+}
+
+.onboarding-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #000000;
+  text-align: center;
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+
+.step-indicator {
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.step-counter {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.3);
+  padding: 6px 12px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.5px;
+}
+
+/* =========================
+   GLASS CARD EFFECTS
+========================= */
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.onboarding-step {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 120px);
+}
+
+.step-header {
+  padding: 24px 0;
+  position: relative;
+}
+
+.gradient-orb {
+  position: absolute;
+  top: -50px;
+  left: -100px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 122, 255, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  filter: blur(40px);
+}
+
+.step-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.step-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
+  position: relative;
+}
+
+.step-icon {
+  font-size: 28px;
+  color: #ffffff;
+}
+
+.step-text {
+  flex: 1;
+}
+
+.step-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.step-subtitle {
+  font-size: 17px;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 4px 0 0 0;
+  font-weight: 400;
+}
+
+/* Step Body */
+.step-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Footer Buttons */
+.step-footer {
+  padding-top: 20px;
+  margin-top: auto;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.primary-button {
+  --background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  --color: white;
+  --border-radius: 16px;
+  --box-shadow: 0 4px 24px rgba(0, 122, 255, 0.4);
+  height: 56px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-2px);
+  --box-shadow: 0 8px 32px rgba(0, 122, 255, 0.5);
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+@media (max-width: 480px) {
+  .onboarding-container {
+    padding: 12px 16px 16px;
+  }
+
+  .step-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .step-title {
+    font-size: 24px;
+  }
+}
+
+/* =========================
+   DARK MODE
+========================= */
+@media (prefers-color-scheme: dark) {
+  .onboarding-page {
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  }
+
+  .onboarding-header {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .back-button {
+    --color: #ffffff;
+    --background-hover: rgba(255, 255, 255, 0.1);
+  }
+
+  .onboarding-title {
+    color: #ffffff;
+  }
+
+  .step-counter {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-input {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .step-title {
+    color: #ffffff;
+  }
+
+  .step-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
