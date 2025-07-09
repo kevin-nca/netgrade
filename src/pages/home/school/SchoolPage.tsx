@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   IonButtons,
@@ -36,9 +36,15 @@ const SchoolPage: React.FC = () => {
   const history = useHistory();
 
   const { data: school = null, error: schoolError } = useSchool(schoolId);
-  const { data: subjects = [], error: subjectsError } =
+  const { data: subjectsData = [], error: subjectsError } =
     useSchoolSubjects(schoolId);
+  const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
+
   const { data: grades = [], error: gradesError } = useGrades();
+
+  useEffect(() => {
+    setSubjects(subjectsData);
+  }, [subjectsData]);
 
   if (schoolError) {
     console.error('Failed to fetch school:', schoolError);
@@ -96,6 +102,7 @@ const SchoolPage: React.FC = () => {
   const deleteSubjectMutation = useDeleteSubject();
 
   const removeSubjectFromStore = (subjectId: string) => {
+    setSubjects((prev) => prev.filter((s) => s.id !== subjectId));
     deleteSubjectMutation.mutate(subjectId, {
       onError: (error) => {
         console.error('Failed to remove subject:', error);
