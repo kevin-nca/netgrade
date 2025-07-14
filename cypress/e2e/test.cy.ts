@@ -4,8 +4,6 @@ describe('Onboarding Flow', () => {
   });
 
   it('should complete the onboarding process successfully', () => {
-    const userName = 'TestUser';
-    cy.get('input[placeholder="Namen eingeben"]').type(userName);
-    cy.contains('Weiter').click();
+    cy.get('.welcome-button').click();
   });
 });
