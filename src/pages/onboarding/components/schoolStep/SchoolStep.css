@@ -1,0 +1,236 @@
+.subsection-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.4px;
+}
+
+.schools-list,
+.subjects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.school-item,
+.subject-item {
+  border-radius: 16px;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.school-content,
+.subject-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.school-avatar,
+.subject-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.school-0 {
+  background: linear-gradient(135deg, #ff3b30 0%, #ff6b6b 100%);
+}
+.school-1 {
+  background: linear-gradient(135deg, #ff9500 0%, #ffb84d 100%);
+}
+.school-2 {
+  background: linear-gradient(135deg, #34c759 0%, #4cd964 100%);
+}
+.school-3 {
+  background: linear-gradient(135deg, #5856d6 0%, #7c7aff 100%);
+}
+
+.school-info,
+.subject-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.school-name,
+.subject-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.2px;
+}
+
+.school-details,
+.subject-details {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+.remove-button {
+  --color: #ff3b30;
+  margin: 0;
+}
+
+.add-prompt {
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px dashed rgba(0, 122, 255, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 122, 255, 0.05) 0%,
+    rgba(0, 122, 255, 0.02) 100%
+  );
+}
+
+.add-prompt:hover {
+  border-color: rgba(0, 122, 255, 0.5);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 122, 255, 0.1) 0%,
+    rgba(0, 122, 255, 0.05) 100%
+  );
+}
+
+.add-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.add-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+}
+
+.add-icon {
+  font-size: 24px;
+  color: white;
+}
+
+.add-text h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 4px 0;
+}
+
+.add-text p {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+.add-form {
+  border-radius: 20px;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.form-content {
+  position: relative;
+}
+
+.form-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.3px;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.7);
+  margin: 0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.cancel-button {
+  --color: rgba(0, 0, 0, 0.6);
+  --background: transparent;
+  --border-radius: 12px;
+  font-weight: 500;
+}
+
+.save-button {
+  --background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  --color: white;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  font-weight: 600;
+}
+
+/* =========================
+   DARK MODE
+========================= */
+@media (prefers-color-scheme: dark) {
+  .subsection-title,
+  .form-title,
+  .school-name,
+  .subject-name {
+    color: #ffffff;
+  }
+
+  .school-details,
+  .subject-details {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .field-label {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .add-prompt {
+    border-color: rgba(0, 122, 255, 0.4);
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.08) 0%,
+      rgba(0, 122, 255, 0.04) 100%
+    );
+  }
+
+  .add-text h4 {
+    color: #ffffff;
+  }
+
+  .add-text p {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}

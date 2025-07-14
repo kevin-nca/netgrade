@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   IonPage,
   IonContent,
@@ -6,173 +6,251 @@ import {
   IonToolbar,
   IonTitle,
   IonButton,
-  IonProgressBar,
-  IonIcon,
-  IonChip,
-  IonLabel,
   IonButtons,
-  IonFooter,
+  IonIcon,
+  IonToast,
 } from '@ionic/react';
-import { arrowBack, personCircle } from 'ionicons/icons';
+import { arrowBack } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-
-import { NameStep } from './steps/NameStep';
-import { SchoolStep } from './steps/SchoolStep';
-import { SubjectStep } from './steps/SubjectStep';
-
 import {
-  useUserName,
-  useSchools,
+  useSaveUserName,
+  useAddSchool,
+  useAddSubject,
   useSetOnboardingCompleted,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
+import { School } from '@/db/entities';
+
+import WelcomeScreen from './components/welcomeScreen/WelcomeScreen';
+import NameStep from './components/nameStep/NameStep';
+import SchoolStep from './components/schoolStep/SchoolStep';
+import SubjectStep from './components/subjectStep/SubjectStep';
+import CompletionStep from './components/completionStep/CompletionStep';
+import ProgressBar from './components/progressbar/ProgressBar';
+
+import { OnboardingDataTemp } from './types';
+import './OnboardingPage.css';
+
+// Generate unique ID
+const generateId = () => Math.random().toString(36).substr(2, 9);
 
 const OnboardingPage: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState<'name' | 'school' | 'subject'>(
-    'name',
-  );
-  const [userName, setUserName] = useState('');
-  const [selectedSchoolId, setSelectedSchoolId] = useState('');
+  const [currentStep, setCurrentStep] = useState(0);
+  const [data, setData] = useState<OnboardingDataTemp>({
+    userName: '',
+    schools: [],
+    subjects: [],
+  });
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string>('');
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<
+    'success' | 'danger' | 'warning'
+  >('success');
+
   const history = useHistory();
-  const { data: savedUserName } = useUserName();
-  const { data: schools = [] } = useSchools();
+  const saveUserNameMutation = useSaveUserName();
+  const addSchoolMutation = useAddSchool();
+  const addSubjectMutation = useAddSubject();
   const setOnboardingCompletedMutation = useSetOnboardingCompleted();
 
-  const canCompleteOnboarding = (): boolean => {
-    return !!userName && userName.trim().length > 0 && schools.length > 0;
+  const totalSteps = 5;
+
+  const showToastMessage = (
+    message: string,
+    color: 'success' | 'danger' | 'warning' = 'success',
+  ) => {
+    setToastMessage(message);
+    setToastColor(color);
+    setShowToast(true);
   };
 
-  useEffect(() => {
-    if (savedUserName) {
-      setUserName(savedUserName);
-      if (currentStep === 'name') {
-        setCurrentStep('school');
-      }
-    }
-  }, [savedUserName, currentStep]);
-
-  const getProgress = (): number => {
+  const getStepTitle = () => {
     switch (currentStep) {
-      case 'name':
-        return 0.33;
-      case 'school':
-        return 0.66;
-      case 'subject':
-        return 1;
-      default:
-        return 0;
-    }
-  };
-
-  const getStepTitle = (): string => {
-    switch (currentStep) {
-      case 'name':
+      case 0:
+        return 'Willkommen';
+      case 1:
         return 'Dein Name';
-      case 'school':
-        return 'Deine Schulen';
-      case 'subject':
-        return 'Deine Fächer';
+      case 2:
+        return 'Schulen';
+      case 3:
+        return 'Fächer';
+      case 4:
+        return 'Fertig';
       default:
-        return '';
+        return 'Einrichtung';
     }
-  };
-
-  const goToNextStep = (step: 'name' | 'school' | 'subject') => {
-    setCurrentStep(step);
   };
 
   const handleBackStep = () => {
-    if (currentStep === 'school') {
-      setCurrentStep('name');
-    } else if (currentStep === 'subject') {
-      setCurrentStep('school');
+    if (currentStep > 0 && !isCompleting) {
+      setCurrentStep(currentStep - 1);
     }
   };
 
-  const handleCompleteOnboarding = () => {
-    setOnboardingCompletedMutation.mutate(true, {
-      onSuccess: () => {
-        history.push(Routes.HOME);
-      },
-      onError: (error) => {
-        console.error('Failed to mark onboarding as completed:', error);
-      },
-    });
+  const handleNextStep = () => {
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
-  const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 'name':
-        return (
-          <NameStep
-            initialName={userName}
-            onNameSaved={(name) => {
-              setUserName(name);
-              goToNextStep('school');
-            }}
-          />
-        );
-      case 'school':
-        return (
-          <SchoolStep
-            userName={userName}
-            selectedSchoolId={selectedSchoolId}
-            onSchoolSelected={(schoolId) => {
-              setSelectedSchoolId(schoolId);
-              goToNextStep('subject');
-            }}
-          />
-        );
-      case 'subject':
-        return (
-          <SubjectStep selectedSchoolId={selectedSchoolId} schools={schools} />
-        );
-      default:
-        return null;
+  const handleComplete = async () => {
+    setIsCompleting(true);
+
+    try {
+      // Save user name
+      await new Promise<void>((resolve, reject) => {
+        saveUserNameMutation.mutate(data.userName, {
+          onSuccess: () => resolve(),
+          onError: reject,
+        });
+      });
+
+      // Save schools and map temp IDs to real IDs
+      const schoolIdMapping: { [tempId: string]: string } = {};
+
+      for (const school of data.schools) {
+        const savedSchool = await new Promise<School>((resolve, reject) => {
+          addSchoolMutation.mutate(
+            {
+              name: school.name,
+              address: school.address || undefined,
+              type: school.type || undefined,
+            },
+            {
+              onSuccess: (result) => resolve(result),
+              onError: reject,
+            },
+          );
+        });
+
+        schoolIdMapping[school.id] = savedSchool.id;
+      }
+
+      // Save subjects with correct schoolId references
+      for (const subject of data.subjects) {
+        const realSchoolId = schoolIdMapping[subject.schoolId];
+
+        if (!realSchoolId) {
+          throw new Error(
+            `Could not find real school ID for subject: ${subject.name}`,
+          );
+        }
+
+        await new Promise<void>((resolve, reject) => {
+          addSubjectMutation.mutate(
+            {
+              name: subject.name,
+              schoolId: realSchoolId,
+              teacher: subject.teacher || null,
+              description: subject.description || null,
+            },
+            {
+              onSuccess: () => resolve(),
+              onError: reject,
+            },
+          );
+        });
+      }
+
+      // Mark onboarding as complete
+      await new Promise<void>((resolve, reject) => {
+        setOnboardingCompletedMutation.mutate(true, {
+          onSuccess: () => resolve(),
+          onError: reject,
+        });
+      });
+
+      showToastMessage('Willkommen bei NetGrade! 🎉', 'success');
+
+      setTimeout(() => {
+        history.replace(Routes.HOME);
+      }, 1000);
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      showToastMessage(
+        'Fehler beim Speichern. Bitte versuche es erneut.',
+        'danger',
+      );
+      setIsCompleting(false);
     }
   };
 
   return (
-    <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            {currentStep !== 'name' && (
-              <IonButton onClick={handleBackStep}>
-                <IonIcon icon={arrowBack} />
+    <IonPage className="onboarding-page">
+      {/* Header - only show for steps 1+ */}
+      {currentStep > 0 && (
+        <IonHeader className="onboarding-header">
+          <IonToolbar className="onboarding-toolbar">
+            <IonButtons slot="start">
+              <IonButton
+                fill="clear"
+                onClick={handleBackStep}
+                disabled={isCompleting}
+                className="back-button"
+              >
+                <IonIcon icon={arrowBack} className="back-icon" />
               </IonButton>
-            )}
-          </IonButtons>
+            </IonButtons>
 
-          <IonTitle size="small">{getStepTitle()}</IonTitle>
+            <IonTitle className="onboarding-title">{getStepTitle()}</IonTitle>
 
-          {userName && currentStep !== 'name' && (
-            <IonChip slot="end" color="primary">
-              <IonIcon icon={personCircle} />
-              <IonLabel>{userName}</IonLabel>
-            </IonChip>
-          )}
-        </IonToolbar>
-        <IonProgressBar value={getProgress()} />
-      </IonHeader>
-
-      <IonContent className="ion-padding">{renderCurrentStep()}</IonContent>
-      <IonFooter>
-        {currentStep === 'subject' && (
-          <IonToolbar>
-            <IonButton
-              expand="block"
-              color="primary"
-              onClick={handleCompleteOnboarding}
-              disabled={!canCompleteOnboarding()}
-              className="ion-margin-horizontal"
-              size="default"
-            >
-              Onboarding abschliessen
-            </IonButton>
+            <div slot="end" className="step-indicator">
+              <span className="step-counter">
+                {currentStep}/{totalSteps - 1}
+              </span>
+            </div>
           </IonToolbar>
-        )}
-      </IonFooter>
+
+          <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+        </IonHeader>
+      )}
+
+      <IonContent className="onboarding-content" scrollY={true}>
+        <div className="onboarding-container">
+          {currentStep === 0 && <WelcomeScreen onNext={handleNextStep} />}
+          {currentStep === 1 && (
+            <NameStep data={data} setData={setData} onNext={handleNextStep} />
+          )}
+          {currentStep === 2 && (
+            <SchoolStep
+              data={data}
+              setData={setData}
+              selectedSchoolId={selectedSchoolId}
+              setSelectedSchoolId={setSelectedSchoolId}
+              generateId={generateId}
+              onNext={handleNextStep}
+            />
+          )}
+          {currentStep === 3 && (
+            <SubjectStep
+              data={data}
+              setData={setData}
+              selectedSchoolId={selectedSchoolId}
+              setSelectedSchoolId={setSelectedSchoolId}
+              generateId={generateId}
+              onNext={handleNextStep}
+            />
+          )}
+          {currentStep === 4 && (
+            <CompletionStep
+              data={data}
+              isCompleting={isCompleting}
+              onComplete={handleComplete}
+            />
+          )}
+        </div>
+      </IonContent>
+
+      <IonToast
+        isOpen={showToast}
+        onDidDismiss={() => setShowToast(false)}
+        message={toastMessage}
+        duration={3000}
+        position="bottom"
+        color={toastColor}
+      />
     </IonPage>
   );
 };
