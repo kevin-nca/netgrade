@@ -16,7 +16,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <IonApp>
           <IonReactRouter>
-            <IonRouterOutlet id="main">
+            <IonRouterOutlet id="main" swipeGesture={true}>
               <Route path="/main" render={() => <AppRouter />} />
               <Route exact path="/" render={() => <Redirect to="/main/" />} />
             </IonRouterOutlet>
