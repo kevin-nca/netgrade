@@ -32,10 +32,11 @@ export function AppRouter() {
     if (!routerOutlet) return;
 
     const handleSwipeGesture = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      const detail = customEvent.detail as {
+      const customEvent = e as CustomEvent<{
         direction: 'forward' | 'backward';
-      };
+      }>;
+      console.log('ionSwipe Event:', customEvent.detail);
+      const detail = customEvent.detail;
       if (detail.direction === 'forward') {
         handleSwipe('forward');
       } else if (detail.direction === 'backward') {
@@ -62,7 +63,11 @@ export function AppRouter() {
 
   return (
     <IonTabs>
-      <IonRouterOutlet ref={routerOutletRef}>
+      <IonRouterOutlet
+        ref={routerOutletRef}
+        swipeGesture={true}
+        animated={true}
+      >
         <Redirect
           exact
           path={Routes.MAIN}
