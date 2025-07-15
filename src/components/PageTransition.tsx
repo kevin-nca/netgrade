@@ -2,7 +2,9 @@ import React from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useLocation } from 'react-router-dom';
 
-export const PageTransition: React.FC<{ children: (location: any) => React.ReactNode }> = ({ children }) => {
+export const PageTransition: React.FC<{
+  children: (location: any) => React.ReactNode;
+}> = ({ children }) => {
   const location = useLocation();
   return (
     <TransitionGroup component={null}>
@@ -15,4 +17,4 @@ export const PageTransition: React.FC<{ children: (location: any) => React.React
       </CSSTransition>
     </TransitionGroup>
   );
-}; 
+};
