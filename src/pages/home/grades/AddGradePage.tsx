@@ -199,7 +199,7 @@ const AddGradePage: React.FC = () => {
         defaultHref={Routes.HOME}
       />
       <IonContent fullscreen>
-        <div style={{ padding: '20px' }}>
+        <div style={{ padding: '20px', paddingBottom: '92px' }}>
           <GlassForm onSubmit={handleAddGrade}>
             {/* School & Subject Selection */}
             <GlassFormSection
@@ -310,22 +310,21 @@ const AddGradePage: React.FC = () => {
                 autoGrow
               />
             </GlassFormSection>
-
-            {/* Submit Button */}
-            <GlassButton
-              variant="primary"
-              onClick={handleAddGrade}
-              loading={addGradeWithExamMutation.isPending}
-              icon={saveOutline}
-              fullWidth
-            >
-              {addGradeWithExamMutation.isPending
-                ? 'Wird hinzugefügt...'
-                : 'Note hinzufügen'}
-            </GlassButton>
           </GlassForm>
         </div>
-
+        <div className="sticky-bottom-button">
+          <GlassButton
+            variant="primary"
+            onClick={handleAddGrade}
+            loading={addGradeWithExamMutation.isPending}
+            icon={saveOutline}
+            fullWidth
+          >
+            {addGradeWithExamMutation.isPending
+              ? 'Wird hinzugefügt...'
+              : 'Note hinzufügen'}
+          </GlassButton>
+        </div>
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}
