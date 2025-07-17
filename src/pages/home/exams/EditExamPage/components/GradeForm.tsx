@@ -4,15 +4,7 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonList,
-  IonItem,
-  IonItemGroup,
-  IonItemDivider,
-  IonLabel,
-  IonTextarea,
-  IonButton,
   IonIcon,
-  IonRange,
 } from '@ionic/react';
 import {
   ribbonOutline,
@@ -21,7 +13,13 @@ import {
   scaleOutline,
   chatbubbleOutline,
 } from 'ionicons/icons';
-import ValidatedNumberInput from '@/components/Form/validated-number-input/validatedNumberInput';
+import {
+  GlassForm,
+  GlassFormSection,
+  GlassInput,
+  GlassTextarea,
+  GlassButton,
+} from '@/components/GlassForm';
 import { validateGrade, validateWeight } from '@/utils/validation';
 import { GradeFormData } from '../types';
 import styles from '../styles/GradeForm.module.css';
@@ -42,15 +40,14 @@ export const GradeForm: React.FC<GradeFormProps> = ({
   getGradeColor,
   onSubmit,
 }) => {
-  const currentScore = formValues.score;
-  const currentWeight = formValues.weight;
-
-  const [localScore, setLocalScore] = useState(currentScore || 5.5);
-  const [localWeight, setLocalWeight] = useState(currentWeight || 100);
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof GradeFormData, string>>
+  >({});
 
   const handleScoreChange = useCallback(
     (value: number) => {
-      setLocalScore(value);
+      const error = validateGrade(value);
+      setErrors((prev) => ({ ...prev, score: error || undefined }));
       onFieldChange('score', value);
     },
     [onFieldChange],
@@ -58,7 +55,8 @@ export const GradeForm: React.FC<GradeFormProps> = ({
 
   const handleWeightChange = useCallback(
     (value: number) => {
-      setLocalWeight(value);
+      const error = validateWeight(value);
+      setErrors((prev) => ({ ...prev, weight: error || undefined }));
       onFieldChange('weight', value);
     },
     [onFieldChange],
@@ -71,8 +69,28 @@ export const GradeForm: React.FC<GradeFormProps> = ({
     [onFieldChange],
   );
 
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof GradeFormData, string>> = {};
+
+    const gradeError = validateGrade(formValues.score);
+    if (gradeError) newErrors.score = gradeError;
+
+    const weightError = validateWeight(formValues.weight);
+    if (weightError) newErrors.weight = weightError;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      onSubmit();
+    }
+  };
+
   return (
-    <>
+    <div style={{ padding: '16px' }}>
+      {/* Warning Card */}
       <IonCard className={styles.warningCard}>
         <IonCardHeader className={styles.warningCardHeader}>
           <IonCardTitle className={styles.warningCardTitle}>
@@ -88,137 +106,61 @@ export const GradeForm: React.FC<GradeFormProps> = ({
         </IonCardContent>
       </IonCard>
 
-      <IonCard className={styles.formCard}>
-        <div className={styles.formCardHeader}>
-          <h2 className={styles.formCardTitle}>Note eintragen</h2>
-        </div>
+      <GlassForm onSubmit={handleSubmit}>
+        <GlassFormSection
+          title="Note eintragen"
+          subtitle="Bewertung und Gewichtung festlegen"
+          icon={trophyOutline}
+        >
+          <GlassInput
+            label="Note (1 bis 6)"
+            value={formValues.score}
+            onChange={handleScoreChange}
+            variant="number"
+            icon={trophyOutline}
+            required
+            error={errors.score}
+            min={1}
+            max={6}
+            step={0.1}
+            helperText="Gib eine Note zwischen 1.0 und 6.0 ein"
+          />
 
-        <IonList className={styles.formCardContent}>
-          {/* Note Field */}
-          <IonItemGroup className={styles.formItemGroup}>
-            <IonItemDivider className={styles.formItemDivider}>
-              <IonIcon
-                icon={trophyOutline}
-                slot="start"
-                color="primary"
-                className={styles.formItemIcon}
-              />
-              <IonLabel color="primary" className={styles.formItemLabel}>
-                Note
-              </IonLabel>
-            </IonItemDivider>
-            <IonItem className={styles.formItem}>
-              <div className={styles.gradeInputContainer}>
-                <div className={styles.gradeInputSmall}>
-                  <ValidatedNumberInput
-                    value={localScore}
-                    onChange={handleScoreChange}
-                    validation={validateGrade}
-                    step="0.1"
-                    min="1"
-                    max="6"
-                  />
-                </div>
-                <div className={styles.rangeContainer}>
-                  <IonRange
-                    value={localScore}
-                    onIonChange={(e) =>
-                      handleScoreChange(e.detail.value as number)
-                    }
-                    min={1}
-                    max={6}
-                    step={0.5}
-                    snaps
-                    color={getGradeColor(localScore)}
-                    className={styles.rangeInput}
-                  />
-                </div>
-              </div>
-            </IonItem>
-          </IonItemGroup>
+          <GlassInput
+            label="Gewichtung (0 bis 100%)"
+            value={formValues.weight}
+            onChange={handleWeightChange}
+            variant="number"
+            icon={scaleOutline}
+            required
+            error={errors.weight}
+            min={0}
+            max={100}
+            step={1}
+            helperText="Gewichtung der Note in Prozent"
+          />
 
-          {/* Weight Field */}
-          <IonItemGroup className={styles.formItemGroup}>
-            <IonItemDivider className={styles.formItemDivider}>
-              <IonIcon
-                icon={scaleOutline}
-                slot="start"
-                color="primary"
-                className={styles.formItemIcon}
-              />
-              <IonLabel color="primary" className={styles.formItemLabel}>
-                Gewichtung
-              </IonLabel>
-            </IonItemDivider>
-            <IonItem className={styles.formItem}>
-              <div className={styles.gradeInputContainer}>
-                <div className={styles.gradeInputSmall}>
-                  <ValidatedNumberInput
-                    value={localWeight}
-                    onChange={handleWeightChange}
-                    validation={validateWeight}
-                    min="0"
-                    max="100"
-                  />
-                </div>
-                <div className={styles.rangeContainer}>
-                  <IonRange
-                    value={localWeight}
-                    onIonChange={(e) =>
-                      handleWeightChange(e.detail.value as number)
-                    }
-                    min={0}
-                    max={100}
-                    step={1}
-                    snaps
-                    className={styles.rangeInput}
-                  />
-                </div>
-              </div>
-            </IonItem>
-          </IonItemGroup>
+          <GlassTextarea
+            label="Kommentar (optional)"
+            value={formValues.comment}
+            onChange={handleCommentChange}
+            placeholder="Notizen zur Note..."
+            icon={chatbubbleOutline}
+            rows={3}
+            maxLength={500}
+            autoGrow
+          />
+        </GlassFormSection>
 
-          {/* Comment Field */}
-          <IonItemGroup className={styles.formItemGroup}>
-            <IonItemDivider className={styles.formItemDivider}>
-              <IonIcon
-                icon={chatbubbleOutline}
-                slot="start"
-                color="primary"
-                className={styles.formItemIcon}
-              />
-              <IonLabel color="primary" className={styles.formItemLabel}>
-                Kommentar (optional)
-              </IonLabel>
-            </IonItemDivider>
-            <IonItem className={styles.formItem}>
-              <IonTextarea
-                value={formValues.comment}
-                onIonChange={(e) => handleCommentChange(e.detail.value || '')}
-                placeholder="Notizen zur Note..."
-                rows={3}
-                className={styles.formInput}
-              />
-            </IonItem>
-          </IonItemGroup>
-        </IonList>
-
-        <div className={styles.formCardFooter}>
-          <IonButton
-            expand="block"
-            className={styles.formButton}
-            onClick={onSubmit}
-          >
-            <div className={styles.buttonContent}>
-              <IonIcon
-                icon={checkmarkCircleOutline}
-                className={styles.saveIcon}
-              />
-              Note eintragen
-            </div>
-          </IonButton>
-        </div>
-      </IonCard>
-    </>
+        <GlassButton
+          variant="primary"
+          onClick={handleSubmit}
+          icon={checkmarkCircleOutline}
+          fullWidth
+        >
+          Note eintragen
+        </GlassButton>
+      </GlassForm>
+    </div>
   );
 };

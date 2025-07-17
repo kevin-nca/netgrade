@@ -1,0 +1,671 @@
+/* =========================
+   GLASS CARD FOUNDATION
+========================= */
+.glass-base {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.glass-input-base {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.glass-button-base {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* =========================
+   GLASS FORM CONTAINER
+========================= */
+.glass-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* =========================
+   GLASS FORM SECTION
+========================= */
+.glass-form-section {
+  border-radius: 20px;
+  padding: 24px;
+  overflow: hidden;
+  position: relative;
+}
+
+.glass-form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.glass-form-section-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+}
+
+.glass-form-section-icon ion-icon {
+  font-size: 20px;
+  color: white;
+}
+
+.glass-form-section-content {
+  flex: 1;
+}
+
+.glass-form-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.3px;
+}
+
+.glass-form-section-subtitle {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+/* =========================
+   GLASS FORM FIELD
+========================= */
+.glass-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.glass-form-field-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.7);
+  margin: 0;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.glass-form-field-required {
+  color: #ff3b30;
+  font-size: 14px;
+}
+
+.glass-form-field-helper {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.glass-form-field-error {
+  font-size: 12px;
+  color: #ff3b30;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: glass-shake 0.5s ease-in-out;
+}
+
+@keyframes glass-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+/* =========================
+   GLASS INPUT
+========================= */
+.glass-input-wrapper {
+  position: relative;
+  border-radius: 16px;
+  padding: 4px;
+  transition: all 0.2s ease;
+}
+
+.glass-input-wrapper.error {
+  border: 1px solid #ff3b30;
+  box-shadow:
+    0 0 0 4px rgba(255, 59, 48, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.glass-input-wrapper.focused {
+  border: 1px solid #007aff;
+  box-shadow:
+    0 0 0 4px rgba(0, 122, 255, 0.1),
+    0 4px 16px rgba(0, 122, 255, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.glass-input-container {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Size variants */
+.glass-input-wrapper.small .glass-input-container {
+  min-height: 44px;
+  padding: 8px 12px;
+}
+
+.glass-input-wrapper.medium .glass-input-container {
+  min-height: 52px;
+  padding: 12px 16px;
+}
+
+.glass-input-wrapper.large .glass-input-container {
+  min-height: 60px;
+  padding: 16px 20px;
+}
+
+.glass-input-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ff9500 0%, #ff8500 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.glass-input-icon ion-icon {
+  font-size: 20px;
+  color: white;
+}
+
+.glass-input-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #000000;
+  font-family: inherit;
+}
+
+.glass-input-field::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+  font-weight: 400;
+}
+
+.glass-input-field:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.glass-input-clear {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.glass-input-wrapper:hover .glass-input-clear,
+.glass-input-wrapper.focused .glass-input-clear {
+  opacity: 1;
+}
+
+.glass-input-clear:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.glass-input-clear ion-icon {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* =========================
+   GLASS SELECT
+========================= */
+.glass-select-wrapper {
+  position: relative;
+  border-radius: 16px;
+  padding: 4px;
+  transition: all 0.2s ease;
+}
+
+.glass-select-container {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+
+.glass-select-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #000000;
+  cursor: pointer;
+  appearance: none;
+  padding-right: 32px;
+}
+
+.glass-select-field option {
+  background: white;
+  color: #000000;
+  padding: 12px;
+}
+
+.glass-select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.glass-select-wrapper.open .glass-select-chevron {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* =========================
+   GLASS TEXTAREA
+========================= */
+.glass-textarea-wrapper {
+  position: relative;
+  border-radius: 16px;
+  padding: 4px;
+  transition: all 0.2s ease;
+}
+
+.glass-textarea-container {
+  display: flex;
+  align-items: flex-start;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.glass-textarea-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #000000;
+  font-family: inherit;
+  resize: none;
+  min-height: 80px;
+}
+
+.glass-textarea-field.auto-grow {
+  resize: none;
+  overflow: hidden;
+}
+
+.glass-textarea-field::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+  font-weight: 400;
+}
+
+/* =========================
+   FORM FIELD FOOTER
+========================= */
+.glass-form-field-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.glass-form-field-counter {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.4);
+  font-weight: 500;
+}
+
+/* =========================
+   GLASS BUTTONS
+========================= */
+.glass-button {
+  border: none;
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+/* Button sizes */
+.glass-button.small {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.glass-button.medium {
+  height: 48px;
+  padding: 0 20px;
+  font-size: 16px;
+}
+
+.glass-button.large {
+  height: 56px;
+  padding: 0 24px;
+  font-size: 17px;
+}
+
+.glass-button.full-width {
+  width: 100%;
+}
+
+/* Button variants */
+.glass-button.primary {
+  color: white;
+}
+
+.glass-button.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.glass-button.secondary {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000000;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.glass-button.secondary:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.glass-button.danger {
+  background: linear-gradient(135deg, #ff3b30 0%, #ff6b6b 100%);
+  color: white;
+  box-shadow: 0 4px 24px rgba(255, 59, 48, 0.3);
+}
+
+.glass-button.danger:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(255, 59, 48, 0.4);
+}
+
+.glass-button.ghost {
+  background: transparent;
+  color: #007aff;
+  border: none;
+  box-shadow: none;
+}
+
+.glass-button.ghost:hover:not(:disabled) {
+  background: rgba(0, 122, 255, 0.1);
+}
+
+.glass-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.glass-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.glass-button-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.glass-button-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: glass-spinner 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.glass-button.secondary .glass-button-spinner {
+  border-color: rgba(0, 0, 0, 0.3);
+  border-top-color: rgba(0, 0, 0, 0.8);
+}
+
+@keyframes glass-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================
+   DARK MODE
+========================= */
+@media (prefers-color-scheme: dark) {
+  .glass-base {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-input-base {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-form-section-title {
+    color: #ffffff;
+  }
+
+  .glass-form-section-subtitle,
+  .glass-form-field-helper {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .glass-form-field-label {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .glass-input-field,
+  .glass-select-field,
+  .glass-textarea-field {
+    color: #ffffff;
+  }
+
+  .glass-input-field::placeholder,
+  .glass-textarea-field::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .glass-select-field option {
+    background: #2a2a2a;
+    color: #ffffff;
+  }
+
+  .glass-input-clear {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-input-clear:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-input-clear ion-icon {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .glass-select-chevron {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .glass-button.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-button.secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-button.ghost {
+    color: #007aff;
+  }
+
+  .glass-button.ghost:hover:not(:disabled) {
+    background: rgba(0, 122, 255, 0.2);
+  }
+
+  .glass-form-field-counter {
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+@media (max-width: 480px) {
+  .glass-form-section {
+    padding: 20px 16px;
+  }
+
+  .glass-form-section-header {
+    gap: 10px;
+  }
+
+  .glass-form-section-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .glass-form-section-title {
+    font-size: 16px;
+  }
+
+  .glass-input-wrapper.medium .glass-input-container {
+    min-height: 48px;
+    padding: 10px 14px;
+  }
+
+  .glass-input-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+  }
+
+  .glass-input-icon ion-icon {
+    font-size: 18px;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+@media (prefers-reduced-motion: reduce) {
+  .glass-input-wrapper,
+  .glass-select-wrapper,
+  .glass-textarea-wrapper,
+  .glass-button {
+    transition: none !important;
+  }
+
+  .glass-select-chevron {
+    transition: none !important;
+  }
+
+  .glass-button-spinner {
+    animation: none !important;
+  }
+
+  @keyframes glass-shake {
+    0%,
+    100% {
+      transform: none;
+    }
+  }
+}

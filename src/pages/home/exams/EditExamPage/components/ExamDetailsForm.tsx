@@ -1,28 +1,22 @@
+// src/pages/home/exams/EditExamPage/components/ExamDetailsForm.tsx
 import React from 'react';
-import {
-  IonCard,
-  IonList,
-  IonItem,
-  IonItemGroup,
-  IonItemDivider,
-  IonLabel,
-  IonInput,
-  IonSelect,
-  IonSelectOption,
-  IonTextarea,
-  IonButton,
-  IonIcon,
-  IonSpinner,
-} from '@ionic/react';
 import {
   documentTextOutline,
   calendarOutline,
   schoolOutline,
   saveOutline,
 } from 'ionicons/icons';
+import {
+  GlassForm,
+  GlassFormSection,
+  GlassInput,
+  GlassSelect,
+  GlassTextarea,
+  GlassDatePicker,
+  GlassButton,
+} from '@/components/GlassForm';
 import { Subject } from '@/db/entities';
 import { ExamFormData } from '../types';
-import styles from '../styles/FormCommon.module.css';
 
 interface ExamDetailsFormProps {
   formValues: ExamFormData;
@@ -42,149 +36,70 @@ export const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
   isSubmitting,
   onSubmit,
 }) => {
-  const handleTitleChange = (value: string) => {
-    onFieldChange('title', value || '');
-  };
-
-  const handleDateChange = (value: string) => {
-    onFieldChange('date', value || '');
-  };
-
-  const handleSubjectChange = (value: string) => {
-    onFieldChange('subject', value);
-  };
-
-  const handleDescriptionChange = (value: string) => {
-    onFieldChange('description', value || '');
-  };
+  // Convert subjects to select options
+  const subjectOptions = subjects.map((subject) => ({
+    value: subject.id,
+    label: subject.name,
+  }));
 
   return (
-    <IonCard className={styles.formCard}>
-      <div className={styles.formCardHeader}>
-        <h2 className={styles.formCardTitle}>Prüfungsdetails bearbeiten</h2>
-      </div>
-
-      <IonList className={styles.formCardContent}>
-        <IonItemGroup className={styles.formItemGroup}>
-          <IonItemDivider className={styles.formItemDivider}>
-            <IonIcon
-              icon={documentTextOutline}
-              slot="start"
-              color="primary"
-              className={styles.formItemIcon}
-            />
-            <IonLabel color="primary" className={styles.formItemLabel}>
-              Titel der Prüfung
-            </IonLabel>
-          </IonItemDivider>
-          <IonItem className={styles.formItem}>
-            <IonInput
-              value={formValues.title}
-              onIonChange={(e) => handleTitleChange(e.detail.value || '')}
-              placeholder="Prüfungstitel"
-              required
-              className={styles.formInput}
-            />
-          </IonItem>
-        </IonItemGroup>
-
-        <IonItemGroup className={styles.formItemGroup}>
-          <IonItemDivider className={styles.formItemDivider}>
-            <IonIcon
-              icon={calendarOutline}
-              slot="start"
-              color="primary"
-              className={styles.formItemIcon}
-            />
-            <IonLabel color="primary" className={styles.formItemLabel}>
-              Prüfungsdatum
-            </IonLabel>
-          </IonItemDivider>
-          <IonItem className={styles.formItem}>
-            <IonInput
-              type="date"
-              value={formValues.date}
-              onIonChange={(e) => handleDateChange(e.detail.value || '')}
-              required
-              className={styles.formInput}
-            />
-          </IonItem>
-        </IonItemGroup>
-
-        <IonItemGroup className={styles.formItemGroup}>
-          <IonItemDivider className={styles.formItemDivider}>
-            <IonIcon
-              icon={schoolOutline}
-              slot="start"
-              color="primary"
-              className={styles.formItemIcon}
-            />
-            <IonLabel color="primary" className={styles.formItemLabel}>
-              Fach
-            </IonLabel>
-          </IonItemDivider>
-          <IonItem className={styles.formItem}>
-            <IonSelect
-              value={formValues.subject}
-              onIonChange={(e) => handleSubjectChange(e.detail.value)}
-              placeholder="Fach wählen"
-              required
-              className={styles.formInput}
-              interface="popover"
-            >
-              {subjects.map((subject) => (
-                <IonSelectOption key={subject.id} value={subject.id}>
-                  {subject.name}
-                </IonSelectOption>
-              ))}
-            </IonSelect>
-          </IonItem>
-        </IonItemGroup>
-
-        <IonItemGroup className={styles.formItemGroup}>
-          <IonItemDivider className={styles.formItemDivider}>
-            <IonIcon
-              icon={documentTextOutline}
-              slot="start"
-              color="primary"
-              className={styles.formItemIcon}
-            />
-            <IonLabel color="primary" className={styles.formItemLabel}>
-              Beschreibung (optional)
-            </IonLabel>
-          </IonItemDivider>
-          <IonItem className={styles.formItem}>
-            <IonTextarea
-              value={formValues.description}
-              onIonChange={(e) => handleDescriptionChange(e.detail.value || '')}
-              placeholder="Notizen zur Prüfung..."
-              rows={3}
-              className={styles.formInput}
-            />
-          </IonItem>
-        </IonItemGroup>
-      </IonList>
-
-      <div className={styles.formCardFooter}>
-        <IonButton
-          expand="block"
-          className={styles.formButton}
-          onClick={onSubmit}
-          disabled={isSubmitting}
+    <div style={{ padding: '16px' }}>
+      <GlassForm onSubmit={onSubmit}>
+        <GlassFormSection
+          title="Prüfungsdetails bearbeiten"
+          subtitle="Grundlegende Informationen der Prüfung"
+          icon={documentTextOutline}
         >
-          {isSubmitting ? (
-            <div className={styles.buttonContent}>
-              <IonSpinner name="crescent" className={styles.spinner} />
-              Wird gespeichert...
-            </div>
-          ) : (
-            <div className={styles.buttonContentSave}>
-              <IonIcon icon={saveOutline} className={styles.saveIcon} />
-              Änderungen speichern
-            </div>
-          )}
-        </IonButton>
-      </div>
-    </IonCard>
+          <GlassInput
+            label="Titel der Prüfung"
+            value={formValues.title}
+            onChange={(value) => onFieldChange('title', String(value))}
+            placeholder="Prüfungstitel"
+            icon={documentTextOutline}
+            required
+            clearable
+          />
+
+          <GlassDatePicker
+            label="Prüfungsdatum"
+            value={formValues.date}
+            onChange={(value) => onFieldChange('date', String(value))}
+            icon={calendarOutline}
+            required
+          />
+
+          <GlassSelect
+            label="Fach"
+            value={formValues.subject}
+            onChange={(value) => onFieldChange('subject', String(value))}
+            options={subjectOptions}
+            placeholder="Fach wählen"
+            icon={schoolOutline}
+            required
+          />
+
+          <GlassTextarea
+            label="Beschreibung (optional)"
+            value={formValues.description}
+            onChange={(value) => onFieldChange('description', String(value))}
+            placeholder="Notizen zur Prüfung..."
+            icon={documentTextOutline}
+            rows={3}
+            maxLength={500}
+            autoGrow
+          />
+        </GlassFormSection>
+
+        <GlassButton
+          variant="primary"
+          onClick={onSubmit}
+          loading={isSubmitting}
+          icon={saveOutline}
+          fullWidth
+        >
+          {isSubmitting ? 'Wird gespeichert...' : 'Änderungen speichern'}
+        </GlassButton>
+      </GlassForm>
+    </div>
   );
 };

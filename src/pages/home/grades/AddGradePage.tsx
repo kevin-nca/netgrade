@@ -1,9 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory, useParams } from 'react-router-dom';
-import Button from '@/components/Button/Button';
+import {
+  schoolOutline,
+  bookOutline,
+  documentTextOutline,
+  calendarOutline,
+  trophyOutline,
+  scaleOutline,
+  chatbubbleOutline,
+  saveOutline,
+} from 'ionicons/icons';
+import {
+  GlassForm,
+  GlassFormSection,
+  GlassInput,
+  GlassSelect,
+  GlassDatePicker,
+  GlassTextarea,
+  GlassButton,
+} from '@/components/GlassForm';
 import Header from '@/components/Header/Header';
-import FormField from '@/components/Form/FormField';
 import { School, Subject } from '@/db/entities';
 import { format, parseISO } from 'date-fns';
 import {
@@ -22,10 +39,19 @@ interface GradeAddFormData {
   selectedSchoolId: string;
   selectedSubjectId: string;
   examName: string;
-  date: string; // Store as ISO string e.g., "YYYY-MM-DD"
+  date: string;
   weight: number;
   score: number;
   comment: string;
+}
+
+interface FormErrors {
+  selectedSchoolId?: string;
+  selectedSubjectId?: string;
+  examName?: string;
+  date?: string;
+  weight?: string;
+  score?: string;
 }
 
 const AddGradePage: React.FC = () => {
@@ -42,6 +68,7 @@ const AddGradePage: React.FC = () => {
     comment: '',
   });
 
+  const [errors, setErrors] = useState<FormErrors>({});
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -50,12 +77,13 @@ const AddGradePage: React.FC = () => {
     formData.selectedSchoolId,
   );
 
+  const addGradeWithExamMutation = useAddGradeWithExam();
+
   // Show error messages if fetching fails
   useEffect(() => {
     if (schoolsError) {
       showAndSetToastMessage('Failed to fetch schools');
     }
-
     if (subjectsError) {
       showAndSetToastMessage('Failed to fetch subjects');
     }
@@ -64,7 +92,6 @@ const AddGradePage: React.FC = () => {
   // Update selectedSchoolId if routeSchoolId changes and is valid
   useEffect(() => {
     if (routeSchoolId && routeSchoolId !== formData.selectedSchoolId) {
-      // Reset subject when school changes
       setFormData((prev) => ({
         ...prev,
         selectedSchoolId: routeSchoolId,
@@ -73,66 +100,20 @@ const AddGradePage: React.FC = () => {
     }
   }, [routeSchoolId, formData.selectedSchoolId]);
 
-  const handleFormChange = <K extends keyof GradeAddFormData>(
+  const handleFieldChange = <K extends keyof GradeAddFormData>(
     field: K,
     value: GradeAddFormData[K],
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-  };
 
-  const handleSubjectChange = (value: string | number | boolean) => {
-    handleFormChange('selectedSubjectId', String(value));
-  };
-
-  const handleSchoolChange = (value: string | number | boolean) => {
-    const newSchoolId = String(value);
-    setFormData((prev) => ({
-      ...prev,
-      selectedSchoolId: newSchoolId,
-      selectedSubjectId: '', // Reset subject when school changes
-    }));
-  };
-
-  // Specific handler for Date change
-  const handleDateChange = (value: string | number | boolean) => {
-    // FormField for date passes ISO string
-    handleFormChange('date', String(value));
-  };
-
-  // Specific handler for numeric fields to parse value
-  const handleNumericChange = (
-    field: 'score' | 'weight',
-    value: string | number | boolean,
-  ) => {
-    const strValue = String(value);
-    // Basic check for valid number format (allow empty string for clearing input)
-    if (strValue === '' || /^-?\d*\.?\d*$/.test(strValue)) {
-      // Attempt to parse, default to 0 or keep previous if parse fails?
-      // For score/weight, 0 might be a valid value, handle NaN carefully
-      const parsedValue = parseFloat(strValue);
-      handleFormChange(field, isNaN(parsedValue) ? 0 : parsedValue);
+    // Clear error when user changes field
+    if (errors[field as keyof FormErrors]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
-  };
 
-  const handleScoreChange = (value: string | number | boolean) => {
-    handleNumericChange('score', value);
-    // Inline validation for decimals (optional immediate feedback)
-    const strValue = String(value);
-    if (strValue.includes('.') && strValue.split('.')[1].length > 2) {
-      showAndSetToastMessage(
-        'Die Note darf maximal zwei Dezimalstellen haben.',
-      );
-    }
-  };
-
-  const handleWeightChange = (value: string | number | boolean) => {
-    handleNumericChange('weight', value);
-    // Inline validation for decimals (optional immediate feedback)
-    const strValue = String(value);
-    if (strValue.includes('.') && strValue.split('.')[1].length > 2) {
-      showAndSetToastMessage(
-        'Die Gewichtung darf maximal zwei Dezimalstellen haben.',
-      );
+    // Reset subject when school changes
+    if (field === 'selectedSchoolId') {
+      setFormData((prev) => ({ ...prev, selectedSubjectId: '' }));
     }
   };
 
@@ -141,29 +122,32 @@ const AddGradePage: React.FC = () => {
     setShowToast(true);
   };
 
-  const addGradeWithExamMutation = useAddGradeWithExam();
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
 
-  const handleAddGrade = () => {
     if (!formData.selectedSubjectId) {
-      showAndSetToastMessage('Bitte wähle ein Fach aus!');
-      return;
+      newErrors.selectedSubjectId = 'Bitte wähle ein Fach aus!';
     }
     if (!formData.examName.trim()) {
-      showAndSetToastMessage('Bitte gib einen Prüfungsnamen ein!');
-      return;
+      newErrors.examName = 'Bitte gib einen Prüfungsnamen ein!';
     }
 
     const gradeError = validateGrade(formData.score);
     if (gradeError) {
-      showAndSetToastMessage(gradeError);
-      return;
+      newErrors.score = gradeError;
     }
 
     const weightError = validateWeight(formData.weight);
     if (weightError) {
-      showAndSetToastMessage(weightError);
-      return;
+      newErrors.weight = weightError;
     }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleAddGrade = () => {
+    if (!validateForm()) return;
 
     const gradePayload = {
       subjectId: formData.selectedSubjectId,
@@ -196,75 +180,152 @@ const AddGradePage: React.FC = () => {
     });
   };
 
+  // Convert data to select options
+  const schoolOptions = schools.map((school: School) => ({
+    value: school.id,
+    label: school.name,
+  }));
+
+  const subjectOptions = subjects.map((subject: Subject) => ({
+    value: subject.id,
+    label: subject.name,
+  }));
+
   return (
     <IonPage>
       <Header
-        title={'Note hinzufügen'}
+        title="Note hinzufügen"
         backButton={true}
         defaultHref={Routes.HOME}
       />
       <IonContent fullscreen>
-        <FormField
-          label="Schule"
-          value={formData.selectedSchoolId}
-          onChange={handleSchoolChange}
-          type="select"
-          options={schools.map((school: School) => ({
-            value: school.id,
-            label: school.name,
-          }))}
-        />
+        <div style={{ padding: '20px' }}>
+          <GlassForm onSubmit={handleAddGrade}>
+            {/* School & Subject Selection */}
+            <GlassFormSection
+              title="Schule & Fach"
+              subtitle="Wähle die entsprechende Zuordnung"
+              icon={schoolOutline}
+            >
+              <GlassSelect
+                label="Schule"
+                value={formData.selectedSchoolId}
+                onChange={(value) =>
+                  handleFieldChange('selectedSchoolId', String(value))
+                }
+                options={schoolOptions}
+                placeholder="Wähle eine Schule"
+                icon={schoolOutline}
+                required
+                error={errors.selectedSchoolId}
+              />
 
-        <FormField
-          label="Fach"
-          value={formData.selectedSubjectId}
-          onChange={handleSubjectChange}
-          type="select"
-          options={subjects.map((subject: Subject) => ({
-            value: subject.id,
-            label: subject.name,
-          }))}
-          disabled={!formData.selectedSchoolId || subjects.length === 0}
-          placeholder="Bitte zuerst Schule wählen"
-        />
+              <GlassSelect
+                label="Fach"
+                value={formData.selectedSubjectId}
+                onChange={(value) =>
+                  handleFieldChange('selectedSubjectId', String(value))
+                }
+                options={subjectOptions}
+                placeholder={
+                  !formData.selectedSchoolId || subjects.length === 0
+                    ? 'Bitte zuerst Schule wählen'
+                    : 'Wähle ein Fach'
+                }
+                icon={bookOutline}
+                required
+                error={errors.selectedSubjectId}
+                disabled={!formData.selectedSchoolId || subjects.length === 0}
+              />
+            </GlassFormSection>
 
-        <FormField
-          label="Prüfungsname"
-          value={formData.examName}
-          onChange={(value) => handleFormChange('examName', String(value))}
-          type="text"
-          placeholder="z.B. Klausur 1, Vokabeltest"
-        />
+            {/* Exam Details */}
+            <GlassFormSection
+              title="Prüfungsdetails"
+              subtitle="Informationen zur Prüfung"
+              icon={documentTextOutline}
+            >
+              <GlassInput
+                label="Prüfungsname"
+                value={formData.examName}
+                onChange={(value) =>
+                  handleFieldChange('examName', String(value))
+                }
+                placeholder="z.B. Klausur 1, Vokabeltest"
+                icon={documentTextOutline}
+                required
+                error={errors.examName}
+                clearable
+              />
 
-        <FormField
-          label="Datum"
-          value={formData.date}
-          onChange={handleDateChange}
-          type="date"
-        />
+              <GlassDatePicker
+                label="Datum"
+                value={formData.date}
+                onChange={(value) => handleFieldChange('date', String(value))}
+                icon={calendarOutline}
+                required
+                error={errors.date}
+              />
+            </GlassFormSection>
 
-        <FormField
-          label="Gewichtung (0 bis 100%)"
-          value={formData.weight}
-          onChange={handleWeightChange}
-          type="number"
-        />
+            {/* Grade Details */}
+            <GlassFormSection
+              title="Bewertung"
+              subtitle="Note und Gewichtung eingeben"
+              icon={trophyOutline}
+            >
+              <GlassInput
+                label="Note (1 bis 6)"
+                value={formData.score}
+                onChange={(value) => handleFieldChange('score', Number(value))}
+                variant="number"
+                icon={trophyOutline}
+                required
+                error={errors.score}
+                min={1}
+                max={6}
+                step={0.1}
+              />
 
-        <FormField
-          label="Note (1 bis 6)"
-          value={formData.score}
-          onChange={handleScoreChange}
-          type="number"
-        />
+              <GlassInput
+                label="Gewichtung (0 bis 100%)"
+                value={formData.weight}
+                onChange={(value) => handleFieldChange('weight', Number(value))}
+                variant="number"
+                icon={scaleOutline}
+                required
+                error={errors.weight}
+                min={0}
+                max={100}
+                step={1}
+              />
 
-        <FormField
-          label="Kommentar (optional)"
-          value={formData.comment}
-          onChange={(value) => handleFormChange('comment', String(value))}
-          type="text"
-        />
+              <GlassTextarea
+                label="Kommentar (optional)"
+                value={formData.comment}
+                onChange={(value) => handleFieldChange('comment', value)}
+                placeholder="Zusätzliche Notizen..."
+                icon={chatbubbleOutline}
+                maxLength={500}
+                autoGrow
+              />
+            </GlassFormSection>
 
-        <Button handleEvent={handleAddGrade} text={'Hinzufügen'} />
+            {/* Submit Button */}
+            <GlassButton
+              variant="primary"
+              onClick={handleAddGrade}
+              loading={addGradeWithExamMutation.isPending}
+              icon={saveOutline}
+              fullWidth
+            >
+              {addGradeWithExamMutation.isPending
+                ? 'Wird hinzugefügt...'
+                : 'Note hinzufügen'}
+            </GlassButton>
+          </GlassForm>
+        </div>
+
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}
