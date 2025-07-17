@@ -1,6 +1,7 @@
 import React from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { useLocation, Location } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import type { Location } from 'history';
 
 export const PageTransition: React.FC<{
   children: (location: Location) => React.ReactNode;
