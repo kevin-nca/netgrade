@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Switch, Route, Redirect, useLocation } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import { IonTabs, IonRouterOutlet, IonPage } from '@ionic/react';
 import { PageTransition } from '@/components/PageTransition';
 import { Routes } from '@/routes';
@@ -20,7 +20,6 @@ import './AppRouter.css';
 export function AppRouter() {
   const { data: isOnboarded } = useOnboardingCompleted();
   const [initialized, setInitialized] = useState(false);
-  const location = useLocation();
 
   useEffect(() => {
     if (isOnboarded !== undefined) {
@@ -34,8 +33,8 @@ export function AppRouter() {
     <IonTabs>
       <IonRouterOutlet id="main" animated={false}>
         <PageTransition>
-          {(loc) => (
-            <Switch location={loc}>
+          {(location) => (
+            <Switch location={location}>
               <Route exact path={Routes.MAIN}>
                 <Redirect to={isOnboarded ? Routes.HOME : Routes.ONBOARDING} />
               </Route>
