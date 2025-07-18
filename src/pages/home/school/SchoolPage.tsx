@@ -23,8 +23,10 @@ import {
   useGrades,
   useAddSubject,
   useDeleteSubject,
+  useUpdateSubject,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
+import EditSubjectModal from '../../../components/modals/EditSubjectModal';
 
 interface SubjectToAdd {
   name: string;
@@ -32,6 +34,8 @@ interface SubjectToAdd {
 
 const SchoolPage: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [subjectToEdit, setSubjectToEdit] = useState<Subject | null>(null);
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
@@ -41,6 +45,8 @@ const SchoolPage: React.FC = () => {
   const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
 
   const { data: grades = [], error: gradesError } = useGrades();
+
+  const updateSubjectMutation = useUpdateSubject();
 
   useEffect(() => {
     setSubjects(subjectsData);
@@ -150,6 +156,15 @@ const SchoolPage: React.FC = () => {
               </IonItem>
               <IonItemOptions side="end">
                 <IonItemOption
+                  color="primary"
+                  onClick={() => {
+                    setSubjectToEdit(subject);
+                    setEditModalOpen(true);
+                  }}
+                >
+                  Bearbeiten
+                </IonItemOption>
+                <IonItemOption
                   color="danger"
                   onClick={(e) => {
                     const slidingItem = (e.target as Element).closest(
@@ -176,6 +191,22 @@ const SchoolPage: React.FC = () => {
             removeSubjectFromStore(id)
           }
           availableSubjects={[]}
+        />
+        <EditSubjectModal
+          isOpen={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          subject={subjectToEdit}
+          onSave={async (newName: string) => {
+            if (subjectToEdit) {
+              await updateSubjectMutation.mutateAsync({
+                id: subjectToEdit.id,
+                name: newName,
+              });
+              setEditModalOpen(false);
+              setSubjectToEdit(null);
+            }
+          }}
+          loading={updateSubjectMutation.isPending}
         />
       </IonContent>
     </IonPage>
