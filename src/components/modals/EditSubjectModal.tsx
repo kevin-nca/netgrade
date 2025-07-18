@@ -20,7 +20,13 @@ interface EditSubjectModalProps {
   loading?: boolean;
 }
 
-const EditSubjectModal: React.FC<EditSubjectModalProps> = ({ isOpen, onClose, subject, onSave, loading }) => {
+const EditSubjectModal: React.FC<EditSubjectModalProps> = ({
+  isOpen,
+  onClose,
+  subject,
+  onSave,
+  loading,
+}) => {
   const [name, setName] = useState(subject?.name || '');
 
   useEffect(() => {
@@ -63,12 +69,15 @@ const EditSubjectModal: React.FC<EditSubjectModalProps> = ({ isOpen, onClose, su
               <div className="modal-input-wrapper glass-input">
                 <IonItem lines="none" className="modal-input-item">
                   <div slot="start" className="modal-input-icon-wrapper">
-                    <IonIcon icon={pencilOutline} className="modal-input-icon" />
+                    <IonIcon
+                      icon={pencilOutline}
+                      className="modal-input-icon"
+                    />
                   </div>
                   <IonInput
                     value={name}
                     placeholder="Fachname..."
-                    onIonChange={e => setName(e.detail.value || '')}
+                    onIonChange={(e) => setName(e.detail.value || '')}
                     className="modal-input-field"
                     clearInput
                     autoFocus
@@ -103,4 +112,4 @@ const EditSubjectModal: React.FC<EditSubjectModalProps> = ({ isOpen, onClose, su
   );
 };
 
-export default EditSubjectModal; 
+export default EditSubjectModal;
