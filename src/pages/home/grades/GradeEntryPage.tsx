@@ -201,16 +201,27 @@ const GradeEntryPage: React.FC = () => {
               <p>Keine Noten gefunden.</p>
             </div>
           ) : (
-            <IonList>
-              {grades.map((grade) => (
-                <GradeListItem
-                  key={grade.id}
-                  grade={grade}
-                  onEdit={() => startEdit(grade)}
-                  onDelete={() => handleDelete(grade.id)}
-                />
-              ))}
-            </IonList>
+            <div style={{ padding: '20px', paddingBottom: '92px' }}>
+              <GlassForm>
+                <GlassFormSection
+                  title="Deine Noten"
+                  subtitle="Alle eingetragenen Noten im Überblick"
+                  icon={trophyOutline}
+                  contentSpacing={28}
+                >
+                  <IonList>
+                    {grades.map((grade) => (
+                      <GradeListItem
+                        key={grade.id}
+                        grade={grade}
+                        onEdit={() => startEdit(grade)}
+                        onDelete={() => handleDelete(grade.id)}
+                      />
+                    ))}
+                  </IonList>
+                </GlassFormSection>
+              </GlassForm>
+            </div>
           )}
           <IonModal
             isOpen={editingId !== null}

@@ -3,12 +3,17 @@ import { IonIcon } from '@ionic/react';
 import { GlassFormSectionProps } from './types';
 import './GlassForm.css';
 
-const GlassFormSection: React.FC<GlassFormSectionProps> = ({
+interface GlassFormSectionExtraProps extends GlassFormSectionProps {
+  contentSpacing?: number;
+}
+
+const GlassFormSection: React.FC<GlassFormSectionExtraProps> = ({
   children,
   title,
   subtitle,
   icon,
   className = '',
+  contentSpacing = 0,
 }) => {
   const sectionClasses = ['glass-form-section', 'glass-base', className]
     .filter(Boolean)
@@ -35,7 +40,9 @@ const GlassFormSection: React.FC<GlassFormSectionProps> = ({
         </div>
       )}
 
-      {children}
+      <div style={contentSpacing ? { marginTop: contentSpacing } : undefined}>
+        {children}
+      </div>
     </div>
   );
 };
