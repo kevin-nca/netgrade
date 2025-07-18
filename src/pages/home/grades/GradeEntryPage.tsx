@@ -20,7 +20,6 @@ import {
   decimalToPercentage,
 } from '@/utils/validation';
 import { useToast } from '@/hooks/useToast';
-import { Routes } from '@/routes';
 import { Layout } from '@/components/Layout/Layout';
 
 interface GradeFormData {
@@ -151,7 +150,11 @@ const GradeEntryPage: React.FC = () => {
 
   return (
     <IonPage>
-      <Header title="Notenübersicht" backButton defaultHref={Routes.HOME} />
+      <Header
+        title="Notenübersicht"
+        backButton
+        onBack={() => window.history.back()}
+      />
       <IonContent>
         <Layout>
           {gradesLoading ? (
