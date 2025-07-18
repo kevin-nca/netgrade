@@ -26,7 +26,7 @@ import {
   useUpdateSubject,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
-import EditSubjectModal from '../../../components/modals/EditSubjectModal';
+import EditSubjectModal from '@/components/modals/EditSubjectModal';
 
 interface SubjectToAdd {
   name: string;
