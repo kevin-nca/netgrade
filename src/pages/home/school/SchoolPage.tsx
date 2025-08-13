@@ -39,6 +39,8 @@ const SchoolPage: React.FC = () => {
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
+  // hallo
+
   const { data: school = null, error: schoolError } = useSchool(schoolId);
   const { data: subjectsData = [], error: subjectsError } =
     useSchoolSubjects(schoolId);
