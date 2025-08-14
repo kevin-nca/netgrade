@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -13,8 +10,6 @@ import {
   IonCardContent,
   IonLabel,
   IonButton,
-  IonButtons,
-  IonBackButton,
   IonIcon,
   IonSegment,
   IonSegmentButton,
@@ -57,6 +52,7 @@ import { formatDate, getGradeColor } from './utils';
 import { ExamFormData, GradeFormData, ExamParams } from './types';
 import styles from './EditExamPage.module.css';
 import { Layout } from '@/components/Layout/Layout';
+import Header from '@/components/Header/Header';
 
 const EditExamPage: React.FC = () => {
   const { examId } = useParams<ExamParams>();
@@ -210,14 +206,7 @@ const EditExamPage: React.FC = () => {
   if (isLoading) {
     return (
       <IonPage>
-        <IonHeader>
-          <IonToolbar>
-            <IonButtons slot="start">
-              <IonBackButton defaultHref={Routes.HOME} />
-            </IonButtons>
-            <IonTitle>Lädt...</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <Header title="Lädt..." backButton={true} />
         <IonContent>
           <Layout>
             <div className={styles.container}>
@@ -241,14 +230,7 @@ const EditExamPage: React.FC = () => {
   if (error) {
     return (
       <IonPage>
-        <IonHeader>
-          <IonToolbar>
-            <IonButtons slot="start">
-              <IonBackButton defaultHref={Routes.HOME} />
-            </IonButtons>
-            <IonTitle>Fehler</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <Header title="Fehler" backButton={true} />
         <IonContent>
           <Layout>
             <div className={styles.container}>
@@ -281,19 +263,15 @@ const EditExamPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref={Routes.HOME} text="Zurück" />
-          </IonButtons>
-          <IonTitle>Prüfung bearbeiten</IonTitle>
-          <IonButtons slot="end">
-            <IonButton color="danger" onClick={() => setShowDeleteAlert(true)}>
-              <IonIcon slot="icon-only" icon={trashOutline} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+      <Header
+        title="Prüfung bearbeiten"
+        backButton={true}
+        endSlot={
+          <IonButton color="danger" onClick={() => setShowDeleteAlert(true)}>
+            <IonIcon slot="icon-only" icon={trashOutline} />
+          </IonButton>
+        }
+      />
 
       <IonContent>
         <Layout>
