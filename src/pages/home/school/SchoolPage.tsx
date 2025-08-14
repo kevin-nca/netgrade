@@ -27,6 +27,7 @@ import {
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/components/modals/EditSubjectModal';
+import './SchoolPage.css';
 
 interface SubjectToAdd {
   name: string;
@@ -144,37 +145,16 @@ const SchoolPage: React.FC = () => {
           {subjects.map((subject: Subject) => (
             <IonItemSliding key={subject.id}>
               <IonItem button onClick={() => goToGradesPage(subject)}>
-<IonLabel
-  style={{
-    display: 'inline-block',
-    border: '1px solid #4b23daff',
-    borderRadius: '8px',
-    padding: '10px 15px',
-    backgroundColor: '#4b23daff',
-    textAlign: 'left',
-    width: '120px', // Breite der Box
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    marginBottom: '16px',
-  }}
->
-  <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '6px' }}>
-    {subject.name}
-   </div>
-  <div
-    style={{
-      backgroundColor: '#4b23daff',
-      borderRadius: '4px',
-      padding: '5px 8px',
-      fontSize: '14px',
-      display: 'inline-block'
-    }}
-  >
-    Durchschnitt:{' '}
-    {calculateAverage(subject) !== null
-      ? calculateAverage(subject)?.toFixed(2)
-      : 'Keine Noten'}
-  </div>
-</IonLabel>
+                <IonLabel className="glass-card grade-card">
+                  <div className="grade-subject">{subject.name}</div>
+                  <div className="grade-average">
+                    Durchschnitt:{' '}
+                    {calculateAverage(subject) !== null
+                      ? calculateAverage(subject)?.toFixed(2)
+                      : 'Keine Noten'}
+                  </div>
+                </IonLabel>
+
 
               </IonItem>
               <IonItemOptions side="end">
