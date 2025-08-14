@@ -201,7 +201,7 @@ const AddGradePage: React.FC = () => {
       <Header
         title={'Note hinzufügen'}
         backButton={true}
-        defaultHref={Routes.HOME}
+        onBack={() => window.history.back()}
       />
       <IonContent fullscreen>
         <FormField
