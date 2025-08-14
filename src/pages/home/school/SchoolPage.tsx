@@ -43,7 +43,7 @@ const SchoolPage: React.FC = () => {
   const { data: school = null, error: schoolError } = useSchool(schoolId);
   const { data: subjectsData = [], error: subjectsError } =
     useSchoolSubjects(schoolId);
-  const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
+     const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
 
   const { data: grades = [], error: gradesError } = useGrades();
 
