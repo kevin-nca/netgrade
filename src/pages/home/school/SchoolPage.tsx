@@ -144,15 +144,38 @@ const SchoolPage: React.FC = () => {
           {subjects.map((subject: Subject) => (
             <IonItemSliding key={subject.id}>
               <IonItem button onClick={() => goToGradesPage(subject)}>
-                <IonLabel>
-                  <span style={{ float: 'left' }}>{subject.name}</span>
-                  <span style={{ float: 'right' }}>
-                    Durchschnitt:{' '}
-                    {calculateAverage(subject) !== null
-                      ? calculateAverage(subject)?.toFixed(2)
-                      : 'Keine Noten'}
-                  </span>
-                </IonLabel>
+<IonLabel
+  style={{
+    display: 'inline-block',
+    border: '1px solid #4b23daff',
+    borderRadius: '8px',
+    padding: '10px 15px',
+    backgroundColor: '#4b23daff',
+    textAlign: 'left',
+    width: '120px', // Breite der Box
+    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+    marginBottom: '16px',
+  }}
+>
+  <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '6px' }}>
+    {subject.name}
+   </div>
+  <div
+    style={{
+      backgroundColor: '#4b23daff',
+      borderRadius: '4px',
+      padding: '5px 8px',
+      fontSize: '14px',
+      display: 'inline-block'
+    }}
+  >
+    Durchschnitt:{' '}
+    {calculateAverage(subject) !== null
+      ? calculateAverage(subject)?.toFixed(2)
+      : 'Keine Noten'}
+  </div>
+</IonLabel>
+
               </IonItem>
               <IonItemOptions side="end">
                 <IonItemOption
