@@ -154,8 +154,6 @@ const SchoolPage: React.FC = () => {
                       : 'Keine Noten'}
                   </div>
                 </IonLabel>
-
-
               </IonItem>
               <IonItemOptions side="end">
                 <IonItemOption
