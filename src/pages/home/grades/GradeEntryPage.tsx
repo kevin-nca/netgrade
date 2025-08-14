@@ -1,39 +1,12 @@
 import React, { useState } from 'react';
-import {
-  IonContent,
-  IonList,
-  IonModal,
-  IonPage,
-  IonToast,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
-  IonButton,
-  IonIcon,
-} from '@ionic/react';
+import { IonContent, IonList, IonModal, IonPage, IonToast } from '@ionic/react';
 import { useParams } from 'react-router-dom';
 import { useForm } from '@tanstack/react-form';
-import {
-  documentTextOutline,
-  calendarOutline,
-  trophyOutline,
-  scaleOutline,
-  chatbubbleOutline,
-  saveOutline,
-  close,
-  createOutline,
-} from 'ionicons/icons';
-import {
-  GlassForm,
-  GlassFormSection,
-  GlassInput,
-  GlassDatePicker,
-  GlassTextarea,
-  GlassButton,
-} from '@/components/GlassForm';
+import ValidatedNumberInput from '@/components/Form/validated-number-input/validatedNumberInput';
+import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import GradeListItem from '@/components/List/GradeListItem';
+import FormField from '@/components/Form/FormField';
 import { Grade } from '@/db/entities';
 import {
   useGrades,
@@ -63,6 +36,36 @@ interface GradeEntryParams {
   subjectId: string;
 }
 
+// Helper function to format date for input (YYYY-MM-DD)
+const formatDateForInput = (date: Date | string): string => {
+  try {
+    const dateObj = date instanceof Date ? date : new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      // Return today's date if invalid
+      return new Date().toISOString().split('T')[0];
+    }
+    return dateObj.toISOString().split('T')[0];
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return new Date().toISOString().split('T')[0];
+  }
+};
+
+// Helper function to create date from input string
+const createDateFromInput = (dateString: string): Date => {
+  if (!dateString || dateString.trim() === '') {
+    throw new Error('Datum darf nicht leer sein');
+  }
+
+  // Parse YYYY-MM-DD format
+  const date = new Date(dateString + 'T00:00:00.000Z');
+  if (isNaN(date.getTime())) {
+    throw new Error('Ungültiges Datumsformat');
+  }
+
+  return date;
+};
+
 const GradeEntryPage: React.FC = () => {
   const { subjectId } = useParams<GradeEntryParams>();
 
@@ -78,8 +81,7 @@ const GradeEntryPage: React.FC = () => {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const { showToast, toastMessage, setShowToast, showMessage } = useToast();
-  const deleteGradeMutation = useDeleteGrade();
-  const updateExamAndGradeMutation = useUpdateExamAndGrade();
+
   const gradeForm = useForm({
     defaultValues: {
       examName: '',
@@ -91,6 +93,11 @@ const GradeEntryPage: React.FC = () => {
     onSubmit: async ({ value }) => {
       if (!value.examName.trim()) {
         showMessage('Bitte geben Sie einen Prüfungsnamen ein.');
+        return;
+      }
+
+      if (!value.date || value.date.trim() === '') {
+        showMessage('Bitte wählen Sie ein Datum aus.');
         return;
       }
 
@@ -108,15 +115,11 @@ const GradeEntryPage: React.FC = () => {
 
       await saveEdit(value);
     },
-    validators: {
-      onChange: ({ value }) => {
-        if (value.examName && value.examName.trim().length < 2) {
-          return 'Prüfungsname muss mindestens 2 Zeichen haben';
-        }
-        return undefined;
-      },
-    },
   });
+
+  // Set up mutation hooks
+  const deleteGradeMutation = useDeleteGrade();
+  const updateExamAndGradeMutation = useUpdateExamAndGrade();
 
   const handleDelete = (gradeId: string) => {
     deleteGradeMutation.mutate(gradeId, {
@@ -133,10 +136,14 @@ const GradeEntryPage: React.FC = () => {
 
   const startEdit = (grade: Grade) => {
     setEditingId(grade.id);
+
+    // Format the date properly for the input field
+    const formattedDate = formatDateForInput(grade.date);
+
     gradeForm.setFieldValue('examName', grade.exam.name);
     gradeForm.setFieldValue('score', grade.score);
     gradeForm.setFieldValue('weight', decimalToPercentage(grade.weight));
-    gradeForm.setFieldValue('date', grade.date.toISOString().split('T')[0]);
+    gradeForm.setFieldValue('date', formattedDate);
     gradeForm.setFieldValue('comment', grade.comment || '');
   };
 
@@ -144,43 +151,54 @@ const GradeEntryPage: React.FC = () => {
     if (!editingId) return;
 
     const grade = grades.find((grade: Grade) => grade.id === editingId);
-    if (!grade) return;
+    if (!grade) {
+      showMessage('Note nicht gefunden.');
+      return;
+    }
 
-    const updatedGrade = {
-      ...grade,
-      score: formData.score,
-      weight: percentageToDecimal(formData.weight),
-      date: new Date(formData.date),
-      comment: formData.comment || null,
-    };
+    try {
+      // Create date from input string
+      const validDate = createDateFromInput(formData.date);
 
-    const updatedExam = {
-      ...grade.exam,
-      name: formData.examName,
-    };
+      const updatedGrade = {
+        ...grade,
+        score: formData.score,
+        weight: percentageToDecimal(formData.weight),
+        date: validDate,
+        comment: formData.comment || null,
+      };
 
-    updateExamAndGradeMutation.mutate(
-      {
-        examData: updatedExam,
-        gradeData: updatedGrade,
-      },
-      {
-        onSuccess: () => {
-          showMessage('Note erfolgreich aktualisiert.');
-          setEditingId(null);
+      const updatedExam = {
+        ...grade.exam,
+        name: formData.examName.trim(),
+      };
+
+      updateExamAndGradeMutation.mutate(
+        {
+          examData: updatedExam,
+          gradeData: updatedGrade,
         },
-        onError: (error) => {
-          showMessage(
-            `Fehler: ${error instanceof Error ? error.message : String(error)}`,
-          );
+        {
+          onSuccess: () => {
+            showMessage('Note erfolgreich aktualisiert.');
+            setEditingId(null);
+          },
+          onError: (error) => {
+            console.error('Update error:', error);
+            showMessage(
+              `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+            );
+          },
         },
-      },
-    );
+      );
+    } catch (error) {
+      console.error('Date error:', error);
+      showMessage(error instanceof Error ? error.message : 'Ungültiges Datum');
+    }
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    gradeForm.reset();
   };
 
   return (
@@ -201,216 +219,97 @@ const GradeEntryPage: React.FC = () => {
               <p>Keine Noten gefunden.</p>
             </div>
           ) : (
-            <div style={{ padding: '20px', paddingBottom: '92px' }}>
-              <GlassForm>
-                <GlassFormSection
-                  title="Deine Noten"
-                  subtitle="Alle eingetragenen Noten im Überblick"
-                  icon={trophyOutline}
-                  contentSpacing={28}
-                >
-                  <IonList>
-                    {grades.map((grade) => (
-                      <GradeListItem
-                        key={grade.id}
-                        grade={grade}
-                        onEdit={() => startEdit(grade)}
-                        onDelete={() => handleDelete(grade.id)}
-                      />
-                    ))}
-                  </IonList>
-                </GlassFormSection>
-              </GlassForm>
-            </div>
+            <IonList>
+              {grades.map((grade) => (
+                <GradeListItem
+                  key={grade.id}
+                  grade={grade}
+                  onEdit={() => startEdit(grade)}
+                  onDelete={() => handleDelete(grade.id)}
+                />
+              ))}
+            </IonList>
           )}
-          <IonModal
-            isOpen={editingId !== null}
-            onDidDismiss={cancelEdit}
-            className="settings-modal"
-            breakpoints={[0, 0.25, 0.5, 0.75, 1]}
-            initialBreakpoint={0.9}
-            backdropBreakpoint={0.5}
-          >
-            <IonPage className="modal-page">
-              <IonHeader className="modal-header">
-                <IonToolbar className="modal-toolbar">
-                  <IonButtons slot="start">
-                    <IonButton
-                      onClick={cancelEdit}
-                      fill="clear"
-                      className="modal-close-button"
-                    >
-                      <IonIcon
-                        icon={close}
-                        slot="icon-only"
-                        className="modal-close-icon"
-                      />
-                    </IonButton>
-                  </IonButtons>
-                  <IonTitle className="modal-title">Note bearbeiten</IonTitle>
-                  <IonButtons slot="end">
-                    <IonButton fill="clear" className="modal-dummy-button">
-                      <IonIcon
-                        icon={close}
-                        slot="icon-only"
-                        className="modal-close-icon"
-                      />
-                    </IonButton>
-                  </IonButtons>
-                </IonToolbar>
-              </IonHeader>
 
-              <IonContent className="modal-content" scrollY={true}>
-                <div className="modal-content-wrapper">
-                  <div className="modal-header-section">
-                    <div className="modal-gradient-orb" />
-                    <div className="modal-header-content">
-                      <div className="modal-header-flex">
-                        <div className="modal-icon-wrapper">
-                          <IonIcon
-                            icon={createOutline}
-                            className="modal-icon"
-                          />
-                        </div>
-                        <div className="modal-text">
-                          <h1>Note bearbeiten</h1>
-                          <p>Ändere die Details deiner Note</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+          <IonModal isOpen={editingId !== null}>
+            <Header title="Note bearbeiten" backButton={false} />
+            <IonContent>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  gradeForm.handleSubmit();
+                }}
+              >
+                <gradeForm.Field name="examName">
+                  {(field) => (
+                    <FormField
+                      label="Titel:"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(String(val))}
+                      type="text"
+                    />
+                  )}
+                </gradeForm.Field>
 
-                  <div style={{ paddingBottom: '92px' }}>
-                    <GlassForm onSubmit={gradeForm.handleSubmit}>
-                      <GlassFormSection
-                        title="Prüfungsdetails"
-                        subtitle="Informationen zur Prüfung"
-                        icon={documentTextOutline}
-                      >
-                        <gradeForm.Field name="examName">
-                          {(field) => (
-                            <GlassInput
-                              label="Prüfungsname"
-                              value={field.state.value}
-                              onChange={(value) =>
-                                field.handleChange(String(value))
-                              }
-                              placeholder="Titel der Prüfung"
-                              icon={documentTextOutline}
-                              required
-                              error={field.state.meta.errors?.[0]}
-                              clearable
-                            />
-                          )}
-                        </gradeForm.Field>
+                <gradeForm.Field name="score">
+                  {(field) => (
+                    <ValidatedNumberInput
+                      label="Note"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(val)}
+                      validation={validateGrade}
+                    />
+                  )}
+                </gradeForm.Field>
 
-                        <gradeForm.Field name="date">
-                          {(field) => (
-                            <GlassDatePicker
-                              label="Datum"
-                              value={field.state.value}
-                              onChange={(value) =>
-                                field.handleChange(String(value))
-                              }
-                              icon={calendarOutline}
-                              required
-                              error={field.state.meta.errors?.[0]}
-                            />
-                          )}
-                        </gradeForm.Field>
-                      </GlassFormSection>
-                      <GlassFormSection
-                        title="Bewertung"
-                        subtitle="Note und Gewichtung anpassen"
-                        icon={trophyOutline}
-                      >
-                        <gradeForm.Field name="score">
-                          {(field) => (
-                            <GlassInput
-                              label="Note (1 bis 6)"
-                              value={field.state.value}
-                              onChange={(value) =>
-                                field.handleChange(Number(value))
-                              }
-                              variant="number"
-                              icon={trophyOutline}
-                              required
-                              error={field.state.meta.errors?.[0]}
-                              min={1}
-                              max={6}
-                              step={0.1}
-                            />
-                          )}
-                        </gradeForm.Field>
+                <gradeForm.Field name="weight">
+                  {(field) => (
+                    <ValidatedNumberInput
+                      label="Gewichtung (%)"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(val)}
+                      validation={validateWeight}
+                    />
+                  )}
+                </gradeForm.Field>
 
-                        <gradeForm.Field name="weight">
-                          {(field) => (
-                            <GlassInput
-                              label="Gewichtung (0 bis 100%)"
-                              value={field.state.value}
-                              onChange={(value) =>
-                                field.handleChange(Number(value))
-                              }
-                              variant="number"
-                              icon={scaleOutline}
-                              required
-                              error={field.state.meta.errors?.[0]}
-                              min={0}
-                              max={100}
-                              step={1}
-                            />
-                          )}
-                        </gradeForm.Field>
-
-                        <gradeForm.Field name="comment">
-                          {(field) => (
-                            <GlassTextarea
-                              label="Kommentar (optional)"
-                              value={field.state.value}
-                              onChange={(value) => field.handleChange(value)}
-                              placeholder="Zusätzliche Notizen..."
-                              icon={chatbubbleOutline}
-                              maxLength={500}
-                              autoGrow
-                              error={field.state.meta.errors?.[0]}
-                            />
-                          )}
-                        </gradeForm.Field>
-                      </GlassFormSection>
-                    </GlassForm>
-                  </div>
-                  <div className="sticky-bottom-button">
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: '12px',
-                        width: '100%',
+                <gradeForm.Field name="date">
+                  {(field) => (
+                    <FormField
+                      label="Datum:"
+                      value={field.state.value}
+                      onChange={(val) => {
+                        const dateValue = String(val);
+                        console.log('Date field onChange:', dateValue);
+                        field.handleChange(dateValue);
                       }}
-                    >
-                      <GlassButton
-                        variant="secondary"
-                        onClick={cancelEdit}
-                        disabled={updateExamAndGradeMutation.isPending}
-                      >
-                        Abbrechen
-                      </GlassButton>
-                      <GlassButton
-                        variant="primary"
-                        onClick={gradeForm.handleSubmit}
-                        loading={updateExamAndGradeMutation.isPending}
-                        icon={saveOutline}
-                      >
-                        {updateExamAndGradeMutation.isPending
-                          ? 'Wird gespeichert...'
-                          : 'Änderungen speichern'}
-                      </GlassButton>
-                    </div>
-                  </div>
+                      type="date"
+                    />
+                  )}
+                </gradeForm.Field>
 
-                  <div className="modal-bottom-spacer" />
-                </div>
-              </IonContent>
-            </IonPage>
+                <gradeForm.Field name="comment">
+                  {(field) => (
+                    <FormField
+                      label="Kommentar:"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(String(val))}
+                      type="text"
+                    />
+                  )}
+                </gradeForm.Field>
+
+                <Button
+                  handleEvent={() => gradeForm.handleSubmit()}
+                  text="Speichern"
+                />
+                <Button
+                  handleEvent={cancelEdit}
+                  text="Abbrechen"
+                  color="medium"
+                />
+              </form>
+            </IonContent>
           </IonModal>
 
           <IonToast
