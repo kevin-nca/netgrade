@@ -16,6 +16,7 @@ interface HeaderProps {
   backButton?: boolean;
   endSlot?: ReactNode;
   defaultHref?: string;
+  onBack?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ title, backButton, endSlot }) => {
