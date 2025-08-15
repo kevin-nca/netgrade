@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
 import './Header.css';
 import {
-  IonBackButton,
   IonButtons,
   IonHeader,
   IonTitle,
@@ -9,7 +8,8 @@ import {
   IonButton,
   IonIcon,
 } from '@ionic/react';
-import { chevronBack } from 'ionicons/icons';
+import { arrowBack } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
 
 interface HeaderProps {
   title: string;
@@ -19,25 +19,25 @@ interface HeaderProps {
   onBack?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  title,
-  backButton,
-  endSlot,
-  defaultHref,
-  onBack,
-}) => {
+const Header: React.FC<HeaderProps> = ({ title, backButton, endSlot }) => {
+  const history = useHistory();
+
+  const handleBackClick = () => {
+    history.goBack();
+  };
+
   return (
     <IonHeader>
       <IonToolbar>
         {backButton && (
           <IonButtons slot="start">
-            {onBack ? (
-              <IonButton onClick={onBack} fill="clear" slot="icon-only">
-                <IonIcon icon={chevronBack} />
-              </IonButton>
-            ) : (
-              <IonBackButton defaultHref={defaultHref} />
-            )}
+            <IonButton
+              fill="clear"
+              onClick={handleBackClick}
+              className="back-button"
+            >
+              <IonIcon icon={arrowBack} />
+            </IonButton>
           </IonButtons>
         )}
 
