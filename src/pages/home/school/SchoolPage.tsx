@@ -27,6 +27,7 @@ import {
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/components/modals/EditSubjectModal';
+import './SchoolPage.css';
 
 interface SubjectToAdd {
   name: string;
@@ -146,14 +147,14 @@ const SchoolPage: React.FC = () => {
           {subjects.map((subject: Subject) => (
             <IonItemSliding key={subject.id}>
               <IonItem button onClick={() => goToGradesPage(subject)}>
-                <IonLabel>
-                  <span style={{ float: 'left' }}>{subject.name}</span>
-                  <span style={{ float: 'right' }}>
+                <IonLabel className="glass-card grade-card">
+                  <div className="grade-subject">{subject.name}</div>
+                  <div className="grade-average">
                     Durchschnitt:{' '}
                     {calculateAverage(subject) !== null
                       ? calculateAverage(subject)?.toFixed(2)
                       : 'Keine Noten'}
-                  </span>
+                  </div>
                 </IonLabel>
               </IonItem>
               <IonItemOptions side="end">
