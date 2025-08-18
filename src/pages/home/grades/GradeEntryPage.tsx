@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
-import { IonContent, IonList, IonModal, IonPage, IonToast } from '@ionic/react';
-import { useParams } from 'react-router-dom';
+import {
+  IonContent,
+  IonButtons,
+  IonIcon,
+  IonList,
+  IonModal,
+  IonPage,
+  IonToast,
+} from '@ionic/react';
+import { add } from 'ionicons/icons';
+import { useHistory, useParams } from 'react-router-dom';
 import { useForm } from '@tanstack/react-form';
 import ValidatedNumberInput from '@/components/Form/validated-number-input/validatedNumberInput';
 import Button from '@/components/Button/Button';
@@ -21,6 +30,7 @@ import {
 } from '@/utils/validation';
 import { useToast } from '@/hooks/useToast';
 import { Layout } from '@/components/Layout/Layout';
+import { Routes } from '@/routes';
 
 interface GradeFormData {
   examName: string;
@@ -37,6 +47,7 @@ interface GradeEntryParams {
 
 const GradeEntryPage: React.FC = () => {
   const { subjectId } = useParams<GradeEntryParams>();
+  const history = useHistory();
 
   const {
     data: allGrades = [],
@@ -154,6 +165,16 @@ const GradeEntryPage: React.FC = () => {
         title="Notenübersicht"
         backButton
         onBack={() => window.history.back()}
+        endSlot={
+          <IonButtons slot="end">
+            <Button
+              handleEvent={() => {
+                history.push(Routes.GRADES_ADD);
+              }}
+              text={<IonIcon icon={add} />}
+            />
+          </IonButtons>
+        }
       />
       <IonContent>
         <Layout>

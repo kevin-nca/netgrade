@@ -227,9 +227,9 @@ function HomePage() {
               <h2 className="section-title">Prüfungen</h2>
               <div
                 className="header-action-button"
-                onClick={() => history.push(Routes.CALENDAR)}
+                onClick={() => history.push(Routes.EXAMS_ADD)}
               >
-                <IonIcon icon={calendar} className="action-icon" />
+                <IonIcon icon={add} className="action-icon" />
               </div>
             </div>
 
