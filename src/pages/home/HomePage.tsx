@@ -56,7 +56,7 @@ function HomePage() {
         !exam.isCompleted &&
         new Date(exam.date).setHours(0, 0, 0, 0) >= today.getTime(),
     )
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     try {
@@ -128,7 +128,7 @@ function HomePage() {
 
   return (
     <IonPage className="home-page">
-      <IonContent className="home-content" scrollY={true}>
+      <IonContent className="home-content" scrollY={false}>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
         </IonRefresher>

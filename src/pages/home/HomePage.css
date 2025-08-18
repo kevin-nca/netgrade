@@ -345,11 +345,25 @@
   gap: 8px;
 }
 
+:root {
+  --exam-card-height: 72px;
+}
+
+.exams-scroll-container {
+  height: calc(var(--exam-card-height) * 5);
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
 .exam-card {
   border-radius: 12px;
   padding: 12px;
   transition: all 0.2s ease;
   cursor: pointer;
+  scroll-snap-align: start;
+  height: var(--exam-card-height);
+  box-sizing: border-box;
 }
 
 .exam-card:active {
@@ -364,15 +378,8 @@
   gap: 10px;
 }
 
-.exams-scroll-container {
-  max-height: 400px;
-  overflow-y: auto;
-  margin-bottom: 8px;
-}
-
 .exam-icon-and-info {
   display: flex;
-
   gap: 10px;
 }
 
