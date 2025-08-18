@@ -128,7 +128,7 @@ function HomePage() {
 
   return (
     <IonPage className="home-page">
-      <IonContent className="home-content" scrollY={true}>
+      <IonContent className="home-content">
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
         </IonRefresher>
