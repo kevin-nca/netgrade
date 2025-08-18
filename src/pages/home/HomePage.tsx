@@ -20,6 +20,7 @@ import {
   timeOutline,
   homeOutline,
   personCircleOutline,
+  today,
 } from 'ionicons/icons';
 import {
   useSchools,
@@ -47,9 +48,13 @@ function HomePage() {
   const { data: allExams = [], refetch: refetchExams } = useExams();
   const addSchoolMutation = useAddSchool();
 
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const upcomingExams = allExams
-    .filter((exam) => !exam.isCompleted)
-    .slice(0, 3);
+    .filter((exam) => !exam.isCompleted && new Date(exam.date).setHours(0, 0, 0, 0) >= today.getTime())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     try {
@@ -125,114 +130,114 @@ function HomePage() {
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
         </IonRefresher>
+          <div className="content-wrapper">
+            <div className="header-section">
+              <div className="gradient-orb" />
+              <div className="profile-card glass-card">
+                <div className="shimmer-effect" />
+                <div className="profile-content">
+                  <div className="profile-avatar">
+                    {userName ? userName.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div className="profile-info">
+                    <h1 className="profile-greeting">
+                      {getGreeting()}
+                      {userName ? `, ${userName}` : ''}
+                    </h1>
+                  </div>
+                  <div
+                    className="profile-settings-button"
+                    onClick={() => history.push(Routes.SETTINGS)}
+                  >
+                    <IonIcon
+                      icon={personCircleOutline}
+                      className="profile-icon"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <div className="content-wrapper">
-          <div className="header-section">
-            <div className="gradient-orb" />
-            <div className="profile-card glass-card">
-              <div className="shimmer-effect" />
-              <div className="profile-content">
-                <div className="profile-avatar">
-                  {userName ? userName.charAt(0).toUpperCase() : 'U'}
-                </div>
-                <div className="profile-info">
-                  <h1 className="profile-greeting">
-                    {getGreeting()}
-                    {userName ? `, ${userName}` : ''}
-                  </h1>
-                </div>
+            <div className="main-section">
+              <div className="section-header">
+                <h2 className="section-title">Schulen</h2>
                 <div
-                  className="profile-settings-button"
-                  onClick={() => history.push(Routes.SETTINGS)}
+                  className="header-action-button"
+                  onClick={() => setShowAddSchoolModal(true)}
                 >
-                  <IonIcon
-                    icon={personCircleOutline}
-                    className="profile-icon"
-                  />
+                  <IonIcon icon={add} className="action-icon" />
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div className="main-section">
-            <div className="section-header">
-              <h2 className="section-title">Schulen</h2>
-              <div
-                className="header-action-button"
-                onClick={() => setShowAddSchoolModal(true)}
-              >
-                <IonIcon icon={add} className="action-icon" />
-              </div>
-            </div>
-
-            <div className="schools-grid">
-              {schools.length > 0 ? (
-                schools.map((school, index) => {
-                  const average = calculateSchoolAverage(school.id, grades);
-                  return (
-                    <div
-                      key={school.id}
-                      className="school-card glass-card"
-                      onClick={() =>
-                        history.push(
-                          Routes.SCHOOL.replace(':schoolId', school.id),
-                        )
-                      }
-                    >
-                      <div className="school-card-header">
-                        <div
-                          className={`school-avatar school-avatar-${index % 4}`}
-                        >
-                          {getSchoolIcon(school.name)}
+              <div className="schools-grid">
+                {schools.length > 0 ? (
+                  schools.map((school, index) => {
+                    const average = calculateSchoolAverage(school.id, grades);
+                    return (
+                      <div
+                        key={school.id}
+                        className="school-card glass-card"
+                        onClick={() =>
+                          history.push(
+                            Routes.SCHOOL.replace(':schoolId', school.id),
+                          )
+                        }
+                      >
+                        <div className="school-card-header">
+                          <div
+                            className={`school-avatar school-avatar-${index % 4}`}
+                          >
+                            {getSchoolIcon(school.name)}
+                          </div>
+                          <IonIcon
+                            icon={chevronForwardOutline}
+                            className="school-chevron"
+                          />
                         </div>
-                        <IonIcon
-                          icon={chevronForwardOutline}
-                          className="school-chevron"
-                        />
-                      </div>
 
-                      <div className="school-card-content">
-                        <h3 className="school-name">{school.name}</h3>
-                        <div className="school-stats">
-                          <div className="school-average">
-                            <IonIcon
-                              icon={statsChartOutline}
-                              className="stats-icon"
-                            />
-                            <span>
-                              {average
-                                ? `${average.toFixed(1)} Ø`
-                                : 'Keine Noten'}
-                            </span>
+                        <div className="school-card-content">
+                          <h3 className="school-name">{school.name}</h3>
+                          <div className="school-stats">
+                            <div className="school-average">
+                              <IonIcon
+                                icon={statsChartOutline}
+                                className="stats-icon"
+                              />
+                              <span>
+                                {average
+                                  ? `${average.toFixed(1)} Ø`
+                                  : 'Keine Noten'}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
+                    );
+                  })
+                ) : (
+                  <div className="empty-schools glass-card">
+                    <div className="empty-icon-wrapper">
+                      <IonIcon icon={school} className="empty-icon" />
                     </div>
-                  );
-                })
-              ) : (
-                <div className="empty-schools glass-card">
-                  <div className="empty-icon-wrapper">
-                    <IonIcon icon={school} className="empty-icon" />
+                    <h3 className="empty-title">Keine Schulen</h3>
+                    <p className="empty-description">Tippe + um zu starten</p>
                   </div>
-                  <h3 className="empty-title">Keine Schulen</h3>
-                  <p className="empty-description">Tippe + um zu starten</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="main-section">
-            <div className="section-header">
-              <h2 className="section-title">Prüfungen</h2>
-              <div
-                className="header-action-button"
-                onClick={() => history.push(Routes.EXAMS_ADD)}
-              >
-                <IonIcon icon={add} className="action-icon" />
+                )}
               </div>
             </div>
 
+            <div className="main-section">
+              <div className="section-header">
+                <h2 className="section-title">Prüfungen</h2>
+                <div
+                  className="header-action-button"
+                  onClick={() => history.push(Routes.EXAMS_ADD)}
+                >
+                  <IonIcon icon={add} className="action-icon" />
+                </div>
+              </div>
+
+          <div className="exams-scroll-container">
             <div className="exams-list">
               {upcomingExams.length > 0 ? (
                 upcomingExams.map((exam) => (
@@ -267,6 +272,7 @@ function HomePage() {
                       </div>
                     </div>
                   </div>
+                  
                 ))
               ) : (
                 <div className="empty-exams glass-card">
@@ -277,6 +283,7 @@ function HomePage() {
                 </div>
               )}
             </div>
+          </div>
           </div>
 
           <div className="bottom-spacer" />

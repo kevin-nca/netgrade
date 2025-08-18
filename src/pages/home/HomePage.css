@@ -145,7 +145,7 @@
 }
 
 .profile-icon {
-  color: #007aff;
+  color: #fafafa;
   width: 36px;
   height: 36px;
 }
@@ -362,6 +362,12 @@
   width: 95%;
   justify-content: space-between;
   gap: 10px;
+}
+
+.exams-scroll-container {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 8px;
 }
 
 .exam-icon-and-info {
