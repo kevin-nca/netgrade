@@ -175,7 +175,6 @@ const SettingsPage: React.FC = () => {
           <div className="profile-section">
             <div className="gradient-orb" />
             <div className="profile-card glass-card">
-              <div className="shimmer-effect" />
               <div className="profile-content">
                 <div className="profile-avatar">
                   {userName ? userName.charAt(0).toUpperCase() : 'U'}
