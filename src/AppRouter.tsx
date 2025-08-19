@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
-import { IonTabs, IonRouterOutlet, IonPage } from '@ionic/react';
+import { IonTabs, IonRouterOutlet } from '@ionic/react';
 import { PageTransition } from '@/components/PageTransition';
 import { Routes } from '@/routes';
 import { useOnboardingCompleted } from '@/hooks/queries';
@@ -19,15 +19,12 @@ import './AppRouter.css';
 
 export function AppRouter() {
   const { data: isOnboarded } = useOnboardingCompleted();
-  const [initialized, setInitialized] = useState(false);
-
+  const [, setIsInitialized] = useState(false);
   useEffect(() => {
     if (isOnboarded !== undefined) {
-      setInitialized(true);
+      setIsInitialized(true);
     }
   }, [isOnboarded]);
-
-  if (!initialized) return null;
 
   return (
     <IonTabs>
@@ -39,53 +36,19 @@ export function AppRouter() {
                 <Redirect to={isOnboarded ? Routes.HOME : Routes.ONBOARDING} />
               </Route>
 
-              <Route exact path={Routes.ONBOARDING}>
-                <IonPage>
-                  <OnboardingPage />
-                </IonPage>
-              </Route>
-
-              <Route exact path={Routes.HOME}>
-                <IonPage>
-                  <HomePage />
-                </IonPage>
-              </Route>
-              <Route exact path={Routes.GRADES_ADD}>
-                <IonPage>
-                  <AddGradePage />
-                </IonPage>
-              </Route>
-              <Route path={Routes.SUBJECT_GRADES}>
-                <IonPage>
-                  <GradeEntryPage />
-                </IonPage>
-              </Route>
-              <Route exact path={Routes.CALENDAR}>
-                <IonPage>
-                  <CalendarPage />
-                </IonPage>
-              </Route>
-              <Route exact path={Routes.SETTINGS}>
-                <IonPage>
-                  <SettingsPage />
-                </IonPage>
-              </Route>
-              <Route exact path={Routes.EXAMS_ADD}>
-                <IonPage>
-                  <AddExamPage />
-                </IonPage>
-              </Route>
-              <Route exact path={Routes.EXAM_EDIT}>
-                <IonPage>
-                  <EditExamPage />
-                </IonPage>
-              </Route>
-
-              <Route exact path={Routes.SCHOOL}>
-                <IonPage>
-                  <SchoolPage />
-                </IonPage>
-              </Route>
+              <Route
+                exact
+                path={Routes.ONBOARDING}
+                component={OnboardingPage}
+              />
+              <Route exact path={Routes.HOME} component={HomePage} />
+              <Route exact path={Routes.GRADES_ADD} component={AddGradePage} />
+              <Route path={Routes.SUBJECT_GRADES} component={GradeEntryPage} />
+              <Route exact path={Routes.CALENDAR} component={CalendarPage} />
+              <Route exact path={Routes.SETTINGS} component={SettingsPage} />
+              <Route exact path={Routes.EXAMS_ADD} component={AddExamPage} />
+              <Route exact path={Routes.EXAM_EDIT} component={EditExamPage} />
+              <Route exact path={Routes.SCHOOL} component={SchoolPage} />
             </Switch>
           )}
         </PageTransition>
