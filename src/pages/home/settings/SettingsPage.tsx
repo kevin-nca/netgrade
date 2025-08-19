@@ -37,6 +37,7 @@ import {
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import Header from '@/components/Header/Header';
+import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
 import './SettingsPage.css';
 
 const SettingsPage: React.FC = () => {
@@ -187,7 +188,6 @@ const SettingsPage: React.FC = () => {
               </div>
             </div>
           </div>
-
           <div className="settings-section">
             <div className="section-header">
               <h2 className="section-title">Deine Schulen</h2>
@@ -230,7 +230,7 @@ const SettingsPage: React.FC = () => {
               )}
             </div>
           </div>
-
+          <NotificationSettings />
           <div className="settings-section">
             <div className="section-header">
               <h2 className="section-title">Aktionen</h2>
@@ -389,7 +389,6 @@ const SettingsPage: React.FC = () => {
           </IonContent>
         </IonPage>
       </IonModal>
-
       <ExportDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
