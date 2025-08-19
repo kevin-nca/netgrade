@@ -724,10 +724,15 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
+  .info-description {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
   .profile-name,
   .section-title,
   .item-title,
-  .settings-title {
+  .settings-title,
+  .info-title {
     color: #ffffff;
   }
 
