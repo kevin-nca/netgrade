@@ -13,14 +13,14 @@ import {
   IonSkeletonText,
   RefresherEventDetail,
 } from '@ionic/react';
-import { 
-  calendar, 
-  list, 
+import {
+  calendar,
+  list,
   informationCircle,
   add,
   homeOutline,
   trophyOutline,
-  settings
+  settings,
 } from 'ionicons/icons';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
