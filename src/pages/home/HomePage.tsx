@@ -338,7 +338,7 @@ function HomePage() {
             className={`tab-item ${activeTab === 'grades' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('grades');
-              history.push(Routes.GRADES_ADD);
+              history.push(Routes.GRADES_ALL);
             }}
           >
             <div className="tab-icon-wrapper">

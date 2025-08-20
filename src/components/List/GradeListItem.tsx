@@ -34,6 +34,7 @@ const GradeListItem: React.FC<GradeListItemProps> = ({
           <p>Datum: {new Date(grade.date).toLocaleDateString()}</p>
           {/*<p>Zählt: {grade.counts ? 'Ja' : 'Nein'}</p>*/}
           <p>Kommentar: {grade.comment}</p>
+          <p>Fach: {grade.exam.subject.name}</p>
         </IonLabel>
       </IonItem>
       <IonItemOptions side="end">
