@@ -51,6 +51,7 @@
 .content-wrapper {
   padding: 0 16px 16px;
   max-width: 100%;
+  overflow: hidden;
 }
 
 /* Header Section */
@@ -345,8 +346,9 @@
 }
 
 .exams-scroll-container {
-  max-height: 390px;
-  overflow-y: auto;
+  max-height: 260px;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
   margin-bottom: 8px;
 }
 
