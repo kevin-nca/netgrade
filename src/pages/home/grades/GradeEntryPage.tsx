@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
-import { IonContent, IonList, IonModal, IonPage, IonToast } from '@ionic/react';
-import { useParams } from 'react-router-dom';
+import {
+  IonContent,
+  IonButtons,
+  IonIcon,
+  IonList,
+  IonModal,
+  IonPage,
+  IonToast,
+} from '@ionic/react';
+import { add } from 'ionicons/icons';
+import { useHistory, useParams } from 'react-router-dom';
+import { useForm } from '@tanstack/react-form';
 import ValidatedNumberInput from '@/components/Form/validated-number-input/validatedNumberInput';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
@@ -12,15 +22,22 @@ import {
   useDeleteGrade,
   useUpdateExamAndGrade,
 } from '@/hooks/queries';
+import {
+  validateGrade,
+  validateWeight,
+  percentageToDecimal,
+  decimalToPercentage,
+} from '@/utils/validation';
+import { useToast } from '@/hooks/useToast';
+import { Layout } from '@/components/Layout/Layout';
 import { Routes } from '@/routes';
 
 interface GradeFormData {
-  id: string | null;
-  examName: string; // Attention: this is stored in a different table.
+  examName: string;
   score: number;
   weight: number;
-  date: Date | null;
-  comment: string | null;
+  date: string;
+  comment: string;
 }
 
 interface GradeEntryParams {
@@ -30,6 +47,7 @@ interface GradeEntryParams {
 
 const GradeEntryPage: React.FC = () => {
   const { subjectId } = useParams<GradeEntryParams>();
+  const history = useHistory();
 
   const {
     data: allGrades = [],
@@ -41,23 +59,38 @@ const GradeEntryPage: React.FC = () => {
     (grade: Grade) => grade.exam.subjectId === subjectId,
   );
 
-  const [formData, setFormData] = useState<GradeFormData>({
-    id: null,
-    examName: '',
-    score: 0,
-    weight: 1,
-    date: null,
-    comment: null,
-  });
-
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const { showToast, toastMessage, setShowToast, showMessage } = useToast();
 
-  const showAndSetToastMessage = (message: string) => {
-    setToastMessage(message);
-    setShowToast(true);
-  };
+  const gradeForm = useForm({
+    defaultValues: {
+      examName: '',
+      score: 0,
+      weight: 100,
+      date: '',
+      comment: '',
+    } as GradeFormData,
+    onSubmit: async ({ value }) => {
+      if (!value.examName.trim()) {
+        showMessage('Bitte geben Sie einen Prüfungsnamen ein.');
+        return;
+      }
+
+      const gradeError = validateGrade(value.score);
+      if (gradeError) {
+        showMessage(gradeError);
+        return;
+      }
+
+      const weightError = validateWeight(value.weight);
+      if (weightError) {
+        showMessage(weightError);
+        return;
+      }
+
+      await saveEdit(value);
+    },
+  });
 
   // Set up mutation hooks
   const deleteGradeMutation = useDeleteGrade();
@@ -66,10 +99,10 @@ const GradeEntryPage: React.FC = () => {
   const handleDelete = (gradeId: string) => {
     deleteGradeMutation.mutate(gradeId, {
       onSuccess: () => {
-        showAndSetToastMessage('Note erfolgreich gelöscht.');
+        showMessage('Note erfolgreich gelöscht.');
       },
       onError: (error) => {
-        showAndSetToastMessage(
+        showMessage(
           `Fehler: ${error instanceof Error ? error.message : String(error)}`,
         );
       },
@@ -78,196 +111,183 @@ const GradeEntryPage: React.FC = () => {
 
   const startEdit = (grade: Grade) => {
     setEditingId(grade.id);
-    setFormData({
-      id: grade.id,
-      examName: grade.exam.name,
-      score: grade.score,
-      weight: grade.weight,
-      date: grade.date,
-      comment: grade.comment,
-    });
+    gradeForm.setFieldValue('examName', grade.exam.name);
+    gradeForm.setFieldValue('score', grade.score);
+    gradeForm.setFieldValue('weight', decimalToPercentage(grade.weight));
+    gradeForm.setFieldValue('date', grade.date.toISOString().split('T')[0]);
+    gradeForm.setFieldValue('comment', grade.comment || '');
   };
 
-  const handleFormChange = <K extends keyof GradeFormData>(
-    field: K,
-    value: GradeFormData[K],
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+  const saveEdit = async (formData: GradeFormData) => {
+    if (!editingId) return;
 
-  const saveEdit = () => {
-    if (editingId) {
-      const grade = grades.find((grade: Grade) => grade.id === editingId)!;
+    const grade = grades.find((grade: Grade) => grade.id === editingId);
+    if (!grade) return;
 
-      // Validate form data
-      if (!formData.examName.trim()) {
-        showAndSetToastMessage('Bitte geben Sie einen Prüfungsnamen ein.');
-        return;
-      }
+    const updatedGrade = {
+      ...grade,
+      score: formData.score,
+      weight: percentageToDecimal(formData.weight),
+      date: new Date(formData.date),
+      comment: formData.comment || null,
+    };
 
-      if (formData.score < 1 || formData.score > 6) {
-        showAndSetToastMessage('Die Note muss zwischen 1 und 6 liegen.');
-        return;
-      }
-
-      if (formData.weight < 0 || formData.weight > 1) {
-        showAndSetToastMessage('Die Gewichtung muss zwischen 0 und 1 liegen.');
-        return;
-      }
-
-      // Create updated grade and exam objects
-      const updatedGrade = {
-        ...grade,
-        score: formData.score,
-        weight: formData.weight,
-        date: formData.date ?? new Date(),
-        comment: formData.comment,
-      };
-
-      const updatedExam = {
-        ...grade.exam,
-        name: formData.examName,
-      };
-
-      // Update both exam and grade in a single transaction
-      updateExamAndGradeMutation.mutate(
-        {
-          examData: updatedExam,
-          gradeData: updatedGrade,
+    const updatedExam = {
+      ...grade.exam,
+      name: formData.examName,
+    };
+    updateExamAndGradeMutation.mutate(
+      {
+        examData: updatedExam,
+        gradeData: updatedGrade,
+      },
+      {
+        onSuccess: () => {
+          showMessage('Note erfolgreich aktualisiert.');
+          setEditingId(null);
         },
-        {
-          onSuccess: () => {
-            showAndSetToastMessage('Note erfolgreich aktualisiert.');
-            setEditingId(null);
-          },
-          onError: (error) => {
-            showAndSetToastMessage(
-              `Fehler: ${error instanceof Error ? error.message : String(error)}`,
-            );
-          },
+        onError: (error) => {
+          showMessage(
+            `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+          );
         },
-      );
-    }
+      },
+    );
   };
 
   const cancelEdit = () => {
     setEditingId(null);
   };
 
-  const handleWeightValidation = (value: number) => {
-    if (value <= 0 || value > 1)
-      return 'Bitte eine Zahl zwischen 0 und 1 eingeben.';
-    if (
-      value.toString().includes('.') &&
-      value.toString().split('.')[1].length > 2
-    ) {
-      return 'Die Gewichtung darf maximal zwei Dezimalstellen haben.';
-    }
-    return null;
-  };
-
-  const handleGradeValidation = (value: number) => {
-    if (value < 1 || value > 6)
-      return 'Bitte eine Zahl zwischen 1 und 6 eingeben.';
-    if (
-      value.toString().includes('.') &&
-      value.toString().split('.')[1].length > 2
-    ) {
-      return 'Die Note darf maximal zwei Dezimalstellen haben.';
-    }
-    return null;
-  };
-
-  const handleDateChange = (val: string | number | boolean) => {
-    const newVal = typeof val === 'string' && val ? new Date(val) : null;
-    handleFormChange('date', newVal);
-  };
-
-  const handleCommentChange = (val: string | number | boolean) => {
-    handleFormChange('comment', val.toString());
-  };
-
-  const handleExamNameChange = (val: string | number | boolean) => {
-    handleFormChange('examName', val.toString());
-  };
-
   return (
     <IonPage>
-      <Header title="Notenübersicht" backButton defaultHref={Routes.HOME} />
+      <Header
+        title="Notenübersicht"
+        backButton
+        onBack={() => window.history.back()}
+        endSlot={
+          <IonButtons slot="end">
+            <Button
+              handleEvent={() => {
+                history.push(Routes.GRADES_ADD);
+              }}
+              text={<IonIcon icon={add} />}
+            />
+          </IonButtons>
+        }
+      />
       <IonContent>
-        {gradesLoading ? (
-          <div className="ion-padding ion-text-center">
-            <p>Noten werden geladen...</p>
-          </div>
-        ) : gradesError ? (
-          <div className="ion-padding ion-text-center">
-            <p>Fehler beim Laden der Noten.</p>
-          </div>
-        ) : grades.length === 0 ? (
-          <div className="ion-padding ion-text-center">
-            <p>Keine Noten gefunden.</p>
-          </div>
-        ) : (
-          <IonList>
-            {grades.map((grade) => (
-              <GradeListItem
-                key={grade.id}
-                grade={grade}
-                onEdit={() => startEdit(grade)}
-                onDelete={() => handleDelete(grade.id)}
-              />
-            ))}
-          </IonList>
-        )}
+        <Layout>
+          {gradesLoading ? (
+            <div className="ion-padding ion-text-center">
+              <p>Noten werden geladen...</p>
+            </div>
+          ) : gradesError ? (
+            <div className="ion-padding ion-text-center">
+              <p>Fehler beim Laden der Noten.</p>
+            </div>
+          ) : grades.length === 0 ? (
+            <div className="ion-padding ion-text-center">
+              <p>Keine Noten gefunden.</p>
+            </div>
+          ) : (
+            <IonList>
+              {grades.map((grade) => (
+                <GradeListItem
+                  key={grade.id}
+                  grade={grade}
+                  onEdit={() => startEdit(grade)}
+                  onDelete={() => handleDelete(grade.id)}
+                />
+              ))}
+            </IonList>
+          )}
 
-        <IonModal isOpen={editingId !== null}>
-          <Header title="Note bearbeiten" backButton={false} />
-          <IonContent>
-            <FormField
-              label="Titel:"
-              value={formData.examName ?? ''}
-              onChange={handleExamNameChange}
-              type="text"
-            />
-            <ValidatedNumberInput
-              label="Note"
-              value={formData.score}
-              onChange={(val) => handleFormChange('score', val)}
-              validation={handleGradeValidation}
-            />
-            <ValidatedNumberInput
-              label="Gewichtung"
-              value={formData.weight}
-              onChange={(val) => handleFormChange('weight', val)}
-              validation={handleWeightValidation}
-            />
-            <FormField
-              label="Datum:"
-              value={
-                formData.date ? formData.date.toISOString().split('T')[0] : ''
-              }
-              onChange={handleDateChange}
-              type="date"
-            />
+          <IonModal isOpen={editingId !== null}>
+            <Header title="Note bearbeiten" backButton={false} />
+            <IonContent>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  gradeForm.handleSubmit();
+                }}
+              >
+                <gradeForm.Field name="examName">
+                  {(field) => (
+                    <FormField
+                      label="Titel:"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(String(val))}
+                      type="text"
+                    />
+                  )}
+                </gradeForm.Field>
 
-            <FormField
-              label="Kommentar:"
-              value={formData.comment ?? ''}
-              onChange={handleCommentChange}
-              type="text"
-            />
-            <Button handleEvent={saveEdit} text="Speichern" />
-            <Button handleEvent={cancelEdit} text="Abbrechen" color="medium" />
-          </IonContent>
-        </IonModal>
+                <gradeForm.Field name="score">
+                  {(field) => (
+                    <ValidatedNumberInput
+                      label="Note"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(val)}
+                      validation={validateGrade}
+                    />
+                  )}
+                </gradeForm.Field>
 
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={toastMessage}
-          duration={2000}
-          color="danger"
-        />
+                <gradeForm.Field name="weight">
+                  {(field) => (
+                    <ValidatedNumberInput
+                      label="Gewichtung (%)"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(val)}
+                      validation={validateWeight}
+                    />
+                  )}
+                </gradeForm.Field>
+
+                <gradeForm.Field name="date">
+                  {(field) => (
+                    <FormField
+                      label="Datum:"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(String(val))}
+                      type="date"
+                    />
+                  )}
+                </gradeForm.Field>
+
+                <gradeForm.Field name="comment">
+                  {(field) => (
+                    <FormField
+                      label="Kommentar:"
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(String(val))}
+                      type="text"
+                    />
+                  )}
+                </gradeForm.Field>
+
+                <Button
+                  handleEvent={() => gradeForm.handleSubmit()}
+                  text="Speichern"
+                />
+                <Button
+                  handleEvent={cancelEdit}
+                  text="Abbrechen"
+                  color="medium"
+                />
+              </form>
+            </IonContent>
+          </IonModal>
+
+          <IonToast
+            isOpen={showToast}
+            onDidDismiss={() => setShowToast(false)}
+            message={toastMessage}
+            duration={2000}
+            color="danger"
+          />
+        </Layout>
       </IonContent>
     </IonPage>
   );

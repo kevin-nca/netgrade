@@ -11,6 +11,11 @@ import {
   useSchoolSubjects,
   useAddGradeWithExam,
 } from '@/hooks/queries';
+import {
+  validateGrade,
+  validateWeight,
+  percentageToDecimal,
+} from '@/utils/validation';
 import { Routes } from '@/routes';
 
 interface GradeAddFormData {
@@ -32,7 +37,7 @@ const AddGradePage: React.FC = () => {
     selectedSubjectId: '',
     examName: '',
     date: format(new Date(), 'yyyy-MM-dd'),
-    weight: 1,
+    weight: 100,
     score: 0,
     comment: '',
   });
@@ -148,16 +153,15 @@ const AddGradePage: React.FC = () => {
       return;
     }
 
-    const score = formData.score;
-    if (score < 1 || score > 6) {
-      showAndSetToastMessage('Die Note muss zwischen 1 und 6 liegen.');
+    const gradeError = validateGrade(formData.score);
+    if (gradeError) {
+      showAndSetToastMessage(gradeError);
       return;
     }
 
-    const weight = formData.weight;
-    if (weight < 0 || weight > 1) {
-      // Allow 0 for non-counting grades
-      showAndSetToastMessage('Die Gewichtung muss zwischen 0 und 1 liegen.');
+    const weightError = validateWeight(formData.weight);
+    if (weightError) {
+      showAndSetToastMessage(weightError);
       return;
     }
 
@@ -166,7 +170,7 @@ const AddGradePage: React.FC = () => {
       examName: formData.examName.trim(),
       date: parseISO(formData.date),
       score: formData.score,
-      weight: formData.weight,
+      weight: percentageToDecimal(formData.weight),
       comment: formData.comment.trim() || undefined,
     };
 
@@ -177,7 +181,7 @@ const AddGradePage: React.FC = () => {
           selectedSubjectId: '',
           examName: '',
           date: format(new Date(), 'yyyy-MM-dd'),
-          weight: 1,
+          weight: 100,
           score: 0,
           comment: '',
         });
@@ -197,7 +201,7 @@ const AddGradePage: React.FC = () => {
       <Header
         title={'Note hinzufügen'}
         backButton={true}
-        defaultHref={Routes.HOME}
+        onBack={() => window.history.back()}
       />
       <IonContent fullscreen>
         <FormField
@@ -240,7 +244,7 @@ const AddGradePage: React.FC = () => {
         />
 
         <FormField
-          label="Gewichtung (0 bis 1)"
+          label="Gewichtung (0 bis 100%)"
           value={formData.weight}
           onChange={handleWeightChange}
           type="number"

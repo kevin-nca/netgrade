@@ -1,85 +1,160 @@
 import React, { useState } from 'react';
-import { IonCard, IonContent, IonPage } from '@ionic/react';
-import { isSameDay } from 'date-fns';
-import Calendar from 'react-calendar';
-import type { Value } from 'react-calendar/dist/cjs/shared/types';
+import {
+  IonPage,
+  IonContent,
+  IonSegment,
+  IonSegmentButton,
+  IonLabel,
+  IonIcon,
+  IonRefresher,
+  IonRefresherContent,
+  IonAlert,
+  IonSkeletonText,
+  RefresherEventDetail,
+} from '@ionic/react';
+import { calendar, list, informationCircle } from 'ionicons/icons';
+import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
 import Header from '@/components/Header/Header';
 import './calendar.css';
 import { Exam } from '@/db/entities/Exam';
 import { useExams } from '@/hooks/queries';
 import { Routes } from '@/routes';
+import MonthSelector from './components/MonthSelector';
+import CalendarGrid from './components/CalendarGrid';
+import SelectedDateView from './components/SelectedDateView';
+import ExamListView from './components/ExamListView';
+
+import { useCalendar } from '@/pages/home/calendar/hook/useCalendar';
 
 const CalendarPage: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const { data: exams = [], error, isLoading } = useExams();
+  const { data: allExams = [], error, isLoading, refetch } = useExams();
+  const [showExamDetail, setShowExamDetail] = useState<Exam | null>(null);
 
-  const handleDateChange = (value: Value) => {
-    if (value instanceof Date) {
-      setSelectedDate(value);
-    } else if (
-      Array.isArray(value) &&
-      value.length > 0 &&
-      value[0] instanceof Date
-    ) {
-      setSelectedDate(value[0]);
-    } else {
-      setSelectedDate(null);
-    }
+  const {
+    currentMonth,
+    selectedDate,
+    viewMode,
+    eventsForSelectedDate,
+    groupedExams,
+    calendarData,
+    setSelectedDate,
+    setViewMode,
+    changeMonth,
+    getRelativeDate,
+  } = useCalendar(allExams);
+
+  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
+    await refetch();
+    event.detail.complete();
   };
 
-  const eventsForSelectedDate = selectedDate
-    ? exams.filter((event: Exam) => isSameDay(event.date, selectedDate))
-    : [];
-
-  const tileClassName = ({ date }: { date: Date }): string => {
-    const hasEvent = exams.some((event: Exam) => isSameDay(event.date, date));
-    return hasEvent ? 'event-day' : '';
-  };
-
-  const tileContent = ({ date }: { date: Date }): React.ReactNode => {
-    const hasEvent = exams.some((event: Exam) => isSameDay(event.date, date));
-    return hasEvent ? <div className="event-dot"></div> : null;
+  const handleSelectExam = (exam: Exam) => {
+    setShowExamDetail(exam);
   };
 
   return (
     <IonPage>
-      <Header title={'Kalender'} backButton={true} defaultHref={Routes.HOME} />
+      <Header
+        title={'Prüfungsplan'}
+        backButton={true}
+        defaultHref={Routes.HOME}
+      />
       <IonContent fullscreen>
+        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+          <IonRefresherContent />
+        </IonRefresher>
+
+        <div className="view-toggle-container">
+          <IonSegment
+            value={viewMode}
+            onIonChange={(e) =>
+              setViewMode(e.detail.value as 'calendar' | 'list')
+            }
+            mode="ios"
+          >
+            <IonSegmentButton value="calendar">
+              <IonIcon icon={calendar} />
+              <IonLabel>Kalender</IonLabel>
+            </IonSegmentButton>
+            <IonSegmentButton value="list">
+              <IonIcon icon={list} />
+              <IonLabel>Liste</IonLabel>
+            </IonSegmentButton>
+          </IonSegment>
+        </div>
+
         {isLoading ? (
-          <div className="ion-padding ion-text-center">
-            <p>Kalender wird geladen...</p>
+          <div className="loading-container">
+            <IonSkeletonText
+              animated
+              style={{ width: '100%', height: '300px', borderRadius: '16px' }}
+            />
+            <IonSkeletonText
+              animated
+              style={{
+                width: '90%',
+                height: '100px',
+                margin: '16px auto',
+                borderRadius: '12px',
+              }}
+            />
           </div>
         ) : error ? (
-          <div className="ion-padding ion-text-center">
-            <p>Fehler beim Laden des Kalenders.</p>
+          <div className="error-container">
+            <div className="error-card">
+              <div className="error-content">
+                <IonIcon icon={informationCircle} color="danger" />
+                <p>Fehler beim Laden. Bitte versuche es erneut.</p>
+              </div>
+            </div>
           </div>
         ) : (
           <>
-            <IonCard className="calendar-card">
-              <Calendar
-                onChange={handleDateChange}
-                value={selectedDate}
-                tileClassName={tileClassName}
-                tileContent={tileContent}
-              />
-            </IonCard>
-            {selectedDate && (
-              <div className="selected-date-info">
-                <h3>Ausgewähltes Datum:</h3>
-                <p>{selectedDate.toLocaleDateString()}</p>
-                {eventsForSelectedDate.length > 0 ? (
-                  <ul>
-                    {eventsForSelectedDate.map((event: Exam) => (
-                      <li key={event.id}>{event.name}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>Keine Tests an diesem Datum.</p>
-                )}
+            {viewMode === 'calendar' ? (
+              <div className="modern-calendar-container">
+                <MonthSelector
+                  currentMonth={currentMonth}
+                  onChangeMonth={changeMonth}
+                />
+
+                <CalendarGrid
+                  calendarData={calendarData}
+                  onSelectDate={setSelectedDate}
+                />
+
+                <SelectedDateView
+                  selectedDate={selectedDate}
+                  events={eventsForSelectedDate}
+                  onSelectExam={handleSelectExam}
+                />
               </div>
+            ) : (
+              <ExamListView
+                groupedExams={groupedExams}
+                onSelectExam={handleSelectExam}
+                getRelativeDate={getRelativeDate}
+              />
             )}
           </>
         )}
+
+        <IonAlert
+          isOpen={!!showExamDetail}
+          header={showExamDetail?.name}
+          subHeader={
+            showExamDetail
+              ? format(showExamDetail.date, 'EEEE, d. MMMM yyyy', {
+                  locale: de,
+                })
+              : ''
+          }
+          message={
+            showExamDetail?.description || 'Keine Beschreibung verfügbar'
+          }
+          buttons={['OK']}
+          onDidDismiss={() => setShowExamDetail(null)}
+        />
       </IonContent>
     </IonPage>
   );

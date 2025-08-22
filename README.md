@@ -1,11 +1,5 @@
 # NetGrade
 
-## TODO
-
-- [ ] Implement appInstanceId
-- [ ] Improve FormField implementation
-- [ ] Implement android release pipeline
-
 ## Overview
 
 **NetGrade** is a Progressive Web App (PWA) designed to deliver a native-like experience on web and mobile platforms.

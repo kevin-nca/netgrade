@@ -1,0 +1,60 @@
+@import 'FormCommon.module.css';
+
+.warningCard {
+  margin: 12px;
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  background: #15529a;
+}
+
+.warningCardHeader {
+  padding: 16px;
+}
+
+.warningCardTitle {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+}
+
+.warningCardText {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.gradeInputContainer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.gradeInputSmall {
+  background: white;
+  display: flex;
+  align-items: center;
+}
+
+.rangeContainer {
+  flex: 1;
+  padding: 0 11px;
+}
+
+.rangeInput {
+  --bar-height: 4px;
+  --knob-size: 18px;
+  width: 100%;
+  padding: 0;
+}
+
+.formItemDivider {
+  background: transparent;
+  border-bottom: none;
+  --ion-item-border-color: transparent;
+}

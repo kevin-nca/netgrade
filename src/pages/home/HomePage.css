@@ -1,0 +1,676 @@
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Page Layout */
+.home-page {
+  background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+  --background: transparent;
+}
+
+.home-content {
+  --background: transparent;
+}
+
+.content-wrapper {
+  padding: 0 16px 16px;
+  max-width: 100%;
+}
+
+/* Header Section */
+.header-section {
+  padding-top: max(44px, env(safe-area-inset-top) + 44px);
+  padding-bottom: 16px;
+  position: relative;
+}
+
+.gradient-orb {
+  position: absolute;
+  top: -30px;
+  left: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 122, 255, 0.08) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  filter: blur(30px);
+}
+
+/* Profile Card */
+.profile-card {
+  border-radius: 18px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.profile-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.profile-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-greeting {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 2px 0;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-settings-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.profile-settings-button:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.profile-icon {
+  color: #007aff;
+  width: 36px;
+  height: 36px;
+}
+
+/* Main Sections */
+.main-section {
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 0 2px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.header-action-button {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.header-action-button:active {
+  transform: scale(0.95);
+}
+
+.action-icon {
+  font-size: 14px;
+  color: white;
+}
+
+/* Schools Grid */
+.schools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.school-card {
+  border-radius: 14px;
+  padding: 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+}
+
+.school-card:active {
+  transform: scale(0.98);
+}
+
+.school-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.school-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.school-avatar-0 {
+  background: linear-gradient(135deg, #ff3b30 0%, #ff6b6b 100%);
+}
+
+.school-avatar-1 {
+  background: linear-gradient(135deg, #ff9500 0%, #ffb84d 100%);
+}
+
+.school-avatar-2 {
+  background: linear-gradient(135deg, #34c759 0%, #4cd964 100%);
+}
+
+.school-avatar-3 {
+  background: linear-gradient(135deg, #5856d6 0%, #7c7aff 100%);
+}
+
+.school-chevron {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.school-card:active .school-chevron {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.school-card-content {
+  flex: 1;
+}
+
+.school-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.school-stats {
+  margin-top: auto;
+}
+
+.school-average {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+}
+
+.stats-icon {
+  font-size: 12px;
+  color: #007aff;
+}
+
+/* Empty States */
+.empty-schools,
+.empty-exams {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 24px 16px;
+  border-radius: 16px;
+}
+
+.empty-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(0, 122, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.empty-icon {
+  font-size: 22px;
+  color: #007aff;
+  opacity: 0.6;
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.2px;
+}
+
+.empty-description {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Exams List */
+.exams-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.exam-card {
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.exam-card:active {
+  transform: scale(0.98);
+}
+
+.exam-card-content {
+  display: flex;
+  align-items: center;
+  width: 95%;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.exam-icon-and-info {
+  display: flex;
+
+  gap: 10px;
+}
+
+.exam-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(142, 68, 173, 0.2);
+  flex-shrink: 0;
+}
+
+.exam-icon {
+  font-size: 14px;
+  color: white;
+}
+
+.exam-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.exam-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 2px 0;
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.exam-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.exam-date {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.5);
+  font-weight: 500;
+}
+
+.meta-icon {
+  font-size: 10px;
+}
+
+.exam-priority {
+  display: flex;
+  align-items: center;
+}
+
+.priority-dot {
+  width: 6px;
+  height: 6px;
+  right: 0;
+  border-radius: 50%;
+  background: #ff9500;
+  box-shadow: 0 1px 4px rgba(255, 149, 0, 0.3);
+}
+
+/* Bottom Spacer */
+.bottom-spacer {
+  height: max(90px, env(safe-area-inset-bottom) + 90px);
+}
+
+/* Tab Bar Navigation */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 1000;
+}
+
+.tab-bar-content {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  position: relative;
+}
+
+.tab-item:active {
+  transform: scale(0.95);
+}
+
+.tab-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+  transition: all 0.2s ease;
+}
+
+.tab-item.active .tab-icon-wrapper {
+  background: rgba(0, 122, 255, 0.15);
+}
+
+.tab-icon {
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.6);
+  transition: all 0.2s ease;
+}
+
+.tab-item.active .tab-icon {
+  color: #007aff;
+}
+
+.tab-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.1px;
+  transition: all 0.2s ease;
+}
+
+.tab-item.active .tab-label {
+  color: #007aff;
+  font-weight: 600;
+}
+
+/* FAB in Center of Tab Bar */
+.tab-fab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tab-fab-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 20px rgba(0, 122, 255, 0.4),
+    0 0 0 4px rgba(255, 255, 255, 0.8);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 2px;
+  position: relative;
+  top: -8px;
+}
+
+.tab-fab-button:active {
+  transform: scale(0.95);
+}
+
+.tab-fab-icon {
+  font-size: 24px;
+  color: white;
+}
+
+.tab-fab-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #007aff;
+  letter-spacing: 0.1px;
+  margin-top: -6px;
+}
+
+/* iPhone SE and smaller */
+@media (max-width: 375px) {
+  .content-wrapper {
+    padding: 0 14px 14px;
+  }
+
+  .schools-grid {
+    gap: 8px;
+  }
+
+  .school-card {
+    min-height: 80px;
+    padding: 12px;
+  }
+
+  .profile-greeting {
+    font-size: 16px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+}
+
+/* Single column for very small screens */
+@media (max-width: 320px) {
+  .schools-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .home-page {
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  }
+
+  .glass-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .profile-greeting,
+  .section-title,
+  .school-name,
+  .exam-title,
+  .empty-title {
+    color: #ffffff;
+  }
+
+  .exam-date,
+  .empty-description {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .profile-icon,
+  .school-chevron {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .profile-settings-button {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .tab-bar {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.95) 0%,
+      rgba(0, 0, 0, 0.85) 100%
+    );
+    border-top: 0.5px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .tab-icon,
+  .tab-label {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .tab-item.active .tab-icon,
+  .tab-item.active .tab-label {
+    color: #007aff;
+  }
+
+  .tab-item.active .tab-icon-wrapper {
+    background: rgba(0, 122, 255, 0.2);
+  }
+
+  .tab-fab-button {
+    box-shadow:
+      0 4px 20px rgba(0, 122, 255, 0.6),
+      0 0 0 4px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-effect {
+    animation: none;
+  }
+
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Touch Optimizations */
+@media (pointer: coarse) {
+  .header-action-button,
+  .profile-settings-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .school-card,
+  .exam-card {
+    min-height: 44px;
+  }
+}

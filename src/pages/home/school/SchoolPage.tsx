@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   IonButtons,
@@ -23,8 +23,11 @@ import {
   useGrades,
   useAddSubject,
   useDeleteSubject,
+  useUpdateSubject,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
+import EditSubjectModal from '@/components/modals/EditSubjectModal';
+import './SchoolPage.css';
 
 interface SubjectToAdd {
   name: string;
@@ -32,13 +35,25 @@ interface SubjectToAdd {
 
 const SchoolPage: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [subjectToEdit, setSubjectToEdit] = useState<Subject | null>(null);
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
+  // hallo
+
   const { data: school = null, error: schoolError } = useSchool(schoolId);
-  const { data: subjects = [], error: subjectsError } =
+  const { data: subjectsData = [], error: subjectsError } =
     useSchoolSubjects(schoolId);
+  const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
+
   const { data: grades = [], error: gradesError } = useGrades();
+
+  const updateSubjectMutation = useUpdateSubject();
+
+  useEffect(() => {
+    setSubjects(subjectsData);
+  }, [subjectsData]);
 
   if (schoolError) {
     console.error('Failed to fetch school:', schoolError);
@@ -96,6 +111,7 @@ const SchoolPage: React.FC = () => {
   const deleteSubjectMutation = useDeleteSubject();
 
   const removeSubjectFromStore = (subjectId: string) => {
+    setSubjects((prev) => prev.filter((s) => s.id !== subjectId));
     deleteSubjectMutation.mutate(subjectId, {
       onError: (error) => {
         console.error('Failed to remove subject:', error);
@@ -131,17 +147,26 @@ const SchoolPage: React.FC = () => {
           {subjects.map((subject: Subject) => (
             <IonItemSliding key={subject.id}>
               <IonItem button onClick={() => goToGradesPage(subject)}>
-                <IonLabel>
-                  <span style={{ float: 'left' }}>{subject.name}</span>
-                  <span style={{ float: 'right' }}>
+                <IonLabel className="glass-card grade-card">
+                  <div className="grade-subject">{subject.name}</div>
+                  <div className="grade-average">
                     Durchschnitt:{' '}
                     {calculateAverage(subject) !== null
                       ? calculateAverage(subject)?.toFixed(2)
                       : 'Keine Noten'}
-                  </span>
+                  </div>
                 </IonLabel>
               </IonItem>
               <IonItemOptions side="end">
+                <IonItemOption
+                  color="primary"
+                  onClick={() => {
+                    setSubjectToEdit(subject);
+                    setEditModalOpen(true);
+                  }}
+                >
+                  Bearbeiten
+                </IonItemOption>
                 <IonItemOption
                   color="danger"
                   onClick={(e) => {
@@ -169,6 +194,22 @@ const SchoolPage: React.FC = () => {
             removeSubjectFromStore(id)
           }
           availableSubjects={[]}
+        />
+        <EditSubjectModal
+          isOpen={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          subject={subjectToEdit}
+          onSave={async (newName: string) => {
+            if (subjectToEdit) {
+              await updateSubjectMutation.mutateAsync({
+                id: subjectToEdit.id,
+                name: newName,
+              });
+              setEditModalOpen(false);
+              setSubjectToEdit(null);
+            }
+          }}
+          loading={updateSubjectMutation.isPending}
         />
       </IonContent>
     </IonPage>

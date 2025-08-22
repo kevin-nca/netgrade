@@ -45,8 +45,7 @@ describe('GradeService', () => {
     expect(grades[0].score).toBe(85);
   });
 
-  // Test addWithExam method
-  it('should add a new grade with an exam', async () => {
+  it('should add a new grade with an exam and maintain bidirectional relationship', async () => {
     const newGradeData: AddExamAndGradePayload = {
       subjectId: testData.subject.id,
       examName: 'New Test Exam with Grade',
@@ -66,11 +65,25 @@ describe('GradeService', () => {
 
     // Check that the exam was created and linked to the grade
     expect(newGrade.exam).toBeDefined();
+    expect(newGrade.exam.id).toBeDefined();
     expect(newGrade.exam.name).toBe(newGradeData.examName);
     expect(newGrade.exam.subjectId).toBe(newGradeData.subjectId);
     expect(newGrade.exam.isCompleted).toBe(true);
 
-    // Verify the grade was actually added to the database
+    expect(newGrade.exam.gradeId).toBe(newGrade.id);
+
+    const dataSourceModule = await import('@/db/data-source');
+    const { exam: examRepo } = dataSourceModule.getRepositories();
+    const examFromDb = await examRepo.findOne({
+      where: { id: newGrade.exam.id },
+      relations: ['grade'],
+    });
+
+    expect(examFromDb).toBeDefined();
+    expect(examFromDb!.gradeId).toBe(newGrade.id);
+    expect(examFromDb!.grade).toBeDefined();
+    expect(examFromDb!.grade!.id).toBe(newGrade.id);
+
     const grades = await GradeService.fetchAll();
     const foundGrade = grades.find((grade) => grade.id === newGrade.id);
     expect(foundGrade).toBeDefined();
@@ -95,38 +108,57 @@ describe('GradeService', () => {
     expect(grades[0].exam.id).toBe(testData.exam.id);
   });
 
-  // Test update method
-  it('should update a grade', async () => {
+  it('should update a grade and maintain bidirectional relationship', async () => {
+    const gradeData: AddExamAndGradePayload = {
+      subjectId: testData.subject.id,
+      examName: 'Update Test Exam',
+      date: new Date(),
+      score: 75,
+      weight: 1.0,
+      comment: 'Original comment',
+    };
+
+    const originalGrade = await GradeService.addWithExam(gradeData);
+    const originalExamId = originalGrade.exam.id;
+
     const updatedGradeData = {
-      ...testData.grade,
+      ...originalGrade,
       score: 95,
       comment: 'Updated Test Comment',
     };
 
     const updatedGrade = await GradeService.update(updatedGradeData);
     expect(updatedGrade).toBeInstanceOf(Grade);
-    expect(updatedGrade.id).toBe(testData.grade.id);
+    expect(updatedGrade.id).toBe(originalGrade.id);
     expect(updatedGrade.score).toBe(updatedGradeData.score);
     expect(updatedGrade.comment).toBe(updatedGradeData.comment);
 
-    // Verify the grade was actually updated in the database
-    const grade = await GradeService.findById(testData.grade.id);
+    expect(updatedGrade.exam.id).toBe(originalExamId);
+
+    const dataSourceModule = await import('@/db/data-source');
+    const { exam: examRepo } = dataSourceModule.getRepositories();
+    const examAfterUpdate = await examRepo.findOne({
+      where: { id: originalExamId },
+    });
+
+    expect(examAfterUpdate!.gradeId).toBe(updatedGrade.id);
+
+    const grade = await GradeService.findById(originalGrade.id);
     expect(grade?.score).toBe(updatedGradeData.score);
     expect(grade?.comment).toBe(updatedGradeData.comment);
   });
 
-  // Test delete method
-  it('should delete a grade', async () => {
-    // First, add a new grade with exam to delete
+  it('should delete a grade and handle exam gradeId correctly', async () => {
     const newGradeData: AddExamAndGradePayload = {
       subjectId: testData.subject.id,
-      examName: 'Exam with Grade to Delete',
+      examName: 'Delete Test Exam with Grade',
       date: new Date(),
       score: 75,
       weight: 1.0,
       comment: 'Delete Comment',
     };
     const newGrade = await GradeService.addWithExam(newGradeData);
+    const examId = newGrade.exam.id;
 
     // Delete the grade
     const deletedGradeId = await GradeService.delete(newGrade.id);
@@ -135,14 +167,90 @@ describe('GradeService', () => {
     // Verify the grade was actually deleted from the database
     const grade = await GradeService.findById(newGrade.id);
     expect(grade).toBeNull();
+
+    const dataSourceModule = await import('@/db/data-source');
+    const { exam: examRepo } = dataSourceModule.getRepositories();
+    const examAfterDelete = await examRepo.findOne({
+      where: { id: examId },
+      relations: ['grade'],
+    });
+
+    expect(examAfterDelete).toBeDefined();
+    expect(examAfterDelete!.gradeId).toBeNull();
+    expect(examAfterDelete!.grade).toBeNull();
   });
 
-  // Test error handling for delete method
   it('should throw an error when deleting a non-existent grade', async () => {
     await expect(GradeService.delete('non-existent-id')).rejects.toThrow();
   });
 
-  // Test complex scenario: add multiple grades and calculate average
+  it('should handle exam without grade correctly', async () => {
+    const dataSourceModule = await import('@/db/data-source');
+    const { exam: examRepo } = dataSourceModule.getRepositories();
+
+    const standaloneExam = examRepo.create({
+      name: 'Standalone Exam',
+      date: new Date(),
+      subjectId: testData.subject.id,
+      isCompleted: false,
+      gradeId: null,
+    });
+
+    const savedExam = await examRepo.save(standaloneExam);
+
+    expect(savedExam.gradeId).toBeNull();
+
+    const gradesForExam = await GradeService.findByExamId(savedExam.id);
+    expect(gradesForExam).toHaveLength(0);
+  });
+
+  it('should update both exam and grade while maintaining bidirectional relationship', async () => {
+    const gradeData: AddExamAndGradePayload = {
+      subjectId: testData.subject.id,
+      examName: 'Original Exam Name',
+      date: new Date(),
+      score: 80,
+      weight: 1.0,
+      comment: 'Original comment',
+    };
+
+    const originalGrade = await GradeService.addWithExam(gradeData);
+
+    const updatedExamData = {
+      ...originalGrade.exam,
+      name: 'Updated Exam Name',
+      description: 'Updated description',
+    };
+
+    const updatedGradeData = {
+      ...originalGrade,
+      score: 92,
+      comment: 'Updated grade comment',
+    };
+
+    const updatedGrade = await GradeService.updateExamAndGrade(
+      updatedExamData,
+      updatedGradeData,
+    );
+
+    expect(updatedGrade.score).toBe(92);
+    expect(updatedGrade.comment).toBe('Updated grade comment');
+
+    expect(updatedGrade.exam.name).toBe('Updated Exam Name');
+    expect(updatedGrade.exam.description).toBe('Updated description');
+
+    expect(updatedGrade.exam.gradeId).toBe(updatedGrade.id);
+
+    const dataSourceModule = await import('@/db/data-source');
+    const { exam: examRepo } = dataSourceModule.getRepositories();
+    const examFromDb = await examRepo.findOne({
+      where: { id: updatedGrade.exam.id },
+    });
+
+    expect(examFromDb!.gradeId).toBe(updatedGrade.id);
+    expect(examFromDb!.name).toBe('Updated Exam Name');
+  });
+
   it('should handle multiple grades for different exams', async () => {
     // Add multiple grades for the same subject
     const gradeData1: AddExamAndGradePayload = {
@@ -161,10 +269,12 @@ describe('GradeService', () => {
       weight: 2.0,
     };
 
-    await GradeService.addWithExam(gradeData1);
-    await GradeService.addWithExam(gradeData2);
+    const grade1 = await GradeService.addWithExam(gradeData1);
+    const grade2 = await GradeService.addWithExam(gradeData2);
 
-    // Get all grades
+    expect(grade1.exam.gradeId).toBe(grade1.id);
+    expect(grade2.exam.gradeId).toBe(grade2.id);
+
     const allGrades = await GradeService.fetchAll();
     expect(allGrades.length).toBeGreaterThan(2);
 

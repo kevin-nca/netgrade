@@ -24,7 +24,6 @@
 }
 
 .profile-icon {
-  background-color: var(--icon-background);
   border-radius: 50%;
   width: var(--icon-size);
   height: var(--icon-size);
