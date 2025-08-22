@@ -7,7 +7,7 @@ import {
   LocalNotifications,
   LocalNotificationSchema,
 } from '@capacitor/local-notifications';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, PluginListenerHandle } from '@capacitor/core';
 import { App, AppState } from '@capacitor/app';
 import { Exam } from './db/entities';
 
@@ -25,7 +25,7 @@ class NotificationScheduler {
   private intervalId: number | null = null;
   private isRunning = false;
   private readonly CHECK_INTERVAL = 60000;
-  private appStateListener: any = null;
+  private appStateListener: PluginListenerHandle | null = null;
   private lastCheckTime = 0;
   private readonly MIN_CHECK_INTERVAL = 30000;
 
@@ -45,10 +45,7 @@ class NotificationScheduler {
     if (Capacitor.isNativePlatform()) {
       this.setupAppLifecycleListeners();
     }
-
-    // Set up periodic checking as fallback (for web or backup)
     this.startPeriodicChecking();
-
     console.log(
       'Notification scheduler started - will check settings automatically',
     );
@@ -78,17 +75,15 @@ class NotificationScheduler {
   /**
    * Setup app lifecycle listeners - more robust than setInterval for production
    */
-  private setupAppLifecycleListeners(): void {
-    this.appStateListener = App.addListener(
+  private async setupAppLifecycleListeners(): Promise<void> {
+    this.appStateListener = await App.addListener(
       'appStateChange',
       async (state: AppState) => {
         console.log(
           'App state changed to:',
           state.isActive ? 'active' : 'background',
         );
-
         if (state.isActive) {
-          // App came to foreground - perform immediate check
           console.log(
             'App became active - performing immediate notification check',
           );
