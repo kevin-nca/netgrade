@@ -6,6 +6,12 @@
   box-sizing: border-box;
 }
 
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
 .text-center {
   text-align: center;
 }
