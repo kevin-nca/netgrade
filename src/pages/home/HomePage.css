@@ -600,7 +600,8 @@
   .section-title,
   .school-name,
   .exam-title,
-  .empty-title {
+  .empty-title,
+  .school-info {
     color: #ffffff;
   }
 
