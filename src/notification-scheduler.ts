@@ -1,5 +1,8 @@
-import { ExamService } from './services';
-import { PreferencesService, NotificationSettings } from './services';
+import {
+  PreferencesService,
+  NotificationSettings,
+  ExamService,
+} from './services';
 import {
   LocalNotifications,
   LocalNotificationSchema,
