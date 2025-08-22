@@ -72,23 +72,20 @@ export const useSaveNotificationSettings = () => {
       return settings;
     },
     onSuccess: async (savedSettings) => {
-      queryClient.invalidateQueries({
-        queryKey: preferencesKeys.notificationSettings(),
-      });
+      queryClient.setQueryData(
+        preferencesKeys.notificationSettings(),
+        savedSettings,
+      );
       queryClient.invalidateQueries({
         queryKey: preferencesKeys.schedulerStatus(),
       });
       try {
-        notificationScheduler.stop();
-        if (savedSettings.enabled) {
-          await notificationScheduler.start();
-          console.log('Scheduler restarted after settings change');
-        } else {
-          console.log('Scheduler stopped due to disabled notifications');
-        }
+        console.log('Settings saved, triggering immediate sync');
+        await notificationScheduler.manualSync();
+        console.log('Immediate sync completed after settings change');
       } catch (error) {
         console.error(
-          'Error restarting scheduler after settings change:',
+          'Error during immediate sync after settings change:',
           error,
         );
       }

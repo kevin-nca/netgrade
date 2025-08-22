@@ -8,6 +8,7 @@ import {
   LocalNotificationSchema,
 } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+import { App, AppState } from '@capacitor/app';
 import { Exam } from './db/entities';
 
 interface RequiredNotification {
@@ -24,6 +25,9 @@ class NotificationScheduler {
   private intervalId: number | null = null;
   private isRunning = false;
   private readonly CHECK_INTERVAL = 60000;
+  private appStateListener: any = null;
+  private lastCheckTime = 0;
+  private readonly MIN_CHECK_INTERVAL = 30000;
 
   static getInstance(): NotificationScheduler {
     if (!NotificationScheduler.instance) {
@@ -34,33 +38,35 @@ class NotificationScheduler {
 
   async start(): Promise<void> {
     if (this.isRunning) return;
-    const settings = await PreferencesService.getNotificationSettings();
-    if (!settings.enabled || !Capacitor.isNativePlatform()) {
-      console.log(
-        'Notification scheduler not started - notifications disabled or not native platform',
-      );
-      return;
+
+    console.log('Starting notification scheduler...');
+    this.isRunning = true;
+    await this.performSchedulingCheck();
+    if (Capacitor.isNativePlatform()) {
+      this.setupAppLifecycleListeners();
     }
 
-    this.isRunning = true;
-    await this.checkAndScheduleNotifications();
+    // Set up periodic checking as fallback (for web or backup)
+    this.startPeriodicChecking();
 
-    this.intervalId = window.setInterval(async () => {
-      try {
-        await this.checkAndScheduleNotifications();
-      } catch (error) {
-        console.error('Error in automatic notification scheduling:', error);
-      }
-    }, this.CHECK_INTERVAL);
-
-    console.log('Notification scheduler started');
+    console.log(
+      'Notification scheduler started - will check settings automatically',
+    );
   }
 
   stop(): void {
+    console.log('Stopping notification scheduler...');
+
     if (this.intervalId) {
       window.clearInterval(this.intervalId);
       this.intervalId = null;
     }
+
+    if (this.appStateListener) {
+      this.appStateListener.remove();
+      this.appStateListener = null;
+    }
+
     this.isRunning = false;
     console.log('Notification scheduler stopped');
   }
@@ -70,7 +76,103 @@ class NotificationScheduler {
   }
 
   /**
-   * Stateless notification scheduling - computes required state on each run
+   * Setup app lifecycle listeners - more robust than setInterval for production
+   */
+  private setupAppLifecycleListeners(): void {
+    this.appStateListener = App.addListener(
+      'appStateChange',
+      async (state: AppState) => {
+        console.log(
+          'App state changed to:',
+          state.isActive ? 'active' : 'background',
+        );
+
+        if (state.isActive) {
+          // App came to foreground - perform immediate check
+          console.log(
+            'App became active - performing immediate notification check',
+          );
+          await this.performSchedulingCheck();
+        }
+      },
+    );
+  }
+
+  /**
+   * Fallback periodic checking for web platform or as backup
+   */
+  private startPeriodicChecking(): void {
+    this.intervalId = window.setInterval(async () => {
+      try {
+        await this.performSchedulingCheck();
+      } catch (error) {
+        console.error('Error in periodic notification scheduling:', error);
+      }
+    }, this.CHECK_INTERVAL);
+  }
+
+  /**
+   * Main scheduling logic with rate limiting and internal settings check
+   * The scheduler always checks settings internally rather than being controlled externally
+   */
+  private async performSchedulingCheck(): Promise<void> {
+    const now = Date.now();
+
+    // Rate limiting to prevent excessive checks
+    if (now - this.lastCheckTime < this.MIN_CHECK_INTERVAL) {
+      console.log('Skipping notification check due to rate limiting');
+      return;
+    }
+
+    this.lastCheckTime = now;
+
+    try {
+      // Always check current settings first - scheduler decides what to do
+      const settings = await PreferencesService.getNotificationSettings();
+
+      if (!settings.enabled || !Capacitor.isNativePlatform()) {
+        console.log(
+          'Notifications disabled or not on native platform - clearing any existing notifications',
+        );
+        // Clear any existing notifications if disabled
+        await this.clearAllScheduledNotifications();
+        return;
+      }
+
+      console.log('Performing notification scheduling check...');
+      await this.checkAndScheduleNotifications();
+    } catch (error) {
+      console.error('Error in notification scheduling check:', error);
+    }
+  }
+
+  /**
+   * Clear all scheduled exam notifications
+   */
+  private async clearAllScheduledNotifications(): Promise<void> {
+    try {
+      if (!Capacitor.isNativePlatform()) return;
+
+      const pendingResult = await LocalNotifications.getPending();
+      const examNotifications =
+        pendingResult.notifications?.filter(
+          (n) => n.extra?.type === 'exam_reminder',
+        ) || [];
+
+      if (examNotifications.length > 0) {
+        const idsToCancel = examNotifications.map((n) => ({ id: n.id }));
+        await LocalNotifications.cancel({ notifications: idsToCancel });
+        console.log(
+          `Cleared ${idsToCancel.length} scheduled exam notifications`,
+        );
+      }
+    } catch (error) {
+      console.error('Error clearing scheduled notifications:', error);
+    }
+  }
+
+  /**
+   * Core notification scheduling logic (unchanged from original)
    */
   private async checkAndScheduleNotifications(): Promise<void> {
     const settings = await PreferencesService.getNotificationSettings();
@@ -87,6 +189,7 @@ class NotificationScheduler {
       );
       const pendingResult = await LocalNotifications.getPending();
       const currentNotifications = pendingResult.notifications || [];
+
       await this.cancelOutdatedNotifications(
         currentNotifications,
         requiredNotifications,
@@ -122,6 +225,7 @@ class NotificationScheduler {
 
       const [hours, minutes] = settings.reminderTime.split(':').map(Number);
       reminderDate.setHours(hours, minutes, 0, 0);
+
       if (reminderDate > now) {
         const notificationId = this.generateNotificationId(
           exam.id,
@@ -188,9 +292,6 @@ class NotificationScheduler {
     }
   }
 
-  /**
-   * Schedule exam reminder notification (moved from service to scheduler)
-   */
   private async scheduleExamReminder(
     notification: RequiredNotification,
   ): Promise<void> {
@@ -260,27 +361,15 @@ class NotificationScheduler {
 
   async manualSync(): Promise<void> {
     console.log('Manual notification sync started');
-    await this.checkAndScheduleNotifications();
+    await this.performSchedulingCheck();
     console.log('Manual notification sync completed');
   }
 
   async resetAndRescheduleAll(): Promise<void> {
     try {
       console.log('Resetting all notifications');
-      if (Capacitor.isNativePlatform()) {
-        const pendingResult = await LocalNotifications.getPending();
-        const examNotifications =
-          pendingResult.notifications?.filter(
-            (n) => n.extra?.type === 'exam_reminder',
-          ) || [];
-
-        if (examNotifications.length > 0) {
-          const idsToCancel = examNotifications.map((n) => ({ id: n.id }));
-          await LocalNotifications.cancel({ notifications: idsToCancel });
-          console.log(`Cancelled ${idsToCancel.length} existing notifications`);
-        }
-      }
-      await this.checkAndScheduleNotifications();
+      await this.clearAllScheduledNotifications();
+      await this.performSchedulingCheck();
       console.log('All notifications reset and rescheduled');
     } catch (error) {
       console.error('Error resetting notifications:', error);
