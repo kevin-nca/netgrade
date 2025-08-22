@@ -27,23 +27,19 @@ export function AppRouter() {
   return (
     <IonTabs>
       <IonRouterOutlet animated={true}>
-              <Route exact path={Routes.MAIN}>
-                <Redirect to={isOnboarded ? Routes.HOME : Routes.ONBOARDING} />
-              </Route>
+        <Route exact path={Routes.MAIN}>
+          <Redirect to={isOnboarded ? Routes.HOME : Routes.ONBOARDING} />
+        </Route>
 
-              <Route
-                exact
-                path={Routes.ONBOARDING}
-                component={OnboardingPage}
-              />
-              <Route exact path={Routes.HOME} component={HomePage} />
-              <Route exact path={Routes.GRADES_ADD} component={AddGradePage} />
-              <Route path={Routes.SUBJECT_GRADES} component={GradeEntryPage} />
-              <Route exact path={Routes.CALENDAR} component={CalendarPage} />
-              <Route exact path={Routes.SETTINGS} component={SettingsPage} />
-              <Route exact path={Routes.EXAMS_ADD} component={AddExamPage} />
-              <Route exact path={Routes.EXAM_EDIT} component={EditExamPage} />
-              <Route exact path={Routes.SCHOOL} component={SchoolPage} />
+        <Route exact path={Routes.ONBOARDING} component={OnboardingPage} />
+        <Route exact path={Routes.HOME} component={HomePage} />
+        <Route exact path={Routes.GRADES_ADD} component={AddGradePage} />
+        <Route path={Routes.SUBJECT_GRADES} component={GradeEntryPage} />
+        <Route exact path={Routes.CALENDAR} component={CalendarPage} />
+        <Route exact path={Routes.SETTINGS} component={SettingsPage} />
+        <Route exact path={Routes.EXAMS_ADD} component={AddExamPage} />
+        <Route exact path={Routes.EXAM_EDIT} component={EditExamPage} />
+        <Route exact path={Routes.SCHOOL} component={SchoolPage} />
       </IonRouterOutlet>
 
       {isPlatform('ios') && <EdgeSwipeBack />}
