@@ -32,6 +32,7 @@ export function AppRouter() {
         </Route>
 
         <Route exact path={Routes.ONBOARDING} component={OnboardingPage} />
+        <Route exact path={Routes.SCHOOL} component={SchoolPage} />
         <Route exact path={Routes.HOME} component={HomePage} />
         <Route exact path={Routes.GRADES_ADD} component={AddGradePage} />
         <Route path={Routes.SUBJECT_GRADES} component={GradeEntryPage} />
@@ -39,7 +40,6 @@ export function AppRouter() {
         <Route exact path={Routes.SETTINGS} component={SettingsPage} />
         <Route exact path={Routes.EXAMS_ADD} component={AddExamPage} />
         <Route exact path={Routes.EXAM_EDIT} component={EditExamPage} />
-        <Route exact path={Routes.SCHOOL} component={SchoolPage} />
       </IonRouterOutlet>
 
       {isPlatform('ios') && <EdgeSwipeBack />}
