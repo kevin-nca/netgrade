@@ -167,6 +167,7 @@ const NotificationSettings: React.FC = () => {
       ],
     });
   };
+
   const getSchedulerStatusColor = () => {
     if (!currentSettings.enabled) return 'medium';
     return isRunning && currentSettings.autoSchedulingEnabled
