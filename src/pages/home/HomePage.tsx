@@ -47,9 +47,16 @@ function HomePage() {
   const { data: allExams = [], refetch: refetchExams } = useExams();
   const addSchoolMutation = useAddSchool();
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const upcomingExams = allExams
-    .filter((exam) => !exam.isCompleted)
-    .slice(0, 3);
+    .filter(
+      (exam) =>
+        !exam.isCompleted &&
+        new Date(exam.date).setHours(0, 0, 0, 0) >= today.getTime(),
+    )
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     try {
@@ -121,11 +128,15 @@ function HomePage() {
 
   return (
     <IonPage className="home-page">
-      <IonContent className="home-content" scrollY={true}>
+      <IonContent
+        className="home-content"
+        scrollY={false}
+        scrollEvents={false}
+        forceOverscroll={false}
+      >
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
         </IonRefresher>
-
         <div className="content-wrapper">
           <div className="header-section">
             <div className="gradient-orb" />
@@ -232,49 +243,53 @@ function HomePage() {
               </div>
             </div>
 
-            <div className="exams-list">
-              {upcomingExams.length > 0 ? (
-                upcomingExams.map((exam) => (
-                  <div
-                    key={exam.id}
-                    className="exam-card glass-card"
-                    onClick={() =>
-                      history.push(Routes.EXAM_EDIT.replace(':examId', exam.id))
-                    }
-                  >
-                    <div className="exam-card-content">
-                      <div className="exam-icon-and-info">
-                        <div className="exam-icon-wrapper">
-                          <IonIcon icon={bookOutline} className="exam-icon" />
-                        </div>
+            <div className="exams-scroll-container">
+              <div className="exams-list">
+                {upcomingExams.length > 0 ? (
+                  upcomingExams.map((exam) => (
+                    <div
+                      key={exam.id}
+                      className="exam-card glass-card"
+                      onClick={() =>
+                        history.push(
+                          Routes.EXAM_EDIT.replace(':examId', exam.id),
+                        )
+                      }
+                    >
+                      <div className="exam-card-content">
+                        <div className="exam-icon-and-info">
+                          <div className="exam-icon-wrapper">
+                            <IonIcon icon={bookOutline} className="exam-icon" />
+                          </div>
 
-                        <div className="exam-info">
-                          <h4 className="exam-title">{exam.name}</h4>
-                          <div className="exam-meta">
-                            <div className="exam-date">
-                              <IonIcon
-                                icon={timeOutline}
-                                className="meta-icon"
-                              />
-                              <span>{formatDate(exam.date)}</span>
+                          <div className="exam-info">
+                            <h4 className="exam-title">{exam.name}</h4>
+                            <div className="exam-meta">
+                              <div className="exam-date">
+                                <IonIcon
+                                  icon={timeOutline}
+                                  className="meta-icon"
+                                />
+                                <span>{formatDate(exam.date)}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="exam-priority">
-                        <div className="priority-dot" />
+                        <div className="exam-priority">
+                          <div className="priority-dot" />
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="empty-exams glass-card">
+                    <h3 className="empty-title">Alles erledigt!</h3>
+                    <p className="empty-description">
+                      Keine anstehenden Prüfungen
+                    </p>
                   </div>
-                ))
-              ) : (
-                <div className="empty-exams glass-card">
-                  <h3 className="empty-title">Alles erledigt!</h3>
-                  <p className="empty-description">
-                    Keine anstehenden Prüfungen
-                  </p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
