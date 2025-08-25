@@ -198,7 +198,7 @@ function HomePage() {
                               icon={statsChartOutline}
                               className="stats-icon"
                             />
-                            <span>
+                            <span className="school-info">
                               {average
                                 ? `${average.toFixed(1)} Ø`
                                 : 'Keine Noten'}

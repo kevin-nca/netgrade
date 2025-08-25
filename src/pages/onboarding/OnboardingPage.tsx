@@ -162,8 +162,6 @@ const OnboardingPage: React.FC = () => {
         });
       });
 
-      showToastMessage('Willkommen bei NetGrade! 🎉', 'success');
-
       setTimeout(() => {
         history.replace(Routes.HOME);
       }, 1000);
