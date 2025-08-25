@@ -32,6 +32,8 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { Layout } from '@/components/Layout/Layout';
 import { Routes } from '@/routes';
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, BarProps } from 'recharts';
+const colors: string[] = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', 'red', 'pink'];
 
 interface GradeFormData {
   examName: string;
@@ -41,6 +43,27 @@ interface GradeFormData {
   comment: string;
 }
 
+const getPath = (x: number, y: number, width: number, height: number): string => {
+  return `M${x},${y + height}
+    C${x + width / 3},${y + height} ${x + width / 2},${y + height / 3}
+    ${x + width / 2},${y}
+    C${x + width / 2},${y + height / 3} ${x + (2 * width) / 3},${y + height} ${x + width},${y + height}
+    Z`;
+};
+
+interface TriangleBarProps extends BarProps {
+  fill?: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+}
+
+const TriangleBar: React.FC<TriangleBarProps> = ({ fill, x = 0, y = 0, width = 0, height = 0 }) => {
+  return <path d={getPath(x, y, width, height)} stroke="none" fill={fill} />;
+};
+
+
 const AllGradeEntryPage: React.FC = () => {
   const history = useHistory();
 
@@ -49,6 +72,20 @@ const AllGradeEntryPage: React.FC = () => {
     error: gradesError,
     isLoading: gradesLoading,
   } = useGrades();
+
+  const subjectAverages: { [subjectName: string]: number[] } = {};
+allGrades.forEach((grade) => {
+  const subject = grade.exam.subject?.name;
+
+  if (!subjectAverages[subject]) subjectAverages[subject] = [];
+  subjectAverages[subject].push(grade.score);
+});
+
+  const chartData = Object.entries(subjectAverages).map(([subject, scores]) => ({
+  name: subject,
+  uv: Number((scores.reduce((sum, val) => sum + val, 0) / scores.length).toFixed(1)),
+}));
+
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const { showToast, toastMessage, setShowToast, showMessage } = useToast();
@@ -182,101 +219,43 @@ const AllGradeEntryPage: React.FC = () => {
             </div>
           ) : (
             <IonList>
-              {allGrades.map((grade) => (
-                <GradeListItem
-                  key={grade.id}
-                  grade={grade}
-                  onEdit={() => startEdit(grade)}
-                  onDelete={() => handleDelete(grade.id)}
-                />
-              ))}
+              <BarChart
+                width={500}
+                height={300}
+                data={chartData}
+                margin={{
+                  top: 20,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Bar
+                  dataKey="uv"
+                  fill="#8884d8"
+                  shape={<TriangleBar />}
+                  label={{ position: 'top' }}
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+
+              <IonToast
+                isOpen={showToast}
+                onDidDismiss={() => setShowToast(false)}
+                message={toastMessage}
+                duration={2000}
+                color="danger"
+              />
             </IonList>
           )}
 
-          <IonModal isOpen={editingId !== null}>
-            <Header title="Note bearbeiten" backButton={false} />
-            <IonContent>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  gradeForm.handleSubmit();
-                }}
-              >
-                <gradeForm.Field name="examName">
-                  {(field) => (
-                    <FormField
-                      label="Titel:"
-                      value={field.state.value}
-                      onChange={(val) => field.handleChange(String(val))}
-                      type="text"
-                    />
-                  )}
-                </gradeForm.Field>
 
-                <gradeForm.Field name="score">
-                  {(field) => (
-                    <ValidatedNumberInput
-                      label="Note"
-                      value={field.state.value}
-                      onChange={(val) => field.handleChange(val)}
-                      validation={validateGrade}
-                    />
-                  )}
-                </gradeForm.Field>
-
-                <gradeForm.Field name="weight">
-                  {(field) => (
-                    <ValidatedNumberInput
-                      label="Gewichtung (%)"
-                      value={field.state.value}
-                      onChange={(val) => field.handleChange(val)}
-                      validation={validateWeight}
-                    />
-                  )}
-                </gradeForm.Field>
-
-                <gradeForm.Field name="date">
-                  {(field) => (
-                    <FormField
-                      label="Datum:"
-                      value={field.state.value}
-                      onChange={(val) => field.handleChange(String(val))}
-                      type="date"
-                    />
-                  )}
-                </gradeForm.Field>
-
-                <gradeForm.Field name="comment">
-                  {(field) => (
-                    <FormField
-                      label="Kommentar:"
-                      value={field.state.value}
-                      onChange={(val) => field.handleChange(String(val))}
-                      type="text"
-                    />
-                  )}
-                </gradeForm.Field>
-
-                <Button
-                  handleEvent={() => gradeForm.handleSubmit()}
-                  text="Speichern"
-                />
-                <Button
-                  handleEvent={cancelEdit}
-                  text="Abbrechen"
-                  color="medium"
-                />
-              </form>
-            </IonContent>
-          </IonModal>
-
-          <IonToast
-            isOpen={showToast}
-            onDidDismiss={() => setShowToast(false)}
-            message={toastMessage}
-            duration={2000}
-            color="danger"
-          />
         </Layout>
       </IonContent>
     </IonPage>
