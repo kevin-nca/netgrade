@@ -97,6 +97,7 @@ export const useSaveNotificationSettings = () => {
     },
   });
 };
+
 export const useNotificationPermissions = () => {
   return useQuery({
     queryKey: preferencesKeys.notificationPermissions(),
@@ -105,6 +106,7 @@ export const useNotificationPermissions = () => {
     enabled: false,
   });
 };
+
 export const useSchedulerStatus = () => {
   return useQuery({
     queryKey: preferencesKeys.schedulerStatus(),
@@ -124,6 +126,7 @@ export const useSchedulerStatus = () => {
     staleTime: 30000,
   });
 };
+
 export const useAvailableReminderTimes = () => {
   return useQuery({
     queryKey: preferencesKeys.availableReminderTimes(),
@@ -131,6 +134,7 @@ export const useAvailableReminderTimes = () => {
     staleTime: Infinity,
   });
 };
+
 export const useManualNotificationSync = () => {
   const queryClient = useQueryClient();
 
