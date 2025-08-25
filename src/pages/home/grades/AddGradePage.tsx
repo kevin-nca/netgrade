@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { IonContent, IonPage, IonToast } from '@ionic/react';
+import { IonContent, IonPage, IonToast, IonIcon } from '@ionic/react';
 import { useHistory, useParams } from 'react-router-dom';
+import {
+  add,
+  homeOutline,
+  calendar,
+  trophyOutline,
+  settings,
+} from 'ionicons/icons';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import FormField from '@/components/Form/FormField';
+import NavigationModal from '@/components/navigation/home/NavigationModal';
 import { School, Subject } from '@/db/entities';
 import { format, parseISO } from 'date-fns';
 import {
@@ -44,6 +52,8 @@ const AddGradePage: React.FC = () => {
 
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [showNavigationModal, setShowNavigationModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('grades');
 
   const { data: schools = [], error: schoolsError } = useSchools();
   const { data: subjects = [], error: subjectsError } = useSchoolSubjects(
@@ -265,6 +275,15 @@ const AddGradePage: React.FC = () => {
         />
 
         <Button handleEvent={handleAddGrade} text={'Hinzufügen'} />
+
+        {/* Bottom Spacer für Tab-Bar */}
+        <div className="bottom-spacer" />
+
+        <NavigationModal
+          isOpen={showNavigationModal}
+          setIsOpen={setShowNavigationModal}
+        />
+
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}
@@ -273,6 +292,70 @@ const AddGradePage: React.FC = () => {
           color="danger"
         />
       </IonContent>
+
+      {/* Tab Bar */}
+      <div className="tab-bar">
+        <div className="tab-bar-content">
+          <div
+            className={`tab-item ${activeTab === 'home' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('home');
+              history.push(Routes.HOME);
+            }}
+          >
+            <div className="tab-icon-wrapper">
+              <IonIcon icon={homeOutline} className="tab-icon" />
+            </div>
+            <span className="tab-label">Home</span>
+          </div>
+
+          <div
+            className={`tab-item ${activeTab === 'calendar' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('calendar');
+              history.push(Routes.CALENDAR);
+            }}
+          >
+            <div className="tab-icon-wrapper">
+              <IonIcon icon={calendar} className="tab-icon" />
+            </div>
+            <span className="tab-label">Kalender</span>
+          </div>
+
+          <div className="tab-fab">
+            <button
+              className="tab-fab-button"
+              onClick={() => setShowNavigationModal(true)}
+            >
+              <IonIcon icon={add} className="tab-fab-icon" />
+            </button>
+            <span className="tab-fab-label">Neu</span>
+          </div>
+
+          <div
+            className={`tab-item ${activeTab === 'grades' ? 'active' : ''}`}
+            onClick={() => setActiveTab('grades')}
+          >
+            <div className="tab-icon-wrapper">
+              <IonIcon icon={trophyOutline} className="tab-icon" />
+            </div>
+            <span className="tab-label">Noten</span>
+          </div>
+
+          <div
+            className={`tab-item ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('settings');
+              history.push(Routes.SETTINGS);
+            }}
+          >
+            <div className="tab-icon-wrapper">
+              <IonIcon icon={settings} className="tab-icon" />
+            </div>
+            <span className="tab-label">Mehr</span>
+          </div>
+        </div>
+      </div>
     </IonPage>
   );
 };
