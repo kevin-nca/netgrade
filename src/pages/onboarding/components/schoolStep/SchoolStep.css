@@ -5,7 +5,7 @@
 html,
 body {
   background-color: #ffffff; /* Light Mode fix */
-  color: #000000; /* Basisfarbe */
+  color: #000000; /* base color */
 }
 
 .subsection-title {
