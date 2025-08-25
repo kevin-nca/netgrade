@@ -1,3 +1,13 @@
+:root {
+  color-scheme: light dark; /* indicates: both modes are supported */
+}
+
+html,
+body {
+  background-color: #ffffff; /* Light Mode fix */
+  color: #000000; /* base color */
+}
+
 .subsection-title {
   font-size: 18px;
   font-weight: 600;
@@ -183,7 +193,7 @@
 }
 
 .cancel-button {
-  --color: rgba(0, 0, 0, 0.6);
+  color: rgba(0, 0, 0, 0.6);
   --background: transparent;
   --border-radius: 12px;
   font-weight: 500;
@@ -204,7 +214,8 @@
   .subsection-title,
   .form-title,
   .school-name,
-  .subject-name {
+  .subject-name,
+  .cancel-button {
     color: #ffffff;
   }
 
