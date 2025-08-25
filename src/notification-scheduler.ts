@@ -71,10 +71,6 @@ class NotificationScheduler {
   isSchedulerRunning(): boolean {
     return this.isRunning;
   }
-
-  /**
-   * Setup app lifecycle listeners - more robust than setInterval for production
-   */
   private async setupAppLifecycleListeners(): Promise<void> {
     this.appStateListener = await App.addListener(
       'appStateChange',
@@ -122,7 +118,6 @@ class NotificationScheduler {
     this.lastCheckTime = now;
 
     try {
-      // Always check current settings first - scheduler decides what to do
       const settings = await PreferencesService.getNotificationSettings();
 
       if (!settings.enabled || !Capacitor.isNativePlatform()) {
@@ -165,10 +160,6 @@ class NotificationScheduler {
       console.error('Error clearing scheduled notifications:', error);
     }
   }
-
-  /**
-   * Core notification scheduling logic (unchanged from original)
-   */
   private async checkAndScheduleNotifications(): Promise<void> {
     const settings = await PreferencesService.getNotificationSettings();
 
