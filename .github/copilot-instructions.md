@@ -1,5 +1,5 @@
 ---
-applyTo: "app/models/**/*.rb"
+applyTo: "**/*.{js,jsx,ts,tsx,json,md}"
 ---
 
 # Project Overview
