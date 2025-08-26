@@ -17,7 +17,7 @@ export enum Routes {
 
   // Grades routes
   GRADES_ADD = '/main/home/grades/add',
-  GRADES_ALL = '/main/home/grades/all',
+  GRADES = '/main/home/grades',
 
   // Calendar route
   CALENDAR = '/main/home/calendar',

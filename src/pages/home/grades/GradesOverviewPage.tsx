@@ -64,7 +64,7 @@ const TriangleBar: React.FC<TriangleBarProps> = ({ fill, x = 0, y = 0, width = 0
 };
 
 
-const AllGradeEntryPage: React.FC = () => {
+const GradesOverviewPage: React.FC = () => {
   const history = useHistory();
 
   const {
@@ -218,7 +218,7 @@ allGrades.forEach((grade) => {
               <p>Keine Noten gefunden.</p>
             </div>
           ) : (
-            <IonList>
+            <IonList className='bar-chart-list'>
               <BarChart
                 width={500}
                 height={300}
@@ -236,7 +236,6 @@ allGrades.forEach((grade) => {
                 <Bar
                   dataKey="uv"
                   fill="#8884d8"
-                  shape={<TriangleBar />}
                   label={{ position: 'top' }}
                 >
                   {chartData.map((entry, index) => (
@@ -262,4 +261,4 @@ allGrades.forEach((grade) => {
   );
 };
 
-export default AllGradeEntryPage;
+export default GradesOverviewPage;
