@@ -13,7 +13,6 @@ import HomePage from '@/pages/home/HomePage';
 import EditExamPage from '@/pages/home/exams/EditExamPage/EditExamPage';
 import { Routes } from '@/routes';
 import { useOnboardingCompleted } from '@/hooks/queries';
-import { Grade } from './db/entities';
 import GradesOverviewPage from '@/pages/home/grades/GradesOverviewPage';
 
 import { EdgeSwipeBack } from '@/components/navigation/EdgeSwipeBack';
