@@ -32,8 +32,23 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { Layout } from '@/components/Layout/Layout';
 import { Routes } from '@/routes';
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, BarProps } from 'recharts';
-const colors: string[] = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', 'red', 'pink'];
+import {
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  BarProps,
+} from 'recharts';
+const colors: string[] = [
+  '#0088FE',
+  '#00C49F',
+  '#FFBB28',
+  '#FF8042',
+  'red',
+  'pink',
+];
 
 interface GradeFormData {
   examName: string;
@@ -43,7 +58,12 @@ interface GradeFormData {
   comment: string;
 }
 
-const getPath = (x: number, y: number, width: number, height: number): string => {
+const getPath = (
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): string => {
   return `M${x},${y + height}
     C${x + width / 3},${y + height} ${x + width / 2},${y + height / 3}
     ${x + width / 2},${y}
@@ -59,10 +79,15 @@ interface TriangleBarProps extends BarProps {
   height?: number;
 }
 
-const TriangleBar: React.FC<TriangleBarProps> = ({ fill, x = 0, y = 0, width = 0, height = 0 }) => {
+const TriangleBar: React.FC<TriangleBarProps> = ({
+  fill,
+  x = 0,
+  y = 0,
+  width = 0,
+  height = 0,
+}) => {
   return <path d={getPath(x, y, width, height)} stroke="none" fill={fill} />;
 };
-
 
 const GradesOverviewPage: React.FC = () => {
   const history = useHistory();
@@ -74,18 +99,21 @@ const GradesOverviewPage: React.FC = () => {
   } = useGrades();
 
   const subjectAverages: { [subjectName: string]: number[] } = {};
-allGrades.forEach((grade) => {
-  const subject = grade.exam.subject?.name;
+  allGrades.forEach((grade) => {
+    const subject = grade.exam.subject?.name;
 
-  if (!subjectAverages[subject]) subjectAverages[subject] = [];
-  subjectAverages[subject].push(grade.score);
-});
+    if (!subjectAverages[subject]) subjectAverages[subject] = [];
+    subjectAverages[subject].push(grade.score);
+  });
 
-  const chartData = Object.entries(subjectAverages).map(([subject, scores]) => ({
-  name: subject,
-  uv: Number((scores.reduce((sum, val) => sum + val, 0) / scores.length).toFixed(1)),
-}));
-
+  const chartData = Object.entries(subjectAverages).map(
+    ([subject, scores]) => ({
+      name: subject,
+      uv: Number(
+        (scores.reduce((sum, val) => sum + val, 0) / scores.length).toFixed(1),
+      ),
+    }),
+  );
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const { showToast, toastMessage, setShowToast, showMessage } = useToast();
@@ -218,7 +246,7 @@ allGrades.forEach((grade) => {
               <p>Keine Noten gefunden.</p>
             </div>
           ) : (
-            <IonList className='bar-chart-list'>
+            <IonList className="bar-chart-list">
               <BarChart
                 width={500}
                 height={300}
@@ -233,13 +261,12 @@ allGrades.forEach((grade) => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Bar
-                  dataKey="uv"
-                  fill="#8884d8"
-                  label={{ position: 'top' }}
-                >
+                <Bar dataKey="uv" fill="#8884d8" label={{ position: 'top' }}>
                   {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={colors[index % colors.length]}
+                    />
                   ))}
                 </Bar>
               </BarChart>
@@ -253,8 +280,6 @@ allGrades.forEach((grade) => {
               />
             </IonList>
           )}
-
-
         </Layout>
       </IonContent>
     </IonPage>
