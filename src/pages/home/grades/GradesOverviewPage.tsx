@@ -40,6 +40,7 @@ import {
   YAxis,
   CartesianGrid,
   BarProps,
+  ResponsiveContainer,
 } from 'recharts';
 const colors: string[] = [
   '#0088FE',
@@ -247,29 +248,29 @@ const GradesOverviewPage: React.FC = () => {
             </div>
           ) : (
             <IonList className="bar-chart-list">
-              <BarChart
-                width={500}
-                height={300}
-                data={chartData}
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Bar dataKey="uv" fill="#8884d8" label={{ position: 'top' }}>
-                  {chartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={colors[index % colors.length]}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={chartData}
+                  margin={{
+                    top: 20,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Bar dataKey="uv" fill="#8884d8" label={{ position: 'top' }}>
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={colors[index % colors.length]}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
 
               <IonToast
                 isOpen={showToast}
