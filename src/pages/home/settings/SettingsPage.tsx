@@ -27,15 +27,11 @@ import {
   settingsOutline,
   informationCircleOutline,
   createOutline,
-  add,
-  homeOutline,
-  calendar,
-  trophyOutline,
-  settings,
 } from 'ionicons/icons';
 import { Routes } from '@/routes';
 import { ExportDialog } from '@/components/export/ExportDialog';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
+import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import {
   useSchools,
   useAddSchool,
@@ -307,9 +303,6 @@ const SettingsPage: React.FC = () => {
               <p className="version-text">{appVersion}</p>
             </div>
           )}
-
-          {/* Bottom Spacer für Tab-Bar */}
-          <div className="bottom-spacer" />
         </div>
 
         <NavigationModal
@@ -421,69 +414,12 @@ const SettingsPage: React.FC = () => {
         onClose={() => setIsExportDialogOpen(false)}
       />
 
-      {/* Tab Bar */}
-      <div className="tab-bar">
-        <div className="tab-bar-content">
-          <div
-            className={`tab-item ${activeTab === 'home' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('home');
-              history.push(Routes.HOME);
-            }}
-          >
-            <div className="tab-icon-wrapper">
-              <IonIcon icon={homeOutline} className="tab-icon" />
-            </div>
-            <span className="tab-label">Home</span>
-          </div>
-
-          <div
-            className={`tab-item ${activeTab === 'calendar' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('calendar');
-              history.push(Routes.CALENDAR);
-            }}
-          >
-            <div className="tab-icon-wrapper">
-              <IonIcon icon={calendar} className="tab-icon" />
-            </div>
-            <span className="tab-label">Kalender</span>
-          </div>
-
-          <div className="tab-fab">
-            <button
-              className="tab-fab-button"
-              onClick={() => setShowNavigationModal(true)}
-            >
-              <IonIcon icon={add} className="tab-fab-icon" />
-            </button>
-            <span className="tab-fab-label">Neu</span>
-          </div>
-
-          <div
-            className={`tab-item ${activeTab === 'grades' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('grades');
-              history.push(Routes.GRADES_ADD);
-            }}
-          >
-            <div className="tab-icon-wrapper">
-              <IonIcon icon={trophyOutline} className="tab-icon" />
-            </div>
-            <span className="tab-label">Noten</span>
-          </div>
-
-          <div
-            className={`tab-item ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('settings')}
-          >
-            <div className="tab-icon-wrapper">
-              <IonIcon icon={settings} className="tab-icon" />
-            </div>
-            <span className="tab-label">Mehr</span>
-          </div>
-        </div>
-      </div>
+      <BottomNavigation
+        showNavigationModal={showNavigationModal}
+        setShowNavigationModal={setShowNavigationModal}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
     </IonPage>
   );
 };
