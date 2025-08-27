@@ -21,6 +21,7 @@ import {
   useGrades,
   useDeleteGrade,
   useUpdateExamAndGrade,
+  useSchoolSubjects,
 } from '@/hooks/queries';
 import {
   validateGrade,
@@ -46,7 +47,7 @@ interface GradeEntryParams {
 }
 
 const GradeEntryPage: React.FC = () => {
-  const { subjectId } = useParams<GradeEntryParams>();
+  const { subjectId, schoolId } = useParams<GradeEntryParams>();
   const history = useHistory();
 
   const {
@@ -54,6 +55,10 @@ const GradeEntryPage: React.FC = () => {
     error: gradesError,
     isLoading: gradesLoading,
   } = useGrades();
+
+  const { data: subjects = [] } = useSchoolSubjects(schoolId || '');
+
+  const subject = subjects.find((s: any) => s.id === subjectId);
 
   const grades = allGrades.filter(
     (grade: Grade) => grade.exam.subjectId === subjectId,
@@ -162,7 +167,7 @@ const GradeEntryPage: React.FC = () => {
   return (
     <IonPage>
       <Header
-        title="Notenübersicht"
+        title={subject ? subject.name : 'Notenübersicht'}
         backButton
         onBack={() => window.history.back()}
         endSlot={
