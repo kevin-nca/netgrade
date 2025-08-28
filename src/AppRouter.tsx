@@ -13,6 +13,7 @@ import HomePage from '@/pages/home/HomePage';
 import EditExamPage from '@/pages/home/exams/EditExamPage/EditExamPage';
 import { Routes } from '@/routes';
 import { useOnboardingCompleted } from '@/hooks/queries';
+import GradesOverviewPage from '@/pages/home/grades/GradesOverviewPage';
 
 import { EdgeSwipeBack } from '@/components/navigation/EdgeSwipeBack';
 
@@ -40,6 +41,7 @@ export function AppRouter() {
         <Route exact path={Routes.SETTINGS} component={SettingsPage} />
         <Route exact path={Routes.EXAMS_ADD} component={AddExamPage} />
         <Route exact path={Routes.EXAM_EDIT} component={EditExamPage} />
+        <Route exact path={Routes.GRADES} component={GradesOverviewPage} />
       </IonRouterOutlet>
 
       {isPlatform('ios') && <EdgeSwipeBack />}
