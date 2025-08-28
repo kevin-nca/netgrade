@@ -50,7 +50,7 @@ const ValidatedNumberInput: React.FC<ValidatedNumberInputProps> = ({
           <IonInput
             type="number"
             value={value}
-            onIonChange={handleInputChange}
+            onIonInput={handleInputChange}
             step={step}
             min={min}
             max={max}
