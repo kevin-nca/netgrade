@@ -50,7 +50,7 @@ const NameStep: React.FC<NameStepProps> = ({ data, setData, onNext }) => {
                 <IonInput
                   value={localName}
                   placeholder="Dein Vorname..."
-                  onIonChange={(e) => setLocalName(e.detail.value || '')}
+                  onIonInput={(e) => setLocalName(e.detail.value || '')}
                   className="input-field"
                   clearInput
                   autoFocus
