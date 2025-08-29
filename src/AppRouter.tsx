@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonRouterOutlet, IonTabs, isPlatform } from '@ionic/react';
+import { IonRouterOutlet, IonSpinner, IonTabs, isPlatform } from '@ionic/react';
 import { Redirect, Route } from 'react-router-dom';
 
 import GradeEntryPage from '@/pages/home/grades/GradeEntryPage';
@@ -37,7 +37,7 @@ export function AppRouter() {
                 height: '100vh',
               }}
             >
-              Loading...
+              <IonSpinner />
             </div>
           </Route>
         </IonRouterOutlet>
