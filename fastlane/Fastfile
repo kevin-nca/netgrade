@@ -44,7 +44,6 @@ platform :ios do
       configuration: "Release",
       export_method: "app-store",
       clean: true,
-      destination: "generic/platform=iOS",
       export_options: {
         provisioningProfiles: {
           "com.netgrade.app" => "netgrade-provisioning"
