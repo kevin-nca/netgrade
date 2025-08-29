@@ -9,11 +9,11 @@ jobs:
   build-and-upload:
     runs-on: macos-15
     env:
-      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
 
     steps:
       - name: Select Xcode 16
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+        run: sudo xcode-select -s /Applications/Xcode.app
 
       - name: Confirm Xcode Version
         run: xcodebuild -version
@@ -36,7 +36,7 @@ jobs:
         id: version
         run: |
           TAG_NAME="${{ github.event.release.tag_name }}"
-          VERSION="${TAG_NAME#v}" # entfernt führendes 'v', falls vorhanden
+          VERSION="${TAG_NAME#v}" # strips leading 'v' if any
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Import Certificate & Profile
