@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonRouterOutlet, IonTabs, isPlatform } from '@ionic/react';
+import { IonRouterOutlet, IonSpinner, IonTabs, isPlatform } from '@ionic/react';
 import { Redirect, Route } from 'react-router-dom';
 
 import GradeEntryPage from '@/pages/home/grades/GradeEntryPage';
@@ -17,12 +17,33 @@ import { useOnboardingCompleted } from '@/hooks/queries';
 import { EdgeSwipeBack } from '@/components/navigation/EdgeSwipeBack';
 
 export function AppRouter() {
-  const { data: isOnboarded } = useOnboardingCompleted();
+  const { data: isOnboarded, isLoading } = useOnboardingCompleted();
   const [, setIsInitialized] = useState(false);
 
   useEffect(() => {
     setIsInitialized(true);
   }, [isOnboarded]);
+
+  if (isLoading) {
+    return (
+      <IonTabs>
+        <IonRouterOutlet animated={true}>
+          <Route exact path={Routes.MAIN}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+              }}
+            >
+              <IonSpinner />
+            </div>
+          </Route>
+        </IonRouterOutlet>
+      </IonTabs>
+    );
+  }
 
   return (
     <IonTabs>
