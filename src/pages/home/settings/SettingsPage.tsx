@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import {
   IonContent,
   IonPage,
@@ -28,6 +29,8 @@ import {
 } from 'ionicons/icons';
 import { Routes } from '@/routes';
 import { ExportDialog } from '@/components/export/ExportDialog';
+import NavigationModal from '@/components/navigation/home/NavigationModal';
+import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import {
   useSchools,
   useAddSchool,
@@ -48,8 +51,11 @@ const SettingsPage: React.FC = () => {
   const [schoolNameInput, setSchoolNameInput] = useState('');
   const [showNameEditModal, setShowNameEditModal] = useState(false);
   const [appVersion] = useState('');
+  const [showNavigationModal, setShowNavigationModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('settings');
   const [present] = useIonToast();
   const [presentAlert] = useIonAlert();
+  const history = useHistory();
 
   const { data: schools = [], refetch } = useSchools();
   const { data: userName } = useUserName();
@@ -287,9 +293,12 @@ const SettingsPage: React.FC = () => {
               <p className="version-text">{appVersion}</p>
             </div>
           )}
-
-          <div style={{ height: '80px' }} />
         </div>
+
+        <NavigationModal
+          isOpen={showNavigationModal}
+          setIsOpen={setShowNavigationModal}
+        />
       </IonContent>
 
       <AddSchoolModal
@@ -392,6 +401,13 @@ const SettingsPage: React.FC = () => {
       <ExportDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
+      />
+
+      <BottomNavigation
+        showNavigationModal={showNavigationModal}
+        setShowNavigationModal={setShowNavigationModal}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
       />
     </IonPage>
   );

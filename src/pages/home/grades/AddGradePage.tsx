@@ -4,6 +4,8 @@ import { useHistory, useParams } from 'react-router-dom';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import FormField from '@/components/Form/FormField';
+import NavigationModal from '@/components/navigation/home/NavigationModal';
+import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import { School, Subject } from '@/db/entities';
 import { format, parseISO } from 'date-fns';
 import {
@@ -44,6 +46,8 @@ const AddGradePage: React.FC = () => {
 
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [showNavigationModal, setShowNavigationModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('grades');
 
   const { data: schools = [], error: schoolsError } = useSchools();
   const { data: subjects = [], error: subjectsError } = useSchoolSubjects(
@@ -265,6 +269,12 @@ const AddGradePage: React.FC = () => {
         />
 
         <Button handleEvent={handleAddGrade} text={'Hinzufügen'} />
+
+        <NavigationModal
+          isOpen={showNavigationModal}
+          setIsOpen={setShowNavigationModal}
+        />
+
         <IonToast
           isOpen={showToast}
           onDidDismiss={() => setShowToast(false)}
@@ -273,6 +283,13 @@ const AddGradePage: React.FC = () => {
           color="danger"
         />
       </IonContent>
+
+      <BottomNavigation
+        showNavigationModal={showNavigationModal}
+        setShowNavigationModal={setShowNavigationModal}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
     </IonPage>
   );
 };
