@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { IonContent, IonPage, IonToast } from '@ionic/react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, useLocation } from 'react-router-dom';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import FormField from '@/components/Form/FormField';
@@ -30,6 +30,10 @@ interface GradeAddFormData {
 
 const AddGradePage: React.FC = () => {
   const history = useHistory();
+  const location = useLocation<{
+    schoolId?: string;
+    subjectId?: string;
+  }>();
   const { schoolId: routeSchoolId } = useParams<{ schoolId: string }>();
 
   const [formData, setFormData] = useState<GradeAddFormData>({
@@ -49,6 +53,30 @@ const AddGradePage: React.FC = () => {
   const { data: subjects = [], error: subjectsError } = useSchoolSubjects(
     formData.selectedSchoolId,
   );
+
+  useEffect(() => {
+    const state = location.state || {};
+    const stateSchoolId = state.schoolId || '';
+    const stateSubjectId = state.subjectId || '';
+
+    if (stateSchoolId && stateSchoolId !== formData.selectedSchoolId) {
+      setFormData((prev) => ({
+        ...prev,
+        selectedSchoolId: stateSchoolId,
+        selectedSubjectId: '',
+      }));
+    }
+
+    if (
+      stateSubjectId &&
+      stateSchoolId &&
+      formData.selectedSchoolId === stateSchoolId &&
+      subjects?.length > 0 &&
+      subjects.some((s) => s.id === stateSubjectId)
+    ) {
+      setFormData((prev) => ({ ...prev, selectedSubjectId: stateSubjectId }));
+    }
+  }, [location.state, subjects, formData.selectedSchoolId]);
 
   // Show error messages if fetching fails
   useEffect(() => {
