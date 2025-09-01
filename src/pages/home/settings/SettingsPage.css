@@ -82,14 +82,14 @@
   color: #000000;
   text-align: center;
   letter-spacing: -0.4px;
-  position: absolute;
+  position: center;
   left: 0;
   right: 0;
   top: 50%;
   transform: translateY(-50%);
   margin: 0 auto;
   width: max-content;
-  pointer-events: none; 
+  pointer-events: none;
 }
 
 .back-button {
