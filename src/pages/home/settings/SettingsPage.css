@@ -89,7 +89,7 @@
   transform: translateY(-50%);
   margin: 0 auto;
   width: max-content;
-  pointer-events: none; /* Prevent blocking clicks on buttons */
+  pointer-events: none; 
 }
 
 .back-button {
