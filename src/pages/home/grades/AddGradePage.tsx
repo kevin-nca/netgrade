@@ -71,6 +71,7 @@ const AddGradePage: React.FC = () => {
       stateSubjectId &&
       stateSchoolId &&
       formData.selectedSchoolId === stateSchoolId &&
+      subjects?.length > 0 &&
       subjects.some((s) => s.id === stateSubjectId)
     ) {
       setFormData((prev) => ({ ...prev, selectedSubjectId: stateSubjectId }));
