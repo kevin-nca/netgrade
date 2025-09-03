@@ -50,7 +50,6 @@ const SettingsPage: React.FC = () => {
   const [showNameEditModal, setShowNameEditModal] = useState(false);
   const [appVersion] = useState('');
   const [showNavigationModal, setShowNavigationModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('settings');
   const [present] = useIonToast();
   const [presentAlert] = useIonAlert();
   const history = useHistory();
@@ -404,8 +403,7 @@ const SettingsPage: React.FC = () => {
       <BottomNavigation
         showNavigationModal={showNavigationModal}
         setShowNavigationModal={setShowNavigationModal}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
+
       />
     </IonPage>
   );

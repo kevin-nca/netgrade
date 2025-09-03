@@ -33,7 +33,6 @@ import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 
 function HomePage() {
   const [showNavigationModal, setShowNavigationModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('home');
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const [schoolNameInput, setSchoolNameInput] = useState('');
   const history = useHistory();
@@ -299,8 +298,7 @@ function HomePage() {
       <BottomNavigation
         showNavigationModal={showNavigationModal}
         setShowNavigationModal={setShowNavigationModal}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
+
       />
     </IonPage>
   );

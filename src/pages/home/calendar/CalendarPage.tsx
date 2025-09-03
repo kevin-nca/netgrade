@@ -33,7 +33,6 @@ const CalendarPage: React.FC = () => {
   const { data: allExams = [], error, isLoading, refetch } = useExams();
   const [showExamDetail, setShowExamDetail] = useState<Exam | null>(null);
   const [showNavigationModal, setShowNavigationModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('calendar');
 
   const {
     currentMonth,
@@ -169,8 +168,6 @@ const CalendarPage: React.FC = () => {
       <BottomNavigation
         showNavigationModal={showNavigationModal}
         setShowNavigationModal={setShowNavigationModal}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
       />
     </IonPage>
   );

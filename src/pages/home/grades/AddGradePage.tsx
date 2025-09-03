@@ -51,7 +51,6 @@ const AddGradePage: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showNavigationModal, setShowNavigationModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('grades');
 
   const { data: schools = [], error: schoolsError } = useSchools();
   const { data: subjects = [], error: subjectsError } = useSchoolSubjects(
@@ -315,8 +314,7 @@ const AddGradePage: React.FC = () => {
       <BottomNavigation
         showNavigationModal={showNavigationModal}
         setShowNavigationModal={setShowNavigationModal}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
+
       />
     </IonPage>
   );

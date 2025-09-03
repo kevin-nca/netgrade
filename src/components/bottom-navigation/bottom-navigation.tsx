@@ -1,5 +1,5 @@
-import React from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import { IonIcon } from '@ionic/react';
 import {
   calendar,
@@ -13,21 +13,33 @@ import { Routes } from '@/routes';
 interface BottomNavigationProps {
   showNavigationModal: boolean;
   setShowNavigationModal: (show: boolean) => void;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
 }
 
 const BottomNavigation: React.FC<BottomNavigationProps> = ({
   setShowNavigationModal,
-  activeTab,
-  setActiveTab,
 }) => {
   const history = useHistory();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState('home');
+
+  // Update activeTab based on current route
+  useEffect(() => {
+    const currentPath = location.pathname;
+    
+    if (currentPath === Routes.HOME) {
+      setActiveTab('home');
+    } else if (currentPath === Routes.CALENDAR) {
+      setActiveTab('calendar');
+    } else if (currentPath === Routes.GRADES_ADD) {
+      setActiveTab('grades');
+    } else if (currentPath === Routes.SETTINGS) {
+      setActiveTab('settings');
+    }
+  }, [location.pathname]);
 
   return (
     <>
       <div className="bottom-spacer" />
-
       {/* Tab Bar */}
       <div className="tab-bar">
         <div className="tab-bar-content">
@@ -43,12 +55,11 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
             </div>
             <span className="tab-label">Home</span>
           </div>
-
           <div
             className={`tab-item ${activeTab === 'calendar' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('calendar');
-              history.push(Routes.CALENDAR); 
+              history.push(Routes.CALENDAR);
             }}
           >
             <div className="tab-icon-wrapper">
@@ -56,7 +67,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
             </div>
             <span className="tab-label">Kalender</span>
           </div>
-
           <div className="tab-fab">
             <button
               className="tab-fab-button"
@@ -66,7 +76,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
             </button>
             <span className="tab-fab-label">Neu</span>
           </div>
-
           <div
             className={`tab-item ${activeTab === 'grades' ? 'active' : ''}`}
             onClick={() => {
@@ -79,7 +88,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
             </div>
             <span className="tab-label">Noten</span>
           </div>
-
           <div
             className={`tab-item ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => {
