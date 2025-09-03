@@ -15,6 +15,10 @@ import {
   useIonAlert,
   useIonToast,
   RefresherEventDetail,
+  IonButtons,
+  IonButton,
+  IonAlert,
+
 } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
@@ -36,6 +40,8 @@ import {
   useAddSchool,
   useUserName,
   useSaveUserName,
+  useDeleteSchool,
+  useUpdateSchool,
 } from '@/hooks/queries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
@@ -52,6 +58,8 @@ const SettingsPage: React.FC = () => {
   const [showNavigationModal, setShowNavigationModal] = useState(false);
   const [present] = useIonToast();
   const [presentAlert] = useIonAlert();
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [schoolIdToDelete, setSchoolIdToDelete] = useState<string | null>(null);
   const history = useHistory();
 
   const { data: schools = [], refetch } = useSchools();
@@ -59,6 +67,15 @@ const SettingsPage: React.FC = () => {
   const addSchoolMutation = useAddSchool();
   const saveUserNameMutation = useSaveUserName();
   const resetAllDataMutation = useResetAllDataMutation();
+  const deleteSchoolMutation = useDeleteSchool();
+  const updateSchoolMutation = useUpdateSchool();
+
+  const [expandedSchoolId, setExpandedSchoolId] = useState<string | null>(null);
+
+
+  const toggleSchool = (id: string) => {
+    setExpandedSchoolId((prev) => (prev === id ? null : id));
+  };
 
   const nameForm = useForm({
     defaultValues: {
@@ -163,6 +180,26 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleDeleteSchool = () => {
+    if (!schoolIdToDelete) return;
+    deleteSchoolMutation.mutate(schoolIdToDelete, {
+      onSuccess: () => {
+        showToast('Schule wurde gelöscht', true);
+        setShowDeleteAlert(false);
+        setSchoolIdToDelete(null);
+        refetch();
+      },
+      onError: (error) => {
+        showToast(
+          `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+          false,
+        );
+        setShowDeleteAlert(false);
+        setSchoolIdToDelete(null);
+      },
+    });
+  };
+
   return (
     <IonPage className="settings-page">
       <Header
@@ -215,18 +252,41 @@ const SettingsPage: React.FC = () => {
 
             <div className="settings-list">
               {schools.length > 0 ? (
-                schools.map((school, index) => (
-                  <div key={school.id} className="settings-item glass-card">
-                    <div className="item-content">
-                      <div className={`item-icon school-${index % 4}`}>
-                        {school.name.charAt(0).toUpperCase()}
+                schools.map((school, index) => {
+                  const isExpanded = expandedSchoolId === school.id;
+
+                  return (
+                    <div
+                      key={school.id}
+                      className={`settings-item glass-card ${isExpanded ? 'expanded' : ''}`}
+                      onClick={() => toggleSchool(school.id)}
+                    >
+                      <div className="item-content">
+                        <div className={`item-icon school-${index % 4}`}>
+                          {school.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="item-text">
+                          <h3 className="item-title">{school.name}</h3>
+                        </div>
                       </div>
-                      <div className="item-text">
-                        <h3 className="item-title">{school.name}</h3>
-                      </div>
+
+                      {isExpanded && (
+                        <div className="item-extra">
+                          <IonButtons slot="end">
+                            <IonButton className="delete-button" color="danger" onClick={(e) => {
+                              e.stopPropagation();
+                              setSchoolIdToDelete(school.id);
+                              setShowDeleteAlert(true);
+                            }}>
+                              <IonIcon slot="icon-only" icon={trashOutline} />
+                              <p className='delete-text'>Löschen</p>
+                            </IonButton>
+                          </IonButtons>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <div className="settings-item glass-card empty-item">
                   <div className="item-content">
@@ -301,6 +361,7 @@ const SettingsPage: React.FC = () => {
               <p className="version-text">{appVersion}</p>
             </div>
           )}
+          <div style={{ height: '80px' }} /> //to review
         </div>
 
         <NavigationModal
@@ -418,6 +479,31 @@ const SettingsPage: React.FC = () => {
           </IonContent>
         </IonPage>
       </IonModal>
+      <IonAlert
+        isOpen={showDeleteAlert}
+        onDidDismiss={() => {
+          setShowDeleteAlert(false);
+          setSchoolIdToDelete(null);
+        }}
+        header="Schule löschen?"
+        message={`Möchtest du die Schule wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
+        buttons={[
+          {
+            text: 'Abbrechen',
+            role: 'cancel',
+            handler: () => {
+              setShowDeleteAlert(false);
+              setSchoolIdToDelete(null);
+            },
+          },
+          {
+            text: 'Löschen',
+            role: 'destructive',
+            handler: handleDeleteSchool,
+          },
+        ]}
+      />
+
       <ExportDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
