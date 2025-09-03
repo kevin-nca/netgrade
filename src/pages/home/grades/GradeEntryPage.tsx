@@ -7,6 +7,7 @@ import {
   IonModal,
   IonPage,
   IonToast,
+  IonSpinner,
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
 import { useHistory, useParams } from 'react-router-dom';
@@ -22,6 +23,8 @@ import {
   useDeleteGrade,
   useUpdateExamAndGrade,
   useSchoolSubjects,
+  useSubjectGrades,
+  useSubject,
 } from '@/hooks/queries';
 import {
   validateGrade,
@@ -32,6 +35,7 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { Layout } from '@/components/Layout/Layout';
 import { Routes } from '@/routes';
+import { is } from 'date-fns/locale';
 
 interface GradeFormData {
   examName: string;
@@ -51,18 +55,18 @@ const GradeEntryPage: React.FC = () => {
   const history = useHistory();
 
   const {
-    data: allGrades = [],
-    error: gradesError,
-    isLoading: gradesLoading,
-  } = useGrades();
+    data: grades = [],
+    isLoading: isGradesLoading,
+    isError: isGradesError,
+  } = useSubjectGrades(subjectId);
+  const {
+    data: subject,
+    isLoading: isSubjectLoading,
+    isError: isSubjectError,
+  } = useSubject(subjectId);
 
-  const { data: subjects = [] } = useSchoolSubjects(schoolId || '');
-
-  const subject = subjects.find((s: any) => s.id === subjectId);
-
-  const grades = allGrades.filter(
-    (grade: Grade) => grade.exam.subjectId === subjectId,
-  );
+  const isLoading = isGradesLoading || isSubjectLoading;
+  const isError = isGradesError || isSubjectError;
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const { showToast, toastMessage, setShowToast, showMessage } = useToast();
@@ -167,7 +171,8 @@ const GradeEntryPage: React.FC = () => {
   return (
     <IonPage>
       <Header
-        title={subject ? subject.name : 'Notenübersicht'}
+        /**FIXME: Maybe improve this handling s.t. we do not have to set empty string while subjects are loading. */
+        title={subject?.name || ''}
         backButton
         onBack={() => window.history.back()}
         endSlot={
@@ -183,11 +188,11 @@ const GradeEntryPage: React.FC = () => {
       />
       <IonContent>
         <Layout>
-          {gradesLoading ? (
+          {isGradesLoading ? (
             <div className="ion-padding ion-text-center">
               <p>Noten werden geladen...</p>
             </div>
-          ) : gradesError ? (
+          ) : isGradesError ? (
             <div className="ion-padding ion-text-center">
               <p>Fehler beim Laden der Noten.</p>
             </div>
