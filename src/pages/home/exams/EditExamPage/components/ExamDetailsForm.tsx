@@ -80,7 +80,7 @@ export const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
           <IonItem className={styles.formItem}>
             <IonInput
               value={formValues.title}
-              onIonChange={(e) => handleTitleChange(e.detail.value || '')}
+              onIonInput={(e) => handleTitleChange(e.detail.value || '')}
               placeholder="Prüfungstitel"
               required
               className={styles.formInput}
@@ -104,7 +104,7 @@ export const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
             <IonInput
               type="date"
               value={formValues.date}
-              onIonChange={(e) => handleDateChange(e.detail.value || '')}
+              onIonInput={(e) => handleDateChange(e.detail.value || '')}
               required
               className={styles.formInput}
             />

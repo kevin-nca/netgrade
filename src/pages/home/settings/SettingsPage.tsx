@@ -6,8 +6,6 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
-  IonButtons,
-  IonBackButton,
   IonRefresher,
   IonRefresherContent,
   IonIcon,
@@ -18,6 +16,7 @@ import {
   useIonToast,
   RefresherEventDetail,
 } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 import {
   personOutline,
   schoolOutline,
@@ -40,9 +39,12 @@ import {
 } from '@/hooks/queries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
+import Header from '@/components/Header/Header';
+import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
 import './SettingsPage.css';
 
 const SettingsPage: React.FC = () => {
+  const history = useHistory();
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [nameInput, setNameInput] = useState('');
@@ -135,7 +137,7 @@ const SettingsPage: React.FC = () => {
               await resetAllDataMutation.mutateAsync();
               showToast('Alle Daten wurden erfolgreich zurückgesetzt');
               setTimeout(() => {
-                window.location.replace(Routes.ONBOARDING);
+                history.replace(Routes.ONBOARDING);
               }, 1500);
             } catch {
               showToast(
@@ -159,18 +161,7 @@ const SettingsPage: React.FC = () => {
 
   return (
     <IonPage className="settings-page">
-      <IonHeader className="settings-header">
-        <IonToolbar className="settings-toolbar">
-          <IonButtons slot="start">
-            <IonBackButton
-              defaultHref={Routes.HOME}
-              text=""
-              className="back-button"
-            />
-          </IonButtons>
-          <IonTitle className="settings-title">Einstellungen</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+      <Header title="Einstellungen" backButton={true} />
 
       <IonContent className="settings-content" scrollY={true}>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
@@ -203,7 +194,6 @@ const SettingsPage: React.FC = () => {
               </div>
             </div>
           </div>
-
           <div className="settings-section">
             <div className="section-header">
               <h2 className="section-title">Deine Schulen</h2>
@@ -246,7 +236,7 @@ const SettingsPage: React.FC = () => {
               )}
             </div>
           </div>
-
+          <NotificationSettings />
           <div className="settings-section">
             <div className="section-header">
               <h2 className="section-title">Aktionen</h2>
@@ -408,7 +398,6 @@ const SettingsPage: React.FC = () => {
           </IonContent>
         </IonPage>
       </IonModal>
-
       <ExportDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonRouterOutlet, IonTabs } from '@ionic/react';
+import { IonRouterOutlet, IonSpinner, IonTabs, isPlatform } from '@ionic/react';
 import { Redirect, Route } from 'react-router-dom';
 
 import GradeEntryPage from '@/pages/home/grades/GradeEntryPage';
@@ -14,24 +14,44 @@ import EditExamPage from '@/pages/home/exams/EditExamPage/EditExamPage';
 import { Routes } from '@/routes';
 import { useOnboardingCompleted } from '@/hooks/queries';
 
+import { EdgeSwipeBack } from '@/components/navigation/EdgeSwipeBack';
+
 export function AppRouter() {
-  const { data: isOnboarded } = useOnboardingCompleted();
+  const { data: isOnboarded, isLoading } = useOnboardingCompleted();
   const [, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (isOnboarded !== undefined) {
-      setIsInitialized(true);
-    }
+    setIsInitialized(true);
   }, [isOnboarded]);
+
+  if (isLoading) {
+    return (
+      <IonTabs>
+        <IonRouterOutlet animated={true}>
+          <Route exact path={Routes.MAIN}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+              }}
+            >
+              <IonSpinner />
+            </div>
+          </Route>
+        </IonRouterOutlet>
+      </IonTabs>
+    );
+  }
 
   return (
     <IonTabs>
-      <IonRouterOutlet>
-        <Redirect
-          exact
-          path={Routes.MAIN}
-          to={isOnboarded ? Routes.HOME : Routes.ONBOARDING}
-        />
+      <IonRouterOutlet animated={true}>
+        <Route exact path={Routes.MAIN}>
+          <Redirect to={isOnboarded ? Routes.HOME : Routes.ONBOARDING} />
+        </Route>
+
         <Route exact path={Routes.ONBOARDING} component={OnboardingPage} />
         <Route exact path={Routes.SCHOOL} component={SchoolPage} />
         <Route exact path={Routes.HOME} component={HomePage} />
@@ -42,6 +62,8 @@ export function AppRouter() {
         <Route exact path={Routes.EXAMS_ADD} component={AddExamPage} />
         <Route exact path={Routes.EXAM_EDIT} component={EditExamPage} />
       </IonRouterOutlet>
+
+      {isPlatform('ios') && <EdgeSwipeBack />}
     </IonTabs>
   );
 }

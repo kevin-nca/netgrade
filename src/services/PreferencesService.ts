@@ -1,8 +1,24 @@
 import { Preferences } from '@capacitor/preferences';
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { Capacitor } from '@capacitor/core';
 
 export interface AppPreferences {
   userName: string | null;
   onboardingCompleted: boolean;
+}
+
+export interface NotificationSettings {
+  enabled: boolean;
+  reminderDays: number;
+  reminderTime: [number, number];
+  autoSchedulingEnabled: boolean;
+}
+
+interface LegacyNotificationSettings {
+  enabled: boolean;
+  reminderDays: number;
+  reminderTime: string;
+  autoSchedulingEnabled: boolean;
 }
 
 /**
@@ -11,6 +27,7 @@ export interface AppPreferences {
 const PREFERENCE_KEYS = {
   userName: 'user_name',
   onboardingCompleted: 'onboarding_completed',
+  notificationSettings: 'notification_settings',
 } as const;
 
 export type PreferenceKey =
@@ -42,6 +59,23 @@ const preferenceDefinitions: {
 };
 
 export class PreferencesService {
+  private static readonly DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings =
+    {
+      enabled: false,
+      reminderDays: 1,
+      reminderTime: [9, 0],
+      autoSchedulingEnabled: true,
+    };
+
+  private static readonly AVAILABLE_REMINDER_TIMES: [number, number][] = [
+    [8, 0],
+    [9, 0],
+    [10, 0],
+    [12, 0],
+    [18, 0],
+    [20, 0],
+  ];
+
   /**
    * Persist the given username in Capacitor Preferences.
    *
@@ -82,6 +116,82 @@ export class PreferencesService {
     return this.getPreference('onboardingCompleted');
   }
 
+  /**
+   * Get notification settings, returns defaults if none set
+   * Handles migration from old string format to new tuple format
+   */
+  static async getNotificationSettings(): Promise<NotificationSettings> {
+    try {
+      const settings = await this.getGenericPreference<
+        NotificationSettings | LegacyNotificationSettings
+      >(PREFERENCE_KEYS.notificationSettings);
+      if (!settings) {
+        return this.DEFAULT_NOTIFICATION_SETTINGS;
+      }
+      if (typeof settings.reminderTime === 'string') {
+        const legacySettings = settings as LegacyNotificationSettings;
+        const [hours, minutes] = legacySettings.reminderTime
+          .split(':')
+          .map(Number);
+        const migratedSettings: NotificationSettings = {
+          enabled: legacySettings.enabled,
+          reminderDays: legacySettings.reminderDays,
+          autoSchedulingEnabled: legacySettings.autoSchedulingEnabled,
+          reminderTime: [hours, minutes],
+        };
+        await this.saveNotificationSettings(migratedSettings);
+        return migratedSettings;
+      }
+
+      return settings as NotificationSettings;
+    } catch (error) {
+      console.error('Error loading notification settings:', error);
+      return this.DEFAULT_NOTIFICATION_SETTINGS;
+    }
+  }
+
+  /**
+   * Save notification settings
+   */
+  static async saveNotificationSettings(
+    settings: NotificationSettings,
+  ): Promise<void> {
+    try {
+      await this.setGenericPreference(
+        PREFERENCE_KEYS.notificationSettings,
+        settings,
+      );
+    } catch (error) {
+      console.error('Error saving notification settings:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Request notification permissions
+   */
+  static async requestNotificationPermissions(): Promise<boolean> {
+    if (!Capacitor.isNativePlatform()) {
+      console.log('Local notifications not available in web');
+      return false;
+    }
+
+    try {
+      const permission = await LocalNotifications.requestPermissions();
+      return permission.display === 'granted';
+    } catch (error) {
+      console.error('Error requesting notification permissions:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get available reminder times (static data)
+   */
+  static getAvailableReminderTimes(): [number, number][] {
+    return [...this.AVAILABLE_REMINDER_TIMES];
+  }
+
   private static async setPreference<K extends keyof AppPreferences>(
     key: K,
     value: NonNullable<AppPreferences[K]>,
@@ -107,6 +217,41 @@ export class PreferencesService {
     } catch (err) {
       console.error(`Error getting ${key}:`, err);
       return def.parse(null);
+    }
+  }
+
+  /**
+   * Stores JSON-serializable data under a key
+   */
+  private static async setGenericPreference<T>(
+    key: string,
+    value: T | null | undefined,
+  ): Promise<void> {
+    if (value === null || value === undefined) {
+      await Preferences.remove({ key });
+    } else {
+      await Preferences.set({
+        key,
+        value: JSON.stringify(value),
+      });
+    }
+  }
+
+  /**
+   * Loads JSON-serializable data from a key
+   */
+  private static async getGenericPreference<T = unknown>(
+    key: string,
+  ): Promise<T | null> {
+    const result = await Preferences.get({ key });
+    if (result.value === null) {
+      return null;
+    }
+    try {
+      return JSON.parse(result.value) as T;
+    } catch (error) {
+      console.error(`Error parsing preference ${key}:`, error);
+      return null;
     }
   }
 }
