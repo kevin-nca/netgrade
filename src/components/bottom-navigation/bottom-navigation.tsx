@@ -18,7 +18,6 @@ interface BottomNavigationProps {
 }
 
 const BottomNavigation: React.FC<BottomNavigationProps> = ({
-  showNavigationModal,
   setShowNavigationModal,
   activeTab,
   setActiveTab,

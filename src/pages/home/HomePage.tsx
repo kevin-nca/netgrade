@@ -10,15 +10,11 @@ import {
 } from '@ionic/react';
 import {
   add,
-  calendar,
-  settings,
   school,
   chevronForwardOutline,
-  trophyOutline,
   bookOutline,
   statsChartOutline,
   timeOutline,
-  homeOutline,
   personCircleOutline,
 } from 'ionicons/icons';
 import {

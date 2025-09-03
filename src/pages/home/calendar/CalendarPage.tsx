@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import {
   IonPage,
   IonContent,
@@ -35,7 +34,6 @@ const CalendarPage: React.FC = () => {
   const [showExamDetail, setShowExamDetail] = useState<Exam | null>(null);
   const [showNavigationModal, setShowNavigationModal] = useState(false);
   const [activeTab, setActiveTab] = useState('calendar');
-  const history = useHistory();
 
   const {
     currentMonth,
