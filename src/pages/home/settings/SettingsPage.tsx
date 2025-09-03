@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
 import {
   IonContent,
   IonPage,
@@ -44,7 +43,6 @@ import NotificationSettings from '@/pages/home/settings/notification/Notificatio
 import './SettingsPage.css';
 
 const SettingsPage: React.FC = () => {
-  const history = useHistory();
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [nameInput, setNameInput] = useState('');
