@@ -27,7 +27,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
 
   return (
     <>
-      {/* Bottom Spacer für Tab-Bar */}
       <div className="bottom-spacer" />
 
       {/* Tab Bar */}
