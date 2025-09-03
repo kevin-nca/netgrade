@@ -35,7 +35,6 @@ import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import './HomePage.css';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 
-
 function HomePage() {
   const [showNavigationModal, setShowNavigationModal] = useState(false);
   const [activeTab, setActiveTab] = useState('home');

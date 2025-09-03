@@ -13,11 +13,7 @@ import {
   IonSkeletonText,
   RefresherEventDetail,
 } from '@ionic/react';
-import {
-  calendar,
-  list,
-  informationCircle,
-} from 'ionicons/icons';
+import { calendar, list, informationCircle } from 'ionicons/icons';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import Header from '@/components/Header/Header';
