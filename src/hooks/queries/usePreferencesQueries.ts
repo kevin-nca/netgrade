@@ -38,7 +38,6 @@ export const useOnboardingCompleted = () => {
   return useQuery({
     queryKey: preferencesKeys.onboardingCompleted(),
     queryFn: () => PreferencesService.isOnboardingCompleted(),
-    placeholderData: () => false,
     select: (v) => Boolean(v),
   });
 };

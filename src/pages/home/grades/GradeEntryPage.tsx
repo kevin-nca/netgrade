@@ -46,7 +46,7 @@ interface GradeEntryParams {
 }
 
 const GradeEntryPage: React.FC = () => {
-  const { subjectId } = useParams<GradeEntryParams>();
+  const { schoolId, subjectId } = useParams<GradeEntryParams>();
   const history = useHistory();
 
   const {
@@ -169,7 +169,10 @@ const GradeEntryPage: React.FC = () => {
           <IonButtons slot="end">
             <Button
               handleEvent={() => {
-                history.push(Routes.GRADES_ADD);
+                history.push(Routes.GRADES_ADD, {
+                  schoolId,
+                  subjectId,
+                });
               }}
               text={<IonIcon icon={add} />}
             />
