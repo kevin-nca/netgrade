@@ -7,7 +7,6 @@ import {
   IonModal,
   IonPage,
   IonToast,
-  IonSpinner,
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
 import { useHistory, useParams } from 'react-router-dom';
@@ -19,10 +18,8 @@ import GradeListItem from '@/components/List/GradeListItem';
 import FormField from '@/components/Form/FormField';
 import { Grade } from '@/db/entities';
 import {
-  useGrades,
   useDeleteGrade,
   useUpdateExamAndGrade,
-  useSchoolSubjects,
   useSubjectGrades,
   useSubject,
 } from '@/hooks/queries';
@@ -35,7 +32,6 @@ import {
 import { useToast } from '@/hooks/useToast';
 import { Layout } from '@/components/Layout/Layout';
 import { Routes } from '@/routes';
-import { is } from 'date-fns/locale';
 
 interface GradeFormData {
   examName: string;
