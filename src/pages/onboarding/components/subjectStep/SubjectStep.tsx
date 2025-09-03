@@ -205,7 +205,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                         <IonInput
                           value={newSubject.name}
                           placeholder="z.B. Mathematik"
-                          onIonChange={(e) =>
+                          onIonInput={(e) =>
                             setNewSubject((prev) => ({
                               ...prev,
                               name: e.detail.value || '',
@@ -231,7 +231,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                         <IonInput
                           value={newSubject.teacher}
                           placeholder="z.B. Frau Schmidt"
-                          onIonChange={(e) =>
+                          onIonInput={(e) =>
                             setNewSubject((prev) => ({
                               ...prev,
                               teacher: e.detail.value || '',
@@ -257,7 +257,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                         <IonTextarea
                           value={newSubject.description}
                           placeholder="Zusätzliche Informationen..."
-                          onIonChange={(e) =>
+                          onIonInput={(e) =>
                             setNewSubject((prev) => ({
                               ...prev,
                               description: e.detail.value || '',

@@ -11,6 +11,7 @@ import { setupIonicReact } from '@ionic/react';
 import App from './App';
 import { initializeDatabase } from '@/db/data-source';
 import { AppInfo } from '@/AppInfo';
+import { notificationScheduler } from './notification-scheduler';
 
 setupIonicReact({
   animated: true,
@@ -24,8 +25,10 @@ AppInfo.initialize()
   .then(() => {
     console.log('AppInfo initialized successfully.');
     initializeDatabase()
-      .then(() => {
+      .then(async () => {
         console.log('Database initialized successfully.');
+        await notificationScheduler.start();
+
         root.render(
           <React.StrictMode>
             <App />

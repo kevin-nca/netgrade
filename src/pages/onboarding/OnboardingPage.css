@@ -189,7 +189,7 @@
 /* Footer Buttons */
 .step-footer {
   padding-top: 20px;
-  margin-top: auto;
+  padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 24px));
 }
 
 .button-group {

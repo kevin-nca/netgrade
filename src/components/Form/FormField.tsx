@@ -99,7 +99,7 @@ const FormField: React.FC<FormFieldProps> = ({
           // For a text or number field, ensure we convert the value to string
           // to display in the input.
           value={value !== undefined && value !== null ? value.toString() : ''}
-          onIonChange={(e) => {
+          onIonInput={(e) => {
             // e.detail.value can be string | null | undefined
             handleGenericChange(e.detail.value);
           }}
