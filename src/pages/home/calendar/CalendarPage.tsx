@@ -16,6 +16,7 @@ import { calendar, list, informationCircle } from 'ionicons/icons';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import Header from '@/components/Header/Header';
+import NavigationModal from '@/components/navigation/home/NavigationModal';
 import './calendar.css';
 import { Exam } from '@/db/entities/Exam';
 import { useExams } from '@/hooks/queries';
@@ -24,12 +25,14 @@ import MonthSelector from './components/MonthSelector';
 import CalendarGrid from './components/CalendarGrid';
 import SelectedDateView from './components/SelectedDateView';
 import ExamListView from './components/ExamListView';
+import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 
 import { useCalendar } from '@/pages/home/calendar/hook/useCalendar';
 
 const CalendarPage: React.FC = () => {
   const { data: allExams = [], error, isLoading, refetch } = useExams();
   const [showExamDetail, setShowExamDetail] = useState<Exam | null>(null);
+  const [showNavigationModal, setShowNavigationModal] = useState(false);
 
   const {
     currentMonth,
@@ -155,7 +158,17 @@ const CalendarPage: React.FC = () => {
           buttons={['OK']}
           onDidDismiss={() => setShowExamDetail(null)}
         />
+
+        <NavigationModal
+          isOpen={showNavigationModal}
+          setIsOpen={setShowNavigationModal}
+        />
       </IonContent>
+
+      <BottomNavigation
+        showNavigationModal={showNavigationModal}
+        setShowNavigationModal={setShowNavigationModal}
+      />
     </IonPage>
   );
 };
