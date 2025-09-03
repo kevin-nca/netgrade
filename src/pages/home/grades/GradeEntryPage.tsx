@@ -47,7 +47,7 @@ interface GradeEntryParams {
 }
 
 const GradeEntryPage: React.FC = () => {
-  const { subjectId, schoolId } = useParams<GradeEntryParams>();
+  const { subjectId } = useParams<GradeEntryParams>();
   const history = useHistory();
 
   const {
