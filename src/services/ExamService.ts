@@ -1,5 +1,6 @@
 import { getRepositories } from '@/db/data-source';
 import { Exam } from '@/db/entities/Exam';
+import { MoreThanOrEqual } from 'typeorm';
 
 export class ExamService {
   /**
@@ -127,6 +128,25 @@ export class ExamService {
       });
     } catch (error) {
       console.error(`Failed to find exams for subject ID ${subjectId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetches upcoming exams from the database
+   * @returns Promise<Exam[]> - A promise that resolves to an array of upcoming exams
+   */
+  static async fetchUpcoming(): Promise<Exam[]> {
+    try {
+      const { exam: examRepo } = getRepositories();
+      const now = new Date();
+
+      return await examRepo.find({
+        where: { date: MoreThanOrEqual(now) },
+        order: { date: 'ASC' },
+      });
+    } catch (error) {
+      console.error('Failed to fetch upcoming exams:', error);
       throw error;
     }
   }
