@@ -403,7 +403,6 @@ const SettingsPage: React.FC = () => {
       <BottomNavigation
         showNavigationModal={showNavigationModal}
         setShowNavigationModal={setShowNavigationModal}
-
       />
     </IonPage>
   );

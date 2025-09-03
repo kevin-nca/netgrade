@@ -25,7 +25,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
   // Update activeTab based on current route
   useEffect(() => {
     const currentPath = location.pathname;
-    
+
     if (currentPath === Routes.HOME) {
       setActiveTab('home');
     } else if (currentPath === Routes.CALENDAR) {

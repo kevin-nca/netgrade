@@ -314,7 +314,6 @@ const AddGradePage: React.FC = () => {
       <BottomNavigation
         showNavigationModal={showNavigationModal}
         setShowNavigationModal={setShowNavigationModal}
-
       />
     </IonPage>
   );

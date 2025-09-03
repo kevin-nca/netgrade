@@ -298,7 +298,6 @@ function HomePage() {
       <BottomNavigation
         showNavigationModal={showNavigationModal}
         setShowNavigationModal={setShowNavigationModal}
-
       />
     </IonPage>
   );
