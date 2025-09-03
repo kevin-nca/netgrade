@@ -47,7 +47,10 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
 
           <div
             className={`tab-item ${activeTab === 'calendar' ? 'active' : ''}`}
-            onClick={() => setActiveTab('calendar')}
+            onClick={() => {
+              setActiveTab('calendar');
+              history.push(Routes.CALENDAR); // ← Jetzt mit Navigation!
+            }}
           >
             <div className="tab-icon-wrapper">
               <IonIcon icon={calendar} className="tab-icon" />
