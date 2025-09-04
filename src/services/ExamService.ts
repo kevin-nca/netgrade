@@ -18,6 +18,14 @@ export class ExamService {
   }
 
   /**
+   * TEST
+   * @returns boolean - A boolean that is always true
+   */
+  static returnTrueAlways(): boolean {
+    return true;
+  }
+
+  /**
    * Adds a new exam to the database
    * @param newExamData - The data for the new exam
    * @returns Promise<Exam> - A promise that resolves to the newly created exam
