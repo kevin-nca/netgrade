@@ -133,4 +133,10 @@ describe('ExamService', () => {
   it('should throw an error when deleting a non-existent exam', async () => {
     await expect(ExamService.delete('non-existent-id')).rejects.toThrow();
   });
+
+  it('should return true when calling returnTrueAlways', () => {
+    const result = ExamService.returnTrueAlways();
+    
+    expect(result).toBe(true);
+  });
 });
