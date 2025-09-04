@@ -18,9 +18,10 @@ import GradeListItem from '@/components/List/GradeListItem';
 import FormField from '@/components/Form/FormField';
 import { Grade } from '@/db/entities';
 import {
-  useGrades,
   useDeleteGrade,
   useUpdateExamAndGrade,
+  useSubjectGrades,
+  useSubject,
 } from '@/hooks/queries';
 import {
   validateGrade,
@@ -46,18 +47,22 @@ interface GradeEntryParams {
 }
 
 const GradeEntryPage: React.FC = () => {
-  const { schoolId, subjectId } = useParams<GradeEntryParams>();
+  const { subjectId } = useParams<GradeEntryParams>();
   const history = useHistory();
 
   const {
-    data: allGrades = [],
-    error: gradesError,
-    isLoading: gradesLoading,
-  } = useGrades();
+    data: grades = [],
+    isLoading: isGradesLoading,
+    isError: isGradesError,
+  } = useSubjectGrades(subjectId);
+  const {
+    data: subject,
+    isLoading: isSubjectLoading,
+    isError: isSubjectError,
+  } = useSubject(subjectId);
 
-  const grades = allGrades.filter(
-    (grade: Grade) => grade.exam.subjectId === subjectId,
-  );
+  const isLoading = isGradesLoading || isSubjectLoading;
+  const isError = isGradesError || isSubjectError;
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const { showToast, toastMessage, setShowToast, showMessage } = useToast();
@@ -162,17 +167,15 @@ const GradeEntryPage: React.FC = () => {
   return (
     <IonPage>
       <Header
-        title="Notenübersicht"
+        /**FIXME: Maybe improve this handling s.t. we do not have to set empty string while subjects are loading. */
+        title={subject?.name || ''}
         backButton
         onBack={() => window.history.back()}
         endSlot={
           <IonButtons slot="end">
             <Button
               handleEvent={() => {
-                history.push(Routes.GRADES_ADD, {
-                  schoolId,
-                  subjectId,
-                });
+                history.push(Routes.GRADES_ADD);
               }}
               text={<IonIcon icon={add} />}
             />
@@ -181,11 +184,11 @@ const GradeEntryPage: React.FC = () => {
       />
       <IonContent>
         <Layout>
-          {gradesLoading ? (
+          {isGradesLoading ? (
             <div className="ion-padding ion-text-center">
               <p>Noten werden geladen...</p>
             </div>
-          ) : gradesError ? (
+          ) : isGradesError ? (
             <div className="ion-padding ion-text-center">
               <p>Fehler beim Laden der Noten.</p>
             </div>
