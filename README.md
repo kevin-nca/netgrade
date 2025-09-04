@@ -1,5 +1,7 @@
 # NetGrade
 
+[![Coverage Status](https://codecov.io/gh/kevin-nca/netgrade/branch/main/graph/badge.svg)](https://codecov.io/gh/kevin-nca/netgrade)
+
 ## Overview
 
 **NetGrade** is a Progressive Web App (PWA) designed to deliver a native-like experience on web and mobile platforms.
@@ -13,7 +15,7 @@
 | Capacitor       | Native runtime for web apps on mobile platforms devices |
 | Vite            | Fast build tool and development server                  |
 | Cypress         | End-to-end testing                                      |
-| Jest            | Unit testing framework                                  |
+| Vitest          | Unit testing framework                                  |
 | Prettier        | Code formatting                                         |
 | ESLint          | Linting and code quality checks                         |
 | TypeORM         | ORM                                                     |
@@ -102,13 +104,21 @@ ESLint helps in identifying and reporting on patterns found in the code. The con
 
 ### Unit Tests
 
-Unit tests are written using **Jest**.
+Unit tests are written using **Vitest**.
 
 - **Running Unit Tests**:
 
   ```bash
-  npm run test
+  npm test
   ```
+
+- **Running Tests with Coverage**:
+
+  ```bash
+  npm run test:coverage
+  ```
+
+  The coverage report is generated in the `coverage/` directory.
 
 Test files are typically located alongside the components they test, following the naming convention
 `ComponentName.test.tsx`.
