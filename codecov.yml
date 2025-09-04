@@ -3,10 +3,21 @@ coverage:
     project:
       default:
         target: auto
-        threshold: 1%
+        threshold: 30%
+        informational: true
+      services:
+        target: auto
+        threshold: 65%
+        paths:
+          - 'src/services'
     patch:
       default:
         target: 50%
+        informational: true
+      services:
+        target: 95%
+        paths:
+          - 'src/services'
 ignore:
   - 'node_modules/**'
   - 'android/**'
