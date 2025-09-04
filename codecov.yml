@@ -1,0 +1,29 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 30%
+        informational: true
+      services:
+        target: auto
+        threshold: 65%
+        paths:
+          - 'src/services'
+    patch:
+      default:
+        target: 50%
+        informational: true
+      services:
+        target: 95%
+        paths:
+          - 'src/services'
+ignore:
+  - 'node_modules/**'
+  - 'android/**'
+  - 'ios/**'
+  - 'cypress/**'
+  - 'dist/**'
+  - 'public/**'
+  - 'resources/**'
+  - 'coverage/**'
