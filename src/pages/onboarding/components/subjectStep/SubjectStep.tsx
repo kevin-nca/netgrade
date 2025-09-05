@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useForm } from '@tanstack/react-form';
 import {
   IonButton,
   IonIcon,
@@ -40,13 +41,37 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
       data.schools[0] ||
       null,
   );
-  const [newSubject, setNewSubject] = useState<Partial<TempSubject>>({
-    name: '',
-    teacher: '',
-    description: '',
-    weight: 100,
-  });
   const [showAddForm, setShowAddForm] = useState(false);
+
+  const form = useForm({
+    defaultValues: {
+      name: '',
+      teacher: '',
+      description: '',
+      weight: 100,
+    },
+    onSubmit: async ({ value }) => {
+      if (selectedSchool) {
+        const subject: TempSubject = {
+          id: generateId(),
+          name: value.name.trim(),
+          teacher: value.teacher?.trim() || null,
+          description: value.description?.trim() || null,
+          weight: 100,
+          schoolId: selectedSchool.id,
+        };
+
+        setData((prev) => ({
+          ...prev,
+          subjects: [...prev.subjects, subject],
+        }));
+
+        form.reset();
+        form.setFieldValue('weight', 100);
+        setShowAddForm(false);
+      }
+    },
+  });
 
   useEffect(() => {
     if (selectedSchool) {
@@ -55,24 +80,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
   }, [selectedSchool, setSelectedSchoolId]);
 
   const handleAddSubject = () => {
-    if (newSubject.name?.trim() && selectedSchool) {
-      const subject: TempSubject = {
-        id: generateId(),
-        name: newSubject.name.trim(),
-        teacher: newSubject.teacher?.trim() || null,
-        description: newSubject.description?.trim() || null,
-        weight: 100,
-        schoolId: selectedSchool.id,
-      };
-
-      setData((prev) => ({
-        ...prev,
-        subjects: [...prev.subjects, subject],
-      }));
-
-      setNewSubject({ name: '', teacher: '', description: '', weight: 100 });
-      setShowAddForm(false);
-    }
+    form.handleSubmit();
   };
 
   const handleRemoveSubject = (subjectId: string) => {
@@ -195,81 +203,87 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                 <h3 className="form-title">Neues Fach erstellen</h3>
 
                 <div className="form-fields">
-                  <div className="field-group">
-                    <label className="field-label">Fachname *</label>
-                    <div className="input-wrapper glass-input">
-                      <IonItem lines="none" className="input-item">
-                        <div slot="start" className="input-icon-wrapper">
-                          <IonIcon icon={bookOutline} className="input-icon" />
+                  <form.Field name="name">
+                    {(field) => (
+                      <div className="field-group">
+                        <label className="field-label">Fachname *</label>
+                        <div className="input-wrapper glass-input">
+                          <IonItem lines="none" className="input-item">
+                            <div slot="start" className="input-icon-wrapper">
+                              <IonIcon
+                                icon={bookOutline}
+                                className="input-icon"
+                              />
+                            </div>
+                            <IonInput
+                              value={field.state.value}
+                              placeholder="z.B. Mathematik"
+                              onIonInput={(e) =>
+                                field.handleChange(e.detail.value || '')
+                              }
+                              className="input-field"
+                              clearInput
+                            />
+                          </IonItem>
                         </div>
-                        <IonInput
-                          value={newSubject.name}
-                          placeholder="z.B. Mathematik"
-                          onIonInput={(e) =>
-                            setNewSubject((prev) => ({
-                              ...prev,
-                              name: e.detail.value || '',
-                            }))
-                          }
-                          className="input-field"
-                          clearInput
-                        />
-                      </IonItem>
-                    </div>
-                  </div>
+                      </div>
+                    )}
+                  </form.Field>
 
-                  <div className="field-group">
-                    <label className="field-label">Lehrer/in</label>
-                    <div className="input-wrapper glass-input">
-                      <IonItem lines="none" className="input-item">
-                        <div slot="start" className="input-icon-wrapper">
-                          <IonIcon
-                            icon={personOutline}
-                            className="input-icon"
-                          />
+                  <form.Field name="teacher">
+                    {(field) => (
+                      <div className="field-group">
+                        <label className="field-label">Lehrer/in</label>
+                        <div className="input-wrapper glass-input">
+                          <IonItem lines="none" className="input-item">
+                            <div slot="start" className="input-icon-wrapper">
+                              <IonIcon
+                                icon={personOutline}
+                                className="input-icon"
+                              />
+                            </div>
+                            <IonInput
+                              value={field.state.value}
+                              placeholder="z.B. Frau Schmidt"
+                              onIonInput={(e) =>
+                                field.handleChange(e.detail.value || '')
+                              }
+                              className="input-field"
+                              clearInput
+                            />
+                          </IonItem>
                         </div>
-                        <IonInput
-                          value={newSubject.teacher}
-                          placeholder="z.B. Frau Schmidt"
-                          onIonInput={(e) =>
-                            setNewSubject((prev) => ({
-                              ...prev,
-                              teacher: e.detail.value || '',
-                            }))
-                          }
-                          className="input-field"
-                          clearInput
-                        />
-                      </IonItem>
-                    </div>
-                  </div>
+                      </div>
+                    )}
+                  </form.Field>
 
-                  <div className="field-group">
-                    <label className="field-label">Beschreibung</label>
-                    <div className="input-wrapper glass-input">
-                      <IonItem lines="none" className="input-item">
-                        <div slot="start" className="input-icon-wrapper">
-                          <IonIcon
-                            icon={documentTextOutline}
-                            className="input-icon"
-                          />
+                  <form.Field name="description">
+                    {(field) => (
+                      <div className="field-group">
+                        <label className="field-label">Beschreibung</label>
+                        <div className="input-wrapper glass-input">
+                          <IonItem lines="none" className="input-item">
+                            <div slot="start" className="input-icon-wrapper">
+                              <IonIcon
+                                icon={documentTextOutline}
+                                className="input-icon"
+                              />
+                            </div>
+                            <IonTextarea
+                              value={field.state.value}
+                              placeholder="Zusätzliche Informationen..."
+                              onIonInput={(e) =>
+                                field.handleChange(e.detail.value || '')
+                              }
+                              className="input-field"
+                              rows={2}
+                              autoGrow
+                            />
+                          </IonItem>
                         </div>
-                        <IonTextarea
-                          value={newSubject.description}
-                          placeholder="Zusätzliche Informationen..."
-                          onIonInput={(e) =>
-                            setNewSubject((prev) => ({
-                              ...prev,
-                              description: e.detail.value || '',
-                            }))
-                          }
-                          className="input-field"
-                          rows={2}
-                          autoGrow
-                        />
-                      </IonItem>
-                    </div>
-                  </div>
+                      </div>
+                    )}
+                  </form.Field>
                 </div>
 
                 <div className="form-actions">
@@ -277,24 +291,24 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                     fill="clear"
                     onClick={() => {
                       setShowAddForm(false);
-                      setNewSubject({
-                        name: '',
-                        teacher: '',
-                        description: '',
-                        weight: 100,
-                      });
+                      form.reset();
+                      form.setFieldValue('weight', 100);
                     }}
                     className="cancel-button"
                   >
                     Abbrechen
                   </IonButton>
-                  <IonButton
-                    onClick={handleAddSubject}
-                    disabled={!newSubject.name?.trim()}
-                    className="save-button"
-                  >
-                    Hinzufügen
-                  </IonButton>
+                  <form.Subscribe selector={(state) => [state.values.name]}>
+                    {([name]) => (
+                      <IonButton
+                        onClick={handleAddSubject}
+                        disabled={!name?.trim()}
+                        className="save-button"
+                      >
+                        Hinzufügen
+                      </IonButton>
+                    )}
+                  </form.Subscribe>
                 </div>
               </div>
             </div>
