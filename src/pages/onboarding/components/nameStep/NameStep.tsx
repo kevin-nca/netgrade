@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from '@tanstack/react-form';
 import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/react';
 import {
   personCircleOutline,
@@ -15,13 +16,18 @@ interface NameStepProps {
 }
 
 const NameStep: React.FC<NameStepProps> = ({ data, setData, onNext }) => {
-  const [localName, setLocalName] = useState(data.userName);
+  const form = useForm({
+    defaultValues: {
+      userName: data.userName,
+    },
+    onSubmit: async ({ value }) => {
+      setData((prev) => ({ ...prev, userName: value.userName.trim() }));
+      onNext();
+    },
+  });
 
   const handleNext = () => {
-    if (localName.trim()) {
-      setData((prev) => ({ ...prev, userName: localName.trim() }));
-      onNext();
-    }
+    form.handleSubmit();
   };
 
   return (
@@ -42,22 +48,28 @@ const NameStep: React.FC<NameStepProps> = ({ data, setData, onNext }) => {
       <div className="step-body">
         <div className="glass-card input-card">
           <div className="input-section">
-            <div className="input-wrapper glass-input">
-              <IonItem lines="none" className="input-item">
-                <div slot="start" className="input-icon-wrapper">
-                  <IonIcon icon={createOutline} className="input-icon" />
+            <form.Field name="userName">
+              {(field) => (
+                <div className="input-wrapper glass-input">
+                  <IonItem lines="none" className="input-item">
+                    <div slot="start" className="input-icon-wrapper">
+                      <IonIcon icon={createOutline} className="input-icon" />
+                    </div>
+                    <IonInput
+                      value={field.state.value}
+                      placeholder="Dein Vorname..."
+                      onIonInput={(e) =>
+                        field.handleChange(e.detail.value || '')
+                      }
+                      className="input-field"
+                      clearInput
+                      autoFocus
+                      maxlength={32}
+                    />
+                  </IonItem>
                 </div>
-                <IonInput
-                  value={localName}
-                  placeholder="Dein Vorname..."
-                  onIonInput={(e) => setLocalName(e.detail.value || '')}
-                  className="input-field"
-                  clearInput
-                  autoFocus
-                  maxlength={32}
-                />
-              </IonItem>
-            </div>
+              )}
+            </form.Field>
 
             <div className="input-hint">
               <p>Keine Sorge, nur du siehst diese Information.</p>
@@ -67,15 +79,19 @@ const NameStep: React.FC<NameStepProps> = ({ data, setData, onNext }) => {
       </div>
 
       <div className="step-footer">
-        <IonButton
-          expand="block"
-          onClick={handleNext}
-          disabled={!localName.trim()}
-          className="primary-button"
-        >
-          Weiter
-          <IonIcon slot="end" icon={arrowForward} />
-        </IonButton>
+        <form.Subscribe selector={(state) => [state.values.userName]}>
+          {([userName]) => (
+            <IonButton
+              expand="block"
+              onClick={handleNext}
+              disabled={!userName.trim()}
+              className="primary-button"
+            >
+              Weiter
+              <IonIcon slot="end" icon={arrowForward} />
+            </IonButton>
+          )}
+        </form.Subscribe>
       </div>
     </div>
   );

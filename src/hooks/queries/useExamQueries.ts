@@ -8,6 +8,7 @@ export const examKeys = {
   lists: () => [...examKeys.all, 'list'] as const,
   list: (filters: Record<string, unknown>) =>
     [...examKeys.lists(), { filters }] as const,
+  upcoming: () => [...examKeys.all, 'upcoming'] as const,
   details: () => [...examKeys.all, 'detail'] as const,
   detail: (id: string) => [...examKeys.details(), id] as const,
   subjectExams: (subjectId: string) =>
@@ -34,7 +35,7 @@ export const useExams = () => {
 
 export const useUpcomingExams = () => {
   return useQuery({
-    queryKey: examKeys.lists(),
+    queryKey: examKeys.upcoming(),
     queryFn: () => ExamService.fetchUpcoming(),
   });
 };
