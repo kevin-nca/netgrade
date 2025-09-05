@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useForm } from '@tanstack/react-form';
 import {
   IonContent,
   IonPage,
@@ -45,7 +46,6 @@ import './SettingsPage.css';
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
-  const [nameInput, setNameInput] = useState('');
   const [schoolNameInput, setSchoolNameInput] = useState('');
   const [showNameEditModal, setShowNameEditModal] = useState(false);
   const [appVersion] = useState('');
@@ -60,24 +60,12 @@ const SettingsPage: React.FC = () => {
   const saveUserNameMutation = useSaveUserName();
   const resetAllDataMutation = useResetAllDataMutation();
 
-  useEffect(() => {
-    if (userName) {
-      setNameInput(userName);
-    }
-  }, [userName]);
-
-  const showToast = (message: string, isSuccess: boolean = true) => {
-    present({
-      message,
-      duration: 2000,
-      position: 'bottom',
-      color: isSuccess ? 'success' : 'danger',
-    });
-  };
-
-  const handleSaveName = () => {
-    if (nameInput.trim()) {
-      saveUserNameMutation.mutate(nameInput.trim(), {
+  const nameForm = useForm({
+    defaultValues: {
+      nameInput: userName || '',
+    },
+    onSubmit: async ({ value }) => {
+      saveUserNameMutation.mutate(value.nameInput.trim(), {
         onSuccess: () => {
           setShowNameEditModal(false);
           showToast('Name erfolgreich gespeichert');
@@ -89,11 +77,30 @@ const SettingsPage: React.FC = () => {
           );
         },
       });
+    },
+  });
+
+  useEffect(() => {
+    if (userName) {
+      nameForm.setFieldValue('nameInput', userName);
     }
+  }, [userName, nameForm]);
+
+  const showToast = (message: string, isSuccess: boolean = true) => {
+    present({
+      message,
+      duration: 2000,
+      position: 'bottom',
+      color: isSuccess ? 'success' : 'danger',
+    });
+  };
+
+  const handleSaveName = () => {
+    nameForm.handleSubmit();
   };
 
   const handleCancelNameEdit = () => {
-    setNameInput(userName || '');
+    nameForm.setFieldValue('nameInput', userName || '');
     setShowNameEditModal(false);
   };
 
@@ -357,14 +364,20 @@ const SettingsPage: React.FC = () => {
                         className="modal-input-icon"
                       />
                     </div>
-                    <IonInput
-                      value={nameInput}
-                      placeholder="Dein Name..."
-                      onIonChange={(e) => setNameInput(e.detail.value || '')}
-                      className="modal-input-field"
-                      clearInput
-                      autoFocus
-                    />
+                    <nameForm.Field name="nameInput">
+                      {(field) => (
+                        <IonInput
+                          value={field.state.value}
+                          placeholder="Dein Name..."
+                          onIonChange={(e) =>
+                            field.handleChange(e.detail.value || '')
+                          }
+                          className="modal-input-field"
+                          clearInput
+                          autoFocus
+                        />
+                      )}
+                    </nameForm.Field>
                   </IonItem>
                 </div>
               </div>
@@ -378,19 +391,25 @@ const SettingsPage: React.FC = () => {
                   >
                     Abbrechen
                   </button>
-                  <button
-                    onClick={handleSaveName}
-                    disabled={
-                      saveUserNameMutation.isPending ||
-                      !nameInput.trim() ||
-                      nameInput.trim() === (userName || '')
-                    }
-                    className="modal-button save"
+                  <nameForm.Subscribe
+                    selector={(state) => [state.values.nameInput]}
                   >
-                    {saveUserNameMutation.isPending
-                      ? 'Speichert...'
-                      : 'Speichern'}
-                  </button>
+                    {([nameInput]) => (
+                      <button
+                        onClick={handleSaveName}
+                        disabled={
+                          saveUserNameMutation.isPending ||
+                          !nameInput.trim() ||
+                          nameInput.trim() === (userName || '')
+                        }
+                        className="modal-button save"
+                      >
+                        {saveUserNameMutation.isPending
+                          ? 'Speichert...'
+                          : 'Speichern'}
+                      </button>
+                    )}
+                  </nameForm.Subscribe>
                 </div>
               </div>
 
