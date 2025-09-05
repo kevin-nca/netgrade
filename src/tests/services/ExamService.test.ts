@@ -133,4 +133,40 @@ describe('ExamService', () => {
   it('should throw an error when deleting a non-existent exam', async () => {
     await expect(ExamService.delete('non-existent-id')).rejects.toThrow();
   });
+
+  it('should fetch only upcoming exams without grades', async () => {
+    // Create an exam in the past with a grade
+    const pastExamData = {
+      schoolId: testData.school.id,
+      subjectId: testData.subject.id,
+      name: 'Past Exam',
+      date: new Date('2023-01-01'),
+      description: 'A past exam',
+    };
+    const pastExam = await ExamService.add(pastExamData);
+    
+    // Create an upcoming exam with a grade
+    const upcomingExamWithGradeData = {
+      schoolId: testData.school.id,
+      subjectId: testData.subject.id,
+      name: 'Upcoming Exam With Grade',
+      date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      description: 'An upcoming exam with grade',
+    };
+    const upcomingExamWithGrade = await ExamService.add(upcomingExamWithGradeData);
+    
+    // Create an upcoming exam without a grade
+    const upcomingExamWithoutGradeData = {
+      schoolId: testData.school.id,
+      subjectId: testData.subject.id,
+      name: 'Upcoming Exam Without Grade',
+      date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+      description: 'An upcoming exam without grade',
+    };
+    const upcomingExamWithoutGrade = await ExamService.add(upcomingExamWithoutGradeData);
+
+    const upcomingExams = await ExamService.fetchUpcoming();
+    expect(upcomingExams).toHaveLength(1);
+    expect(upcomingExams[0].id).toBe(upcomingExamWithoutGrade.id);
+  });
 });
