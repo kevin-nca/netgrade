@@ -27,24 +27,21 @@ const TestWrapper = ({ children, onSubmit = vi.fn() }: any) => {
     onSubmit,
   });
 
-  return (
-    <form.Provider>
-      {children}
-    </form.Provider>
-  );
+  return <form.Provider>{children}</form.Provider>;
 };
 
 describe('UserName FormElement', () => {
   it('should render with default props', () => {
     const mockForm = {
-      Field: ({ children }: any) => children({
-        state: { value: '' },
-        handleChange: vi.fn(),
-      }),
+      Field: ({ children }: any) =>
+        children({
+          state: { value: '' },
+          handleChange: vi.fn(),
+        }),
     };
 
     render(<UserName form={mockForm} />);
-    
+
     expect(screen.getByRole('textbox')).toBeInTheDocument();
     expect(screen.getByLabelText('Name')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Dein Name...')).toBeInTheDocument();
@@ -52,39 +49,45 @@ describe('UserName FormElement', () => {
 
   it('should render with custom props', () => {
     const mockForm = {
-      Field: ({ children }: any) => children({
-        state: { value: 'John Doe' },
-        handleChange: vi.fn(),
-      }),
+      Field: ({ children }: any) =>
+        children({
+          state: { value: 'John Doe' },
+          handleChange: vi.fn(),
+        }),
     };
 
     render(
-      <UserName 
+      <UserName
         form={mockForm}
         fieldName="customUserName"
         placeholder="Custom placeholder"
         label="Custom Label"
         disabled={true}
-      />
+      />,
     );
-    
+
     expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
     expect(screen.getByLabelText('Custom Label')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Custom placeholder')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Custom placeholder'),
+    ).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toBeDisabled();
   });
 
   it('should handle value changes', () => {
     const mockHandleChange = vi.fn();
     const mockForm = {
-      Field: ({ children }: any) => children({
-        state: { value: '' },
-        handleChange: mockHandleChange,
-      }),
+      Field: ({ children }: any) =>
+        children({
+          state: { value: '' },
+          handleChange: mockHandleChange,
+        }),
     };
 
     render(<UserName form={mockForm} />);
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Jane Smith' } });
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: 'Jane Smith' },
+    });
     expect(mockHandleChange).toHaveBeenCalledWith('Jane Smith');
   });
 });

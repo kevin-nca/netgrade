@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { 
-  validateSubjectName, 
-  validateSchoolName, 
-  validateUserName, 
-  validateSearchText 
+import {
+  validateSubjectName,
+  validateSchoolName,
+  validateUserName,
+  validateSearchText,
 } from '@/components/Form/validations';
 
 describe('Form Validations', () => {
@@ -22,16 +22,24 @@ describe('Form Validations', () => {
     });
 
     it('should return error for subject names that are too short', () => {
-      expect(validateSubjectName('A')).toBe('Fachname muss mindestens 2 Zeichen lang sein');
+      expect(validateSubjectName('A')).toBe(
+        'Fachname muss mindestens 2 Zeichen lang sein',
+      );
     });
 
     it('should return error for subject names that are too long', () => {
-      expect(validateSubjectName('A'.repeat(101))).toBe('Fachname darf maximal 100 Zeichen lang sein');
+      expect(validateSubjectName('A'.repeat(101))).toBe(
+        'Fachname darf maximal 100 Zeichen lang sein',
+      );
     });
 
     it('should handle null or undefined input', () => {
-      expect(validateSubjectName(null as any)).toBe('Fachname ist erforderlich');
-      expect(validateSubjectName(undefined as any)).toBe('Fachname ist erforderlich');
+      expect(validateSubjectName(null as any)).toBe(
+        'Fachname ist erforderlich',
+      );
+      expect(validateSubjectName(undefined as any)).toBe(
+        'Fachname ist erforderlich',
+      );
     });
   });
 
@@ -49,16 +57,24 @@ describe('Form Validations', () => {
     });
 
     it('should return error for school names that are too short', () => {
-      expect(validateSchoolName('A')).toBe('Schulname muss mindestens 2 Zeichen lang sein');
+      expect(validateSchoolName('A')).toBe(
+        'Schulname muss mindestens 2 Zeichen lang sein',
+      );
     });
 
     it('should return error for school names that are too long', () => {
-      expect(validateSchoolName('A'.repeat(201))).toBe('Schulname darf maximal 200 Zeichen lang sein');
+      expect(validateSchoolName('A'.repeat(201))).toBe(
+        'Schulname darf maximal 200 Zeichen lang sein',
+      );
     });
 
     it('should handle null or undefined input', () => {
-      expect(validateSchoolName(null as any)).toBe('Schulname ist erforderlich');
-      expect(validateSchoolName(undefined as any)).toBe('Schulname ist erforderlich');
+      expect(validateSchoolName(null as any)).toBe(
+        'Schulname ist erforderlich',
+      );
+      expect(validateSchoolName(undefined as any)).toBe(
+        'Schulname ist erforderlich',
+      );
     });
   });
 
@@ -76,7 +92,9 @@ describe('Form Validations', () => {
     });
 
     it('should return error for user names that are too long', () => {
-      expect(validateUserName('A'.repeat(51))).toBe('Name darf maximal 50 Zeichen lang sein');
+      expect(validateUserName('A'.repeat(51))).toBe(
+        'Name darf maximal 50 Zeichen lang sein',
+      );
     });
 
     it('should handle null or undefined input', () => {

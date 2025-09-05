@@ -27,64 +27,69 @@ const TestWrapper = ({ children, onSubmit = vi.fn() }: any) => {
     onSubmit,
   });
 
-  return (
-    <form.Provider>
-      {children}
-    </form.Provider>
-  );
+  return <form.Provider>{children}</form.Provider>;
 };
 
 describe('SubjectName FormElement', () => {
   it('should render with default props', () => {
     const mockForm = {
-      Field: ({ children }: any) => children({
-        state: { value: '' },
-        handleChange: vi.fn(),
-      }),
+      Field: ({ children }: any) =>
+        children({
+          state: { value: '' },
+          handleChange: vi.fn(),
+        }),
     };
 
     render(<SubjectName form={mockForm} />);
-    
+
     expect(screen.getByRole('textbox')).toBeInTheDocument();
     expect(screen.getByLabelText('Fach')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Fachname eingeben')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Fachname eingeben'),
+    ).toBeInTheDocument();
   });
 
   it('should render with custom props', () => {
     const mockForm = {
-      Field: ({ children }: any) => children({
-        state: { value: 'Mathematics' },
-        handleChange: vi.fn(),
-      }),
+      Field: ({ children }: any) =>
+        children({
+          state: { value: 'Mathematics' },
+          handleChange: vi.fn(),
+        }),
     };
 
     render(
-      <SubjectName 
+      <SubjectName
         form={mockForm}
         fieldName="customSubjectName"
         placeholder="Custom placeholder"
         label="Custom Label"
         disabled={true}
-      />
+      />,
     );
-    
+
     expect(screen.getByDisplayValue('Mathematics')).toBeInTheDocument();
     expect(screen.getByLabelText('Custom Label')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Custom placeholder')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Custom placeholder'),
+    ).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toBeDisabled();
   });
 
   it('should handle value changes', () => {
     const mockHandleChange = vi.fn();
     const mockForm = {
-      Field: ({ children }: any) => children({
-        state: { value: '' },
-        handleChange: mockHandleChange,
-      }),
+      Field: ({ children }: any) =>
+        children({
+          state: { value: '' },
+          handleChange: mockHandleChange,
+        }),
     };
 
     render(<SubjectName form={mockForm} />);
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Physics' } });
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: 'Physics' },
+    });
     expect(mockHandleChange).toHaveBeenCalledWith('Physics');
   });
 });

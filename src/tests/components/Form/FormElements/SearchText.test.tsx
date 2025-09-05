@@ -27,63 +27,66 @@ const TestWrapper = ({ children, onSubmit = vi.fn() }: any) => {
     onSubmit,
   });
 
-  return (
-    <form.Provider>
-      {children}
-    </form.Provider>
-  );
+  return <form.Provider>{children}</form.Provider>;
 };
 
 describe('SearchText FormElement', () => {
   it('should render with default props', () => {
     const mockForm = {
-      Field: ({ children }: any) => children({
-        state: { value: '' },
-        handleChange: vi.fn(),
-      }),
+      Field: ({ children }: any) =>
+        children({
+          state: { value: '' },
+          handleChange: vi.fn(),
+        }),
     };
 
     render(<SearchText form={mockForm} />);
-    
+
     expect(screen.getByRole('textbox')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Suchen...')).toBeInTheDocument();
   });
 
   it('should render with custom props', () => {
     const mockForm = {
-      Field: ({ children }: any) => children({
-        state: { value: 'search query' },
-        handleChange: vi.fn(),
-      }),
+      Field: ({ children }: any) =>
+        children({
+          state: { value: 'search query' },
+          handleChange: vi.fn(),
+        }),
     };
 
     render(
-      <SearchText 
+      <SearchText
         form={mockForm}
         fieldName="customSearchText"
         placeholder="Custom search placeholder"
         label="Search Label"
         disabled={true}
-      />
+      />,
     );
-    
+
     expect(screen.getByDisplayValue('search query')).toBeInTheDocument();
     expect(screen.getByLabelText('Search Label')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Custom search placeholder')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Custom search placeholder'),
+    ).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toBeDisabled();
   });
 
   it('should handle value changes', () => {
     const mockHandleChange = vi.fn();
     const mockForm = {
-      Field: ({ children }: any) => children({
-        state: { value: '' },
-        handleChange: mockHandleChange,
-      }),
+      Field: ({ children }: any) =>
+        children({
+          state: { value: '' },
+          handleChange: mockHandleChange,
+        }),
     };
 
     render(<SearchText form={mockForm} />);
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'new search' } });
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: 'new search' },
+    });
     expect(mockHandleChange).toHaveBeenCalledWith('new search');
   });
 });

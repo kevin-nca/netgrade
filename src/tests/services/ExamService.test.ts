@@ -144,7 +144,7 @@ describe('ExamService', () => {
       description: 'A past exam',
     };
     const pastExam = await ExamService.add(pastExamData);
-    
+
     // Create an upcoming exam with a grade
     const upcomingExamWithGradeData = {
       schoolId: testData.school.id,
@@ -153,8 +153,10 @@ describe('ExamService', () => {
       date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       description: 'An upcoming exam with grade',
     };
-    const upcomingExamWithGrade = await ExamService.add(upcomingExamWithGradeData);
-    
+    const upcomingExamWithGrade = await ExamService.add(
+      upcomingExamWithGradeData,
+    );
+
     // Create an upcoming exam without a grade
     const upcomingExamWithoutGradeData = {
       schoolId: testData.school.id,
@@ -163,7 +165,9 @@ describe('ExamService', () => {
       date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
       description: 'An upcoming exam without grade',
     };
-    const upcomingExamWithoutGrade = await ExamService.add(upcomingExamWithoutGradeData);
+    const upcomingExamWithoutGrade = await ExamService.add(
+      upcomingExamWithoutGradeData,
+    );
 
     const upcomingExams = await ExamService.fetchUpcoming();
     expect(upcomingExams).toHaveLength(1);
