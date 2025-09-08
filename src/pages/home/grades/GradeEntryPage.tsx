@@ -55,6 +55,7 @@ const GradeEntryPage: React.FC = () => {
     isLoading: isGradesLoading,
     isError: isGradesError,
   } = useSubjectGrades(subjectId);
+
   const {
     data: subject,
     isLoading: isSubjectLoading,
@@ -126,7 +127,7 @@ const GradeEntryPage: React.FC = () => {
   const saveEdit = async (formData: GradeFormData) => {
     if (!editingId) return;
 
-    const grade = grades.find((grade: Grade) => grade.id === editingId);
+    const grade = grades.find((g: Grade) => g.id === editingId);
     if (!grade) return;
 
     const updatedGrade = {
@@ -141,6 +142,7 @@ const GradeEntryPage: React.FC = () => {
       ...grade.exam,
       name: formData.examName,
     };
+
     updateExamAndGradeMutation.mutate(
       {
         examData: updatedExam,
@@ -167,7 +169,6 @@ const GradeEntryPage: React.FC = () => {
   return (
     <IonPage>
       <Header
-        /**FIXME: Maybe improve this handling s.t. we do not have to set empty string while subjects are loading. */
         title={subject?.name || ''}
         backButton
         onBack={() => window.history.back()}
@@ -184,11 +185,11 @@ const GradeEntryPage: React.FC = () => {
       />
       <IonContent>
         <Layout>
-          {isGradesLoading ? (
+          {isLoading ? (
             <div className="ion-padding ion-text-center">
               <p>Noten werden geladen...</p>
             </div>
-          ) : isGradesError ? (
+          ) : isError ? (
             <div className="ion-padding ion-text-center">
               <p>Fehler beim Laden der Noten.</p>
             </div>
