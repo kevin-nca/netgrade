@@ -98,7 +98,7 @@ describe('GradeService', () => {
     expect(grade?.score).toBe(testData.grade.score);
     expect(grade?.exam).toBeDefined();
   });
-  
+
   // Test findBySubjectId method
   it('should find grades by subject id', async () => {
     const gradeData: AddExamAndGradePayload = {
