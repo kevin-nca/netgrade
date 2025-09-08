@@ -31,8 +31,18 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Unit Tests
-        run: npm test
+      - name: Unit Tests with Coverage
+        run: npm run test:coverage
+
+      - name: Install dependencies for Codecov uploader (curl, gpg)
+        run: |
+          apt-get update
+          apt-get install -y curl gnupg
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build Project
         run: npm run build
