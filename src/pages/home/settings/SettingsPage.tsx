@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from '@tanstack/react-form';
 import {
   IonContent,
   IonPage,
@@ -30,6 +29,9 @@ import {
   settingsOutline,
   informationCircleOutline,
   createOutline,
+  pencilOutline,
+  checkmarkOutline,
+  closeOutline,
 } from 'ionicons/icons';
 import { Routes } from '@/routes';
 import { ExportDialog } from '@/components/export/ExportDialog';
@@ -71,10 +73,46 @@ const SettingsPage: React.FC = () => {
   const updateSchoolMutation = useUpdateSchool();
 
   const [expandedSchoolId, setExpandedSchoolId] = useState<string | null>(null);
-
+  const [editingSchoolId, setEditingSchoolId] = useState<string | null>(null);
+  const [editSchoolName, setEditSchoolName] = useState('');
 
   const toggleSchool = (id: string) => {
     setExpandedSchoolId((prev) => (prev === id ? null : id));
+  };
+
+   const handleEditSchool = (schoolId: string, currentName: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingSchoolId(schoolId);
+    setEditSchoolName(currentName);
+  };
+
+  const handleSaveSchoolEdit = (schoolId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (editSchoolName.trim()) {
+      updateSchoolMutation.mutate(
+        { id: schoolId, name: editSchoolName.trim() },
+        {
+          onSuccess: () => {
+            setEditingSchoolId(null);
+            setEditSchoolName('');
+            showToast('Schulname erfolgreich geändert');
+            refetch();
+          },
+          onError: (error) => {
+            showToast(
+              `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+              false,
+            );
+          },
+        },
+      );
+    }
+  };
+
+  const handleCancelSchoolEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingSchoolId(null);
+    setEditSchoolName('');
   };
 
   const nameForm = useForm({
@@ -239,6 +277,7 @@ const SettingsPage: React.FC = () => {
               </div>
             </div>
           </div>
+
           <div className="settings-section">
             <div className="section-header">
               <h2 className="section-title">Deine Schulen</h2>
@@ -254,6 +293,7 @@ const SettingsPage: React.FC = () => {
               {schools.length > 0 ? (
                 schools.map((school, index) => {
                   const isExpanded = expandedSchoolId === school.id;
+                  const isEditing = editingSchoolId === school.id;
 
                   return (
                     <div
@@ -265,22 +305,72 @@ const SettingsPage: React.FC = () => {
                         <div className={`item-icon school-${index % 4}`}>
                           {school.name.charAt(0).toUpperCase()}
                         </div>
-                        <div className="item-text">
-                          <h3 className="item-title">{school.name}</h3>
+                         <div className="item-text">
+                          {isEditing ? (
+                            <div className="edit-school-input">
+                              <IonInput
+                                value={editSchoolName}
+                                placeholder="Schulname..."
+                                onIonChange={(e) => setEditSchoolName(e.detail.value || '')}
+                                onClick={(e) => e.stopPropagation()}
+                                className="school-edit-field"
+                                clearInput
+                                autoFocus
+                              />
+                            </div>
+                          ) : (
+                            <h3 className="item-title">{school.name}</h3>
+                          )}
                         </div>
                       </div>
 
                       {isExpanded && (
-                        <div className="item-extra">
+                        <div className="item-extra" onClick={(e) => e.stopPropagation()}>
                           <IonButtons slot="end">
-                            <IonButton className="delete-button" color="danger" onClick={(e) => {
-                              e.stopPropagation();
-                              setSchoolIdToDelete(school.id);
-                              setShowDeleteAlert(true);
-                            }}>
-                              <IonIcon slot="icon-only" icon={trashOutline} />
-                              <p className='delete-text'>Löschen</p>
-                            </IonButton>
+                            {isEditing ? (
+                              <div className="edit-buttons">
+                                <IonButton
+                                  className="save-button"
+                                  color="success"
+                                  onClick={(e) => handleSaveSchoolEdit(school.id, e)}
+                                  disabled={updateSchoolMutation.isPending || !editSchoolName.trim() || editSchoolName.trim() === school.name}
+                                >
+                                  <IonIcon slot="icon-only" icon={checkmarkOutline} />
+                                  <p className="save-text">Speichern</p>
+                                </IonButton>
+                                <IonButton
+                                  className="cancel-button"
+                                  color="medium"
+                                  onClick={handleCancelSchoolEdit}
+                                  disabled={updateSchoolMutation.isPending}
+                                >
+                                  <IonIcon slot="icon-only" icon={closeOutline} />
+                                  <p className="cancel-text">Abbrechen</p>
+                                </IonButton>
+                              </div>
+                            ) : (
+                              <>
+                                <IonButton
+                                  className="edit-button"
+                                  color="primary"
+                                  onClick={(e) => handleEditSchool(school.id, school.name, e)}
+                                >
+                                  <IonIcon slot="icon-only" icon={pencilOutline} />
+                                  <p className="edit-text">Bearbeiten</p>
+                                </IonButton>
+                                <IonButton
+                                  className="delete-button"
+                                  color="danger"
+                                  onClick={(e) => {
+                                    setSchoolIdToDelete(school.id);
+                                    setShowDeleteAlert(true);
+                                  }}
+                                >
+                                  <IonIcon slot="icon-only" icon={trashOutline} />
+                                  <p className="delete-text">Löschen</p>
+                                </IonButton>
+                              </>
+                            )}
                           </IonButtons>
                         </div>
                       )}
@@ -361,7 +451,7 @@ const SettingsPage: React.FC = () => {
               <p className="version-text">{appVersion}</p>
             </div>
           )}
-          <div style={{ height: '80px' }} /> //to review
+          <div style={{ height: '80px' }} />
         </div>
 
         <NavigationModal

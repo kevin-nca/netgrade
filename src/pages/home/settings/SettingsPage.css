@@ -643,12 +643,28 @@
   color: rgba(255, 255, 255, 0.3);
   padding-left: 8px;
   padding-top: 4px;
+  font-size: 16px;
 }
+
+.edit-text{
+  font-size: 16px;
+}
+
+.edit-button{
+  padding-top: 19px;
+}
+
+.save-button{
+  --box-shadow: none !important;
+}
+
+.edit-buttons{
+  padding-top: 19px;
+} 
 
 .settings-item.expanded .item-extra {
   max-height: 200px;
 }
-
 
 .modal-page {
   background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
