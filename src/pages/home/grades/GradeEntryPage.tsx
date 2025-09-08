@@ -60,7 +60,8 @@ const GradeEntryPage: React.FC = () => {
   );
 
   const [editingId, setEditingId] = useState<string | null>(null);
-  const { showToast, toastMessage, setShowToast, showMessage } = useToast();
+  const { showToast, toastMessage, toastColor, setShowToast, showMessage } =
+    useToast();
 
   const gradeForm = useForm({
     defaultValues: {
@@ -99,7 +100,7 @@ const GradeEntryPage: React.FC = () => {
   const handleDelete = (gradeId: string) => {
     deleteGradeMutation.mutate(gradeId, {
       onSuccess: () => {
-        showMessage('Note erfolgreich gelöscht.');
+        showMessage('Note erfolgreich gelöscht.', 'success');
       },
       onError: (error) => {
         showMessage(
@@ -143,7 +144,7 @@ const GradeEntryPage: React.FC = () => {
       },
       {
         onSuccess: () => {
-          showMessage('Note erfolgreich aktualisiert.');
+          showMessage('Note erfolgreich aktualisiert.', 'success');
           setEditingId(null);
         },
         onError: (error) => {
@@ -288,7 +289,7 @@ const GradeEntryPage: React.FC = () => {
             onDidDismiss={() => setShowToast(false)}
             message={toastMessage}
             duration={2000}
-            color="danger"
+            color={toastColor}
           />
         </Layout>
       </IonContent>

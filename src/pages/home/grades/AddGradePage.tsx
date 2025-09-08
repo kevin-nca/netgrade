@@ -50,6 +50,7 @@ const AddGradePage: React.FC = () => {
 
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
   const [showNavigationModal, setShowNavigationModal] = useState(false);
 
   const { data: schools = [], error: schoolsError } = useSchools();
@@ -167,8 +168,12 @@ const AddGradePage: React.FC = () => {
     }
   };
 
-  const showAndSetToastMessage = (message: string) => {
+  const showAndSetToastMessage = (
+    message: string,
+    color: 'success' | 'danger' = 'danger',
+  ) => {
     setToastMessage(message);
+    setToastColor(color);
     setShowToast(true);
   };
 
@@ -216,8 +221,8 @@ const AddGradePage: React.FC = () => {
           score: 0,
           comment: '',
         });
-        history.push(Routes.HOME);
-        showAndSetToastMessage('Note erfolgreich hinzugefügt.');
+        showAndSetToastMessage('Note erfolgreich hinzugefügt.', 'success');
+        setTimeout(() => history.push(Routes.HOME), 2000);
       },
       onError: (error) => {
         showAndSetToastMessage(
@@ -307,7 +312,7 @@ const AddGradePage: React.FC = () => {
           onDidDismiss={() => setShowToast(false)}
           message={toastMessage}
           duration={2000}
-          color="danger"
+          color={toastColor}
         />
       </IonContent>
 
