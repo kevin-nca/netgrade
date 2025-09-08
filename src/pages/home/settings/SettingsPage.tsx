@@ -17,7 +17,6 @@ import {
   IonButtons,
   IonButton,
   IonAlert,
-
 } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
@@ -80,7 +79,11 @@ const SettingsPage: React.FC = () => {
     setExpandedSchoolId((prev) => (prev === id ? null : id));
   };
 
-   const handleEditSchool = (schoolId: string, currentName: string, e: React.MouseEvent) => {
+  const handleEditSchool = (
+    schoolId: string,
+    currentName: string,
+    e: React.MouseEvent,
+  ) => {
     e.stopPropagation();
     setEditingSchoolId(schoolId);
     setEditSchoolName(currentName);
@@ -305,13 +308,15 @@ const SettingsPage: React.FC = () => {
                         <div className={`item-icon school-${index % 4}`}>
                           {school.name.charAt(0).toUpperCase()}
                         </div>
-                         <div className="item-text">
+                        <div className="item-text">
                           {isEditing ? (
                             <div className="edit-school-input">
                               <IonInput
                                 value={editSchoolName}
                                 placeholder="Schulname..."
-                                onIonChange={(e) => setEditSchoolName(e.detail.value || '')}
+                                onIonChange={(e) =>
+                                  setEditSchoolName(e.detail.value || '')
+                                }
                                 onClick={(e) => e.stopPropagation()}
                                 className="school-edit-field"
                                 clearInput
@@ -325,17 +330,29 @@ const SettingsPage: React.FC = () => {
                       </div>
 
                       {isExpanded && (
-                        <div className="item-extra" onClick={(e) => e.stopPropagation()}>
+                        <div
+                          className="item-extra"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <IonButtons slot="end">
                             {isEditing ? (
                               <div className="edit-buttons">
                                 <IonButton
                                   className="save-button"
                                   color="success"
-                                  onClick={(e) => handleSaveSchoolEdit(school.id, e)}
-                                  disabled={updateSchoolMutation.isPending || !editSchoolName.trim() || editSchoolName.trim() === school.name}
+                                  onClick={(e) =>
+                                    handleSaveSchoolEdit(school.id, e)
+                                  }
+                                  disabled={
+                                    updateSchoolMutation.isPending ||
+                                    !editSchoolName.trim() ||
+                                    editSchoolName.trim() === school.name
+                                  }
                                 >
-                                  <IonIcon slot="icon-only" icon={checkmarkOutline} />
+                                  <IonIcon
+                                    slot="icon-only"
+                                    icon={checkmarkOutline}
+                                  />
                                   <p className="save-text">Speichern</p>
                                 </IonButton>
                                 <IonButton
@@ -344,7 +361,10 @@ const SettingsPage: React.FC = () => {
                                   onClick={handleCancelSchoolEdit}
                                   disabled={updateSchoolMutation.isPending}
                                 >
-                                  <IonIcon slot="icon-only" icon={closeOutline} />
+                                  <IonIcon
+                                    slot="icon-only"
+                                    icon={closeOutline}
+                                  />
                                   <p className="cancel-text">Abbrechen</p>
                                 </IonButton>
                               </div>
@@ -353,9 +373,14 @@ const SettingsPage: React.FC = () => {
                                 <IonButton
                                   className="edit-button"
                                   color="primary"
-                                  onClick={(e) => handleEditSchool(school.id, school.name, e)}
+                                  onClick={(e) =>
+                                    handleEditSchool(school.id, school.name, e)
+                                  }
                                 >
-                                  <IonIcon slot="icon-only" icon={pencilOutline} />
+                                  <IonIcon
+                                    slot="icon-only"
+                                    icon={pencilOutline}
+                                  />
                                   <p className="edit-text">Bearbeiten</p>
                                 </IonButton>
                                 <IonButton
@@ -366,7 +391,10 @@ const SettingsPage: React.FC = () => {
                                     setShowDeleteAlert(true);
                                   }}
                                 >
-                                  <IonIcon slot="icon-only" icon={trashOutline} />
+                                  <IonIcon
+                                    slot="icon-only"
+                                    icon={trashOutline}
+                                  />
                                   <p className="delete-text">Löschen</p>
                                 </IonButton>
                               </>
