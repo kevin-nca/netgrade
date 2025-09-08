@@ -10,33 +10,29 @@ import {
 } from '@ionic/react';
 import {
   add,
-  calendar,
-  settings,
   school,
   chevronForwardOutline,
-  trophyOutline,
   bookOutline,
   statsChartOutline,
   timeOutline,
-  homeOutline,
   personCircleOutline,
 } from 'ionicons/icons';
 import {
   useSchools,
   useGrades,
   useUserName,
-  useExams,
   useAddSchool,
+  useUpcomingExams,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import { Grade } from '@/db/entities';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import './HomePage.css';
+import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 
 function HomePage() {
   const [showNavigationModal, setShowNavigationModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('home');
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const [schoolNameInput, setSchoolNameInput] = useState('');
   const history = useHistory();
@@ -44,16 +40,18 @@ function HomePage() {
   const { data: schools = [], refetch: refetchSchools } = useSchools();
   const { data: grades = [], refetch: refetchGrades } = useGrades();
   const { data: userName } = useUserName();
-  const { data: allExams = [], refetch: refetchExams } = useExams();
   const addSchoolMutation = useAddSchool();
 
-  const upcomingExams = allExams
-    .filter((exam) => !exam.isCompleted)
-    .slice(0, 3);
+  const { data: upcomingExams = [], refetch: refetchUpcomingExams } =
+    useUpcomingExams();
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     try {
-      await Promise.all([refetchSchools(), refetchGrades(), refetchExams()]);
+      await Promise.all([
+        refetchSchools(),
+        refetchGrades(),
+        refetchUpcomingExams(),
+      ]);
     } finally {
       event.detail.complete();
     }
@@ -121,11 +119,15 @@ function HomePage() {
 
   return (
     <IonPage className="home-page">
-      <IonContent className="home-content" scrollY={true}>
+      <IonContent
+        className="home-content"
+        scrollY={false}
+        scrollEvents={false}
+        forceOverscroll={false}
+      >
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
         </IonRefresher>
-
         <div className="content-wrapper">
           <div className="header-section">
             <div className="gradient-orb" />
@@ -232,49 +234,53 @@ function HomePage() {
               </div>
             </div>
 
-            <div className="exams-list">
-              {upcomingExams.length > 0 ? (
-                upcomingExams.map((exam) => (
-                  <div
-                    key={exam.id}
-                    className="exam-card glass-card"
-                    onClick={() =>
-                      history.push(Routes.EXAM_EDIT.replace(':examId', exam.id))
-                    }
-                  >
-                    <div className="exam-card-content">
-                      <div className="exam-icon-and-info">
-                        <div className="exam-icon-wrapper">
-                          <IonIcon icon={bookOutline} className="exam-icon" />
-                        </div>
+            <div className="exams-scroll-container">
+              <div className="exams-list">
+                {upcomingExams.length > 0 ? (
+                  upcomingExams.map((exam) => (
+                    <div
+                      key={exam.id}
+                      className="exam-card glass-card"
+                      onClick={() =>
+                        history.push(
+                          Routes.EXAM_EDIT.replace(':examId', exam.id),
+                        )
+                      }
+                    >
+                      <div className="exam-card-content">
+                        <div className="exam-icon-and-info">
+                          <div className="exam-icon-wrapper">
+                            <IonIcon icon={bookOutline} className="exam-icon" />
+                          </div>
 
-                        <div className="exam-info">
-                          <h4 className="exam-title">{exam.name}</h4>
-                          <div className="exam-meta">
-                            <div className="exam-date">
-                              <IonIcon
-                                icon={timeOutline}
-                                className="meta-icon"
-                              />
-                              <span>{formatDate(exam.date)}</span>
+                          <div className="exam-info">
+                            <h4 className="exam-title">{exam.name}</h4>
+                            <div className="exam-meta">
+                              <div className="exam-date">
+                                <IonIcon
+                                  icon={timeOutline}
+                                  className="meta-icon"
+                                />
+                                <span>{formatDate(exam.date)}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="exam-priority">
-                        <div className="priority-dot" />
+                        <div className="exam-priority">
+                          <div className="priority-dot" />
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="empty-exams glass-card">
+                    <h3 className="empty-title">Alles erledigt!</h3>
+                    <p className="empty-description">
+                      Keine anstehenden Prüfungen
+                    </p>
                   </div>
-                ))
-              ) : (
-                <div className="empty-exams glass-card">
-                  <h3 className="empty-title">Alles erledigt!</h3>
-                  <p className="empty-description">
-                    Keine anstehenden Prüfungen
-                  </p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
@@ -299,68 +305,10 @@ function HomePage() {
         isLoading={addSchoolMutation.isPending}
       />
 
-      <div className="tab-bar">
-        <div className="tab-bar-content">
-          <div
-            className={`tab-item ${activeTab === 'home' ? 'active' : ''}`}
-            onClick={() => setActiveTab('home')}
-          >
-            <div className="tab-icon-wrapper">
-              <IonIcon icon={homeOutline} className="tab-icon" />
-            </div>
-            <span className="tab-label">Home</span>
-          </div>
-
-          <div
-            className={`tab-item ${activeTab === 'calendar' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('calendar');
-              history.push(Routes.CALENDAR);
-            }}
-          >
-            <div className="tab-icon-wrapper">
-              <IonIcon icon={calendar} className="tab-icon" />
-            </div>
-            <span className="tab-label">Kalender</span>
-          </div>
-
-          <div className="tab-fab">
-            <button
-              className="tab-fab-button"
-              onClick={() => setShowNavigationModal(true)}
-            >
-              <IonIcon icon={add} className="tab-fab-icon" />
-            </button>
-            <span className="tab-fab-label">Neu</span>
-          </div>
-
-          <div
-            className={`tab-item ${activeTab === 'grades' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('grades');
-              history.push(Routes.GRADES_ADD);
-            }}
-          >
-            <div className="tab-icon-wrapper">
-              <IonIcon icon={trophyOutline} className="tab-icon" />
-            </div>
-            <span className="tab-label">Noten</span>
-          </div>
-
-          <div
-            className={`tab-item ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('settings');
-              history.push(Routes.SETTINGS);
-            }}
-          >
-            <div className="tab-icon-wrapper">
-              <IonIcon icon={settings} className="tab-icon" />
-            </div>
-            <span className="tab-label">Mehr</span>
-          </div>
-        </div>
-      </div>
+      <BottomNavigation
+        showNavigationModal={showNavigationModal}
+        setShowNavigationModal={setShowNavigationModal}
+      />
     </IonPage>
   );
 }
