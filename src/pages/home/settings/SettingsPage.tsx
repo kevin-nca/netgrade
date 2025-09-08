@@ -14,6 +14,7 @@ import {
   useIonAlert,
   useIonToast,
   RefresherEventDetail,
+  IonButtons,
 } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
@@ -158,7 +159,12 @@ const SettingsPage: React.FC = () => {
 
   return (
     <IonPage className="settings-page">
-      <Header title="Einstellungen" backButton={true} />
+      <Header
+        title="Einstellungen"
+        backButton={true}
+        defaultHref={Routes.HOME}
+        endSlot={<IonButtons slot="end"></IonButtons>}
+      />
 
       <IonContent className="settings-content" scrollY={true}>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
