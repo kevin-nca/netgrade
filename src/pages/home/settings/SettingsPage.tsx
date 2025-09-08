@@ -386,7 +386,7 @@ const SettingsPage: React.FC = () => {
                                 <IonButton
                                   className="delete-button"
                                   color="danger"
-                                  onClick={(e) => {
+                                  onClick={() => {
                                     setSchoolIdToDelete(school.id);
                                     setShowDeleteAlert(true);
                                   }}
