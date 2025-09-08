@@ -204,8 +204,6 @@ export class GradeService {
 
   /**
    *
-   * FIXME: please add tests
-   *
    *
    * Finds grades by subject ID
    * @param examId - The ID of the subject to find grades for
