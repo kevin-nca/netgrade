@@ -52,7 +52,7 @@
     "reflect-metadata": "^0.2.2",
     "reselect": "^5.1.1",
     "sql.js": "^1.13.0",
-    "swiper": "^11.1.14",
+    "swiper": "^11.2.10",
     "typeorm": "^0.3.22",
     "vite-plugin-wasm": "^3.4.1",
     "xlsx": "^0.18.5"
