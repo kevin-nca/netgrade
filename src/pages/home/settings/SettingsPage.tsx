@@ -158,7 +158,11 @@ const SettingsPage: React.FC = () => {
 
   return (
     <IonPage className="settings-page">
-      <Header title="Einstellungen" backButton={true} />
+      <Header
+        title="Einstellungen"
+        backButton={true}
+        defaultHref={Routes.HOME}
+      />
 
       <IonContent className="settings-content" scrollY={true}>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
