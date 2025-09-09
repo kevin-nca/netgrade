@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useForm } from '@tanstack/react-form';
 import {
   IonModal,
   IonPage,
@@ -27,11 +28,19 @@ const EditSubjectModal: React.FC<EditSubjectModalProps> = ({
   onSave,
   loading,
 }) => {
-  const [name, setName] = useState(subject?.name || '');
+  const form = useForm({
+    defaultValues: {
+      name: subject?.name || '',
+    },
+    onSubmit: async ({ value }) => {
+      onSave(value.name.trim());
+    },
+  });
 
   useEffect(() => {
-    setName(subject?.name || '');
-  }, [subject]);
+    const newName = subject?.name || '';
+    form.setFieldValue('name', newName);
+  }, [subject, form]);
 
   return (
     <IonModal
@@ -74,15 +83,21 @@ const EditSubjectModal: React.FC<EditSubjectModalProps> = ({
                       className="modal-input-icon"
                     />
                   </div>
-                  <IonInput
-                    value={name}
-                    placeholder="Fachname..."
-                    onIonChange={(e) => setName(e.detail.value || '')}
-                    className="modal-input-field"
-                    clearInput
-                    autoFocus
-                    disabled={loading}
-                  />
+                  <form.Field name="name">
+                    {(field) => (
+                      <IonInput
+                        value={field.state.value}
+                        placeholder="Fachname..."
+                        onIonChange={(e) =>
+                          field.handleChange(e.detail.value || '')
+                        }
+                        className="modal-input-field"
+                        clearInput
+                        autoFocus
+                        disabled={loading}
+                      />
+                    )}
+                  </form.Field>
                 </IonItem>
               </div>
             </div>
@@ -95,13 +110,17 @@ const EditSubjectModal: React.FC<EditSubjectModalProps> = ({
                 >
                   Abbrechen
                 </button>
-                <button
-                  onClick={() => name.trim() && !loading && onSave(name.trim())}
-                  disabled={!name.trim() || loading}
-                  className="modal-button save"
-                >
-                  {loading ? 'Speichert...' : 'Speichern'}
-                </button>
+                <form.Subscribe selector={(state) => [state.values.name]}>
+                  {([name]) => (
+                    <button
+                      onClick={() => form.handleSubmit()}
+                      disabled={!name.trim() || loading}
+                      className="modal-button save"
+                    >
+                      {loading ? 'Speichert...' : 'Speichern'}
+                    </button>
+                  )}
+                </form.Subscribe>
               </div>
             </div>
             <div className="modal-bottom-spacer" />

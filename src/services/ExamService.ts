@@ -1,6 +1,5 @@
 import { getRepositories } from '@/db/data-source';
 import { Exam } from '@/db/entities/Exam';
-import { MoreThanOrEqual } from 'typeorm';
 
 export class ExamService {
   /**
@@ -133,18 +132,22 @@ export class ExamService {
   }
 
   /**
-   * Fetches upcoming exams from the database
-   * @returns Promise<Exam[]> - A promise that resolves to an array of upcoming exams
+   * Fetches upcoming exams from the database that don't have grades yet
+   * @returns Promise<Exam[]> - A promise that resolves to an array of upcoming exams without grades
    */
   static async fetchUpcoming(): Promise<Exam[]> {
     try {
       const { exam: examRepo } = getRepositories();
       const now = new Date();
+      const upcomingExams = await examRepo
+        .createQueryBuilder('exam')
+        .leftJoin('exam.grade', 'grade')
+        .where('exam.date >= :now', { now })
+        .andWhere('grade.id IS NULL')
+        .orderBy('exam.date', 'ASC')
+        .getMany();
 
-      return await examRepo.find({
-        where: { date: MoreThanOrEqual(now) },
-        order: { date: 'ASC' },
-      });
+      return upcomingExams;
     } catch (error) {
       console.error('Failed to fetch upcoming exams:', error);
       throw error;

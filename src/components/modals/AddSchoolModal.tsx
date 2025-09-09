@@ -1,4 +1,5 @@
 import React from 'react';
+import { useForm } from '@tanstack/react-form';
 import {
   IonModal,
   IonPage,
@@ -29,6 +30,23 @@ const AddSchoolModal: React.FC<AddSchoolModalProps> = ({
   onAdd,
   isLoading,
 }) => {
+  const form = useForm({
+    defaultValues: {
+      schoolName: schoolName,
+    },
+    onSubmit: async () => {
+      onAdd();
+    },
+  });
+
+  React.useEffect(() => {
+    form.setFieldValue('schoolName', schoolName);
+  }, [schoolName, form]);
+
+  const handleInputChange = (value: string) => {
+    setSchoolName(value);
+    form.setFieldValue('schoolName', value);
+  };
   return (
     <IonModal
       isOpen={isOpen}
@@ -76,7 +94,7 @@ const AddSchoolModal: React.FC<AddSchoolModalProps> = ({
                   <IonInput
                     value={schoolName}
                     placeholder="Name der Schule..."
-                    onIonChange={(e) => setSchoolName(e.detail.value || '')}
+                    onIonChange={(e) => handleInputChange(e.detail.value || '')}
                     className="modal-input-field"
                     clearInput
                     autoFocus
