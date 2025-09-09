@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useForm } from '@tanstack/react-form';
 import {
   IonButton,
   IonIcon,
@@ -35,20 +36,20 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
   generateId,
   onNext,
 }) => {
-  const [newSchool, setNewSchool] = useState<Partial<TempSchool>>({
-    name: '',
-    address: '',
-    type: '',
-  });
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const handleAddSchool = () => {
-    if (newSchool.name?.trim()) {
+  const form = useForm({
+    defaultValues: {
+      name: '',
+      address: '',
+      type: '',
+    },
+    onSubmit: async ({ value }) => {
       const school: TempSchool = {
         id: generateId(),
-        name: newSchool.name.trim(),
-        address: newSchool.address?.trim() || null,
-        type: newSchool.type || null,
+        name: value.name.trim(),
+        address: value.address?.trim() || null,
+        type: value.type || null,
       };
 
       setData((prev) => ({
@@ -56,9 +57,13 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
         schools: [...prev.schools, school],
       }));
 
-      setNewSchool({ name: '', address: '', type: '' });
+      form.reset();
       setShowAddForm(false);
-    }
+    },
+  });
+
+  const handleAddSchool = () => {
+    form.handleSubmit();
   };
 
   const handleRemoveSchool = (schoolId: string) => {
@@ -150,86 +155,92 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
                 <h3 className="form-title">Neue Schule erstellen</h3>
 
                 <div className="form-fields">
-                  <div className="field-group">
-                    <label className="field-label">Schulname *</label>
-                    <div className="input-wrapper glass-input">
-                      <IonItem lines="none" className="input-item">
-                        <div slot="start" className="input-icon-wrapper">
-                          <IonIcon
-                            icon={schoolOutline}
-                            className="input-icon"
-                          />
+                  <form.Field name="name">
+                    {(field) => (
+                      <div className="field-group">
+                        <label className="field-label">Schulname *</label>
+                        <div className="input-wrapper glass-input">
+                          <IonItem lines="none" className="input-item">
+                            <div slot="start" className="input-icon-wrapper">
+                              <IonIcon
+                                icon={schoolOutline}
+                                className="input-icon"
+                              />
+                            </div>
+                            <IonInput
+                              value={field.state.value}
+                              placeholder="z.B. Gymnasium München"
+                              onIonChange={(e) =>
+                                field.handleChange(e.detail.value || '')
+                              }
+                              className="input-field"
+                              clearInput
+                            />
+                          </IonItem>
                         </div>
-                        <IonInput
-                          value={newSchool.name}
-                          placeholder="z.B. Gymnasium München"
-                          onIonChange={(e) =>
-                            setNewSchool((prev) => ({
-                              ...prev,
-                              name: e.detail.value || '',
-                            }))
-                          }
-                          className="input-field"
-                          clearInput
-                        />
-                      </IonItem>
-                    </div>
-                  </div>
+                      </div>
+                    )}
+                  </form.Field>
 
-                  <div className="field-group">
-                    <label className="field-label">Schultyp</label>
-                    <div className="input-wrapper glass-input">
-                      <IonItem lines="none" className="input-item">
-                        <div slot="start" className="input-icon-wrapper">
-                          <IonIcon
-                            icon={businessOutline}
-                            className="input-icon"
-                          />
+                  <form.Field name="type">
+                    {(field) => (
+                      <div className="field-group">
+                        <label className="field-label">Schultyp</label>
+                        <div className="input-wrapper glass-input">
+                          <IonItem lines="none" className="input-item">
+                            <div slot="start" className="input-icon-wrapper">
+                              <IonIcon
+                                icon={businessOutline}
+                                className="input-icon"
+                              />
+                            </div>
+                            <IonSelect
+                              value={field.state.value}
+                              placeholder="Wähle den Schultyp"
+                              onIonChange={(e) =>
+                                field.handleChange(e.detail.value)
+                              }
+                              className="input-field"
+                              interface="popover"
+                            >
+                              {SCHOOL_TYPES.map((type) => (
+                                <IonSelectOption key={type} value={type}>
+                                  {type}
+                                </IonSelectOption>
+                              ))}
+                            </IonSelect>
+                          </IonItem>
                         </div>
-                        <IonSelect
-                          value={newSchool.type}
-                          placeholder="Wähle den Schultyp"
-                          onIonChange={(e) =>
-                            setNewSchool((prev) => ({
-                              ...prev,
-                              type: e.detail.value,
-                            }))
-                          }
-                          className="input-field"
-                          interface="popover"
-                        >
-                          {SCHOOL_TYPES.map((type) => (
-                            <IonSelectOption key={type} value={type}>
-                              {type}
-                            </IonSelectOption>
-                          ))}
-                        </IonSelect>
-                      </IonItem>
-                    </div>
-                  </div>
+                      </div>
+                    )}
+                  </form.Field>
 
-                  <div className="field-group">
-                    <label className="field-label">Adresse</label>
-                    <div className="input-wrapper glass-input">
-                      <IonItem lines="none" className="input-item">
-                        <div slot="start" className="input-icon-wrapper">
-                          <IonIcon icon={homeOutline} className="input-icon" />
+                  <form.Field name="address">
+                    {(field) => (
+                      <div className="field-group">
+                        <label className="field-label">Adresse</label>
+                        <div className="input-wrapper glass-input">
+                          <IonItem lines="none" className="input-item">
+                            <div slot="start" className="input-icon-wrapper">
+                              <IonIcon
+                                icon={homeOutline}
+                                className="input-icon"
+                              />
+                            </div>
+                            <IonInput
+                              value={field.state.value}
+                              placeholder="z.B. München, Deutschland"
+                              onIonChange={(e) =>
+                                field.handleChange(e.detail.value || '')
+                              }
+                              className="input-field"
+                              clearInput
+                            />
+                          </IonItem>
                         </div>
-                        <IonInput
-                          value={newSchool.address}
-                          placeholder="z.B. München, Deutschland"
-                          onIonChange={(e) =>
-                            setNewSchool((prev) => ({
-                              ...prev,
-                              address: e.detail.value || '',
-                            }))
-                          }
-                          className="input-field"
-                          clearInput
-                        />
-                      </IonItem>
-                    </div>
-                  </div>
+                      </div>
+                    )}
+                  </form.Field>
                 </div>
 
                 <div className="form-actions">
@@ -237,19 +248,23 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
                     fill="clear"
                     onClick={() => {
                       setShowAddForm(false);
-                      setNewSchool({ name: '', address: '', type: '' });
+                      form.reset();
                     }}
                     className="cancel-button"
                   >
                     Abbrechen
                   </IonButton>
-                  <IonButton
-                    onClick={handleAddSchool}
-                    disabled={!newSchool.name?.trim()}
-                    className="save-button"
-                  >
-                    Hinzufügen
-                  </IonButton>
+                  <form.Subscribe selector={(state) => [state.values.name]}>
+                    {([name]) => (
+                      <IonButton
+                        onClick={handleAddSchool}
+                        disabled={!name?.trim()}
+                        className="save-button"
+                      >
+                        Hinzufügen
+                      </IonButton>
+                    )}
+                  </form.Subscribe>
                 </div>
               </div>
             </div>
