@@ -24,6 +24,16 @@ body:
     validations:
       required: true
   - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots/Attachments
+      description: |
+        Drag and drop images here or click to upload.
+        Screenshots help us understand the issue better.
+      placeholder: Paste your screenshots here...
+    validations:
+      required: false
+  - type: textarea
     id: environment
     attributes:
       label: Environment
