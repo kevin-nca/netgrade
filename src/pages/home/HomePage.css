@@ -429,7 +429,7 @@
 
 /* Bottom Spacer */
 .bottom-spacer {
-  height: max(90px, env(safe-area-inset-bottom) + 90px);
+  height: max(66px, env(safe-area-inset-bottom) + 66px);
 }
 
 /* Tab Bar Navigation */
