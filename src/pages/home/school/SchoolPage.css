@@ -27,7 +27,7 @@
 
 @media (prefers-color-scheme: light) {
   .grade-subject {
-    color: #000000; 
+    color: #000000;
   }
   .grade-average {
     color: rgba(0, 0, 0, 0.7);
