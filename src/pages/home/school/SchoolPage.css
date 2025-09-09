@@ -24,3 +24,12 @@
   color: rgba(255, 255, 255, 0.7);
   display: block;
 }
+
+@media (prefers-color-scheme: light) {
+  .grade-subject {
+    color: #000000;
+  }
+  .grade-average {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
