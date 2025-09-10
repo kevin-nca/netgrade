@@ -203,6 +203,33 @@ export class GradeService {
   }
 
   /**
+   *
+   *
+   * Finds grades by subject ID
+   * @param examId - The ID of the subject to find grades for
+   * @returns Promise<Grade[]> - A promise that resolves to an array of grades
+   */
+  static async findBySubjectId(subjectId: string): Promise<Grade[]> {
+    try {
+      const { grade: gradeRepo } = getRepositories();
+      return await gradeRepo.find({
+        where: {
+          exam: { subjectId },
+        },
+        relations: {
+          exam: { subject: true },
+        },
+      });
+    } catch (error) {
+      console.error(
+        `Failed to find grades for subject ID ${subjectId}:`,
+        error,
+      );
+      throw error;
+    }
+  }
+
+  /**
    * Updates both an exam and a grade in a single transaction
    * @param examData - The updated exam data
    * @param gradeData - The updated grade data

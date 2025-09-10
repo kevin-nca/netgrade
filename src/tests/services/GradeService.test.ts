@@ -99,6 +99,32 @@ describe('GradeService', () => {
     expect(grade?.exam).toBeDefined();
   });
 
+  // Test findBySubjectId method
+  it('should find grades by subject id', async () => {
+    const gradeData: AddExamAndGradePayload = {
+      subjectId: testData.subject.id,
+      examName: 'Subject ID Test Exam',
+      date: new Date(),
+      score: 88,
+      weight: 1.2,
+      comment: 'Subject-specific test',
+    };
+
+    const createdGrade = await GradeService.addWithExam(gradeData);
+
+    const foundGrades = await GradeService.findBySubjectId(testData.subject.id);
+
+    expect(Array.isArray(foundGrades)).toBe(true);
+    expect(foundGrades.length).toBeGreaterThan(0);
+
+    const match = foundGrades.find((g) => g.id === createdGrade.id);
+    expect(match).toBeDefined();
+    expect(match?.score).toBe(88);
+    expect(match?.weight).toBe(1.2);
+    expect(match?.exam).toBeDefined();
+    expect(match?.exam.subjectId).toBe(testData.subject.id);
+  });
+
   // Test findByExamId method
   it('should find grades by exam id', async () => {
     const grades = await GradeService.findByExamId(testData.exam.id);
