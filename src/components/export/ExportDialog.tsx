@@ -341,8 +341,6 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 
               {selectedSchoolId && customFilename.trim() && (
                 <div className="glass-card details-card">
-                  <div className="shimmer-effect shimmer-overlay" />
-
                   <h3 className="details-title">Export-Details</h3>
 
                   <div className="details-list">
