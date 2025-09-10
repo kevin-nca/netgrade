@@ -123,6 +123,12 @@
   flex-shrink: 0;
 }
 
+@media (prefers-color-scheme: light) {
+  .profile-settings-button {
+    background: #746f6f; 
+  }
+}
+
 .profile-settings-button:active {
   transform: scale(0.95);
   background: rgba(255, 255, 255, 0.4);
