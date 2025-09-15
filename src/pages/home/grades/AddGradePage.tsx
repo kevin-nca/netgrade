@@ -1,10 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { IonContent, IonPage, IonToast } from '@ionic/react';
+import { IonContent, IonPage, IonToast, IonIcon } from '@ionic/react';
 import { useHistory, useLocation } from 'react-router-dom';
-import Button from '@/components/Button/Button';
+import {
+  schoolOutline,
+  libraryOutline,
+  documentTextOutline,
+  calendarOutline,
+  scaleOutline,
+  ribbonOutline,
+  chatboxOutline,
+  addOutline,
+  checkmarkCircleOutline,
+} from 'ionicons/icons';
 import Header from '@/components/Header/Header';
-import FormField from '@/components/Form/FormField';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import { School, Subject } from '@/db/entities';
