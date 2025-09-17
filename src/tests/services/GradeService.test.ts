@@ -125,6 +125,35 @@ describe('GradeService', () => {
     expect(match?.exam.subjectId).toBe(testData.subject.id);
   });
 
+  it('should log and rethrow an error if gradeRepo.find fails', async () => {
+    const fakeError = new Error('Mocked DB error');
+    const subjectId = testData.subject.id;
+
+    const dataSourceModule = await import('@/db/data-source');
+    const { grade: gradeRepo } = dataSourceModule.getRepositories();
+
+    // Spy auf console.error
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    // Mock gradeRepo.find to throw error
+    const findSpy = vi.spyOn(gradeRepo, 'find').mockRejectedValue(fakeError);
+
+    await expect(GradeService.findBySubjectId(subjectId)).rejects.toThrow(
+      'Mocked DB error',
+    );
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      `Failed to find grades for subject ID ${subjectId}:`,
+      fakeError,
+    );
+
+    // Cleanup
+    findSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+  });
+
   // Test findByExamId method
   it('should find grades by exam id', async () => {
     const grades = await GradeService.findByExamId(testData.exam.id);
