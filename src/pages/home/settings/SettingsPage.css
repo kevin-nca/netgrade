@@ -71,14 +71,9 @@
   --background: transparent;
   --border-width: 0;
   padding: 8px 4px;
-}
-
-.settings-title {
-  font-size: 17px;
-  font-weight: 600;
-  color: #000000;
-  text-align: center;
-  letter-spacing: -0.4px;
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
 .back-button {
