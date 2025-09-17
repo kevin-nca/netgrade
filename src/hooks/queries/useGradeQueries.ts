@@ -22,6 +22,14 @@ export const useGrades = () => {
     queryFn: () => GradeService.fetchAll(),
   });
 };
+
+export const useSubjectGrades = (subjectId: string) => {
+  return useQuery({
+    queryKey: gradeKeys.lists(),
+    queryFn: () => GradeService.findBySubjectId(subjectId),
+  });
+};
+
 export const useAddGradeWithExam = () => {
   const queryClient = useQueryClient();
 

@@ -18,9 +18,10 @@ import GradeListItem from '@/components/List/GradeListItem';
 import FormField from '@/components/Form/FormField';
 import { Grade } from '@/db/entities';
 import {
-  useGrades,
   useDeleteGrade,
   useUpdateExamAndGrade,
+  useSubjectGrades,
+  useSubject,
 } from '@/hooks/queries';
 import {
   validateGrade,
@@ -46,18 +47,23 @@ interface GradeEntryParams {
 }
 
 const GradeEntryPage: React.FC = () => {
-  const { schoolId, subjectId } = useParams<GradeEntryParams>();
+  const { subjectId } = useParams<GradeEntryParams>();
   const history = useHistory();
 
   const {
-    data: allGrades = [],
-    error: gradesError,
-    isLoading: gradesLoading,
-  } = useGrades();
+    data: grades = [],
+    isLoading: isGradesLoading,
+    isError: isGradesError,
+  } = useSubjectGrades(subjectId);
 
-  const grades = allGrades.filter(
-    (grade: Grade) => grade.exam.subjectId === subjectId,
-  );
+  const {
+    data: subject,
+    isLoading: isSubjectLoading,
+    isError: isSubjectError,
+  } = useSubject(subjectId);
+
+  const isLoading = isGradesLoading || isSubjectLoading;
+  const isError = isGradesError || isSubjectError;
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const { showToast, toastMessage, setShowToast, showMessage } = useToast();
@@ -121,7 +127,7 @@ const GradeEntryPage: React.FC = () => {
   const saveEdit = async (formData: GradeFormData) => {
     if (!editingId) return;
 
-    const grade = grades.find((grade: Grade) => grade.id === editingId);
+    const grade = grades.find((g: Grade) => g.id === editingId);
     if (!grade) return;
 
     const updatedGrade = {
@@ -136,6 +142,7 @@ const GradeEntryPage: React.FC = () => {
       ...grade.exam,
       name: formData.examName,
     };
+
     updateExamAndGradeMutation.mutate(
       {
         examData: updatedExam,
@@ -162,17 +169,14 @@ const GradeEntryPage: React.FC = () => {
   return (
     <IonPage>
       <Header
-        title="Notenübersicht"
+        title={subject?.name || ''}
         backButton
         onBack={() => window.history.back()}
         endSlot={
           <IonButtons slot="end">
             <Button
               handleEvent={() => {
-                history.push(Routes.GRADES_ADD, {
-                  schoolId,
-                  subjectId,
-                });
+                history.push(Routes.GRADES_ADD);
               }}
               text={<IonIcon icon={add} />}
             />
@@ -181,11 +185,11 @@ const GradeEntryPage: React.FC = () => {
       />
       <IonContent>
         <Layout>
-          {gradesLoading ? (
+          {isLoading ? (
             <div className="ion-padding ion-text-center">
               <p>Noten werden geladen...</p>
             </div>
-          ) : gradesError ? (
+          ) : isError ? (
             <div className="ion-padding ion-text-center">
               <p>Fehler beim Laden der Noten.</p>
             </div>

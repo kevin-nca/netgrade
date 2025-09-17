@@ -99,6 +99,61 @@ describe('GradeService', () => {
     expect(grade?.exam).toBeDefined();
   });
 
+  // Test findBySubjectId method
+  it('should find grades by subject id', async () => {
+    const gradeData: AddExamAndGradePayload = {
+      subjectId: testData.subject.id,
+      examName: 'Subject ID Test Exam',
+      date: new Date(),
+      score: 88,
+      weight: 1.2,
+      comment: 'Subject-specific test',
+    };
+
+    const createdGrade = await GradeService.addWithExam(gradeData);
+
+    const foundGrades = await GradeService.findBySubjectId(testData.subject.id);
+
+    expect(Array.isArray(foundGrades)).toBe(true);
+    expect(foundGrades.length).toBeGreaterThan(0);
+
+    const match = foundGrades.find((g) => g.id === createdGrade.id);
+    expect(match).toBeDefined();
+    expect(match?.score).toBe(88);
+    expect(match?.weight).toBe(1.2);
+    expect(match?.exam).toBeDefined();
+    expect(match?.exam.subjectId).toBe(testData.subject.id);
+  });
+
+  it('should log and rethrow an error if gradeRepo.find fails', async () => {
+    const fakeError = new Error('Mocked DB error');
+    const subjectId = testData.subject.id;
+
+    const dataSourceModule = await import('@/db/data-source');
+    const { grade: gradeRepo } = dataSourceModule.getRepositories();
+
+    // Spy auf console.error
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    // Mock gradeRepo.find to throw error
+    const findSpy = vi.spyOn(gradeRepo, 'find').mockRejectedValue(fakeError);
+
+    await expect(GradeService.findBySubjectId(subjectId)).rejects.toThrow(
+      'Mocked DB error',
+    );
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      `Failed to find grades for subject ID ${subjectId}:`,
+      fakeError,
+    );
+
+    // Cleanup
+    findSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+  });
+
   // Test findByExamId method
   it('should find grades by exam id', async () => {
     const grades = await GradeService.findByExamId(testData.exam.id);
