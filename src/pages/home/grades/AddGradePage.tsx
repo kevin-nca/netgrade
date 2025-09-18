@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
 import { useForm } from '@tanstack/react-form';
 import { IonContent, IonPage, IonToast, IonIcon } from '@ionic/react';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -192,11 +198,14 @@ const AddGradePage: React.FC = () => {
       form.setFieldValue('selectedSchoolId', newSchoolId);
       form.setFieldValue('selectedSubjectId', '');
       setSelectedSchoolId(newSchoolId);
-      setFieldErrors((prev) => ({ ...prev, selectedSchoolId: '', selectedSubjectId: '' }));
+      setFieldErrors((prev) => ({
+        ...prev,
+        selectedSchoolId: '',
+        selectedSubjectId: '',
+      }));
     },
     [form],
   );
-
 
   const showAndSetToastMessage = (
     message: string,
@@ -218,10 +227,12 @@ const AddGradePage: React.FC = () => {
             const scoreNum = Number(value);
             error = validateGrade(scoreNum) || '';
             if (!error && scoreNum > 0) {
-              if (scoreNum >= 5.5) suggestion = '💡 Ausgezeichnet! Eine sehr gute Note.';
+              if (scoreNum >= 5.5)
+                suggestion = '💡 Ausgezeichnet! Eine sehr gute Note.';
               else if (scoreNum >= 4.5) suggestion = '✨ Gute Leistung!';
               else if (scoreNum >= 3.5) suggestion = '👍 Solide Note.';
-              else if (scoreNum >= 2.5) suggestion = '📚 Noch Verbesserungspotential.';
+              else if (scoreNum >= 2.5)
+                suggestion = '📚 Noch Verbesserungspotential.';
               else suggestion = '🎯 Beim nächsten Mal wird es besser!';
             }
             break;
@@ -233,13 +244,17 @@ const AddGradePage: React.FC = () => {
               if (weightNum === 100) suggestion = '📋 Standard-Gewichtung';
               else if (weightNum === 50) suggestion = '⚖️ Halbe Gewichtung';
               else if (weightNum === 25) suggestion = '📝 Niedrige Gewichtung';
-              else if (weightNum > 100) suggestion = '⚠️ Ungewöhnlich hohe Gewichtung';
-              else if (weightNum < 10) suggestion = '💭 Sehr niedrige Gewichtung';
+              else if (weightNum > 100)
+                suggestion = '⚠️ Ungewöhnlich hohe Gewichtung';
+              else if (weightNum < 10)
+                suggestion = '💭 Sehr niedrige Gewichtung';
             }
             break;
           }
           case 'examName':
-            error = !String(value).trim() ? 'Prüfungsname ist erforderlich' : '';
+            error = !String(value).trim()
+              ? 'Prüfungsname ist erforderlich'
+              : '';
             break;
         }
 
@@ -306,7 +321,14 @@ const AddGradePage: React.FC = () => {
 
   const formProgress = useMemo(() => {
     const values = form.state.values;
-    const fields = ['selectedSchoolId', 'selectedSubjectId', 'examName', 'date', 'weight', 'score'];
+    const fields = [
+      'selectedSchoolId',
+      'selectedSubjectId',
+      'examName',
+      'date',
+      'weight',
+      'score',
+    ];
     const completed = fields.filter((field) => {
       const value = values[field as keyof GradeAddFormData];
       return value !== '' && value !== 0;
