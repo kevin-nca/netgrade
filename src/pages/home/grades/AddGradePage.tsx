@@ -245,7 +245,7 @@ const AddGradePage: React.FC = () => {
           case 'examName': {
             const examName = String(value).trim();
             error = !examName ? 'Prüfungsname ist erforderlich' : '';
-            if (!error && examName.length >= 20) {
+            if (!error && examName.length >= 7) {
               suggestion = '📝 Ausführlicher Prüfungsname';
             }
             break;
