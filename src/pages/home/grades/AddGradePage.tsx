@@ -240,22 +240,16 @@ const AddGradePage: React.FC = () => {
           case 'weight': {
             const weightNum = Number(value);
             error = validateWeight(weightNum) || '';
-            if (!error && weightNum > 0) {
-              if (weightNum === 100) suggestion = '📋 Standard-Gewichtung';
-              else if (weightNum === 50) suggestion = '⚖️ Halbe Gewichtung';
-              else if (weightNum === 25) suggestion = '📝 Niedrige Gewichtung';
-              else if (weightNum > 100)
-                suggestion = '⚠️ Ungewöhnlich hohe Gewichtung';
-              else if (weightNum < 10)
-                suggestion = '💭 Sehr niedrige Gewichtung';
+            break;
+          }
+          case 'examName': {
+            const examName = String(value).trim();
+            error = !examName ? 'Prüfungsname ist erforderlich' : '';
+            if (!error && examName.length >= 20) {
+              suggestion = '📝 Ausführlicher Prüfungsname';
             }
             break;
           }
-          case 'examName':
-            error = !String(value).trim()
-              ? 'Prüfungsname ist erforderlich'
-              : '';
-            break;
         }
 
         setFieldErrors((prev) => ({
@@ -517,6 +511,12 @@ const AddGradePage: React.FC = () => {
                           {fieldErrors.examName}
                         </div>
                       )}
+                      {fieldErrors.examName_suggestion &&
+                        !fieldErrors.examName && (
+                          <div className="field-suggestion">
+                            {fieldErrors.examName_suggestion}
+                          </div>
+                        )}
                     </div>
                   </div>
                 )}
@@ -574,7 +574,10 @@ const AddGradePage: React.FC = () => {
                           <button
                             type="button"
                             className="weight-preset-btn"
-                            onClick={() => form.setFieldValue('weight', 25)}
+                            onClick={() => {
+                              form.setFieldValue('weight', 25);
+                              validateField('weight', '25');
+                            }}
                             tabIndex={-1}
                           >
                             25%
@@ -582,7 +585,10 @@ const AddGradePage: React.FC = () => {
                           <button
                             type="button"
                             className="weight-preset-btn"
-                            onClick={() => form.setFieldValue('weight', 50)}
+                            onClick={() => {
+                              form.setFieldValue('weight', 50);
+                              validateField('weight', '50');
+                            }}
                             tabIndex={-1}
                           >
                             50%
@@ -590,7 +596,10 @@ const AddGradePage: React.FC = () => {
                           <button
                             type="button"
                             className="weight-preset-btn"
-                            onClick={() => form.setFieldValue('weight', 100)}
+                            onClick={() => {
+                              form.setFieldValue('weight', 100);
+                              validateField('weight', '100');
+                            }}
                             tabIndex={-1}
                           >
                             100%
