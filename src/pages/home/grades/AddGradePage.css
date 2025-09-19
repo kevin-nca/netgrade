@@ -74,6 +74,43 @@
   pointer-events: none;
 }
 
+/* Form Group - Subtle container for form and button */
+.form-group {
+  position: relative;
+  padding: 8px;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 122, 255, 0.02) 0%,
+    rgba(0, 122, 255, 0.01) 100%
+  );
+  border: 1px solid rgba(0, 122, 255, 0.08);
+  margin-bottom: 16px;
+}
+
+.form-group::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 20px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 122, 255, 0.1),
+    transparent 30%,
+    transparent 70%,
+    rgba(0, 122, 255, 0.05)
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
 /* Form Card */
 .form-card {
   background: linear-gradient(
@@ -705,6 +742,25 @@ select.form-input option {
 @media (prefers-color-scheme: dark) {
   .add-grade-page {
     background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  }
+
+  .form-group {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.04) 0%,
+      rgba(0, 122, 255, 0.02) 100%
+    );
+    border: 1px solid rgba(0, 122, 255, 0.15);
+  }
+
+  .form-group::before {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.2),
+      transparent 30%,
+      transparent 70%,
+      rgba(0, 122, 255, 0.1)
+    );
   }
 
   .form-card {

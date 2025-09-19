@@ -111,7 +111,6 @@ const AddGradePage: React.FC = () => {
         onSuccess: () => {
           setLastUsedSchool(value.selectedSchoolId);
           setShowSuccess(true);
-          showAndSetToastMessage('Note erfolgreich hinzugefügt!', 'success');
 
           form.reset();
           form.setFieldValue('selectedSchoolId', value.selectedSchoolId);
@@ -373,8 +372,9 @@ const AddGradePage: React.FC = () => {
             </div>
             <span className="progress-text">{formProgress}% completed</span>
           </div>
-          <div className="form-card">
-            <div className="form-fields">
+          <div className="form-group">
+            <div className="form-card">
+              <div className="form-fields">
               <form.Field name="selectedSchoolId">
                 {(field) => (
                   <div
@@ -694,10 +694,10 @@ const AddGradePage: React.FC = () => {
                   </div>
                 )}
               </form.Field>
+              </div>
             </div>
-          </div>
-          <div className="button-section">
-            <button
+            <div className="button-section">
+              <button
               className="glass-button primary"
               onClick={handleAddGrade}
               disabled={addGradeWithExamMutation.isPending}
@@ -709,6 +709,7 @@ const AddGradePage: React.FC = () => {
                   : 'Note hinzufügen'}
               </span>
             </button>
+            </div>
           </div>
 
           <div className="bottom-spacer" />
