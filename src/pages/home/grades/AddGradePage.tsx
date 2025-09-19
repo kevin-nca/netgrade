@@ -375,340 +375,344 @@ const AddGradePage: React.FC = () => {
           <div className="form-group">
             <div className="form-card">
               <div className="form-fields">
-              <form.Field name="selectedSchoolId">
-                {(field) => (
-                  <div
-                    className={`input-row ${fieldErrors.selectedSchoolId ? 'error' : ''}`}
-                  >
-                    <div className="field-icon-wrapper">
-                      <IonIcon icon={schoolOutline} className="field-icon" />
-                    </div>
-                    <div className="field-content">
-                      <label className="field-label" htmlFor="school-select">
-                        Schule *
-                      </label>
-                      <select
-                        id="school-select"
-                        className="form-input"
-                        value={field.state.value}
-                        onChange={(e) => handleSchoolChange(e.target.value)}
-                        aria-describedby={
-                          fieldErrors.selectedSchoolId
-                            ? 'school-error'
-                            : undefined
-                        }
-                        required
-                      >
-                        <option value="">Schule auswählen</option>
-                        {schoolOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                      {fieldErrors.selectedSchoolId && (
-                        <div
-                          id="school-error"
-                          className="field-error"
-                          role="alert"
+                <form.Field name="selectedSchoolId">
+                  {(field) => (
+                    <div
+                      className={`input-row ${fieldErrors.selectedSchoolId ? 'error' : ''}`}
+                    >
+                      <div className="field-icon-wrapper">
+                        <IonIcon icon={schoolOutline} className="field-icon" />
+                      </div>
+                      <div className="field-content">
+                        <label className="field-label" htmlFor="school-select">
+                          Schule *
+                        </label>
+                        <select
+                          id="school-select"
+                          className="form-input"
+                          value={field.state.value}
+                          onChange={(e) => handleSchoolChange(e.target.value)}
+                          aria-describedby={
+                            fieldErrors.selectedSchoolId
+                              ? 'school-error'
+                              : undefined
+                          }
+                          required
                         >
-                          {fieldErrors.selectedSchoolId}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </form.Field>
-
-              <form.Field name="selectedSubjectId">
-                {(field) => (
-                  <div
-                    className={`input-row ${fieldErrors.selectedSubjectId ? 'error' : ''}`}
-                  >
-                    <div className="field-icon-wrapper">
-                      <IonIcon icon={libraryOutline} className="field-icon" />
-                    </div>
-                    <div className="field-content">
-                      <label className="field-label" htmlFor="subject-select">
-                        Fach *
-                      </label>
-                      <select
-                        id="subject-select"
-                        ref={subjectRef}
-                        className="form-input"
-                        value={field.state.value}
-                        onChange={(e) => handleSubjectChange(e.target.value)}
-                        disabled={
-                          !form.state.values.selectedSchoolId ||
-                          subjects.length === 0
-                        }
-                        aria-describedby={
-                          fieldErrors.selectedSubjectId
-                            ? 'subject-error'
-                            : undefined
-                        }
-                        required
-                      >
-                        <option value="">
-                          {!form.state.values.selectedSchoolId
-                            ? 'Bitte zuerst Schule wählen'
-                            : 'Fach auswählen'}
-                        </option>
-                        {subjectOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                      {fieldErrors.selectedSubjectId && (
-                        <div
-                          id="subject-error"
-                          className="field-error"
-                          role="alert"
-                        >
-                          {fieldErrors.selectedSubjectId}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </form.Field>
-
-              <form.Field name="examName">
-                {(field) => (
-                  <div
-                    className={`input-row ${fieldErrors.examName ? 'error' : ''}`}
-                  >
-                    <div className="field-icon-wrapper">
-                      <IonIcon
-                        icon={documentTextOutline}
-                        className="field-icon"
-                      />
-                    </div>
-                    <div className="field-content">
-                      <label className="field-label" htmlFor="exam-name">
-                        Prüfungsname *
-                      </label>
-                      <input
-                        id="exam-name"
-                        ref={examNameRef}
-                        className="form-input"
-                        type="text"
-                        value={field.state.value}
-                        onChange={(e) => handleExamNameChange(e.target.value)}
-                        placeholder="z.B. Klausur 1, Vokabeltest"
-                        aria-describedby={
-                          fieldErrors.examName ? 'exam-name-error' : undefined
-                        }
-                        required
-                      />
-                      {fieldErrors.examName && (
-                        <div
-                          id="exam-name-error"
-                          className="field-error"
-                          role="alert"
-                        >
-                          {fieldErrors.examName}
-                        </div>
-                      )}
-                      {fieldErrors.examName_suggestion &&
-                        !fieldErrors.examName && (
-                          <div className="field-suggestion">
-                            {fieldErrors.examName_suggestion}
+                          <option value="">Schule auswählen</option>
+                          {schoolOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        {fieldErrors.selectedSchoolId && (
+                          <div
+                            id="school-error"
+                            className="field-error"
+                            role="alert"
+                          >
+                            {fieldErrors.selectedSchoolId}
                           </div>
                         )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </form.Field>
+                  )}
+                </form.Field>
 
-              <form.Field name="date">
-                {(field) => (
-                  <div className="input-row">
-                    <div className="field-icon-wrapper">
-                      <IonIcon icon={calendarOutline} className="field-icon" />
+                <form.Field name="selectedSubjectId">
+                  {(field) => (
+                    <div
+                      className={`input-row ${fieldErrors.selectedSubjectId ? 'error' : ''}`}
+                    >
+                      <div className="field-icon-wrapper">
+                        <IonIcon icon={libraryOutline} className="field-icon" />
+                      </div>
+                      <div className="field-content">
+                        <label className="field-label" htmlFor="subject-select">
+                          Fach *
+                        </label>
+                        <select
+                          id="subject-select"
+                          ref={subjectRef}
+                          className="form-input"
+                          value={field.state.value}
+                          onChange={(e) => handleSubjectChange(e.target.value)}
+                          disabled={
+                            !form.state.values.selectedSchoolId ||
+                            subjects.length === 0
+                          }
+                          aria-describedby={
+                            fieldErrors.selectedSubjectId
+                              ? 'subject-error'
+                              : undefined
+                          }
+                          required
+                        >
+                          <option value="">
+                            {!form.state.values.selectedSchoolId
+                              ? 'Bitte zuerst Schule wählen'
+                              : 'Fach auswählen'}
+                          </option>
+                          {subjectOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        {fieldErrors.selectedSubjectId && (
+                          <div
+                            id="subject-error"
+                            className="field-error"
+                            role="alert"
+                          >
+                            {fieldErrors.selectedSubjectId}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="field-content">
-                      <label className="field-label">Datum</label>
-                      <input
-                        className="form-input"
-                        type="date"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                )}
-              </form.Field>
+                  )}
+                </form.Field>
 
-              <form.Field name="weight">
-                {(field) => (
-                  <div
-                    className={`input-row ${fieldErrors.weight ? 'error' : ''}`}
-                  >
-                    <div className="field-icon-wrapper">
-                      <IonIcon icon={scaleOutline} className="field-icon" />
-                    </div>
-                    <div className="field-content">
-                      <label className="field-label" htmlFor="weight">
-                        Gewichtung (0-100%)
-                      </label>
-                      <div className="weight-input-container">
+                <form.Field name="examName">
+                  {(field) => (
+                    <div
+                      className={`input-row ${fieldErrors.examName ? 'error' : ''}`}
+                    >
+                      <div className="field-icon-wrapper">
+                        <IonIcon
+                          icon={documentTextOutline}
+                          className="field-icon"
+                        />
+                      </div>
+                      <div className="field-content">
+                        <label className="field-label" htmlFor="exam-name">
+                          Prüfungsname *
+                        </label>
                         <input
-                          id="weight"
-                          ref={weightRef}
-                          className="form-input weight-input"
+                          id="exam-name"
+                          ref={examNameRef}
+                          className="form-input"
+                          type="text"
+                          value={field.state.value}
+                          onChange={(e) => handleExamNameChange(e.target.value)}
+                          placeholder="z.B. Klausur 1, Vokabeltest"
+                          aria-describedby={
+                            fieldErrors.examName ? 'exam-name-error' : undefined
+                          }
+                          required
+                        />
+                        {fieldErrors.examName && (
+                          <div
+                            id="exam-name-error"
+                            className="field-error"
+                            role="alert"
+                          >
+                            {fieldErrors.examName}
+                          </div>
+                        )}
+                        {fieldErrors.examName_suggestion &&
+                          !fieldErrors.examName && (
+                            <div className="field-suggestion">
+                              {fieldErrors.examName_suggestion}
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="date">
+                  {(field) => (
+                    <div className="input-row">
+                      <div className="field-icon-wrapper">
+                        <IonIcon
+                          icon={calendarOutline}
+                          className="field-icon"
+                        />
+                      </div>
+                      <div className="field-content">
+                        <label className="field-label">Datum</label>
+                        <input
+                          className="form-input"
+                          type="date"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="weight">
+                  {(field) => (
+                    <div
+                      className={`input-row ${fieldErrors.weight ? 'error' : ''}`}
+                    >
+                      <div className="field-icon-wrapper">
+                        <IonIcon icon={scaleOutline} className="field-icon" />
+                      </div>
+                      <div className="field-content">
+                        <label className="field-label" htmlFor="weight">
+                          Gewichtung (0-100%)
+                        </label>
+                        <div className="weight-input-container">
+                          <input
+                            id="weight"
+                            ref={weightRef}
+                            className="form-input weight-input"
+                            type="number"
+                            inputMode="decimal"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            value={field.state.value}
+                            onChange={handleWeightChange}
+                            placeholder="100"
+                            aria-describedby={
+                              fieldErrors.weight ? 'weight-error' : undefined
+                            }
+                          />
+                          <div className="weight-quick-actions">
+                            <button
+                              type="button"
+                              className="weight-preset-btn"
+                              onClick={() => {
+                                form.setFieldValue('weight', 25);
+                                validateField('weight', '25');
+                              }}
+                              tabIndex={-1}
+                            >
+                              25%
+                            </button>
+                            <button
+                              type="button"
+                              className="weight-preset-btn"
+                              onClick={() => {
+                                form.setFieldValue('weight', 50);
+                                validateField('weight', '50');
+                              }}
+                              tabIndex={-1}
+                            >
+                              50%
+                            </button>
+                            <button
+                              type="button"
+                              className="weight-preset-btn"
+                              onClick={() => {
+                                form.setFieldValue('weight', 100);
+                                validateField('weight', '100');
+                              }}
+                              tabIndex={-1}
+                            >
+                              100%
+                            </button>
+                          </div>
+                        </div>
+                        {fieldErrors.weight && (
+                          <div
+                            id="weight-error"
+                            className="field-error"
+                            role="alert"
+                          >
+                            {fieldErrors.weight}
+                          </div>
+                        )}
+                        {fieldErrors.weight_suggestion &&
+                          !fieldErrors.weight && (
+                            <div className="field-suggestion">
+                              {fieldErrors.weight_suggestion}
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                  )}
+                </form.Field>
+
+                <form.Field name="score">
+                  {(field) => (
+                    <div
+                      className={`input-row ${fieldErrors.score ? 'error' : ''}`}
+                    >
+                      <div className="field-icon-wrapper">
+                        <IonIcon icon={ribbonOutline} className="field-icon" />
+                      </div>
+                      <div className="field-content">
+                        <label className="field-label" htmlFor="score">
+                          Note (1-6) *
+                        </label>
+                        <input
+                          id="score"
+                          ref={scoreRef}
+                          className="form-input"
                           type="number"
                           inputMode="decimal"
-                          min="0"
-                          max="100"
+                          min="1"
+                          max="6"
                           step="0.01"
-                          value={field.state.value}
-                          onChange={handleWeightChange}
-                          placeholder="100"
+                          value={field.state.value || ''}
+                          onChange={handleScoreChange}
+                          placeholder="6.0"
                           aria-describedby={
-                            fieldErrors.weight ? 'weight-error' : undefined
+                            fieldErrors.score ? 'score-error' : undefined
                           }
+                          required
                         />
-                        <div className="weight-quick-actions">
-                          <button
-                            type="button"
-                            className="weight-preset-btn"
-                            onClick={() => {
-                              form.setFieldValue('weight', 25);
-                              validateField('weight', '25');
-                            }}
-                            tabIndex={-1}
+                        {fieldErrors.score && (
+                          <div
+                            id="score-error"
+                            className="field-error"
+                            role="alert"
                           >
-                            25%
-                          </button>
-                          <button
-                            type="button"
-                            className="weight-preset-btn"
-                            onClick={() => {
-                              form.setFieldValue('weight', 50);
-                              validateField('weight', '50');
-                            }}
-                            tabIndex={-1}
-                          >
-                            50%
-                          </button>
-                          <button
-                            type="button"
-                            className="weight-preset-btn"
-                            onClick={() => {
-                              form.setFieldValue('weight', 100);
-                              validateField('weight', '100');
-                            }}
-                            tabIndex={-1}
-                          >
-                            100%
-                          </button>
-                        </div>
+                            {fieldErrors.score}
+                          </div>
+                        )}
+                        {fieldErrors.score_suggestion && !fieldErrors.score && (
+                          <div className="field-suggestion">
+                            {fieldErrors.score_suggestion}
+                          </div>
+                        )}
                       </div>
-                      {fieldErrors.weight && (
-                        <div
-                          id="weight-error"
-                          className="field-error"
-                          role="alert"
-                        >
-                          {fieldErrors.weight}
-                        </div>
-                      )}
-                      {fieldErrors.weight_suggestion && !fieldErrors.weight && (
-                        <div className="field-suggestion">
-                          {fieldErrors.weight_suggestion}
-                        </div>
-                      )}
                     </div>
-                  </div>
-                )}
-              </form.Field>
+                  )}
+                </form.Field>
 
-              <form.Field name="score">
-                {(field) => (
-                  <div
-                    className={`input-row ${fieldErrors.score ? 'error' : ''}`}
-                  >
-                    <div className="field-icon-wrapper">
-                      <IonIcon icon={ribbonOutline} className="field-icon" />
+                <form.Field name="comment">
+                  {(field) => (
+                    <div className="input-row">
+                      <div className="field-icon-wrapper">
+                        <IonIcon icon={chatboxOutline} className="field-icon" />
+                      </div>
+                      <div className="field-content">
+                        <label className="field-label">
+                          Kommentar (optional)
+                        </label>
+                        <input
+                          className="form-input"
+                          type="text"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="Zusätzliche Notizen..."
+                        />
+                      </div>
                     </div>
-                    <div className="field-content">
-                      <label className="field-label" htmlFor="score">
-                        Note (1-6) *
-                      </label>
-                      <input
-                        id="score"
-                        ref={scoreRef}
-                        className="form-input"
-                        type="number"
-                        inputMode="decimal"
-                        min="1"
-                        max="6"
-                        step="0.01"
-                        value={field.state.value || ''}
-                        onChange={handleScoreChange}
-                        placeholder="6.0"
-                        aria-describedby={
-                          fieldErrors.score ? 'score-error' : undefined
-                        }
-                        required
-                      />
-                      {fieldErrors.score && (
-                        <div
-                          id="score-error"
-                          className="field-error"
-                          role="alert"
-                        >
-                          {fieldErrors.score}
-                        </div>
-                      )}
-                      {fieldErrors.score_suggestion && !fieldErrors.score && (
-                        <div className="field-suggestion">
-                          {fieldErrors.score_suggestion}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </form.Field>
-
-              <form.Field name="comment">
-                {(field) => (
-                  <div className="input-row">
-                    <div className="field-icon-wrapper">
-                      <IonIcon icon={chatboxOutline} className="field-icon" />
-                    </div>
-                    <div className="field-content">
-                      <label className="field-label">
-                        Kommentar (optional)
-                      </label>
-                      <input
-                        className="form-input"
-                        type="text"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="Zusätzliche Notizen..."
-                      />
-                    </div>
-                  </div>
-                )}
-              </form.Field>
+                  )}
+                </form.Field>
               </div>
             </div>
             <div className="button-section">
               <button
-              className="glass-button primary"
-              onClick={handleAddGrade}
-              disabled={addGradeWithExamMutation.isPending}
-            >
-              <IonIcon icon={addOutline} className="button-icon" />
-              <span className="button-text">
-                {addGradeWithExamMutation.isPending
-                  ? 'Wird hinzugefügt...'
-                  : 'Note hinzufügen'}
-              </span>
-            </button>
+                className="glass-button primary"
+                onClick={handleAddGrade}
+                disabled={addGradeWithExamMutation.isPending}
+              >
+                <IonIcon icon={addOutline} className="button-icon" />
+                <span className="button-text">
+                  {addGradeWithExamMutation.isPending
+                    ? 'Wird hinzugefügt...'
+                    : 'Note hinzufügen'}
+                </span>
+              </button>
             </div>
           </div>
 
