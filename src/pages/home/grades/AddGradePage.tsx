@@ -15,7 +15,6 @@ import {
   calendarOutline,
   scaleOutline,
   ribbonOutline,
-  chatboxOutline,
   addOutline,
   checkmarkCircleOutline,
 } from 'ionicons/icons';
@@ -28,6 +27,7 @@ import {
   useSchools,
   useSchoolSubjects,
   useAddGradeWithExam,
+  useSubjectGrades,
 } from '@/hooks/queries';
 import {
   validateGrade,
@@ -86,14 +86,12 @@ const AddGradePage: React.FC = () => {
       const gradeError = validateGrade(scoreNumber);
       if (gradeError) {
         setFieldErrors((prev) => ({ ...prev, score: gradeError }));
-        showAndSetToastMessage(gradeError);
         return;
       }
 
       const weightError = validateWeight(weightNumber);
       if (weightError) {
         setFieldErrors((prev) => ({ ...prev, weight: weightError }));
-        showAndSetToastMessage(weightError);
         return;
       }
       setFieldErrors({});
@@ -104,16 +102,18 @@ const AddGradePage: React.FC = () => {
         date: parseISO(value.date),
         score: scoreNumber,
         weight: percentageToDecimal(weightNumber),
-        comment: value.comment.trim() || undefined,
       };
 
       addGradeWithExamMutation.mutate(gradePayload, {
         onSuccess: () => {
           setLastUsedSchool(value.selectedSchoolId);
           setShowSuccess(true);
+          const nextExamName = generateDefaultExamName(value.selectedSubjectId);
 
           form.reset();
           form.setFieldValue('selectedSchoolId', value.selectedSchoolId);
+          form.setFieldValue('selectedSubjectId', value.selectedSubjectId);
+          form.setFieldValue('examName', nextExamName);
           form.setFieldValue('date', format(new Date(), 'yyyy-MM-dd'));
           form.setFieldValue('weight', 100);
 
@@ -158,6 +158,8 @@ const AddGradePage: React.FC = () => {
   );
   const { data: subjects = [], error: subjectsError } =
     useSchoolSubjects(selectedSchoolId);
+  const selectedSubjectId = form.state.values.selectedSubjectId;
+  const { data: subjectGrades = [] } = useSubjectGrades(selectedSubjectId);
   useEffect(() => {
     const state = location.state || {};
     if (state.schoolId) {
@@ -178,6 +180,16 @@ const AddGradePage: React.FC = () => {
     }
   }, [schoolsError, subjectsError]);
 
+  const generateDefaultExamName = useCallback((subjectId: string) => {
+    if (!subjectId || !subjectGrades) return '';
+    const examCount = subjectGrades.length;
+    const nextNumber = examCount + 1;
+
+    console.log(`Subject ${subjectId}: Found ${examCount} exams, suggesting Prüfung ${nextNumber}`);
+
+    return `Prüfung ${nextNumber}`;
+  }, [subjectGrades]);
+
   const handleSubjectChange = useCallback(
     (value: string | number | boolean) => {
       const subjectId = String(value);
@@ -190,6 +202,14 @@ const AddGradePage: React.FC = () => {
     },
     [form],
   );
+  useEffect(() => {
+    if (selectedSubjectId && subjectGrades) {
+      const defaultName = generateDefaultExamName(selectedSubjectId);
+      if (defaultName && form.state.values.examName !== defaultName) {
+        form.setFieldValue('examName', defaultName);
+      }
+    }
+  }, [selectedSubjectId, subjectGrades, generateDefaultExamName, form]);
 
   const handleSchoolChange = useCallback(
     (value: string | number | boolean) => {
@@ -223,16 +243,25 @@ const AddGradePage: React.FC = () => {
 
         switch (fieldName) {
           case 'score': {
+            const stringValue = String(value);
             const scoreNum = Number(value);
-            error = validateGrade(scoreNum) || '';
-            if (!error && scoreNum > 0) {
-              if (scoreNum >= 5.5)
-                suggestion = '💡 Ausgezeichnet! Eine sehr gute Note.';
-              else if (scoreNum >= 4.5) suggestion = '✨ Gute Leistung!';
-              else if (scoreNum >= 3.5) suggestion = '👍 Solide Note.';
-              else if (scoreNum >= 2.5)
-                suggestion = '📚 Noch Verbesserungspotential.';
-              else suggestion = '🎯 Beim nächsten Mal wird es besser!';
+            if (stringValue.endsWith('.') || stringValue === '') {
+              error = '';
+              suggestion = '';
+            } else if (isNaN(scoreNum)) {
+              error = 'Bitte eine gültige Zahl eingeben.';
+              suggestion = '';
+            } else {
+              error = validateGrade(scoreNum) || '';
+              if (!error && scoreNum > 0) {
+                if (scoreNum >= 5.5)
+                  suggestion = '💡 Ausgezeichnet! Eine sehr gute Note.';
+                else if (scoreNum >= 4.5) suggestion = '✨ Gute Leistung!';
+                else if (scoreNum >= 3.5) suggestion = '👍 Solide Note.';
+                else if (scoreNum >= 2.5)
+                  suggestion = '📚 Noch Verbesserungspotential.';
+                else suggestion = '🎯 Beim nächsten Mal wird es besser!';
+              }
             }
             break;
           }
@@ -294,6 +323,19 @@ const AddGradePage: React.FC = () => {
       setTimeout(() => subjectRef.current?.focus(), 100);
     }
   }, [selectedSchoolId, subjects.length]);
+  useEffect(() => {
+    if (schools.length === 1 && !form.state.values.selectedSchoolId) {
+      const onlySchool = schools[0];
+      form.setFieldValue('selectedSchoolId', onlySchool.id);
+      setSelectedSchoolId(onlySchool.id);
+    }
+  }, [schools, form]);
+  useEffect(() => {
+    if (subjects.length === 1 && selectedSchoolId && !form.state.values.selectedSubjectId) {
+      const onlySubject = subjects[0];
+      form.setFieldValue('selectedSubjectId', onlySubject.id);
+    }
+  }, [subjects, selectedSchoolId, form]);
   const schoolOptions = useMemo(
     () =>
       schools.map((school: School) => ({
@@ -342,7 +384,7 @@ const AddGradePage: React.FC = () => {
         backButton={true}
         onBack={() => window.history.back()}
       />
-      <IonContent className="add-grade-content" scrollY={true}>
+      <IonContent className="add-grade-content" scrollY={false}>
         <div className="content-wrapper">
           <div className="gradient-orb" />
           {showSuccess && (
@@ -406,15 +448,17 @@ const AddGradePage: React.FC = () => {
                             </option>
                           ))}
                         </select>
-                        {fieldErrors.selectedSchoolId && (
-                          <div
-                            id="school-error"
-                            className="field-error"
-                            role="alert"
-                          >
-                            {fieldErrors.selectedSchoolId}
-                          </div>
-                        )}
+                        <div className="message-area">
+                          {fieldErrors.selectedSchoolId && (
+                            <div
+                              id="school-error"
+                              className="field-error"
+                              role="alert"
+                            >
+                              {fieldErrors.selectedSchoolId}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -460,15 +504,17 @@ const AddGradePage: React.FC = () => {
                             </option>
                           ))}
                         </select>
-                        {fieldErrors.selectedSubjectId && (
-                          <div
-                            id="subject-error"
-                            className="field-error"
-                            role="alert"
-                          >
-                            {fieldErrors.selectedSubjectId}
-                          </div>
-                        )}
+                        <div className="message-area">
+                          {fieldErrors.selectedSubjectId && (
+                            <div
+                              id="subject-error"
+                              className="field-error"
+                              role="alert"
+                            >
+                              {fieldErrors.selectedSubjectId}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -502,21 +548,23 @@ const AddGradePage: React.FC = () => {
                           }
                           required
                         />
-                        {fieldErrors.examName && (
-                          <div
-                            id="exam-name-error"
-                            className="field-error"
-                            role="alert"
-                          >
-                            {fieldErrors.examName}
-                          </div>
-                        )}
-                        {fieldErrors.examName_suggestion &&
-                          !fieldErrors.examName && (
-                            <div className="field-suggestion">
-                              {fieldErrors.examName_suggestion}
+                        <div className="message-area">
+                          {fieldErrors.examName && (
+                            <div
+                              id="exam-name-error"
+                              className="field-error"
+                              role="alert"
+                            >
+                              {fieldErrors.examName}
                             </div>
                           )}
+                          {fieldErrors.examName_suggestion &&
+                            !fieldErrors.examName && (
+                              <div className="field-suggestion">
+                                {fieldErrors.examName_suggestion}
+                              </div>
+                            )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -539,6 +587,7 @@ const AddGradePage: React.FC = () => {
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
                         />
+                        <div className="message-area"></div>
                       </div>
                     </div>
                   )}
@@ -563,15 +612,13 @@ const AddGradePage: React.FC = () => {
                             className="form-input weight-input"
                             type="number"
                             inputMode="decimal"
+                            pattern="[0-9]*\.?[0-9]*"
                             min="0"
                             max="100"
                             step="0.01"
                             value={field.state.value}
                             onChange={handleWeightChange}
                             placeholder="100"
-                            aria-describedby={
-                              fieldErrors.weight ? 'weight-error' : undefined
-                            }
                           />
                           <div className="weight-quick-actions">
                             <button
@@ -609,21 +656,7 @@ const AddGradePage: React.FC = () => {
                             </button>
                           </div>
                         </div>
-                        {fieldErrors.weight && (
-                          <div
-                            id="weight-error"
-                            className="field-error"
-                            role="alert"
-                          >
-                            {fieldErrors.weight}
-                          </div>
-                        )}
-                        {fieldErrors.weight_suggestion &&
-                          !fieldErrors.weight && (
-                            <div className="field-suggestion">
-                              {fieldErrors.weight_suggestion}
-                            </div>
-                          )}
+                        <div className="message-area"></div>
                       </div>
                     </div>
                   )}
@@ -658,62 +691,44 @@ const AddGradePage: React.FC = () => {
                           }
                           required
                         />
-                        {fieldErrors.score && (
-                          <div
-                            id="score-error"
-                            className="field-error"
-                            role="alert"
-                          >
-                            {fieldErrors.score}
-                          </div>
-                        )}
-                        {fieldErrors.score_suggestion && !fieldErrors.score && (
-                          <div className="field-suggestion">
-                            {fieldErrors.score_suggestion}
-                          </div>
-                        )}
+                        <div className="message-area">
+                          {fieldErrors.score && (
+                            <div
+                              id="score-error"
+                              className="field-error"
+                              role="alert"
+                            >
+                              {fieldErrors.score}
+                            </div>
+                          )}
+                          {fieldErrors.score_suggestion && !fieldErrors.score && (
+                            <div className="field-suggestion">
+                              {fieldErrors.score_suggestion}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
                 </form.Field>
 
-                <form.Field name="comment">
-                  {(field) => (
-                    <div className="input-row">
-                      <div className="field-icon-wrapper">
-                        <IonIcon icon={chatboxOutline} className="field-icon" />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label">
-                          Kommentar (optional)
-                        </label>
-                        <input
-                          className="form-input"
-                          type="text"
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="Zusätzliche Notizen..."
-                        />
-                      </div>
-                    </div>
-                  )}
-                </form.Field>
               </div>
             </div>
-            <div className="button-section">
-              <button
-                className="glass-button primary"
-                onClick={handleAddGrade}
-                disabled={addGradeWithExamMutation.isPending}
-              >
-                <IonIcon icon={addOutline} className="button-icon" />
-                <span className="button-text">
-                  {addGradeWithExamMutation.isPending
-                    ? 'Wird hinzugefügt...'
-                    : 'Note hinzufügen'}
-                </span>
-              </button>
-            </div>
+          </div>
+
+          <div className="button-section">
+            <button
+              className="glass-button primary"
+              onClick={handleAddGrade}
+              disabled={addGradeWithExamMutation.isPending}
+            >
+              <IonIcon icon={addOutline} className="button-icon" />
+              <span className="button-text">
+                {addGradeWithExamMutation.isPending
+                  ? 'Wird hinzugefügt...'
+                  : 'Note hinzufügen'}
+              </span>
+            </button>
           </div>
 
           <div className="bottom-spacer" />
