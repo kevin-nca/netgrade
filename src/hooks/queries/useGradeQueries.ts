@@ -40,7 +40,9 @@ export const useAddGradeWithExam = () => {
     onSuccess: () => {
       // Invalidate and refetch grades list
       queryClient.invalidateQueries({ queryKey: gradeKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: [...gradeKeys.all, 'subject'] });
+      queryClient.invalidateQueries({
+        queryKey: [...gradeKeys.all, 'subject'],
+      });
       queryClient.invalidateQueries({ queryKey: examKeys.all });
       queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
     },

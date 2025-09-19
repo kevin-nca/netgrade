@@ -101,7 +101,6 @@
   min-height: 0;
 }
 
-
 /* Form Card - Cleaner iOS style */
 .form-card {
   background: rgba(255, 255, 255, 0.95);
@@ -143,7 +142,9 @@
   gap: 10px;
   padding: 6px 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
   min-height: 58px;
 }
 
@@ -209,7 +210,7 @@
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: 
+  box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
   font-size: 16px;
@@ -314,12 +315,10 @@ select.form-input option {
   border: 1px solid rgba(0, 122, 255, 0.08);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.15),
     0 -4px 20px rgba(245, 245, 247, 0.8);
 }
-
-
 
 .button-section .glass-button {
   background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
@@ -597,7 +596,6 @@ select.form-input option {
   animation: errorShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
-
 .field-error {
   color: #ff3b30;
   font-size: 11px;
@@ -826,11 +824,10 @@ select.form-input option {
     border: 1px solid rgba(0, 122, 255, 0.15);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    box-shadow: 
+    box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.4),
       0 -4px 20px rgba(26, 26, 26, 0.8);
   }
-
 
   .button-section .glass-button {
     background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
