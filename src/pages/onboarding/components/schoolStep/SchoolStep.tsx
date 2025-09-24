@@ -12,7 +12,6 @@ import {
   schoolOutline,
   addOutline,
   trashOutline,
-  homeOutline,
   businessOutline,
   arrowForward,
 } from 'ionicons/icons';
@@ -100,44 +99,10 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
         </div>
       </div>
 
-      <div className="step-body">
-        {/* Existing Schools */}
-        {data.schools.length > 0 && (
-          <div className="schools-section">
-            <h3 className="subsection-title">Deine Schulen</h3>
-            <div className="schools-list">
-              {data.schools.map((school, index) => (
-                <div key={school.id} className="glass-card school-item">
-                  <div className="school-content">
-                    <div className={`school-avatar school-${index % 4}`}>
-                      {school.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="school-info">
-                      <h4 className="school-name">{school.name}</h4>
-                      <p className="school-details">
-                        {school.type && `${school.type}`}
-                        {school.address && school.type && ' • '}
-                        {school.address}
-                      </p>
-                    </div>
-                    <IonButton
-                      fill="clear"
-                      color="danger"
-                      onClick={() => handleRemoveSchool(school.id)}
-                      className="remove-button"
-                    >
-                      <IonIcon icon={trashOutline} />
-                    </IonButton>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Add School Form */}
-        <div className="add-section">
-          {!showAddForm ? (
+      {/* Add School Form */}
+      <div className="add-section">
+        {data.schools.length < 2 &&
+          (!showAddForm ? (
             <div className="glass-card add-prompt">
               <div className="add-content" onClick={() => setShowAddForm(true)}>
                 <div className="add-icon-wrapper">
@@ -169,7 +134,7 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
                             </div>
                             <IonInput
                               value={field.state.value}
-                              placeholder="z.B. Gymnasium München"
+                              placeholder="z.B. BBW"
                               onIonChange={(e) =>
                                 field.handleChange(e.detail.value || '')
                               }
@@ -214,33 +179,6 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
                       </div>
                     )}
                   </form.Field>
-
-                  <form.Field name="address">
-                    {(field) => (
-                      <div className="field-group">
-                        <label className="field-label">Adresse</label>
-                        <div className="input-wrapper glass-input">
-                          <IonItem lines="none" className="input-item">
-                            <div slot="start" className="input-icon-wrapper">
-                              <IonIcon
-                                icon={homeOutline}
-                                className="input-icon"
-                              />
-                            </div>
-                            <IonInput
-                              value={field.state.value}
-                              placeholder="z.B. München, Deutschland"
-                              onIonChange={(e) =>
-                                field.handleChange(e.detail.value || '')
-                              }
-                              className="input-field"
-                              clearInput
-                            />
-                          </IonItem>
-                        </div>
-                      </div>
-                    )}
-                  </form.Field>
                 </div>
 
                 <div className="form-actions">
@@ -268,8 +206,43 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
                 </div>
               </div>
             </div>
-          )}
-        </div>
+          ))}
+      </div>
+
+      <div className="step-body">
+        {/* Existing Schools */}
+        {data.schools.length > 0 && (
+          <div className="schools-section">
+            <h3 className="subsection-title">Deine Schulen</h3>
+            <div className="schools-list">
+              {data.schools.map((school, index) => (
+                <div key={school.id} className="glass-card school-item">
+                  <div className="school-content">
+                    <div className={`school-avatar school-${index % 4}`}>
+                      {school.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="school-info">
+                      <h4 className="school-name">{school.name}</h4>
+                      <p className="school-details">
+                        {school.type && `${school.type}`}
+                        {school.address && school.type && ' • '}
+                        {school.address}
+                      </p>
+                    </div>
+                    <IonButton
+                      fill="clear"
+                      color="danger"
+                      onClick={() => handleRemoveSchool(school.id)}
+                      className="remove-button"
+                    >
+                      <IonIcon icon={trashOutline} />
+                    </IonButton>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="step-footer">

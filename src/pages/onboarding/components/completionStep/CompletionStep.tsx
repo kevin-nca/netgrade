@@ -23,24 +23,6 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
 }) => {
   return (
     <div className="onboarding-step">
-      <div className="step-header">
-        <div className="gradient-orb" />
-        <div className="completion-content">
-          <div className="completion-icon-wrapper">
-            <IonIcon
-              icon={checkmarkCircleOutline}
-              className="completion-icon"
-            />
-          </div>
-          <div className="completion-text">
-            <h1 className="completion-title">Alles bereit!</h1>
-            <p className="completion-subtitle">
-              Dein Profil wurde erfolgreich erstellt
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="step-body">
         <div className="glass-card summary-card">
           <div className="summary-content">

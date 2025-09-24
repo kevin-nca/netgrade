@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from '@tanstack/react-form';
-import {
-  IonButton,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonTextarea,
-} from '@ionic/react';
+import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/react';
 import {
   bookOutline,
   addOutline,
   trashOutline,
   personOutline,
-  documentTextOutline,
   checkmarkCircleOutline,
   arrowForward,
 } from 'ionicons/icons';
@@ -149,7 +142,113 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
           </div>
         )}
 
-        {/* Existing Subjects */}
+        {/* Add Subject Form */}
+        <div className="add-section">
+          {currentSchoolSubjects.length < 2 &&
+            (!showAddForm ? (
+              <div className="glass-card add-prompt">
+                <div
+                  className="add-content"
+                  onClick={() => setShowAddForm(true)}
+                >
+                  <div className="add-icon-wrapper">
+                    <IonIcon icon={addOutline} className="add-icon" />
+                  </div>
+                  <div className="add-text">
+                    <h4>Fach hinzufügen</h4>
+                    <p>Tippe hier, um ein neues Fach zu erstellen</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="glass-card add-form">
+                <div className="form-content">
+                  <h3 className="form-title">Neues Fach erstellen</h3>
+
+                  <div className="form-fields">
+                    <form.Field name="name">
+                      {(field) => (
+                        <div className="field-group">
+                          <label className="field-label">Fachname *</label>
+                          <div className="input-wrapper glass-input">
+                            <IonItem lines="none" className="input-item">
+                              <div slot="start" className="input-icon-wrapper">
+                                <IonIcon
+                                  icon={bookOutline}
+                                  className="input-icon"
+                                />
+                              </div>
+                              <IonInput
+                                value={field.state.value}
+                                placeholder="z.B. Mathematik"
+                                onIonInput={(e) =>
+                                  field.handleChange(e.detail.value || '')
+                                }
+                                className="input-field"
+                                clearInput
+                              />
+                            </IonItem>
+                          </div>
+                        </div>
+                      )}
+                    </form.Field>
+
+                    <form.Field name="teacher">
+                      {(field) => (
+                        <div className="field-group">
+                          <label className="field-label">Lehrer/in</label>
+                          <div className="input-wrapper glass-input">
+                            <IonItem lines="none" className="input-item">
+                              <div slot="start" className="input-icon-wrapper">
+                                <IonIcon
+                                  icon={personOutline}
+                                  className="input-icon"
+                                />
+                              </div>
+                              <IonInput
+                                value={field.state.value}
+                                placeholder="z.B. Frau Schmidt"
+                                onIonInput={(e) =>
+                                  field.handleChange(e.detail.value || '')
+                                }
+                                className="input-field"
+                                clearInput
+                              />
+                            </IonItem>
+                          </div>
+                        </div>
+                      )}
+                    </form.Field>
+                  </div>
+
+                  <div className="form-actions">
+                    <IonButton
+                      fill="clear"
+                      onClick={() => {
+                        setShowAddForm(false);
+                        form.reset();
+                        form.setFieldValue('weight', 100);
+                      }}
+                      className="cancel-button"
+                    >
+                      Abbrechen
+                    </IonButton>
+                    <form.Subscribe selector={(state) => [state.values.name]}>
+                      {([name]) => (
+                        <IonButton
+                          onClick={handleAddSubject}
+                          disabled={!name?.trim()}
+                          className="save-button"
+                        >
+                          Hinzufügen
+                        </IonButton>
+                      )}
+                    </form.Subscribe>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
         {currentSchoolSubjects.length > 0 && (
           <div className="subjects-section">
             <h3 className="subsection-title">Deine Fächer</h3>
@@ -184,136 +283,6 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
         )}
 
         {/* Add Subject Form */}
-        <div className="add-section">
-          {!showAddForm ? (
-            <div className="glass-card add-prompt">
-              <div className="add-content" onClick={() => setShowAddForm(true)}>
-                <div className="add-icon-wrapper">
-                  <IonIcon icon={addOutline} className="add-icon" />
-                </div>
-                <div className="add-text">
-                  <h4>Fach hinzufügen</h4>
-                  <p>Tippe hier, um ein neues Fach zu erstellen</p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="glass-card add-form">
-              <div className="form-content">
-                <h3 className="form-title">Neues Fach erstellen</h3>
-
-                <div className="form-fields">
-                  <form.Field name="name">
-                    {(field) => (
-                      <div className="field-group">
-                        <label className="field-label">Fachname *</label>
-                        <div className="input-wrapper glass-input">
-                          <IonItem lines="none" className="input-item">
-                            <div slot="start" className="input-icon-wrapper">
-                              <IonIcon
-                                icon={bookOutline}
-                                className="input-icon"
-                              />
-                            </div>
-                            <IonInput
-                              value={field.state.value}
-                              placeholder="z.B. Mathematik"
-                              onIonInput={(e) =>
-                                field.handleChange(e.detail.value || '')
-                              }
-                              className="input-field"
-                              clearInput
-                            />
-                          </IonItem>
-                        </div>
-                      </div>
-                    )}
-                  </form.Field>
-
-                  <form.Field name="teacher">
-                    {(field) => (
-                      <div className="field-group">
-                        <label className="field-label">Lehrer/in</label>
-                        <div className="input-wrapper glass-input">
-                          <IonItem lines="none" className="input-item">
-                            <div slot="start" className="input-icon-wrapper">
-                              <IonIcon
-                                icon={personOutline}
-                                className="input-icon"
-                              />
-                            </div>
-                            <IonInput
-                              value={field.state.value}
-                              placeholder="z.B. Frau Schmidt"
-                              onIonInput={(e) =>
-                                field.handleChange(e.detail.value || '')
-                              }
-                              className="input-field"
-                              clearInput
-                            />
-                          </IonItem>
-                        </div>
-                      </div>
-                    )}
-                  </form.Field>
-
-                  <form.Field name="description">
-                    {(field) => (
-                      <div className="field-group">
-                        <label className="field-label">Beschreibung</label>
-                        <div className="input-wrapper glass-input">
-                          <IonItem lines="none" className="input-item">
-                            <div slot="start" className="input-icon-wrapper">
-                              <IonIcon
-                                icon={documentTextOutline}
-                                className="input-icon"
-                              />
-                            </div>
-                            <IonTextarea
-                              value={field.state.value}
-                              placeholder="Zusätzliche Informationen..."
-                              onIonInput={(e) =>
-                                field.handleChange(e.detail.value || '')
-                              }
-                              className="input-field"
-                              rows={2}
-                              autoGrow
-                            />
-                          </IonItem>
-                        </div>
-                      </div>
-                    )}
-                  </form.Field>
-                </div>
-
-                <div className="form-actions">
-                  <IonButton
-                    fill="clear"
-                    onClick={() => {
-                      setShowAddForm(false);
-                      form.reset();
-                      form.setFieldValue('weight', 100);
-                    }}
-                    className="cancel-button"
-                  >
-                    Abbrechen
-                  </IonButton>
-                  <form.Subscribe selector={(state) => [state.values.name]}>
-                    {([name]) => (
-                      <IonButton
-                        onClick={handleAddSubject}
-                        disabled={!name?.trim()}
-                        className="save-button"
-                      >
-                        Hinzufügen
-                      </IonButton>
-                    )}
-                  </form.Subscribe>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
       <div className="step-footer">
