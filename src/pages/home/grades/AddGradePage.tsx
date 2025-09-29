@@ -180,15 +180,16 @@ const AddGradePage: React.FC = () => {
     }
   }, [schoolsError, subjectsError]);
 
-  const generateDefaultExamName = useCallback((subjectId: string) => {
-    if (!subjectId || !subjectGrades) return '';
-    const examCount = subjectGrades.length;
-    const nextNumber = examCount + 1;
+  const generateDefaultExamName = useCallback(
+    (subjectId: string) => {
+      if (!subjectId || !subjectGrades) return '';
+      const examCount = subjectGrades.length;
+      const nextNumber = examCount + 1;
 
-    console.log(`Subject ${subjectId}: Found ${examCount} exams, suggesting Prüfung ${nextNumber}`);
-
-    return `Prüfung ${nextNumber}`;
-  }, [subjectGrades]);
+      return `Prüfung ${nextNumber}`;
+    },
+    [subjectGrades],
+  );
 
   const handleSubjectChange = useCallback(
     (value: string | number | boolean) => {
@@ -331,7 +332,11 @@ const AddGradePage: React.FC = () => {
     }
   }, [schools, form]);
   useEffect(() => {
-    if (subjects.length === 1 && selectedSchoolId && !form.state.values.selectedSubjectId) {
+    if (
+      subjects.length === 1 &&
+      selectedSchoolId &&
+      !form.state.values.selectedSubjectId
+    ) {
       const onlySubject = subjects[0];
       form.setFieldValue('selectedSubjectId', onlySubject.id);
     }
@@ -701,17 +706,17 @@ const AddGradePage: React.FC = () => {
                               {fieldErrors.score}
                             </div>
                           )}
-                          {fieldErrors.score_suggestion && !fieldErrors.score && (
-                            <div className="field-suggestion">
-                              {fieldErrors.score_suggestion}
-                            </div>
-                          )}
+                          {fieldErrors.score_suggestion &&
+                            !fieldErrors.score && (
+                              <div className="field-suggestion">
+                                {fieldErrors.score_suggestion}
+                              </div>
+                            )}
                         </div>
                       </div>
                     </div>
                   )}
                 </form.Field>
-
               </div>
             </div>
           </div>

@@ -13,6 +13,8 @@ export const gradeKeys = {
   details: () => [...gradeKeys.all, 'detail'] as const,
   detail: (id: string) => [...gradeKeys.details(), id] as const,
   examGrades: (examId: string) => [...gradeKeys.all, 'exam', examId] as const,
+  subjectGrades: (subjectId: string) =>
+    [...gradeKeys.all, 'subject', subjectId] as const,
 };
 
 // Hooks
@@ -25,9 +27,8 @@ export const useGrades = () => {
 
 export const useSubjectGrades = (subjectId: string) => {
   return useQuery({
-    queryKey: [...gradeKeys.all, 'subject', subjectId],
+    queryKey: gradeKeys.subjectGrades(subjectId),
     queryFn: () => GradeService.findBySubjectId(subjectId),
-    enabled: !!subjectId,
   });
 };
 
@@ -40,7 +41,9 @@ export const useAddGradeWithExam = () => {
     onSuccess: () => {
       // Invalidate and refetch grades list
       queryClient.invalidateQueries({ queryKey: gradeKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: [...gradeKeys.all, 'subject'] });
+      queryClient.invalidateQueries({
+        queryKey: [...gradeKeys.all, 'subject'],
+      });
       queryClient.invalidateQueries({ queryKey: examKeys.all });
       queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
     },
