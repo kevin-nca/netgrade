@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryKey,
+} from '@tanstack/react-query';
 import { PreferencesService, NotificationSettings } from '@/services';
 import { notificationScheduler } from '@/notification-scheduler';
 
@@ -34,12 +39,14 @@ export const useSaveUserName = () => {
   });
 };
 
+export const onboardingCompletedQuery = {
+  queryKey: preferencesKeys.onboardingCompleted() as QueryKey,
+  queryFn: () => PreferencesService.isOnboardingCompleted(),
+  staleTime: Infinity,
+} as const;
+
 export const useOnboardingCompleted = () => {
-  return useQuery({
-    queryKey: preferencesKeys.onboardingCompleted(),
-    queryFn: () => PreferencesService.isOnboardingCompleted(),
-    select: (v) => Boolean(v),
-  });
+  return useQuery(onboardingCompletedQuery);
 };
 
 export const useSetOnboardingCompleted = () => {

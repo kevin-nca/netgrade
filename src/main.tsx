@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import './ionic';
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 import './theme/theme.css';
@@ -12,11 +11,15 @@ import App from './App';
 import { initializeDatabase } from '@/db/data-source';
 import { AppInfo } from '@/AppInfo';
 import { notificationScheduler } from './notification-scheduler';
+import { QueryClient } from '@tanstack/react-query';
+import { prefetchData } from './prefetch-data';
 
 setupIonicReact({
   animated: true,
   swipeBackEnabled: true,
 });
+
+const queryClient = new QueryClient();
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
@@ -28,12 +31,9 @@ AppInfo.initialize()
       .then(async () => {
         console.log('Database initialized successfully.');
         await notificationScheduler.start();
+        await prefetchData(queryClient);
 
-        root.render(
-          <React.StrictMode>
-            <App />
-          </React.StrictMode>,
-        );
+        root.render(<App queryClient={queryClient} />);
       })
       .catch((error) => {
         console.error('FATAL: Failed to initialize database:', error);

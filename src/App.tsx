@@ -5,9 +5,7 @@ import { IonApp } from '@ionic/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppRouter } from '@/AppRouter';
 
-const queryClient = new QueryClient();
-
-function App() {
+function App({ queryClient }: { queryClient: QueryClient }) {
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
