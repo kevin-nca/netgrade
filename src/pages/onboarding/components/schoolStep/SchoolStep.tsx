@@ -225,8 +225,6 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
                       <h4 className="school-name">{school.name}</h4>
                       <p className="school-details">
                         {school.type && `${school.type}`}
-                        {school.address && school.type && ' • '}
-                        {school.address}
                       </p>
                     </div>
                     <IonButton
