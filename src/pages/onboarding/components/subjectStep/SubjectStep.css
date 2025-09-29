@@ -16,6 +16,14 @@
   gap: 12px;
 }
 
+.step-text h1 {
+  font-size: 24px;
+}
+
+.step-text p {
+  font-size: 16px;
+}
+
 .school-selector-item {
   border-radius: 16px;
   padding: 16px;

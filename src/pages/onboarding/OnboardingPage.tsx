@@ -205,7 +205,7 @@ const OnboardingPage: React.FC = () => {
         </IonHeader>
       )}
 
-      <IonContent className="onboarding-content" scrollY={true}>
+      <IonContent className="onboarding-content" scrollY={currentStep === 3}>
         <div className="onboarding-container">
           {currentStep === 0 && <WelcomeScreen onNext={handleNextStep} />}
           {currentStep === 1 && (

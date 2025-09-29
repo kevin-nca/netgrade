@@ -31,8 +31,6 @@ export interface OnboardingDataTemp {
 export const SCHOOL_TYPES = [
   'Gymnasium',
   'Berufsschule',
-  'Universität',
-  'Fachhochschule',
   'Berufsmaturitätsschule',
   'Andere',
 ];

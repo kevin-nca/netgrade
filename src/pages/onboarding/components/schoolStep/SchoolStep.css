@@ -135,6 +135,10 @@ body {
   color: white;
 }
 
+.add-section {
+  margin-bottom: 16px;
+}
+
 .add-text h4 {
   font-size: 16px;
   font-weight: 600;
