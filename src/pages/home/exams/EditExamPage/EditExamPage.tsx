@@ -143,7 +143,7 @@ const EditExamPage: React.FC = () => {
   }, [exam, examForm]);
 
   const updateExamMutation = useUpdateExam();
-  const addGradeWithExamMutation = useAddGradeWithExam(exam?.subjectId ?? '');
+  const addGradeWithExamMutation = useAddGradeWithExam();
   const deleteExamMutation = useDeleteExam();
 
   const showMessage = (message: string, color: string = 'primary') => {

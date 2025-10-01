@@ -9,11 +9,13 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <IonApp>
-        <AppRouter />
-      </IonApp>
-    </QueryClientProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <IonApp>
+          <AppRouter />
+        </IonApp>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 }
 
