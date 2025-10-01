@@ -376,7 +376,7 @@ const AddGradePage: React.FC = () => {
     return Math.round((completed / fields.length) * 100);
   }, [form.state.values]);
 
-  const addGradeWithExamMutation = useAddGradeWithExam();
+  const addGradeWithExamMutation = useAddGradeWithExam(selectedSubjectId);
 
   const handleAddGrade = () => {
     form.handleSubmit();

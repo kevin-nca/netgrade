@@ -73,7 +73,7 @@ const SchoolPage: React.FC = () => {
 
   const calculateAverage = (subject: Subject): number | null => {
     const subjectGrades = grades.filter(
-      (grade) => grade.exam?.subjectId === subject.id,
+      (grade) => grade.exam.subjectId === subject.id,
     );
     if (subjectGrades.length === 0) return null;
     const totalScore = subjectGrades.reduce(

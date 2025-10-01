@@ -32,7 +32,7 @@ export const useSubjectGrades = (subjectId: string) => {
   });
 };
 
-export const useAddGradeWithExam = () => {
+export const useAddGradeWithExam = (subjectId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -42,7 +42,7 @@ export const useAddGradeWithExam = () => {
       // Invalidate and refetch grades list
       queryClient.invalidateQueries({ queryKey: gradeKeys.lists() });
       queryClient.invalidateQueries({
-        queryKey: [...gradeKeys.all, 'subject'],
+        queryKey: gradeKeys.subjectGrades(subjectId),
       });
       queryClient.invalidateQueries({ queryKey: examKeys.all });
       queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
