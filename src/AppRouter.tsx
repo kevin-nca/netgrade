@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { IonRouterOutlet, IonSpinner, IonTabs, isPlatform } from '@ionic/react';
+import { IonRouterOutlet, IonTabs, isPlatform } from '@ionic/react';
 import { Redirect, Route } from 'react-router-dom';
 
 import GradeEntryPage from '@/pages/home/grades/GradeEntryPage';
@@ -12,41 +11,13 @@ import AddGradePage from '@/pages/home/grades/AddGradePage';
 import HomePage from '@/pages/home/HomePage';
 import EditExamPage from '@/pages/home/exams/EditExamPage/EditExamPage';
 import { Routes } from '@/routes';
-import { useOnboardingCompleted } from '@/hooks/queries';
 
 import { EdgeSwipeBack } from '@/components/navigation/EdgeSwipeBack';
 import { IonReactRouter } from '@ionic/react-router';
+import { useOnboardingCompleted } from '@/hooks/queries';
 
 export function AppRouter() {
-  const { data: isOnboarded, isLoading } = useOnboardingCompleted();
-  const [, setIsInitialized] = useState(false);
-
-  useEffect(() => {
-    setIsInitialized(true);
-  }, [isOnboarded]);
-
-  if (isLoading) {
-    return (
-      <IonReactRouter>
-        <IonTabs>
-          <IonRouterOutlet animated={true}>
-            <Route exact path={Routes.MAIN}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: '100vh',
-                }}
-              >
-                <IonSpinner />
-              </div>
-            </Route>
-          </IonRouterOutlet>
-        </IonTabs>
-      </IonReactRouter>
-    );
-  }
+  const { data: isOnboarded } = useOnboardingCompleted();
 
   return (
     <IonReactRouter>
