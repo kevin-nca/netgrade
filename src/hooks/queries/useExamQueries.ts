@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ExamService } from '@/services/ExamService';
 import { Exam } from '@/db/entities/Exam';
+import { SchoolService } from '@/services';
+import { schoolKeys } from '@/hooks';
 
 // Query keys
 export const examKeys = {
@@ -109,4 +111,13 @@ export const useDeleteExam = () => {
       queryClient.invalidateQueries({ queryKey: examKeys.lists() });
     },
   });
+};
+
+export const ExamCompletedQuery = {
+  queryKey: examKeys.upcoming(),
+  queryFn: () => ExamService.fetchUpcoming(),
+} as const;
+
+export const useExamsCompleted = () => {
+  return useQuery(ExamCompletedQuery);
 };

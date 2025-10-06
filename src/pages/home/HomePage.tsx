@@ -6,7 +6,6 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  RefresherEventDetail,
 } from '@ionic/react';
 import {
   add,
@@ -18,11 +17,11 @@ import {
   personCircleOutline,
 } from 'ionicons/icons';
 import {
-  useSchools,
-  useGrades,
-  useUserName,
   useAddSchool,
-  useUpcomingExams,
+  useSchoolCompleted,
+  useGradeCompleted,
+  useUsername,
+  useExamsCompleted,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import { Grade } from '@/db/entities';
@@ -37,26 +36,15 @@ function HomePage() {
   const [schoolNameInput, setSchoolNameInput] = useState('');
   const history = useHistory();
 
-  const { data: schools = [], refetch: refetchSchools } = useSchools();
-  const { data: grades = [], refetch: refetchGrades } = useGrades();
-  const { data: userName } = useUserName();
+  const { data: schools, isLoading } = useSchoolCompleted();
+
+  const { data: grades } = useGradeCompleted();
+  const { data: userName } = useUsername();
   const addSchoolMutation = useAddSchool();
 
-  const { data: upcomingExams = [], refetch: refetchUpcomingExams } =
-    useUpcomingExams();
+  const { data: upcomingExams } = useExamsCompleted();
 
-  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
-    try {
-      await Promise.all([
-        refetchSchools(),
-        refetchGrades(),
-        refetchUpcomingExams(),
-      ]);
-    } finally {
-      event.detail.complete();
-    }
-  };
-
+  // Should be implemented in service
   const calculateSchoolAverage = (schoolId: string, grades: Grade[]) => {
     if (!grades || grades.length === 0) return null;
 
@@ -84,6 +72,7 @@ function HomePage() {
     return schoolName.charAt(0).toUpperCase();
   };
 
+  // factor out
   const formatDate = (date: Date) => {
     const today = new Date();
     const diffTime = date.getTime() - today.getTime();
@@ -107,10 +96,9 @@ function HomePage() {
           onSuccess: () => {
             setShowAddSchoolModal(false);
             setSchoolNameInput('');
-            refetchSchools();
           },
           onError: (error) => {
-            console.error('Fehler beim Hinzufügen:', error);
+            console.error('Error when adding:', error);
           },
         },
       );
@@ -125,7 +113,7 @@ function HomePage() {
         scrollEvents={false}
         forceOverscroll={false}
       >
-        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+        <IonRefresher slot="fixed">
           <IonRefresherContent />
         </IonRefresher>
         <div className="content-wrapper">
@@ -169,6 +157,7 @@ function HomePage() {
             <div className="schools-grid">
               {schools.length > 0 ? (
                 schools.map((school, index) => {
+                  // still incorrect, as we still show no schools when its loading (!schools)
                   const average = calculateSchoolAverage(school.id, grades);
                   return (
                     <div

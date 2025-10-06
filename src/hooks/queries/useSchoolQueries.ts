@@ -1,6 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryKey,
+} from '@tanstack/react-query';
 import { SchoolService } from '@/services/SchoolService';
 import { School } from '@/db/entities/School';
+import { PreferencesService } from '@/services';
+import { onboardingCompletedQuery, preferencesKeys } from '@/hooks';
 
 // Query keys
 export const schoolKeys = {
@@ -78,4 +85,13 @@ export const useDeleteSchool = () => {
       queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
     },
   });
+};
+
+export const SchoolCompletedQuery = {
+  queryKey: schoolKeys.lists(),
+  queryFn: () => SchoolService.fetchAll(),
+} as const;
+
+export const useSchoolCompleted = () => {
+  return useQuery(SchoolCompletedQuery);
 };

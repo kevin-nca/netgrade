@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { GradeService, AddExamAndGradePayload } from '@/services/GradeService';
 import { Grade } from '@/db/entities/Grade';
-import { examKeys } from '@/hooks';
+import { examKeys, schoolKeys } from '@/hooks';
 import { Exam } from '@/db/entities';
+import { SchoolService } from '@/services';
 
 // Query keys
 export const gradeKeys = {
@@ -91,4 +92,13 @@ export const useUpdateExamAndGrade = () => {
       queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
     },
   });
+};
+
+export const GradeCompletedQuery = {
+  queryKey: gradeKeys.lists(),
+  queryFn: () => GradeService.fetchAll(),
+} as const;
+
+export const useGradeCompleted = () => {
+  return useQuery(GradeCompletedQuery);
 };

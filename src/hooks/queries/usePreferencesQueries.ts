@@ -4,8 +4,13 @@ import {
   useQueryClient,
   QueryKey,
 } from '@tanstack/react-query';
-import { PreferencesService, NotificationSettings } from '@/services';
+import {
+  PreferencesService,
+  NotificationSettings,
+  SchoolService,
+} from '@/services';
 import { notificationScheduler } from '@/notification-scheduler';
+import { schoolKeys } from '@/hooks';
 
 export const preferencesKeys = {
   all: ['preferences'] as const,
@@ -167,4 +172,13 @@ export const useResetNotifications = () => {
       });
     },
   });
+};
+
+export const userNameQuery = {
+  queryKey: preferencesKeys.userName(),
+  queryFn: () => PreferencesService.getName(),
+} as const;
+
+export const useUsername = () => {
+  return useQuery(userNameQuery);
 };
