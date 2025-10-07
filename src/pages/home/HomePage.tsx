@@ -28,6 +28,7 @@ import NavigationModal from '@/components/navigation/home/NavigationModal';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import ExamsList from '@/components/homePage/ExamsList';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
+import './HomePage.css';
 
 function HomePage() {
   const [showNavigationModal, setShowNavigationModal] = useState(false);
@@ -38,11 +39,15 @@ function HomePage() {
   const { data: schools, isLoading } = useSchoolCompleted();
   const { data: grades } = useGradeCompleted();
   const { data: userName } = useUsername();
-  const { data: upcomingExams, isLoading: isLoadingExams } = useExamsCompleted();
+  const { data: upcomingExams, isLoading: isLoadingExams } =
+    useExamsCompleted();
   const addSchoolMutation = useAddSchool();
 
   // Should be implemented in service
-  const calculateSchoolAverage = (schoolId: string, grades: Grade[] | undefined) => {
+  const calculateSchoolAverage = (
+    schoolId: string,
+    grades: Grade[] | undefined,
+  ) => {
     if (!grades || grades.length === 0) return null;
 
     const schoolGrades = grades.filter(
@@ -137,7 +142,7 @@ function HomePage() {
 
             <div className="schools-grid">
               {isLoading ? (
-                  <IonSpinner name="crescent" />
+                <IonSpinner name="crescent" />
               ) : schools && schools.length > 0 ? (
                 schools.map((school, index) => {
                   const average = calculateSchoolAverage(school.id, grades);
@@ -205,7 +210,10 @@ function HomePage() {
               </div>
             </div>
 
-            <ExamsList upcomingExams={upcomingExams} isLoading={isLoadingExams} />
+            <ExamsList
+              upcomingExams={upcomingExams}
+              isLoading={isLoadingExams}
+            />
           </div>
 
           <div className="bottom-spacer" />
