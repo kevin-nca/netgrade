@@ -7,10 +7,8 @@ import {
 import {
   PreferencesService,
   NotificationSettings,
-  SchoolService,
 } from '@/services';
 import { notificationScheduler } from '@/notification-scheduler';
-import { schoolKeys } from '@/hooks';
 
 export const preferencesKeys = {
   all: ['preferences'] as const,

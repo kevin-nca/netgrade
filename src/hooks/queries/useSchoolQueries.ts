@@ -2,12 +2,9 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
-  QueryKey,
 } from '@tanstack/react-query';
 import { SchoolService } from '@/services/SchoolService';
 import { School } from '@/db/entities/School';
-import { PreferencesService } from '@/services';
-import { onboardingCompletedQuery, preferencesKeys } from '@/hooks';
 
 // Query keys
 export const schoolKeys = {

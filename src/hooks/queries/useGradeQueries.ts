@@ -1,9 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { GradeService, AddExamAndGradePayload } from '@/services/GradeService';
 import { Grade } from '@/db/entities/Grade';
-import { examKeys, schoolKeys } from '@/hooks';
+import { examKeys } from '@/hooks';
 import { Exam } from '@/db/entities';
-import { SchoolService } from '@/services';
 
 // Query keys
 export const gradeKeys = {

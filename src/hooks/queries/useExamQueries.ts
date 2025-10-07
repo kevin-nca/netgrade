@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ExamService } from '@/services/ExamService';
 import { Exam } from '@/db/entities/Exam';
-import { SchoolService } from '@/services';
-import { schoolKeys } from '@/hooks';
+
 
 // Query keys
 export const examKeys = {
