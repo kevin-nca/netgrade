@@ -4,10 +4,7 @@ import {
   useQueryClient,
   QueryKey,
 } from '@tanstack/react-query';
-import {
-  PreferencesService,
-  NotificationSettings,
-} from '@/services';
+import { PreferencesService, NotificationSettings } from '@/services';
 import { notificationScheduler } from '@/notification-scheduler';
 
 export const preferencesKeys = {

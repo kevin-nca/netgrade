@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ExamService } from '@/services/ExamService';
 import { Exam } from '@/db/entities/Exam';
 
-
 // Query keys
 export const examKeys = {
   all: ['exams'] as const,
