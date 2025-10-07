@@ -6,6 +6,7 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
+  IonSpinner,
 } from '@ionic/react';
 import {
   add,
@@ -42,7 +43,7 @@ function HomePage() {
   const { data: userName } = useUsername();
   const addSchoolMutation = useAddSchool();
 
-  const { data: upcomingExams } = useExamsCompleted();
+  const { data: upcomingExams, isLoading: isLoadingExams } = useExamsCompleted();
 
   // Should be implemented in service
   const calculateSchoolAverage = (schoolId: string, grades: Grade[]) => {
@@ -155,9 +156,10 @@ function HomePage() {
             </div>
 
             <div className="schools-grid">
-              {schools.length > 0 ? (
+              {isLoading ? (
+                  <IonSpinner name="crescent" />
+              ) : schools && schools.length > 0 ? (
                 schools.map((school, index) => {
-                  // still incorrect, as we still show no schools when its loading (!schools)
                   const average = calculateSchoolAverage(school.id, grades);
                   return (
                     <div
@@ -225,7 +227,9 @@ function HomePage() {
 
             <div className="exams-scroll-container">
               <div className="exams-list">
-                {upcomingExams.length > 0 ? (
+                {isLoadingExams ? (
+                  <IonSpinner name="crescent" />
+                ) : upcomingExams && upcomingExams.length > 0 ? (
                   upcomingExams.map((exam) => (
                     <div
                       key={exam.id}
