@@ -6,15 +6,8 @@ import {
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonSpinner,
 } from '@ionic/react';
-import {
-  add,
-  school,
-  chevronForwardOutline,
-  statsChartOutline,
-  personCircleOutline,
-} from 'ionicons/icons';
+import { add, personCircleOutline } from 'ionicons/icons';
 import {
   useAddSchool,
   useSchoolCompleted,
@@ -23,11 +16,12 @@ import {
   useExamsCompleted,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
-import { Grade } from '@/db/entities';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import ExamsList from '@/components/homePage/ExamsList';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
+import SchoolsList from '@/components/homePage/SchoolsList';
+
 import './HomePage.css';
 
 function HomePage() {
@@ -44,35 +38,6 @@ function HomePage() {
   const addSchoolMutation = useAddSchool();
 
   // Should be implemented in service
-  const calculateSchoolAverage = (
-    schoolId: string,
-    grades: Grade[] | undefined,
-  ) => {
-    if (!grades || grades.length === 0) return null;
-
-    const schoolGrades = grades.filter(
-      (grade) =>
-        grade.exam &&
-        grade.exam.subject &&
-        grade.exam.subject.schoolId &&
-        grade.exam.subject.schoolId === schoolId,
-    );
-    if (schoolGrades.length === 0) return null;
-
-    const totalScore = schoolGrades.reduce(
-      (acc, grade) => acc + grade.score * grade.weight,
-      0,
-    );
-    const totalWeight = schoolGrades.reduce(
-      (acc, grade) => acc + grade.weight,
-      0,
-    );
-    return totalWeight ? totalScore / totalWeight : null;
-  };
-
-  const getSchoolIcon = (schoolName: string) => {
-    return schoolName.charAt(0).toUpperCase();
-  };
 
   const handleAddSchool = () => {
     if (schoolNameInput.trim()) {
@@ -140,63 +105,11 @@ function HomePage() {
               </div>
             </div>
 
-            <div className="schools-grid">
-              {isLoading ? (
-                <IonSpinner name="crescent" />
-              ) : schools && schools.length > 0 ? (
-                schools.map((school, index) => {
-                  const average = calculateSchoolAverage(school.id, grades);
-                  return (
-                    <div
-                      key={school.id}
-                      className="school-card glass-card"
-                      onClick={() =>
-                        history.push(
-                          Routes.SCHOOL.replace(':schoolId', school.id),
-                        )
-                      }
-                    >
-                      <div className="school-card-header">
-                        <div
-                          className={`school-avatar school-avatar-${index % 4}`}
-                        >
-                          {getSchoolIcon(school.name)}
-                        </div>
-                        <IonIcon
-                          icon={chevronForwardOutline}
-                          className="school-chevron"
-                        />
-                      </div>
-
-                      <div className="school-card-content">
-                        <h3 className="school-name">{school.name}</h3>
-                        <div className="school-stats">
-                          <div className="school-average">
-                            <IonIcon
-                              icon={statsChartOutline}
-                              className="stats-icon"
-                            />
-                            <span className="school-info">
-                              {average
-                                ? `${average.toFixed(1)} Ø`
-                                : 'Keine Noten'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="empty-schools glass-card">
-                  <div className="empty-icon-wrapper">
-                    <IonIcon icon={school} className="empty-icon" />
-                  </div>
-                  <h3 className="empty-title">Keine Schulen</h3>
-                  <p className="empty-description">Tippe + um zu starten</p>
-                </div>
-              )}
-            </div>
+            <SchoolsList
+              schools={schools}
+              grades={grades}
+              isLoading={isLoading}
+            />
           </div>
 
           <div className="main-section">
