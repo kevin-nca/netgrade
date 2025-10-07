@@ -12,9 +12,7 @@ import {
   add,
   school,
   chevronForwardOutline,
-  bookOutline,
   statsChartOutline,
-  timeOutline,
   personCircleOutline,
 } from 'ionicons/icons';
 import {
@@ -28,7 +26,7 @@ import { Routes } from '@/routes';
 import { Grade } from '@/db/entities';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
-import './HomePage.css';
+import ExamsList from '@/components/homePage/ExamsList';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 
 function HomePage() {
@@ -38,15 +36,13 @@ function HomePage() {
   const history = useHistory();
 
   const { data: schools, isLoading } = useSchoolCompleted();
-
   const { data: grades } = useGradeCompleted();
   const { data: userName } = useUsername();
+  const { data: upcomingExams, isLoading: isLoadingExams } = useExamsCompleted();
   const addSchoolMutation = useAddSchool();
 
-  const { data: upcomingExams, isLoading: isLoadingExams } = useExamsCompleted();
-
   // Should be implemented in service
-  const calculateSchoolAverage = (schoolId: string, grades: Grade[]) => {
+  const calculateSchoolAverage = (schoolId: string, grades: Grade[] | undefined) => {
     if (!grades || grades.length === 0) return null;
 
     const schoolGrades = grades.filter(
@@ -71,22 +67,6 @@ function HomePage() {
 
   const getSchoolIcon = (schoolName: string) => {
     return schoolName.charAt(0).toUpperCase();
-  };
-
-  // factor out
-  const formatDate = (date: Date) => {
-    const today = new Date();
-    const diffTime = date.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return 'Heute';
-    if (diffDays === 1) return 'Morgen';
-    if (diffDays > 1 && diffDays <= 7) return `In ${diffDays} Tagen`;
-
-    return date.toLocaleDateString('de-DE', {
-      day: '2-digit',
-      month: 'short',
-    });
   };
 
   const handleAddSchool = () => {
@@ -225,56 +205,7 @@ function HomePage() {
               </div>
             </div>
 
-            <div className="exams-scroll-container">
-              <div className="exams-list">
-                {isLoadingExams ? (
-                  <IonSpinner name="crescent" />
-                ) : upcomingExams && upcomingExams.length > 0 ? (
-                  upcomingExams.map((exam) => (
-                    <div
-                      key={exam.id}
-                      className="exam-card glass-card"
-                      onClick={() =>
-                        history.push(
-                          Routes.EXAM_EDIT.replace(':examId', exam.id),
-                        )
-                      }
-                    >
-                      <div className="exam-card-content">
-                        <div className="exam-icon-and-info">
-                          <div className="exam-icon-wrapper">
-                            <IonIcon icon={bookOutline} className="exam-icon" />
-                          </div>
-
-                          <div className="exam-info">
-                            <h4 className="exam-title">{exam.name}</h4>
-                            <div className="exam-meta">
-                              <div className="exam-date">
-                                <IonIcon
-                                  icon={timeOutline}
-                                  className="meta-icon"
-                                />
-                                <span>{formatDate(exam.date)}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="exam-priority">
-                          <div className="priority-dot" />
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="empty-exams glass-card">
-                    <h3 className="empty-title">Alles erledigt!</h3>
-                    <p className="empty-description">
-                      Keine anstehenden Prüfungen
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+            <ExamsList upcomingExams={upcomingExams} isLoading={isLoadingExams} />
           </div>
 
           <div className="bottom-spacer" />
