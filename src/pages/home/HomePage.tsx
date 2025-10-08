@@ -12,9 +12,9 @@ import { useAddSchool, useUsername } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
-import ExamsList from '@/components/homePage/ExamsList';
+import ExamsList from '@/pages/home/components/ExamsList';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-import SchoolsList from '@/components/homePage/SchoolsList';
+import SchoolsList from '@/pages/home/components/SchoolsList';
 
 import './HomePage.css';
 
