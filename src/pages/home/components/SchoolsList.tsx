@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { IonIcon, IonSpinner } from '@ionic/react';
+import { IonIcon } from '@ionic/react';
 import {
   school,
   chevronForwardOutline,
@@ -12,7 +12,7 @@ import { useSchoolCompleted, useGradeCompleted } from '@/hooks/queries';
 
 const SchoolsList: React.FC = () => {
   const history = useHistory();
-  const { data: schools, isLoading } = useSchoolCompleted();
+  const { data: schools } = useSchoolCompleted();
   const { data: grades } = useGradeCompleted();
 
   const calculateSchoolAverage = (
@@ -44,14 +44,6 @@ const SchoolsList: React.FC = () => {
   const getSchoolIcon = (schoolName: string) => {
     return schoolName.charAt(0).toUpperCase();
   };
-
-  if (isLoading) {
-    return (
-      <div className="schools-grid">
-        <IonSpinner name="crescent" />
-      </div>
-    );
-  }
 
   if (!schools || schools.length === 0) {
     return (

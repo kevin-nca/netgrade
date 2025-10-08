@@ -1,13 +1,13 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { IonIcon, IonSpinner } from '@ionic/react';
+import { IonIcon } from '@ionic/react';
 import { bookOutline, timeOutline } from 'ionicons/icons';
 import { Routes } from '@/routes';
 import { useExamsCompleted } from '@/hooks/queries';
 
 const ExamsList: React.FC = () => {
   const history = useHistory();
-  const { data: upcomingExams, isLoading } = useExamsCompleted();
+  const { data: upcomingExams } = useExamsCompleted();
 
   const formatDate = (date: Date) => {
     const today = new Date();
@@ -23,16 +23,6 @@ const ExamsList: React.FC = () => {
       month: 'short',
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="exams-scroll-container">
-        <div className="exams-list">
-          <IonSpinner name="crescent" />
-        </div>
-      </div>
-    );
-  }
 
   if (!upcomingExams || upcomingExams.length === 0) {
     return (
