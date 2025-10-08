@@ -45,46 +45,17 @@ const SchoolsList: React.FC = () => {
     return schoolName.charAt(0).toUpperCase();
   };
 
-  return (
-    <div className="schools-grid">
-      {isLoading ? (
+  if (isLoading) {
+    return (
+      <div className="schools-grid">
         <IonSpinner name="crescent" />
-      ) : schools && schools.length > 0 ? (
-        schools.map((school, index) => {
-          const average = calculateSchoolAverage(school.id, grades);
-          return (
-            <div
-              key={school.id}
-              className="school-card glass-card"
-              onClick={() =>
-                history.push(Routes.SCHOOL.replace(':schoolId', school.id))
-              }
-            >
-              <div className="school-card-header">
-                <div className={`school-avatar school-avatar-${index % 4}`}>
-                  {getSchoolIcon(school.name)}
-                </div>
-                <IonIcon
-                  icon={chevronForwardOutline}
-                  className="school-chevron"
-                />
-              </div>
+      </div>
+    );
+  }
 
-              <div className="school-card-content">
-                <h3 className="school-name">{school.name}</h3>
-                <div className="school-stats">
-                  <div className="school-average">
-                    <IonIcon icon={statsChartOutline} className="stats-icon" />
-                    <span className="school-info">
-                      {average ? `${average.toFixed(1)} Ø` : 'Keine Noten'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })
-      ) : (
+  if (!schools || schools.length === 0) {
+    return (
+      <div className="schools-grid">
         <div className="empty-schools glass-card">
           <div className="empty-icon-wrapper">
             <IonIcon icon={school} className="empty-icon" />
@@ -92,7 +63,46 @@ const SchoolsList: React.FC = () => {
           <h3 className="empty-title">Keine Schulen</h3>
           <p className="empty-description">Tippe + um zu starten</p>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="schools-grid">
+      {schools.map((school, index) => {
+        const average = calculateSchoolAverage(school.id, grades);
+        return (
+          <div
+            key={school.id}
+            className="school-card glass-card"
+            onClick={() =>
+              history.push(Routes.SCHOOL.replace(':schoolId', school.id))
+            }
+          >
+            <div className="school-card-header">
+              <div className={`school-avatar school-avatar-${index % 4}`}>
+                {getSchoolIcon(school.name)}
+              </div>
+              <IonIcon
+                icon={chevronForwardOutline}
+                className="school-chevron"
+              />
+            </div>
+
+            <div className="school-card-content">
+              <h3 className="school-name">{school.name}</h3>
+              <div className="school-stats">
+                <div className="school-average">
+                  <IonIcon icon={statsChartOutline} className="stats-icon" />
+                  <span className="school-info">
+                    {average ? `${average.toFixed(1)} Ø` : 'Keine Noten'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
