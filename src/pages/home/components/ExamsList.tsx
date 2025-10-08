@@ -24,48 +24,62 @@ const ExamsList: React.FC = () => {
     });
   };
 
-  return (
-    <div className="exams-scroll-container">
-      <div className="exams-list">
-        {isLoading ? (
+  if (isLoading) {
+    return (
+      <div className="exams-scroll-container">
+        <div className="exams-list">
           <IonSpinner name="crescent" />
-        ) : upcomingExams && upcomingExams.length > 0 ? (
-          upcomingExams.map((exam) => (
-            <div
-              key={exam.id}
-              className="exam-card glass-card"
-              onClick={() =>
-                history.push(Routes.EXAM_EDIT.replace(':examId', exam.id))
-              }
-            >
-              <div className="exam-card-content">
-                <div className="exam-icon-and-info">
-                  <div className="exam-icon-wrapper">
-                    <IonIcon icon={bookOutline} className="exam-icon" />
-                  </div>
+        </div>
+      </div>
+    );
+  }
 
-                  <div className="exam-info">
-                    <h4 className="exam-title">{exam.name}</h4>
-                    <div className="exam-meta">
-                      <div className="exam-date">
-                        <IonIcon icon={timeOutline} className="meta-icon" />
-                        <span>{formatDate(exam.date)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="exam-priority">
-                  <div className="priority-dot" />
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
+  if (!upcomingExams || upcomingExams.length === 0) {
+    return (
+      <div className="exams-scroll-container">
+        <div className="exams-list">
           <div className="empty-exams glass-card">
             <h3 className="empty-title">Alles erledigt!</h3>
             <p className="empty-description">Keine anstehenden Prüfungen</p>
           </div>
-        )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="exams-scroll-container">
+      <div className="exams-list">
+        {upcomingExams.map((exam) => (
+          <div
+            key={exam.id}
+            className="exam-card glass-card"
+            onClick={() =>
+              history.push(Routes.EXAM_EDIT.replace(':examId', exam.id))
+            }
+          >
+            <div className="exam-card-content">
+              <div className="exam-icon-and-info">
+                <div className="exam-icon-wrapper">
+                  <IonIcon icon={bookOutline} className="exam-icon" />
+                </div>
+
+                <div className="exam-info">
+                  <h4 className="exam-title">{exam.name}</h4>
+                  <div className="exam-meta">
+                    <div className="exam-date">
+                      <IonIcon icon={timeOutline} className="meta-icon" />
+                      <span>{formatDate(exam.date)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="exam-priority">
+                <div className="priority-dot" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
