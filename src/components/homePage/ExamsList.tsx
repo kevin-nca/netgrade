@@ -2,16 +2,12 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { IonIcon, IonSpinner } from '@ionic/react';
 import { bookOutline, timeOutline } from 'ionicons/icons';
-import { Exam } from '@/db/entities';
 import { Routes } from '@/routes';
+import { useExamsCompleted } from '@/hooks/queries';
 
-interface ExamsListProps {
-  upcomingExams: Exam[] | undefined;
-  isLoading: boolean;
-}
-
-const ExamsList: React.FC<ExamsListProps> = ({ upcomingExams, isLoading }) => {
+const ExamsList: React.FC = () => {
   const history = useHistory();
+  const { data: upcomingExams, isLoading } = useExamsCompleted();
 
   const formatDate = (date: Date) => {
     const today = new Date();
