@@ -8,13 +8,7 @@ import {
   IonRefresherContent,
 } from '@ionic/react';
 import { add, personCircleOutline } from 'ionicons/icons';
-import {
-  useAddSchool,
-  useSchoolCompleted,
-  useGradeCompleted,
-  useUsername,
-  useExamsCompleted,
-} from '@/hooks/queries';
+import { useAddSchool, useUsername } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
@@ -30,14 +24,9 @@ function HomePage() {
   const [schoolNameInput, setSchoolNameInput] = useState('');
   const history = useHistory();
 
-  const { data: schools, isLoading } = useSchoolCompleted();
-  const { data: grades } = useGradeCompleted();
   const { data: userName } = useUsername();
-  const { data: upcomingExams, isLoading: isLoadingExams } =
-    useExamsCompleted();
-  const addSchoolMutation = useAddSchool();
 
-  // Should be implemented in service
+  const addSchoolMutation = useAddSchool();
 
   const handleAddSchool = () => {
     if (schoolNameInput.trim()) {
@@ -105,11 +94,7 @@ function HomePage() {
               </div>
             </div>
 
-            <SchoolsList
-              schools={schools}
-              grades={grades}
-              isLoading={isLoading}
-            />
+            <SchoolsList />
           </div>
 
           <div className="main-section">
@@ -123,10 +108,7 @@ function HomePage() {
               </div>
             </div>
 
-            <ExamsList
-              upcomingExams={upcomingExams}
-              isLoading={isLoadingExams}
-            />
+            <ExamsList />
           </div>
 
           <div className="bottom-spacer" />

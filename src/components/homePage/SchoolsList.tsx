@@ -6,21 +6,14 @@ import {
   chevronForwardOutline,
   statsChartOutline,
 } from 'ionicons/icons';
-import { School, Grade } from '@/db/entities';
+import { Grade } from '@/db/entities';
 import { Routes } from '@/routes';
+import { useSchoolCompleted, useGradeCompleted } from '@/hooks/queries';
 
-interface SchoolsListProps {
-  schools: School[] | undefined;
-  grades: Grade[] | undefined;
-  isLoading: boolean;
-}
-
-const SchoolsList: React.FC<SchoolsListProps> = ({
-  schools,
-  grades,
-  isLoading,
-}) => {
+const SchoolsList: React.FC = () => {
   const history = useHistory();
+  const { data: schools, isLoading } = useSchoolCompleted();
+  const { data: grades } = useGradeCompleted();
 
   const calculateSchoolAverage = (
     schoolId: string,
