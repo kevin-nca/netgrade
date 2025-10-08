@@ -6,40 +6,14 @@ import {
   chevronForwardOutline,
   statsChartOutline,
 } from 'ionicons/icons';
-import { Grade } from '@/db/entities';
 import { Routes } from '@/routes';
 import { useSchoolCompleted, useGradeCompleted } from '@/hooks/queries';
+import { SchoolService } from '@/services/SchoolService';
 
 const SchoolsList: React.FC = () => {
   const history = useHistory();
   const { data: schools } = useSchoolCompleted();
   const { data: grades } = useGradeCompleted();
-
-  const calculateSchoolAverage = (
-    schoolId: string,
-    grades: Grade[] | undefined,
-  ) => {
-    if (!grades || grades.length === 0) return null;
-
-    const schoolGrades = grades.filter(
-      (grade) =>
-        grade.exam &&
-        grade.exam.subject &&
-        grade.exam.subject.schoolId &&
-        grade.exam.subject.schoolId === schoolId,
-    );
-    if (schoolGrades.length === 0) return null;
-
-    const totalScore = schoolGrades.reduce(
-      (acc, grade) => acc + grade.score * grade.weight,
-      0,
-    );
-    const totalWeight = schoolGrades.reduce(
-      (acc, grade) => acc + grade.weight,
-      0,
-    );
-    return totalWeight ? totalScore / totalWeight : null;
-  };
 
   const getSchoolIcon = (schoolName: string) => {
     return schoolName.charAt(0).toUpperCase();
@@ -62,7 +36,7 @@ const SchoolsList: React.FC = () => {
   return (
     <div className="schools-grid">
       {schools.map((school, index) => {
-        const average = calculateSchoolAverage(school.id, grades);
+        const average = SchoolService.calculateSchoolAverage(school.id, grades);
         return (
           <div
             key={school.id}

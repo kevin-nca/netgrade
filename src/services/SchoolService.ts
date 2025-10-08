@@ -1,5 +1,6 @@
 import { getRepositories } from '@/db/data-source';
 import { School } from '@/db/entities/School';
+import { Grade } from '@/db/entities';
 
 export class SchoolService {
   /**
@@ -102,5 +103,37 @@ export class SchoolService {
       console.error(`Failed to find school with ID ${id}:`, error);
       throw error;
     }
+  }
+
+  /**
+   * Calculates the average grade for a specific school
+   * @param schoolId - The ID of the school
+   * @param grades - Array of grades to calculate from
+   * @returns number | null - The calculated average or null if no grades exist
+   */
+  static calculateSchoolAverage(
+    schoolId: string,
+    grades: Grade[] | undefined,
+  ): number | null {
+    if (!grades || grades.length === 0) return null;
+
+    const schoolGrades = grades.filter(
+      (grade) =>
+        grade.exam &&
+        grade.exam.subject &&
+        grade.exam.subject.schoolId &&
+        grade.exam.subject.schoolId === schoolId,
+    );
+    if (schoolGrades.length === 0) return null;
+
+    const totalScore = schoolGrades.reduce(
+      (acc, grade) => acc + grade.score * grade.weight,
+      0,
+    );
+    const totalWeight = schoolGrades.reduce(
+      (acc, grade) => acc + grade.weight,
+      0,
+    );
+    return totalWeight ? totalScore / totalWeight : null;
   }
 }
