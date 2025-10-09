@@ -166,23 +166,23 @@ describe('SchoolService', () => {
       expect(average).toBe(4.75);
     });
 
-    it('should return null when grades array is undefined', () => {
+    it('should return undefined when grades array is undefined', () => {
       const average = SchoolService.calculateSchoolAverage(
         'test-school-id',
         undefined,
       );
-      expect(average).toBeNull();
+      expect(average).toBeUndefined();
     });
 
-    it('should return null when grades array is empty', () => {
+    it('should return undefined when grades array is empty', () => {
       const average = SchoolService.calculateSchoolAverage(
         'test-school-id',
         [],
       );
-      expect(average).toBeNull();
+      expect(average).toBeUndefined();
     });
 
-    it('should return null when no grades belong to the specified school', () => {
+    it('should return undefined when no grades belong to the specified school', () => {
       const schoolId = 'test-school-id';
       const otherSchoolId = 'other-school-id';
 
@@ -205,7 +205,7 @@ describe('SchoolService', () => {
         schoolId,
         mockGrades,
       );
-      expect(average).toBeNull();
+      expect(average).toBeUndefined();
     });
 
     it('should only include grades from the specified school', () => {
@@ -295,7 +295,7 @@ describe('SchoolService', () => {
       expect(average).toBe(5.5);
     });
 
-    it('should return null when total weight is zero', () => {
+    it('should return undefined when total weight is zero', () => {
       const schoolId = 'test-school-id';
 
       const mockGrades: Grade[] = [
@@ -317,7 +317,7 @@ describe('SchoolService', () => {
         schoolId,
         mockGrades,
       );
-      expect(average).toBeNull();
+      expect(average).toBeUndefined();
     });
 
     it('should handle grades with missing exam relationship gracefully', () => {
