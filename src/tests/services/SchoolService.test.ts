@@ -114,4 +114,241 @@ describe('SchoolService', () => {
   it('should throw an error when deleting a non-existent school', async () => {
     await expect(SchoolService.delete('non-existent-id')).rejects.toThrow();
   });
+
+  // Test calculateSchoolAverage method
+  describe('calculateSchoolAverage', () => {
+    it('should calculate the weighted average for a school with grades', () => {
+      const schoolId = 'test-school-id';
+
+      const mockGrades: Grade[] = [
+        {
+          id: '1',
+          score: 5.0,
+          weight: 1,
+          exam: {
+            id: 'exam1',
+            subject: {
+              id: 'subject1',
+              schoolId: schoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+        {
+          id: '2',
+          score: 4.0,
+          weight: 2,
+          exam: {
+            id: 'exam2',
+            subject: {
+              id: 'subject2',
+              schoolId: schoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+        {
+          id: '3',
+          score: 6.0,
+          weight: 1,
+          exam: {
+            id: 'exam3',
+            subject: {
+              id: 'subject3',
+              schoolId: schoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+      ];
+
+      const average = SchoolService.calculateSchoolAverage(
+        schoolId,
+        mockGrades,
+      );
+      expect(average).toBe(4.75);
+    });
+
+    it('should return null when grades array is undefined', () => {
+      const average = SchoolService.calculateSchoolAverage(
+        'test-school-id',
+        undefined,
+      );
+      expect(average).toBeNull();
+    });
+
+    it('should return null when grades array is empty', () => {
+      const average = SchoolService.calculateSchoolAverage(
+        'test-school-id',
+        [],
+      );
+      expect(average).toBeNull();
+    });
+
+    it('should return null when no grades belong to the specified school', () => {
+      const schoolId = 'test-school-id';
+      const otherSchoolId = 'other-school-id';
+
+      const mockGrades: Grade[] = [
+        {
+          id: '1',
+          score: 5.0,
+          weight: 1,
+          exam: {
+            id: 'exam1',
+            subject: {
+              id: 'subject1',
+              schoolId: otherSchoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+      ];
+
+      const average = SchoolService.calculateSchoolAverage(
+        schoolId,
+        mockGrades,
+      );
+      expect(average).toBeNull();
+    });
+
+    it('should only include grades from the specified school', () => {
+      const schoolId = 'test-school-id';
+      const otherSchoolId = 'other-school-id';
+
+      const mockGrades: Grade[] = [
+        {
+          id: '1',
+          score: 5.0,
+          weight: 1,
+          exam: {
+            id: 'exam1',
+            subject: {
+              id: 'subject1',
+              schoolId: schoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+        {
+          id: '2',
+          score: 3.0,
+          weight: 1,
+          exam: {
+            id: 'exam2',
+            subject: {
+              id: 'subject2',
+              schoolId: otherSchoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+        {
+          id: '3',
+          score: 6.0,
+          weight: 1,
+          exam: {
+            id: 'exam3',
+            subject: {
+              id: 'subject3',
+              schoolId: schoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+      ];
+
+      const average = SchoolService.calculateSchoolAverage(
+        schoolId,
+        mockGrades,
+      );
+      expect(average).toBe(5.5);
+    });
+
+    it('should handle grades with different weights correctly', () => {
+      const schoolId = 'test-school-id';
+
+      const mockGrades: Grade[] = [
+        {
+          id: '1',
+          score: 6.0,
+          weight: 3,
+          exam: {
+            id: 'exam1',
+            subject: {
+              id: 'subject1',
+              schoolId: schoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+        {
+          id: '2',
+          score: 4.0,
+          weight: 1,
+          exam: {
+            id: 'exam2',
+            subject: {
+              id: 'subject2',
+              schoolId: schoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+      ];
+
+      const average = SchoolService.calculateSchoolAverage(
+        schoolId,
+        mockGrades,
+      );
+      expect(average).toBe(5.5);
+    });
+
+    it('should return null when total weight is zero', () => {
+      const schoolId = 'test-school-id';
+
+      const mockGrades: Grade[] = [
+        {
+          id: '1',
+          score: 5.0,
+          weight: 0, // Zero weight
+          exam: {
+            id: 'exam1',
+            subject: {
+              id: 'subject1',
+              schoolId: schoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+      ];
+
+      const average = SchoolService.calculateSchoolAverage(
+        schoolId,
+        mockGrades,
+      );
+      expect(average).toBeNull();
+    });
+
+    it('should handle grades with missing exam relationship gracefully', () => {
+      const schoolId = 'test-school-id';
+
+      const mockGrades: Grade[] = [
+        {
+          id: '1',
+          score: 5.0,
+          weight: 1,
+          exam: {
+            id: 'exam1',
+            subject: {
+              id: 'subject1',
+              schoolId: schoolId,
+            } as Subject,
+          } as Exam,
+        } as Grade,
+        {
+          id: '2',
+          score: 4.0,
+          weight: 1,
+          exam: null as unknown as Exam,
+        } as Grade,
+      ];
+
+      const average = SchoolService.calculateSchoolAverage(
+        schoolId,
+        mockGrades,
+      );
+      expect(average).toBe(5.0);
+    });
+  });
 });
