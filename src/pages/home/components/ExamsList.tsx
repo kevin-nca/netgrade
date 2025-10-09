@@ -32,7 +32,7 @@ const ExamsList: React.FC = () => {
     });
   };
 
-  if (!upcomingExams || upcomingExams.length === 0) {
+  if (upcomingExams!.length === 0) {
     return (
       <div className="exams-scroll-container">
         <div className="exams-list">
@@ -48,7 +48,7 @@ const ExamsList: React.FC = () => {
   return (
     <div className="exams-scroll-container">
       <div className="exams-list">
-        {upcomingExams.map((exam) => (
+        {upcomingExams!.map((exam) => (
           <div
             key={exam.id}
             className="exam-card glass-card"
