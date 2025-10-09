@@ -90,6 +90,187 @@ export const seedTestData = async (dataSource: DataSource) => {
   return { school, subject, exam, grade };
 };
 
+// Helper function to create mock grades for calculateSchoolAverage tests
+export const createMockGrades = (schoolId: string): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 5.0,
+      weight: 1,
+      exam: {
+        id: 'exam1',
+        subject: {
+          id: 'subject1',
+          schoolId: schoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+    {
+      id: '2',
+      score: 4.0,
+      weight: 2,
+      exam: {
+        id: 'exam2',
+        subject: {
+          id: 'subject2',
+          schoolId: schoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+    {
+      id: '3',
+      score: 6.0,
+      weight: 1,
+      exam: {
+        id: 'exam3',
+        subject: {
+          id: 'subject3',
+          schoolId: schoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+  ];
+};
+
+// Helper function to create mock grades with different schools
+export const createMockGradesWithMultipleSchools = (
+  schoolId: string,
+  otherSchoolId: string,
+): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 5.0,
+      weight: 1,
+      exam: {
+        id: 'exam1',
+        subject: {
+          id: 'subject1',
+          schoolId: schoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+    {
+      id: '2',
+      score: 3.0,
+      weight: 1,
+      exam: {
+        id: 'exam2',
+        subject: {
+          id: 'subject2',
+          schoolId: otherSchoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+    {
+      id: '3',
+      score: 6.0,
+      weight: 1,
+      exam: {
+        id: 'exam3',
+        subject: {
+          id: 'subject3',
+          schoolId: schoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+  ];
+};
+
+// Helper function to create mock grades with different weights
+export const createMockGradesWithDifferentWeights = (
+  schoolId: string,
+): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 6.0,
+      weight: 3,
+      exam: {
+        id: 'exam1',
+        subject: {
+          id: 'subject1',
+          schoolId: schoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+    {
+      id: '2',
+      score: 4.0,
+      weight: 1,
+      exam: {
+        id: 'exam2',
+        subject: {
+          id: 'subject2',
+          schoolId: schoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+  ];
+};
+
+// Helper function to create mock grades with zero weight
+export const createMockGradesWithZeroWeight = (schoolId: string): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 5.0,
+      weight: 0,
+      exam: {
+        id: 'exam1',
+        subject: {
+          id: 'subject1',
+          schoolId: schoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+  ];
+};
+
+// Helper function to create mock grades with missing exam relationship
+export const createMockGradesWithMissingExam = (schoolId: string): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 5.0,
+      weight: 1,
+      exam: {
+        id: 'exam1',
+        subject: {
+          id: 'subject1',
+          schoolId: schoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+    {
+      id: '2',
+      score: 4.0,
+      weight: 1,
+      exam: null as unknown as Exam,
+    } as Grade,
+  ];
+};
+
+// Helper function to create mock grades for other school
+export const createMockGradesForOtherSchool = (
+  otherSchoolId: string,
+): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 5.0,
+      weight: 1,
+      exam: {
+        id: 'exam1',
+        subject: {
+          id: 'subject1',
+          schoolId: otherSchoolId,
+        } as Subject,
+      } as Exam,
+    } as Grade,
+  ];
+};
+
 // Helper function to clean up test data
 export const cleanupTestData = async (dataSource: DataSource) => {
   if (dataSource.isInitialized) {
