@@ -23,7 +23,7 @@ const SchoolsList: React.FC = () => {
     return schoolName.charAt(0).toUpperCase();
   };
 
-  if (!schools || schools.length === 0) {
+  if (schools!.length === 0) {
     return (
       <div className="schools-grid">
         <div className="empty-schools glass-card">
@@ -39,7 +39,7 @@ const SchoolsList: React.FC = () => {
 
   return (
     <div className="schools-grid">
-      {schools.map((school, index) => {
+      {schools!.map((school, index) => {
         const average = SchoolService.calculateSchoolAverage(school.id, grades);
         return (
           <div
