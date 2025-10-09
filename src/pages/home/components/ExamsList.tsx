@@ -9,6 +9,14 @@ const ExamsList: React.FC = () => {
   const history = useHistory();
   const { data: upcomingExams } = useExamsCompleted();
 
+  console.log('ExamsList - upcomingExams:', upcomingExams);
+  console.log(
+    'ExamsList - is upcomingExams undefined?',
+    upcomingExams === undefined,
+  );
+  console.log('ExamsList - is upcomingExams null?', upcomingExams === null);
+  console.log('ExamsList - upcomingExams length:', upcomingExams?.length);
+
   const formatDate = (date: Date) => {
     const today = new Date();
     const diffTime = date.getTime() - today.getTime();
