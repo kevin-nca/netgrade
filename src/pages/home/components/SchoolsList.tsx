@@ -15,10 +15,6 @@ const SchoolsList: React.FC = () => {
   const { data: schools } = useSchoolCompleted();
   const { data: grades } = useGradeCompleted();
 
-  console.log('SchoolsList - schools:', schools);
-  console.log('SchoolsList - is schools undefined?', schools === undefined);
-  console.log('SchoolsList - is schools null?', schools === null);
-
   const getSchoolIcon = (schoolName: string) => {
     return schoolName.charAt(0).toUpperCase();
   };
