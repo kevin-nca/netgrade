@@ -151,7 +151,7 @@ const SchoolPage: React.FC = () => {
                   <div className="grade-subject">{subject.name}</div>
                   <div className="grade-average">
                     Durchschnitt:{' '}
-                    {calculateAverage(subject) !== null
+                    {calculateAverage(subject) !== undefined
                       ? calculateAverage(subject)?.toFixed(2)
                       : 'Keine Noten'}
                   </div>

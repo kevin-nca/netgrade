@@ -114,8 +114,8 @@ export class SchoolService {
   static calculateSchoolAverage(
     schoolId: string,
     grades: Grade[] | undefined,
-  ): number | null {
-    if (!grades || grades.length === 0) return null;
+  ): number | undefined {
+    if (!grades || grades.length === 0) return undefined;
 
     const schoolGrades = grades.filter(
       (grade) =>
@@ -124,7 +124,7 @@ export class SchoolService {
         grade.exam.subject.schoolId &&
         grade.exam.subject.schoolId === schoolId,
     );
-    if (schoolGrades.length === 0) return null;
+    if (schoolGrades.length === 0) return undefined;
 
     const totalScore = schoolGrades.reduce(
       (acc, grade) => acc + grade.score * grade.weight,
@@ -134,6 +134,6 @@ export class SchoolService {
       (acc, grade) => acc + grade.weight,
       0,
     );
-    return totalWeight ? totalScore / totalWeight : null;
+    return totalWeight ? totalScore / totalWeight : undefined;
   }
 }
