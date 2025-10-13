@@ -3,11 +3,11 @@ import { useHistory } from 'react-router-dom';
 import { IonIcon } from '@ionic/react';
 import { bookOutline, timeOutline } from 'ionicons/icons';
 import { Routes } from '@/routes';
-import { useExamsCompleted } from '@/hooks/queries';
+import { useUpcomingExams } from '@/hooks/queries';
 
 const ExamsList: React.FC = () => {
   const history = useHistory();
-  const { data: upcomingExams } = useExamsCompleted();
+  const { data: upcomingExams } = useUpcomingExams();
 
   const formatDate = (date: Date) => {
     const today = new Date();

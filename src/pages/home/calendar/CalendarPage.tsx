@@ -19,7 +19,7 @@ import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import './calendar.css';
 import { Exam } from '@/db/entities/Exam';
-import { useExams } from '@/hooks/queries';
+import { useUpcomingExams } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import MonthSelector from './components/MonthSelector';
 import CalendarGrid from './components/CalendarGrid';
@@ -30,7 +30,7 @@ import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import { useCalendar } from '@/pages/home/calendar/hook/useCalendar';
 
 const CalendarPage: React.FC = () => {
-  const { data: allExams = [], error, isLoading, refetch } = useExams();
+  const { data: allExams = [], error, isLoading, refetch } = useUpcomingExams();
   const [showExamDetail, setShowExamDetail] = useState<Exam | null>(null);
   const [showNavigationModal, setShowNavigationModal] = useState(false);
 

@@ -26,11 +26,14 @@ export interface AddExamPayload {
 }
 
 // Hooks
-export const useExams = () => {
-  return useQuery({
-    queryKey: examKeys.lists(),
-    queryFn: () => ExamService.fetchAll(),
-  });
+
+export const UpcomingExamsQuery = {
+  queryKey: examKeys.upcoming(),
+  queryFn: () => ExamService.fetchUpcoming(),
+} as const;
+
+export const useUpcomingExams = () => {
+  return useQuery(UpcomingExamsQuery);
 };
 
 export const useExam = (id: string) => {
@@ -102,13 +105,4 @@ export const useDeleteExam = () => {
       queryClient.invalidateQueries({ queryKey: examKeys.lists() });
     },
   });
-};
-
-export const ExamCompletedQuery = {
-  queryKey: examKeys.upcoming(),
-  queryFn: () => ExamService.fetchUpcoming(),
-} as const;
-
-export const useExamsCompleted = () => {
-  return useQuery(ExamCompletedQuery);
 };
