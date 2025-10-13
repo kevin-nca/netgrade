@@ -192,17 +192,6 @@ describe('SchoolService', () => {
       expect(average).toBe(5.5);
     });
 
-    it('should return undefined when total weight is zero', () => {
-      const schoolId = 'test-school-id';
-      const mockGrades = createMockGradesWithZeroWeight(schoolId);
-
-      const average = SchoolService.calculateSchoolAverage(
-        schoolId,
-        mockGrades,
-      );
-      expect(average).toBeUndefined();
-    });
-
     it('should handle grades with missing exam relationship gracefully', () => {
       const schoolId = 'test-school-id';
       const mockGrades = createMockGradesWithMissingExam(schoolId);

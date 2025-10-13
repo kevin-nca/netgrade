@@ -134,6 +134,6 @@ export class SchoolService {
       (acc, grade) => acc + grade.weight,
       0,
     );
-    return totalWeight ? totalScore / totalWeight : undefined;
+    return totalScore / totalWeight;
   }
 }
