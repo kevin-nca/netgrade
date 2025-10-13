@@ -8,7 +8,6 @@ import {
   createMockGrades,
   createMockGradesWithMultipleSchools,
   createMockGradesWithDifferentWeights,
-  createMockGradesWithZeroWeight,
   createMockGradesWithMissingExam,
   createMockGradesForOtherSchool,
 } from './setup';
