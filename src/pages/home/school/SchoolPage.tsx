@@ -20,10 +20,10 @@ import { Subject } from '@/db/entities';
 import {
   useSchool,
   useSchoolSubjects,
-  useGrades,
   useAddSubject,
   useDeleteSubject,
   useUpdateSubject,
+  useGrades,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/components/modals/EditSubjectModal';
