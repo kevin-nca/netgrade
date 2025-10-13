@@ -20,11 +20,14 @@ export interface AddSchoolPayload {
 }
 
 // Hooks
+
+export const SchoolQuery = {
+  queryKey: schoolKeys.lists(),
+  queryFn: () => SchoolService.fetchAll(),
+} as const;
+
 export const useSchools = () => {
-  return useQuery({
-    queryKey: schoolKeys.lists(),
-    queryFn: () => SchoolService.fetchAll(),
-  });
+  return useQuery(SchoolQuery);
 };
 
 export const useSchool = (id: string) => {
@@ -78,13 +81,4 @@ export const useDeleteSchool = () => {
       queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
     },
   });
-};
-
-export const SchoolCompletedQuery = {
-  queryKey: schoolKeys.lists(),
-  queryFn: () => SchoolService.fetchAll(),
-} as const;
-
-export const useSchoolCompleted = () => {
-  return useQuery(SchoolCompletedQuery);
 };

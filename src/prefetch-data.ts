@@ -3,13 +3,13 @@ import {
   UpcomingExamsQuery,
   GradeQuery,
   onboardingCompletedQuery,
-  SchoolCompletedQuery,
+  SchoolQuery,
   userNameQuery,
 } from '@/hooks/queries';
 
 export async function prefetchData(queryClient: QueryClient) {
   await queryClient.prefetchQuery(onboardingCompletedQuery);
-  await queryClient.prefetchQuery(SchoolCompletedQuery);
+  await queryClient.prefetchQuery(SchoolQuery);
   await queryClient.prefetchQuery(GradeQuery);
   await queryClient.prefetchQuery(userNameQuery);
   await queryClient.prefetchQuery(UpcomingExamsQuery);
