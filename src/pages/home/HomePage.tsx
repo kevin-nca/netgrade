@@ -8,7 +8,7 @@ import {
   IonRefresherContent,
 } from '@ionic/react';
 import { add, personCircleOutline } from 'ionicons/icons';
-import { useAddSchool, useUsername } from '@/hooks/queries';
+import { useAddSchool, useUserName } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
@@ -24,7 +24,7 @@ function HomePage() {
   const [schoolNameInput, setSchoolNameInput] = useState('');
   const history = useHistory();
 
-  const { data: userName } = useUsername();
+  const { data: userName } = useUserName();
 
   const addSchoolMutation = useAddSchool();
 
