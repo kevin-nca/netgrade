@@ -134,6 +134,7 @@ export class SchoolService {
       (acc, grade) => acc + grade.weight,
       0,
     );
-    return totalScore / totalWeight;
+    const average = totalScore / totalWeight;
+    return Number(average.toFixed(1));
   }
 }

@@ -134,7 +134,7 @@ describe('SchoolService', () => {
         schoolId,
         mockGrades,
       );
-      expect(average).toBe(4.75);
+      expect(average).toBe(4.8);
     });
 
     it('should return undefined when grades array is undefined', () => {

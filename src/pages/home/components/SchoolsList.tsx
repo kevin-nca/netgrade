@@ -61,7 +61,7 @@ const SchoolsList: React.FC = () => {
                 <div className="school-average">
                   <IonIcon icon={statsChartOutline} className="stats-icon" />
                   <span className="school-info">
-                    {average ? `${average.toFixed(1)} Ø` : 'Keine Noten'}
+                    {average ? `${average} Ø` : 'Keine Noten'}
                   </span>
                 </div>
               </div>
