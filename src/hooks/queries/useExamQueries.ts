@@ -30,6 +30,7 @@ export interface AddExamPayload {
 export const UpcomingExamsQuery = {
   queryKey: examKeys.upcoming(),
   queryFn: () => ExamService.fetchUpcoming(),
+  staleTime: Infinity,
 } as const;
 
 export const useUpcomingExams = () => {

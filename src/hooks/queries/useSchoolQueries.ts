@@ -24,6 +24,7 @@ export interface AddSchoolPayload {
 export const SchoolQuery = {
   queryKey: schoolKeys.lists(),
   queryFn: () => SchoolService.fetchAll(),
+  staleTime: Infinity,
 } as const;
 
 export const useSchools = () => {

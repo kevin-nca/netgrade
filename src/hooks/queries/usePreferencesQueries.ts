@@ -24,6 +24,7 @@ export const preferencesKeys = {
 export const userNameQuery = {
   queryKey: preferencesKeys.userName(),
   queryFn: () => PreferencesService.getName(),
+  staleTime: Infinity,
 } as const;
 
 export const useUserName = () => {
