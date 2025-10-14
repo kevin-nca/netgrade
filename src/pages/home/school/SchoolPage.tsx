@@ -27,6 +27,7 @@ import {
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/components/modals/EditSubjectModal';
+import { SchoolService } from '@/services/SchoolService';
 import './SchoolPage.css';
 
 interface SubjectToAdd {
@@ -39,8 +40,6 @@ const SchoolPage: React.FC = () => {
   const [subjectToEdit, setSubjectToEdit] = useState<Subject | null>(null);
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
-
-  // hallo
 
   const { data: school = null, error: schoolError } = useSchool(schoolId);
   const { data: subjectsData = [], error: subjectsError } =
@@ -69,22 +68,6 @@ const SchoolPage: React.FC = () => {
     history.push(
       `${Routes.SUBJECT_GRADES.replace(':schoolId', schoolId).replace(':subjectId', subject.id)}`,
     );
-  };
-
-  const calculateAverage = (subject: Subject): number | null => {
-    const subjectGrades = grades.filter(
-      (grade) => grade.exam.subjectId === subject.id,
-    );
-    if (subjectGrades.length === 0) return null;
-    const totalScore = subjectGrades.reduce(
-      (acc, grade) => acc + Number(grade.score) * Number(grade.weight),
-      0,
-    );
-    const totalWeight = subjectGrades.reduce(
-      (acc, grade) => acc + Number(grade.weight),
-      0,
-    );
-    return totalWeight > 0 ? totalScore / totalWeight : null;
   };
 
   const addSubjectMutation = useAddSubject();
@@ -145,7 +128,10 @@ const SchoolPage: React.FC = () => {
       <IonContent>
         <IonList>
           {subjects.map((subject: Subject) => {
-            const average = calculateAverage(subject);
+            const average = SchoolService.calculateSubjectAverage(
+              subject.id,
+              grades,
+            );
 
             return (
               <IonItemSliding key={subject.id}>
@@ -154,7 +140,9 @@ const SchoolPage: React.FC = () => {
                     <div className="grade-subject">{subject.name}</div>
                     <div className="grade-average">
                       Durchschnitt:{' '}
-                      {average !== null ? average.toFixed(2) : 'Keine Noten'}
+                      {average !== undefined
+                        ? average.toFixed(1)
+                        : 'Keine Noten'}
                     </div>
                   </IonLabel>
                 </IonItem>

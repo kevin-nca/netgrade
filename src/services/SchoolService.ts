@@ -137,4 +137,36 @@ export class SchoolService {
     const average = totalScore / totalWeight;
     return Number(average.toFixed(1));
   }
+
+  /**
+   * Calculates the average grade for a specific subject
+   * @param subjectId - The ID of the subject
+   * @param grades - Array of grades to calculate from
+   * @returns number | undefined - The calculated average or undefined if no grades exist
+   */
+  static calculateSubjectAverage(
+    subjectId: string,
+    grades: Grade[] | undefined,
+  ): number | undefined {
+    if (!grades || grades.length === 0) return undefined;
+
+    const subjectGrades = grades.filter(
+      (grade) => grade.exam && grade.exam.subjectId === subjectId,
+    );
+    if (subjectGrades.length === 0) return undefined;
+
+    const totalScore = subjectGrades.reduce(
+      (acc, grade) => acc + grade.score * grade.weight,
+      0,
+    );
+    const totalWeight = subjectGrades.reduce(
+      (acc, grade) => acc + grade.weight,
+      0,
+    );
+
+    if (totalWeight === 0) return undefined;
+
+    const average = totalScore / totalWeight;
+    return Number(average.toFixed(1));
+  }
 }
