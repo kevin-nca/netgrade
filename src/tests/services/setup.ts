@@ -90,6 +90,8 @@ export const seedTestData = async (dataSource: DataSource) => {
   return { school, subject, exam, grade };
 };
 
+// ========== Mock Grades for School Average Tests ==========
+
 // Helper function to create mock grades for calculateSchoolAverage tests
 export const createMockGrades = (schoolId: string): Grade[] => {
   return [
@@ -209,24 +211,6 @@ export const createMockGradesWithDifferentWeights = (
   ];
 };
 
-// Helper function to create mock grades with zero weight
-export const createMockGradesWithZeroWeight = (schoolId: string): Grade[] => {
-  return [
-    {
-      id: '1',
-      score: 5.0,
-      weight: 0,
-      exam: {
-        id: 'exam1',
-        subject: {
-          id: 'subject1',
-          schoolId: schoolId,
-        } as Subject,
-      } as Exam,
-    } as Grade,
-  ];
-};
-
 // Helper function to create mock grades with missing exam relationship
 export const createMockGradesWithMissingExam = (schoolId: string): Grade[] => {
   return [
@@ -266,6 +250,160 @@ export const createMockGradesForOtherSchool = (
           id: 'subject1',
           schoolId: otherSchoolId,
         } as Subject,
+      } as Exam,
+    } as Grade,
+  ];
+};
+
+// ========== Mock Grades for Subject Average Tests ==========
+
+// Helper function to create mock grades for calculateSubjectAverage tests
+export const createMockSubjectGrades = (subjectId: string): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 5.0,
+      weight: 1,
+      exam: {
+        id: 'exam1',
+        subjectId: subjectId,
+      } as Exam,
+    } as Grade,
+    {
+      id: '2',
+      score: 4.0,
+      weight: 2,
+      exam: {
+        id: 'exam2',
+        subjectId: subjectId,
+      } as Exam,
+    } as Grade,
+    {
+      id: '3',
+      score: 6.0,
+      weight: 1,
+      exam: {
+        id: 'exam3',
+        subjectId: subjectId,
+      } as Exam,
+    } as Grade,
+  ];
+};
+
+// Helper function to create mock grades with multiple subjects
+export const createMockGradesWithMultipleSubjects = (
+  subjectId: string,
+  otherSubjectId: string,
+): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 5.0,
+      weight: 1,
+      exam: {
+        id: 'exam1',
+        subjectId: subjectId,
+      } as Exam,
+    } as Grade,
+    {
+      id: '2',
+      score: 3.0,
+      weight: 1,
+      exam: {
+        id: 'exam2',
+        subjectId: otherSubjectId,
+      } as Exam,
+    } as Grade,
+    {
+      id: '3',
+      score: 6.0,
+      weight: 1,
+      exam: {
+        id: 'exam3',
+        subjectId: subjectId,
+      } as Exam,
+    } as Grade,
+  ];
+};
+
+// Helper function to create mock subject grades with different weights
+export const createMockSubjectGradesWithDifferentWeights = (
+  subjectId: string,
+): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 6.0,
+      weight: 3,
+      exam: {
+        id: 'exam1',
+        subjectId: subjectId,
+      } as Exam,
+    } as Grade,
+    {
+      id: '2',
+      score: 4.0,
+      weight: 1,
+      exam: {
+        id: 'exam2',
+        subjectId: subjectId,
+      } as Exam,
+    } as Grade,
+  ];
+};
+
+// Helper function to create mock subject grades with zero weight
+export const createMockSubjectGradesWithZeroWeight = (
+  subjectId: string,
+): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 5.0,
+      weight: 0,
+      exam: {
+        id: 'exam1',
+        subjectId: subjectId,
+      } as Exam,
+    } as Grade,
+  ];
+};
+
+// Helper function to create mock subject grades with missing exam
+export const createMockSubjectGradesWithMissingExam = (
+  subjectId: string,
+): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 5.0,
+      weight: 1,
+      exam: {
+        id: 'exam1',
+        subjectId: subjectId,
+      } as Exam,
+    } as Grade,
+    {
+      id: '2',
+      score: 4.0,
+      weight: 1,
+      exam: null as unknown as Exam,
+    } as Grade,
+  ];
+};
+
+// Helper function to create mock grades for other subject
+export const createMockGradesForOtherSubject = (
+  otherSubjectId: string,
+): Grade[] => {
+  return [
+    {
+      id: '1',
+      score: 5.0,
+      weight: 1,
+      exam: {
+        id: 'exam1',
+        subjectId: otherSubjectId,
       } as Exam,
     } as Grade,
   ];

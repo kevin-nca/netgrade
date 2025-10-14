@@ -10,6 +10,12 @@ import {
   createMockGradesWithDifferentWeights,
   createMockGradesWithMissingExam,
   createMockGradesForOtherSchool,
+  createMockSubjectGrades,
+  createMockGradesWithMultipleSubjects,
+  createMockSubjectGradesWithDifferentWeights,
+  createMockSubjectGradesWithZeroWeight,
+  createMockSubjectGradesWithMissingExam,
+  createMockGradesForOtherSubject,
 } from './setup';
 import { School } from '@/db/entities/School';
 import { Exam, Grade, Subject } from '@/db/entities';
@@ -200,6 +206,122 @@ describe('SchoolService', () => {
         mockGrades,
       );
       expect(average).toBe(5.0);
+    });
+
+    it('should round average to 1 decimal place', () => {
+      const schoolId = 'test-school-id';
+      const mockGrades = createMockGrades(schoolId);
+
+      const average = SchoolService.calculateSchoolAverage(
+        schoolId,
+        mockGrades,
+      );
+      // Original calculation: (5.0*1 + 4.0*2 + 6.0*1) / 4 = 4.75
+      // Rounded to 1 decimal: 4.8
+      expect(average).toBe(4.8);
+    });
+  });
+
+  // Test calculateSubjectAverage method
+  describe('calculateSubjectAverage', () => {
+    it('should calculate the weighted average for a subject with grades', () => {
+      const subjectId = 'test-subject-id';
+      const mockGrades = createMockSubjectGrades(subjectId);
+
+      const average = SchoolService.calculateSubjectAverage(
+        subjectId,
+        mockGrades,
+      );
+      expect(average).toBe(4.8);
+    });
+
+    it('should return undefined when grades array is undefined', () => {
+      const average = SchoolService.calculateSubjectAverage(
+        'test-subject-id',
+        undefined,
+      );
+      expect(average).toBeUndefined();
+    });
+
+    it('should return undefined when grades array is empty', () => {
+      const average = SchoolService.calculateSubjectAverage(
+        'test-subject-id',
+        [],
+      );
+      expect(average).toBeUndefined();
+    });
+
+    it('should return undefined when no grades belong to the specified subject', () => {
+      const subjectId = 'test-subject-id';
+      const otherSubjectId = 'other-subject-id';
+      const mockGrades = createMockGradesForOtherSubject(otherSubjectId);
+
+      const average = SchoolService.calculateSubjectAverage(
+        subjectId,
+        mockGrades,
+      );
+      expect(average).toBeUndefined();
+    });
+
+    it('should only include grades from the specified subject', () => {
+      const subjectId = 'test-subject-id';
+      const otherSubjectId = 'other-subject-id';
+      const mockGrades = createMockGradesWithMultipleSubjects(
+        subjectId,
+        otherSubjectId,
+      );
+
+      const average = SchoolService.calculateSubjectAverage(
+        subjectId,
+        mockGrades,
+      );
+      expect(average).toBe(5.5);
+    });
+
+    it('should handle grades with different weights correctly', () => {
+      const subjectId = 'test-subject-id';
+      const mockGrades = createMockSubjectGradesWithDifferentWeights(subjectId);
+
+      const average = SchoolService.calculateSubjectAverage(
+        subjectId,
+        mockGrades,
+      );
+      expect(average).toBe(5.5);
+    });
+
+    it('should return undefined when total weight is zero', () => {
+      const subjectId = 'test-subject-id';
+      const mockGrades = createMockSubjectGradesWithZeroWeight(subjectId);
+
+      const average = SchoolService.calculateSubjectAverage(
+        subjectId,
+        mockGrades,
+      );
+      expect(average).toBeUndefined();
+    });
+
+    it('should handle grades with missing exam relationship gracefully', () => {
+      const subjectId = 'test-subject-id';
+      const mockGrades = createMockSubjectGradesWithMissingExam(subjectId);
+
+      const average = SchoolService.calculateSubjectAverage(
+        subjectId,
+        mockGrades,
+      );
+      expect(average).toBe(5.0);
+    });
+
+    it('should round average to 1 decimal place', () => {
+      const subjectId = 'test-subject-id';
+      const mockGrades = createMockSubjectGrades(subjectId);
+
+      const average = SchoolService.calculateSubjectAverage(
+        subjectId,
+        mockGrades,
+      );
+      // Original calculation: (5.0*1 + 4.0*2 + 6.0*1) / 4 = 4.75
+      // Rounded to 1 decimal: 4.8
+      expect(average).toBe(4.8);
     });
   });
 });
