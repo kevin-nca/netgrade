@@ -38,6 +38,8 @@ const setLastUsedSchool = (schoolId: string) => {
   if (schoolId) localStorage.setItem('lastUsedSchool', schoolId);
 };
 
+const FOCUS_DELAY_MS = 100;
+
 const AddExamPage: React.FC = () => {
   const history = useHistory();
   const [showToast, setShowToast] = useState(false);
@@ -151,7 +153,7 @@ const AddExamPage: React.FC = () => {
       setFieldErrors((prev) => ({ ...prev, selectedSubjectId: '' }));
 
       if (subjectId && titleRef.current) {
-        setTimeout(() => titleRef.current?.focus(), 100);
+        setTimeout(() => titleRef.current?.focus(), FOCUS_DELAY_MS);
       }
     },
     [form],
@@ -168,7 +170,7 @@ const AddExamPage: React.FC = () => {
 
   useEffect(() => {
     if (selectedSchoolId && subjects.length > 0 && subjectRef.current) {
-      setTimeout(() => subjectRef.current?.focus(), 100);
+      setTimeout(() => subjectRef.current?.focus(), FOCUS_DELAY_MS);
     }
   }, [selectedSchoolId, subjects.length]);
 
@@ -482,7 +484,6 @@ const AddExamPage: React.FC = () => {
                           onChange={(e) => field.handleChange(e.target.value)}
                           placeholder="Zusätzliche Notizen..."
                         />
-                        <div className="message-area"></div>
                       </div>
                     </div>
                   )}
