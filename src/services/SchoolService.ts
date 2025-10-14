@@ -109,7 +109,7 @@ export class SchoolService {
    * Calculates the average grade for a specific school
    * @param schoolId - The ID of the school
    * @param grades - Array of grades to calculate from
-   * @returns number | null - The calculated average or null if no grades exist
+   * @returns number | undefined - The calculated average or undefined if no grades exist
    */
   static calculateSchoolAverage(
     schoolId: string,
@@ -124,17 +124,23 @@ export class SchoolService {
         grade.exam.subject.schoolId &&
         grade.exam.subject.schoolId === schoolId,
     );
+
     if (schoolGrades.length === 0) return undefined;
 
-    const totalScore = schoolGrades.reduce(
-      (acc, grade) => acc + grade.score * grade.weight,
-      0,
-    );
-    const totalWeight = schoolGrades.reduce(
-      (acc, grade) => acc + grade.weight,
-      0,
-    );
-    const average = totalScore / totalWeight;
+    const subjectIds = [
+      ...new Set(schoolGrades.map((grade) => grade.exam.subjectId)),
+    ];
+
+    const subjectAverages = subjectIds
+      .map((subjectId) => this.calculateSubjectAverage(subjectId, grades))
+      .filter((avg): avg is number => avg !== undefined);
+
+    if (subjectAverages.length === 0) return undefined;
+
+    const totalScore = subjectAverages.reduce((acc, avg) => acc + avg, 0);
+    const totalCount = subjectAverages.length;
+    const average = totalScore / totalCount;
+
     return Number(average.toFixed(1));
   }
 

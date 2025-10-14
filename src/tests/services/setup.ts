@@ -146,6 +146,7 @@ export const createMockGradesWithMultipleSchools = (
       weight: 1,
       exam: {
         id: 'exam1',
+        subjectId: 'subject1', // ADD THIS
         subject: {
           id: 'subject1',
           schoolId: schoolId,
@@ -158,6 +159,7 @@ export const createMockGradesWithMultipleSchools = (
       weight: 1,
       exam: {
         id: 'exam2',
+        subjectId: 'subject2', // ADD THIS
         subject: {
           id: 'subject2',
           schoolId: otherSchoolId,
@@ -170,6 +172,7 @@ export const createMockGradesWithMultipleSchools = (
       weight: 1,
       exam: {
         id: 'exam3',
+        subjectId: 'subject3', // ADD THIS
         subject: {
           id: 'subject3',
           schoolId: schoolId,
