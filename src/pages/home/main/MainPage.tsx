@@ -12,13 +12,13 @@ import { useAddSchool, useUserName } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
-import ExamsList from '@/pages/home/components/ExamsList';
+import ExamsList from '@/pages/home/main/components/ExamsList';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-import SchoolsList from '@/pages/home/components/SchoolsList';
+import SchoolsList from '@/pages/home/main/components/SchoolsList';
 
-import './HomePage.css';
+import './MainPage.css';
 
-function HomePage() {
+function MainPage() {
   const [showNavigationModal, setShowNavigationModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const [schoolNameInput, setSchoolNameInput] = useState('');
@@ -147,4 +147,4 @@ function getGreeting() {
   return 'Guten Abend';
 }
 
-export default HomePage;
+export default MainPage;
