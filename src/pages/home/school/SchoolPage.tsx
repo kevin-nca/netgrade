@@ -140,9 +140,7 @@ const SchoolPage: React.FC = () => {
                     <div className="grade-subject">{subject.name}</div>
                     <div className="grade-average">
                       Durchschnitt:{' '}
-                      {average !== undefined
-                        ? average.toFixed(1)
-                        : 'Keine Noten'}
+                      {average !== undefined ? average : 'Keine Noten'}
                     </div>
                   </IonLabel>
                 </IonItem>
