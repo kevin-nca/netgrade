@@ -173,6 +173,6 @@ export class SchoolService {
     if (totalWeight === 0) return undefined;
 
     const average = totalScore / totalWeight;
-    return Number(average.toFixed(1));
+    return Number(average.toFixed(2));
   }
 }
