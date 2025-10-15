@@ -7,13 +7,12 @@ import {
   statsChartOutline,
 } from 'ionicons/icons';
 import { Routes } from '@/routes';
-import { useSchools, useGrades } from '@/hooks/queries';
+import { useSchools } from '@/hooks/queries';
 import { SchoolService } from '@/services/SchoolService';
 
 const SchoolsList: React.FC = () => {
   const history = useHistory();
   const { data: schools } = useSchools();
-  const { data: grades } = useGrades();
 
   const getSchoolIcon = (schoolName: string) => {
     return schoolName.charAt(0).toUpperCase();
@@ -36,7 +35,7 @@ const SchoolsList: React.FC = () => {
   return (
     <div className="schools-grid">
       {schools!.map((school, index) => {
-        const average = SchoolService.calculateSchoolAverage(school.id, grades);
+        const average = SchoolService.calculateSchoolAverage(school);
         return (
           <div
             key={school.id}
