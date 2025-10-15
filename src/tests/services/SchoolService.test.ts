@@ -291,7 +291,7 @@ describe('SchoolService', () => {
       expect(average).toBe(5.0);
     });
 
-    it('should round average to 1 decimal place', () => {
+    it('should round average to 2 decimal places', () => {
       const subjectId = 'test-subject-id';
       const mockGrades = createMockSubjectGrades(subjectId);
 
@@ -300,8 +300,8 @@ describe('SchoolService', () => {
         mockGrades,
       );
       // Original calculation: (5.0*1 + 4.0*2 + 6.0*1) / 4 = 4.75
-      // Rounded to 1 decimal: 4.8
-      expect(average).toBe(4.8);
+      // Rounded to 2 decimal places: 4.75
+      expect(average).toBe(4.75);
     });
   });
 });
