@@ -1,6 +1,7 @@
 import { getRepositories } from '@/db/data-source';
 import { School } from '@/db/entities/School';
 import { Grade } from '@/db/entities';
+import { Subject } from '@/db/entities/Subject';
 
 export class SchoolService {
   /**
@@ -10,7 +11,16 @@ export class SchoolService {
   static async fetchAll(): Promise<School[]> {
     try {
       const { school: schoolRepo } = getRepositories();
-      return await schoolRepo.find({ order: { name: 'ASC' } });
+      return await schoolRepo.find({
+        order: { name: 'ASC' },
+        relations: {
+          subjects: {
+            exams: {
+              grade: true,
+            },
+          },
+        },
+      });
     } catch (error) {
       console.error('Failed to fetch schools:', error);
       throw error;
@@ -107,32 +117,16 @@ export class SchoolService {
 
   /**
    * Calculates the average grade for a specific school
-   * @param schoolId - The ID of the school
-   * @param grades - Array of grades to calculate from
+   * @param school - The school entity with loaded subjects and their exams/grades relations
    * @returns number | undefined - The calculated average or undefined if no grades exist
    */
-  static calculateSchoolAverage(
-    schoolId: string,
-    grades: Grade[] | undefined,
-  ): number | undefined {
-    if (!grades || grades.length === 0) return undefined;
+  static calculateSchoolAverage(school: School): number | undefined {
+    // Check if school has subjects
+    if (!school.subjects || school.subjects.length === 0) return undefined;
 
-    const schoolGrades = grades.filter(
-      (grade) =>
-        grade.exam &&
-        grade.exam.subject &&
-        grade.exam.subject.schoolId &&
-        grade.exam.subject.schoolId === schoolId,
-    );
-
-    if (schoolGrades.length === 0) return undefined;
-
-    const subjectIds = [
-      ...new Set(schoolGrades.map((grade) => grade.exam.subjectId)),
-    ];
-
-    const subjectAverages = subjectIds
-      .map((subjectId) => this.calculateSubjectAverage(subjectId, grades))
+    // Calculate average for each subject
+    const subjectAverages = school.subjects
+      .map((subject) => this.calculateSubjectAverage(subject))
       .filter((avg): avg is number => avg !== undefined);
 
     if (subjectAverages.length === 0) return undefined;
@@ -146,29 +140,25 @@ export class SchoolService {
 
   /**
    * Calculates the average grade for a specific subject
-   * @param subjectId - The ID of the subject
-   * @param grades - Array of grades to calculate from
+   * @param subject - The subject entity with loaded exams and grades relations
    * @returns number | undefined - The calculated average or undefined if no grades exist
    */
-  static calculateSubjectAverage(
-    subjectId: string,
-    grades: Grade[] | undefined,
-  ): number | undefined {
-    if (!grades || grades.length === 0) return undefined;
+  static calculateSubjectAverage(subject: Subject): number | undefined {
+    // Extract grades from the subject's exams
+    const grades =
+      subject.exams
+        ?.map((exam) => exam.grade)
+        .filter(
+          (grade): grade is Grade => grade !== null && grade !== undefined,
+        ) || [];
 
-    const subjectGrades = grades.filter(
-      (grade) => grade.exam && grade.exam.subjectId === subjectId,
-    );
-    if (subjectGrades.length === 0) return undefined;
+    if (grades.length === 0) return undefined;
 
-    const totalScore = subjectGrades.reduce(
+    const totalScore = grades.reduce(
       (acc, grade) => acc + grade.score * grade.weight,
       0,
     );
-    const totalWeight = subjectGrades.reduce(
-      (acc, grade) => acc + grade.weight,
-      0,
-    );
+    const totalWeight = grades.reduce((acc, grade) => acc + grade.weight, 0);
 
     if (totalWeight === 0) return undefined;
 

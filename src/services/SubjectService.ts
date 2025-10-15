@@ -119,6 +119,11 @@ export class SubjectService {
       return await subjectRepo.find({
         where: { schoolId },
         order: { name: 'ASC' },
+        relations: {
+          exams: {
+            grade: true,
+          },
+        },
       });
     } catch (error) {
       console.error(
