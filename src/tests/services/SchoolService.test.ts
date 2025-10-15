@@ -8,7 +8,6 @@ import {
   createMockGrades,
   createMockGradesWithMultipleSchools,
   createMockGradesWithDifferentWeights,
-  createMockGradesWithMissingExam,
   createMockGradesForOtherSchool,
   createMockSubjectGrades,
   createMockGradesWithMultipleSubjects,
