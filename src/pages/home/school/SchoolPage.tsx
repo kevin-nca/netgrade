@@ -23,7 +23,6 @@ import {
   useAddSubject,
   useDeleteSubject,
   useUpdateSubject,
-  useGrades,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/components/modals/EditSubjectModal';
@@ -46,8 +45,6 @@ const SchoolPage: React.FC = () => {
     useSchoolSubjects(schoolId);
   const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
 
-  const { data: grades = [], error: gradesError } = useGrades();
-
   const updateSubjectMutation = useUpdateSubject();
 
   useEffect(() => {
@@ -59,9 +56,6 @@ const SchoolPage: React.FC = () => {
   }
   if (subjectsError) {
     console.error('Failed to fetch subjects:', subjectsError);
-  }
-  if (gradesError) {
-    console.error('Failed to fetch grades:', gradesError);
   }
 
   const goToGradesPage = (subject: Subject) => {
@@ -128,10 +122,7 @@ const SchoolPage: React.FC = () => {
       <IonContent>
         <IonList>
           {subjects.map((subject: Subject) => {
-            const average = SchoolService.calculateSubjectAverage(
-              subject.id,
-              grades,
-            );
+            const average = SchoolService.calculateSubjectAverage(subject);
 
             return (
               <IonItemSliding key={subject.id}>
