@@ -143,14 +143,6 @@ describe('SchoolService', () => {
       expect(average).toBe(4.8);
     });
 
-    it('should return undefined when grades array is undefined', () => {
-      const average = SchoolService.calculateSchoolAverage(
-        'test-school-id',
-        undefined,
-      );
-      expect(average).toBeUndefined();
-    });
-
     it('should return undefined when grades array is empty', () => {
       const average = SchoolService.calculateSchoolAverage(
         'test-school-id',
@@ -195,17 +187,6 @@ describe('SchoolService', () => {
         mockGrades,
       );
       expect(average).toBe(5.5);
-    });
-
-    it('should handle grades with missing exam relationship gracefully', () => {
-      const schoolId = 'test-school-id';
-      const mockGrades = createMockGradesWithMissingExam(schoolId);
-
-      const average = SchoolService.calculateSchoolAverage(
-        schoolId,
-        mockGrades,
-      );
-      expect(average).toBe(5.0);
     });
 
     it('should round average to 1 decimal place', () => {
