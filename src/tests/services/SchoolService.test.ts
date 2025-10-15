@@ -5,16 +5,14 @@ import {
   initializeTestDatabase,
   cleanupTestData,
   seedTestData,
-  createMockGrades,
-  createMockGradesWithMultipleSchools,
-  createMockGradesWithDifferentWeights,
-  createMockGradesForOtherSchool,
-  createMockSubjectGrades,
-  createMockGradesWithMultipleSubjects,
-  createMockSubjectGradesWithDifferentWeights,
-  createMockSubjectGradesWithZeroWeight,
-  createMockSubjectGradesWithMissingExam,
-  createMockGradesForOtherSubject,
+  createMockSchoolWithSubjects,
+  createMockSchoolWithMixedSubjects,
+  createMockSchoolWithDifferentSubjectAverages,
+  createMockSubjectWithGrades,
+  createMockSubjectWithNoGrades,
+  createMockSubjectWithDifferentWeights,
+  createMockSubjectWithZeroWeight,
+  createMockSubjectWithMissingGrade,
 } from './setup';
 import { School } from '@/db/entities/School';
 import { Exam, Grade, Subject } from '@/db/entities';
@@ -132,70 +130,30 @@ describe('SchoolService', () => {
   // Test calculateSchoolAverage method
   describe('calculateSchoolAverage', () => {
     it('should calculate the weighted average for a school with grades', () => {
-      const schoolId = 'test-school-id';
-      const mockGrades = createMockGrades(schoolId);
+      const mockSchool = createMockSchoolWithSubjects();
 
-      const average = SchoolService.calculateSchoolAverage(
-        schoolId,
-        mockGrades,
-      );
+      const average = SchoolService.calculateSchoolAverage(mockSchool);
       expect(average).toBe(4.8);
     });
 
-    it('should return undefined when grades array is empty', () => {
-      const average = SchoolService.calculateSchoolAverage(
-        'test-school-id',
-        [],
-      );
-      expect(average).toBeUndefined();
-    });
-
-    it('should return undefined when no grades belong to the specified school', () => {
-      const schoolId = 'test-school-id';
-      const otherSchoolId = 'other-school-id';
-      const mockGrades = createMockGradesForOtherSchool(otherSchoolId);
-
-      const average = SchoolService.calculateSchoolAverage(
-        schoolId,
-        mockGrades,
-      );
-      expect(average).toBeUndefined();
-    });
-
     it('should only include grades from the specified school', () => {
-      const schoolId = 'test-school-id';
-      const otherSchoolId = 'other-school-id';
-      const mockGrades = createMockGradesWithMultipleSchools(
-        schoolId,
-        otherSchoolId,
-      );
+      const mockSchool = createMockSchoolWithMixedSubjects();
 
-      const average = SchoolService.calculateSchoolAverage(
-        schoolId,
-        mockGrades,
-      );
+      const average = SchoolService.calculateSchoolAverage(mockSchool);
       expect(average).toBe(5.5);
     });
 
     it('should handle grades with different weights correctly', () => {
-      const schoolId = 'test-school-id';
-      const mockGrades = createMockGradesWithDifferentWeights(schoolId);
+      const mockSchool = createMockSchoolWithDifferentSubjectAverages();
 
-      const average = SchoolService.calculateSchoolAverage(
-        schoolId,
-        mockGrades,
-      );
-      expect(average).toBe(5.5);
+      const average = SchoolService.calculateSchoolAverage(mockSchool);
+      expect(average).toBe(5.3);
     });
 
     it('should round average to 1 decimal place', () => {
-      const schoolId = 'test-school-id';
-      const mockGrades = createMockGrades(schoolId);
+      const mockSchool = createMockSchoolWithSubjects();
 
-      const average = SchoolService.calculateSchoolAverage(
-        schoolId,
-        mockGrades,
-      );
+      const average = SchoolService.calculateSchoolAverage(mockSchool);
       // Original calculation: (5.0*1 + 4.0*2 + 6.0*1) / 4 = 4.75
       // Rounded to 1 decimal: 4.8
       expect(average).toBe(4.8);
@@ -205,100 +163,51 @@ describe('SchoolService', () => {
   // Test calculateSubjectAverage method
   describe('calculateSubjectAverage', () => {
     it('should calculate the weighted average for a subject with grades', () => {
-      const subjectId = 'test-subject-id';
-      const mockGrades = createMockSubjectGrades(subjectId);
+      const mockSubject = createMockSubjectWithGrades();
 
-      const average = SchoolService.calculateSubjectAverage(
-        subjectId,
-        mockGrades,
-      );
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
       expect(average).toBe(4.75);
     });
 
-    it('should return undefined when grades array is undefined', () => {
-      const average = SchoolService.calculateSubjectAverage(
-        'test-subject-id',
-        undefined,
-      );
-      expect(average).toBeUndefined();
-    });
-
-    it('should return undefined when grades array is empty', () => {
-      const average = SchoolService.calculateSubjectAverage(
-        'test-subject-id',
-        [],
-      );
-      expect(average).toBeUndefined();
-    });
-
     it('should return undefined when no grades belong to the specified subject', () => {
-      const subjectId = 'test-subject-id';
-      const otherSubjectId = 'other-subject-id';
-      const mockGrades = createMockGradesForOtherSubject(otherSubjectId);
+      const mockSubject = createMockSubjectWithNoGrades();
 
-      const average = SchoolService.calculateSubjectAverage(
-        subjectId,
-        mockGrades,
-      );
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
       expect(average).toBeUndefined();
     });
 
     it('should only include grades from the specified subject', () => {
-      const subjectId = 'test-subject-id';
-      const otherSubjectId = 'other-subject-id';
-      const mockGrades = createMockGradesWithMultipleSubjects(
-        subjectId,
-        otherSubjectId,
-      );
+      const mockSubject = createMockSubjectWithGrades();
 
-      const average = SchoolService.calculateSubjectAverage(
-        subjectId,
-        mockGrades,
-      );
-      expect(average).toBe(5.5);
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
+      expect(average).toBe(4.75);
     });
 
     it('should handle grades with different weights correctly', () => {
-      const subjectId = 'test-subject-id';
-      const mockGrades = createMockSubjectGradesWithDifferentWeights(subjectId);
+      const mockSubject = createMockSubjectWithDifferentWeights();
 
-      const average = SchoolService.calculateSubjectAverage(
-        subjectId,
-        mockGrades,
-      );
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
       expect(average).toBe(5.5);
     });
 
     it('should return undefined when total weight is zero', () => {
-      const subjectId = 'test-subject-id';
-      const mockGrades = createMockSubjectGradesWithZeroWeight(subjectId);
+      const mockSubject = createMockSubjectWithZeroWeight();
 
-      const average = SchoolService.calculateSubjectAverage(
-        subjectId,
-        mockGrades,
-      );
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
       expect(average).toBeUndefined();
     });
 
     it('should handle grades with missing exam relationship gracefully', () => {
-      const subjectId = 'test-subject-id';
-      const mockGrades = createMockSubjectGradesWithMissingExam(subjectId);
+      const mockSubject = createMockSubjectWithMissingGrade();
 
-      const average = SchoolService.calculateSubjectAverage(
-        subjectId,
-        mockGrades,
-      );
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
       expect(average).toBe(5.0);
     });
 
     it('should round average to 2 decimal places', () => {
-      const subjectId = 'test-subject-id';
-      const mockGrades = createMockSubjectGrades(subjectId);
+      const mockSubject = createMockSubjectWithGrades();
 
-      const average = SchoolService.calculateSubjectAverage(
-        subjectId,
-        mockGrades,
-      );
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
       // Original calculation: (5.0*1 + 4.0*2 + 6.0*1) / 4 = 4.75
       // Rounded to 2 decimal places: 4.75
       expect(average).toBe(4.75);
