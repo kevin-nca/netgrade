@@ -121,9 +121,6 @@ export class SchoolService {
    * @returns number | undefined - The calculated average or undefined if no grades exist
    */
   static calculateSchoolAverage(school: School): number | undefined {
-    // Check if school has subjects
-    if (!school.subjects || school.subjects.length === 0) return undefined;
-
     // Calculate average for each subject
     const subjectAverages = school.subjects
       .map((subject) => this.calculateSubjectAverage(subject))
@@ -145,12 +142,9 @@ export class SchoolService {
    */
   static calculateSubjectAverage(subject: Subject): number | undefined {
     // Extract grades from the subject's exams
-    const grades =
-      subject.exams
-        ?.map((exam) => exam.grade)
-        .filter(
-          (grade): grade is Grade => grade !== null && grade !== undefined,
-        ) || [];
+    const grades = subject.exams
+      ?.map((exam) => exam.grade)
+      .filter((grade): grade is Grade => grade !== null && grade !== undefined);
 
     if (grades.length === 0) return undefined;
 
