@@ -169,7 +169,7 @@ export const GradeForm: React.FC<GradeFormProps> = ({
                     }
                     min={0}
                     max={100}
-                    step={1}
+                    step={5}
                     snaps
                     className={styles.rangeInput}
                   />

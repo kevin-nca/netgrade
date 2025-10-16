@@ -9,7 +9,7 @@
 
 .formCardHeader {
   padding: 16px;
-  background: #15529a;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
   color: white;
   border-bottom: none;
 }
@@ -89,9 +89,10 @@ ion-label.formItemLabel {
   margin: 0;
   height: 40px;
   font-size: 14px;
+  color: white;
   --border-radius: 10px;
   --box-shadow: 0 2px 6px rgba(21, 82, 154, 0.25);
-  --background: #15529a;
+  --background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);;
 }
 
 .buttonContent {
@@ -119,4 +120,33 @@ ion-label.formItemLabel {
   width: 16px;
   margin-right: 8px;
   opacity: 0.9;
+}
+
+@media (prefers-color-scheme: dark) {
+  .formCard {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .formCardContent {
+    background: #1e1e28;
+  }
+
+  .formCardFooter {
+    background: #1e1e28;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  ion-label.formItemLabel {
+    color: #4ea1ff !important;
+  }
+
+  .formItem {
+    --background: #2c2c36;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  .formInput {
+    --placeholder-color: #666680;
+    color: #ddd;
+  }
 }

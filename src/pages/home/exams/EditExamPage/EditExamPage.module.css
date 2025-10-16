@@ -1,662 +1,224 @@
+/* ===== Page/Layout ===== */
 .container {
-  padding: 16px;
+  padding: 0 16px 16px;
+  position: relative;
 }
 
+/* ===== Glass Cards (Header, Loading, Error) ===== */
+.loadingCard,
+.errorCard,
 .headerCard {
-  background: #15529a;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.15);
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  margin: 0 0 24px 0;
+  overflow: hidden;
 }
 
-.headerCardContent {
-  padding: 20px;
-}
+.headerCard { margin-top: 10px; }
+.headerCardContent { padding: 14px 16px; }
 
 .headerCardTitle {
-  font-size: 1.3rem;
+  font-size: 18px;
   font-weight: 700;
-  color: white;
-  margin-bottom: 8px;
+  letter-spacing: -0.2px;
+  color: #000000;
+  margin: 0 0 2px 0;
 }
 
-.headerCardSubtitle {
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.9);
-}
+.headerCardSubtitle { color: rgb(0, 0, 0); }
+.headerCardInfo { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; }
+.headerCardInfoRow { display: inline-flex; align-items: center; gap: 8px; }
 
-.headerCardInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+/* ===== Loading Skeletons ===== */
+.skeletonTitle { width: 60%; height: 20px; border-radius: 8px; }
+.skeletonText { width: 90%; height: 14px; border-radius: 8px; margin-top: 10px; }
+.skeletonTextShort { width: 40%; height: 14px; border-radius: 8px; margin-top: 10px; }
 
-.headerCardInfoRow {
+/* ===== Error Card ===== */
+.errorCardTitle {
   display: flex;
   align-items: center;
   gap: 8px;
+  color: #fff;
+  font-weight: 700;
 }
+.errorCardText { color: rgba(255,255,255,0.85); }
 
+/* ===== Segment (Tabs) ===== */
 .segment {
-  background: #f0f2ff;
-  border-radius: 12px;
-  height: 54px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin: 0 0 24px 0;
+  margin-top: 8px;
+  --background: transparent;
 }
-
 .segmentButton {
-  border-radius: 8px;
-  margin: 5px;
-  min-height: 44px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
+  --color-checked: #fff;
+  --indicator-color: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
 }
-
 .segmentLabel {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.loadingCard {
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin: 16px;
-}
-
-.skeletonTitle {
-  width: 60%;
-  height: 25px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-}
-
-.skeletonText {
-  width: 100%;
-  height: 20px;
-  margin-bottom: 10px;
-  border-radius: 6px;
-}
-
-.skeletonTextShort {
-  width: 80%;
-  height: 20px;
-  border-radius: 6px;
-}
-
-.errorCard {
-  background: #ff6b6b;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: none;
-}
-
-.errorCardTitle {
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.errorCardText {
-  color: white;
-  margin-bottom: 16px;
-}
-
-/* Form Card Styles */
-.formCard {
-  margin: 12px;
-  padding: 0;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.formCardHeader {
-  padding: 16px;
-  background: #15529a;
-  color: white;
-  border-bottom: none;
-}
-
-.formCardHeader.textCenter {
-  text-align: center;
-}
-
-.headerCardIcon {
-  margin-bottom: 12px;
-}
-
-.headerCardIconLarge {
-  font-size: 48px;
-  color: white;
-  opacity: 0.9;
-}
-
-.formCardTitle {
-  font-size: 18px;
-  margin: 0;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  color: white;
-}
-
-.formCardTitle.textWhite {
-  color: white;
-}
-
-.formCardContent {
-  padding: 8px 12px;
-  background: #f9f9fc;
-}
-
-.formCardFooter {
-  padding: 12px 16px;
-  background: #f9f9fc;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-/* Form Elements */
-.formItemGroup {
-  margin: 8px 0;
-}
-
-.formItemDivider {
-  min-height: 34px;
-  padding: 6px 8px;
-  background: transparent;
-  border-bottom: none;
-  --ion-item-border-color: transparent;
-}
-
-.formItemIcon {
-  font-size: 18px;
-  margin-right: 8px;
-}
-
-ion-label.formItemLabel {
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  color: #15529a !important;
-  margin-bottom: 2px !important;
-  letter-spacing: 0.01em !important;
-  line-height: 1.2 !important;
-  display: block !important;
-}
-
-.formItem {
-  --border-width: 0;
-  --background: white;
-  --border-radius: 10px;
-  --padding-start: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  margin-bottom: 2px;
-}
-
-.formInput {
-  font-size: 14px;
-  --padding-top: 8px;
-  --padding-bottom: 8px;
-  --placeholder-color: #a0a0b0;
-  --placeholder-opacity: 0.6;
-  color: #444;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-/* Button Styles */
-.buttonGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.buttonContent {
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.buttonContentSmall {
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.buttonContentSave {
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500;
-}
-
-.saveIcon {
-  margin-right: 8px;
-  font-size: 18px;
-}
-
-.spinner {
-  height: 16px;
-  width: 16px;
-  margin-right: 8px;
-  opacity: 0.9;
-}
-
-.formButton {
-  margin: 0;
-  height: 40px;
-  font-size: 14px;
-  --border-radius: 10px;
-  --box-shadow: 0 2px 6px rgba(21, 82, 154, 0.25);
-  --background: #15529a;
-}
-
-.successButton {
-  margin: 0;
-  height: 40px;
-  font-size: 14px;
-  --border-radius: 10px;
-  --box-shadow: 0 2px 6px rgba(40, 167, 69, 0.25);
-  --background: #28a745;
-}
-
-.cancelButton {
-  margin: 0;
-  height: 40px;
-  font-size: 14px;
-  --border-radius: 10px;
-  --border-color: #15529a;
-  --color: #15529a;
-}
-
-/* Grade input styling */
-.gradeInputContainer {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-.gradeInputSmall {
-  background: white;
-  display: flex;
-  align-items: center;
-}
-
-.rangeContainer {
-  flex: 1;
-  padding: 0 11px;
-}
-
-.rangeInput {
-  --bar-height: 4px;
-  --knob-size: 18px;
-  width: 100%;
-  padding: 0;
-}
-
-/* Modal Styles */
+/* ===== Modal (Grade Confirm) ===== */
 .modal {
-  --background: rgba(0, 0, 0, 0.5);
-  --backdrop-opacity: 0.8;
+  --height: auto;
+  --width: auto;
+  --backdrop-opacity: 0.6;
+  --backdrop-color: #000;
 }
-
 .modalContent {
-  --background: #f5f7fa;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  border-radius: 24px;
+  padding: 20px 16px 16px;
+  margin: 20px;
+  color: #fff;
 }
 
-/* Header Styles */
 .modalHeader {
-  background: linear-gradient(135deg, #15529a 0%, #1e6bb8 100%);
-  padding: 32px 24px 24px;
-  position: relative;
-  overflow: hidden;
-}
-
-.modalHeader::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.1) 0%,
-    transparent 70%
-  );
-  animation: pulse 3s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.3;
-  }
-}
-
-.closeButton {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.closeButton {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 4px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 10;
 }
-
-.closeButton:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
-}
-
-.closeIcon {
-  font-size: 20px;
-  color: white;
-}
+.closeIcon { width: 24px; height: 24px; color: rgba(255,255,255,0.8); }
 
 .modalTitle {
-  font-size: 24px;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 8px;
-  letter-spacing: -0.5px;
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
 }
-
 .modalSubtitle {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 400;
+  margin: 2px 0 0 0;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
 }
 
-/* Content Container */
-.contentContainer {
-  flex: 1;
-  padding: 24px 16px;
-  overflow-y: auto;
-}
+/* ===== Modal Content Elements ===== */
+.contentContainer { display: grid; gap: 14px; }
 
-/* Grade Display Card */
 .gradeCard {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 10px 30px rgba(21, 82, 154, 0.15);
-  position: relative;
-  overflow: hidden;
+  display: grid;
+  justify-items: center;
+  padding: 10px 0 4px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
 }
+.animateIn { animation: fadeIn .24s ease-out both; }
+@keyframes fadeIn { from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none} }
 
-.gradeCard::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(135deg, #15529a, #28a745);
-  border-radius: 20px;
-  opacity: 0;
-  z-index: -1;
-  transition: opacity 0.3s ease;
-}
-
-.gradeCard:hover::before {
-  opacity: 0.1;
-}
-
-.gradeDisplay {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
+.gradeDisplay { display: grid; place-items: center; margin: 6px 0; }
 .gradeCircle {
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 28px;
+  color: #fff;
 }
+.gradeValue { line-height: 1; }
+.gradeLabel { margin: 4px 0 8px; color: rgba(255,255,255,0.7); font-weight: 600; }
 
-.gradeCircle.success {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-}
+.success { background: linear-gradient(135deg,#00c853,#009688); }
+.warning { background: linear-gradient(135deg,#ffb300,#ff6f00); }
+.danger  { background: linear-gradient(135deg,#ff5252,#d50000); }
+.neutral { background: linear-gradient(135deg,#4f46e5,#0ea5e9); }
 
-.gradeCircle.primary {
-  background: linear-gradient(135deg, #15529a 0%, #1e6bb8 100%);
-}
-
-.gradeCircle.warning {
-  background: linear-gradient(135deg, #ffc107 0%, #ffb347 100%);
-}
-
-.gradeCircle.danger {
-  background: linear-gradient(135deg, #dc3545 0%, #ff6b6b 100%);
-}
-
-.gradeValue {
-  font-size: 32px;
-  font-weight: 700;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.gradeLabel {
-  text-align: center;
-  font-size: 14px;
-  color: #6c757d;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 500;
-}
-
-/* Info Cards */
+/* Info Grid */
 .infoGrid {
   display: grid;
-  gap: 12px;
-  margin-bottom: 20px;
+  grid-template-columns: 1fr;
+  gap: 10px;
 }
-
 .infoCard {
-  background: white;
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 12px;
 }
-
-.infoCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
 .infoCardHeader {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 6px;
 }
-
 .infoIcon {
-  font-size: 20px;
-  color: #15529a;
-  background: rgba(21, 82, 154, 0.1);
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 28px; height: 28px; border-radius: 8px;
+  display: grid; place-items: center;
+  background: linear-gradient(135deg,#007aff,#0051d5);
+  box-shadow: 0 2px 8px rgba(0,122,255,0.25);
 }
+.infoLabel { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.85); }
+.infoValue { font-weight: 600; color: #fff; }
+.commentCard { }
+.commentText { color: rgba(255,255,255,0.85); margin: 0; }
 
-.infoLabel {
-  font-size: 13px;
-  color: #6c757d;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.infoValue {
-  font-size: 16px;
-  color: #2c3e50;
-  font-weight: 600;
-  padding-left: 46px;
-}
-
-/* Comment Card */
-.commentCard {
-  background: #f8f9ff;
-  border-left: 4px solid #15529a;
-}
-
-.commentText {
-  font-size: 15px;
-  color: #495057;
-  line-height: 1.6;
-  font-style: italic;
-}
-
-/* Action Buttons */
-.actionContainer {
-  padding: 16px;
-  background: white;
-  border-top: 1px solid #e9ecef;
-}
-
-.buttonGroup {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
+/* ===== Modal Actions ===== */
+.actionContainer { margin-top: 8px; }
+.buttonGroup { display: flex; gap: 10px; }
 .confirmButton,
 .cancelButton {
-  min-height: 52px;
+  height: 52px;
   border-radius: 12px;
-  padding: 14px 20px;
-  font-size: 16px;
-  font-weight: 600;
+  padding: 0 16px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: none;
-  width: 100%;
+  border: 0;
 }
-
 .confirmButton {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  flex: 1;
+  color: #fff;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  box-shadow: 0 4px 16px rgba(0,122,255,0.35);
 }
-
-.confirmButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-}
-
-.confirmButton:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
+.confirmButton:disabled { opacity: .7; box-shadow: 0 4px 16px rgba(0,122,255,0.2); cursor: not-allowed; }
 .cancelButton {
-  background: white;
-  color: #15529a;
-  border: 2px solid #e9ecef;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  flex: 1;
+  color: #0051d5;
+  background: rgba(255,255,255,0.9);
 }
-
-.cancelButton:hover {
-  border-color: #15529a;
-  background: rgba(21, 82, 154, 0.05);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.buttonIcon {
-  font-size: 20px;
-}
-
+.buttonIcon { width: 20px; height: 20px; }
 .spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  animation: spin .9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== Responsive ===== */
+@media (min-width: 480px) {
+  .infoGrid { grid-template-columns: 1fr 1fr; }
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+@media (prefers-color-scheme: dark) {
+  .headerCardTitle { color: #fff; }
+  .headerCardSubtitle { color: rgba(255,255,255,0.85); }
+  .errorCardTitle { color: #fff; }
+  .errorCardText { color: rgba(255,255,255,0.85); }
 }
 
-/* Success Animation */
-@keyframes successPulse {
-  0% {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.gradeCard.animateIn {
-  animation: successPulse 0.5s ease-out;
-}
-
-@media (max-width: 380px) {
-  .modalHeader {
-    padding: 24px 20px 20px;
-  }
-
-  .gradeCircle {
-    width: 70px;
-    height: 70px;
-  }
-
-  .gradeValue {
-    font-size: 28px;
-  }
-
-  .buttonGroup {
-    grid-template-columns: 1fr;
-  }
-}
