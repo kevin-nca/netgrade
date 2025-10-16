@@ -31,7 +31,6 @@ import {
   checkmarkCircleOutline,
   alertCircleOutline,
   trophyOutline,
-  closeCircleOutline,
   chatbubbleOutline,
   scaleOutline,
   documentTextOutline,
@@ -389,12 +388,7 @@ const EditExamPage: React.FC = () => {
                 <button
                   className={styles.closeButton}
                   onClick={() => setShowGradeConfirmModal(false)}
-                >
-                  <IonIcon
-                    icon={closeCircleOutline}
-                    className={styles.closeIcon}
-                  />
-                </button>
+                ></button>
                 <h2 className={styles.modalTitle}>Note bestätigen</h2>
                 <p className={styles.modalSubtitle}>
                   Überprüfe deine Eingaben vor dem Speichern

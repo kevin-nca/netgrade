@@ -1,9 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import {
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
   IonList,
   IonItem,
   IonItemGroup,
@@ -15,7 +12,6 @@ import {
   IonRange,
 } from '@ionic/react';
 import {
-  ribbonOutline,
   checkmarkCircleOutline,
   trophyOutline,
   scaleOutline,
@@ -73,21 +69,6 @@ export const GradeForm: React.FC<GradeFormProps> = ({
 
   return (
     <>
-      <IonCard className={styles.warningCard}>
-        <IonCardHeader className={styles.warningCardHeader}>
-          <IonCardTitle className={styles.warningCardTitle}>
-            <IonIcon icon={ribbonOutline} className={styles.formItemIcon} />
-            Prüfung abschliessen
-          </IonCardTitle>
-        </IonCardHeader>
-        <IonCardContent>
-          <p className={styles.warningCardText}>
-            Nach dem Eintragen der Note wird die Prüfung als erledigt markiert
-            und aus den anstehenden Prüfungen entfernt.
-          </p>
-        </IonCardContent>
-      </IonCard>
-
       <IonCard className={styles.formCard}>
         <div className={styles.formCardHeader}>
           <h2 className={styles.formCardTitle}>Note eintragen</h2>

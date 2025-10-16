@@ -92,7 +92,7 @@ ion-label.formItemLabel {
   color: white;
   --border-radius: 10px;
   --box-shadow: 0 2px 6px rgba(21, 82, 154, 0.25);
-  --background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);;
+  --background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
 }
 
 .buttonContent {
