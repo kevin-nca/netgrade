@@ -124,7 +124,7 @@ export class SchoolService {
     // Calculate average for each subject
     const subjectAverages = school.subjects
       .map((subject) => this.calculateSubjectAverage(subject))
-      .filter((avg): avg is number => avg !== undefined);
+      .filter((avg) => avg !== undefined);
 
     if (subjectAverages.length === 0) return undefined;
 
