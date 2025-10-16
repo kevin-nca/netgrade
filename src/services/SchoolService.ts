@@ -144,7 +144,7 @@ export class SchoolService {
     // Extract grades from the subject's exams
     const grades = subject.exams
       .map((exam) => exam.grade)
-      .filter((grade): grade is Grade => grade !== null && grade !== undefined);
+      .filter((grade): grade is Grade => grade !== null);
 
     if (grades.length === 0) return undefined;
 
