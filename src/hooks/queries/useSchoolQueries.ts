@@ -20,11 +20,15 @@ export interface AddSchoolPayload {
 }
 
 // Hooks
+
+export const SchoolQuery = {
+  queryKey: schoolKeys.lists(),
+  queryFn: () => SchoolService.fetchAll(),
+  staleTime: Infinity,
+} as const;
+
 export const useSchools = () => {
-  return useQuery({
-    queryKey: schoolKeys.lists(),
-    queryFn: () => SchoolService.fetchAll(),
-  });
+  return useQuery(SchoolQuery);
 };
 
 export const useSchool = (id: string) => {

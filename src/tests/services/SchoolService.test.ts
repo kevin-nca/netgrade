@@ -1,7 +1,19 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
 import { SchoolService } from '@/services/SchoolService';
-import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
+import {
+  initializeTestDatabase,
+  cleanupTestData,
+  seedTestData,
+  createMockSchoolWithSubjects,
+  createMockSchoolWithMixedSubjects,
+  createMockSchoolWithDifferentSubjectAverages,
+  createMockSubjectWithGrades,
+  createMockSubjectWithNoGrades,
+  createMockSubjectWithDifferentWeights,
+  createMockSubjectWithZeroWeight,
+  createMockSubjectWithMissingGrade,
+} from './setup';
 import { School } from '@/db/entities/School';
 import { Exam, Grade, Subject } from '@/db/entities';
 
@@ -113,5 +125,92 @@ describe('SchoolService', () => {
   // Test error handling for delete method
   it('should throw an error when deleting a non-existent school', async () => {
     await expect(SchoolService.delete('non-existent-id')).rejects.toThrow();
+  });
+
+  // Test calculateSchoolAverage method
+  describe('calculateSchoolAverage', () => {
+    it('should calculate the weighted average for a school with grades', () => {
+      const mockSchool = createMockSchoolWithSubjects();
+
+      const average = SchoolService.calculateSchoolAverage(mockSchool);
+      expect(average).toBe(4.8);
+    });
+
+    it('should only include grades from the specified school', () => {
+      const mockSchool = createMockSchoolWithMixedSubjects();
+
+      const average = SchoolService.calculateSchoolAverage(mockSchool);
+      expect(average).toBe(5.5);
+    });
+
+    it('should handle grades with different weights correctly', () => {
+      const mockSchool = createMockSchoolWithDifferentSubjectAverages();
+
+      const average = SchoolService.calculateSchoolAverage(mockSchool);
+      expect(average).toBe(5.3);
+    });
+
+    it('should round average to 1 decimal place', () => {
+      const mockSchool = createMockSchoolWithSubjects();
+
+      const average = SchoolService.calculateSchoolAverage(mockSchool);
+      // Original calculation: (5.0*1 + 4.0*2 + 6.0*1) / 4 = 4.75
+      // Rounded to 1 decimal: 4.8
+      expect(average).toBe(4.8);
+    });
+  });
+
+  // Test calculateSubjectAverage method
+  describe('calculateSubjectAverage', () => {
+    it('should calculate the weighted average for a subject with grades', () => {
+      const mockSubject = createMockSubjectWithGrades();
+
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
+      expect(average).toBe(4.75);
+    });
+
+    it('should return undefined when no grades belong to the specified subject', () => {
+      const mockSubject = createMockSubjectWithNoGrades();
+
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
+      expect(average).toBeUndefined();
+    });
+
+    it('should only include grades from the specified subject', () => {
+      const mockSubject = createMockSubjectWithGrades();
+
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
+      expect(average).toBe(4.75);
+    });
+
+    it('should handle grades with different weights correctly', () => {
+      const mockSubject = createMockSubjectWithDifferentWeights();
+
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
+      expect(average).toBe(5.5);
+    });
+
+    it('should return undefined when total weight is zero', () => {
+      const mockSubject = createMockSubjectWithZeroWeight();
+
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
+      expect(average).toBeUndefined();
+    });
+
+    it('should handle grades with missing exam relationship gracefully', () => {
+      const mockSubject = createMockSubjectWithMissingGrade();
+
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
+      expect(average).toBe(5.0);
+    });
+
+    it('should round average to 2 decimal places', () => {
+      const mockSubject = createMockSubjectWithGrades();
+
+      const average = SchoolService.calculateSubjectAverage(mockSubject);
+      // Original calculation: (5.0*1 + 4.0*2 + 6.0*1) / 4 = 4.75
+      // Rounded to 2 decimal places: 4.75
+      expect(average).toBe(4.75);
+    });
   });
 });

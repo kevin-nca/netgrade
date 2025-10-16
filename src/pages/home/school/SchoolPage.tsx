@@ -20,13 +20,13 @@ import { Subject } from '@/db/entities';
 import {
   useSchool,
   useSchoolSubjects,
-  useGrades,
   useAddSubject,
   useDeleteSubject,
   useUpdateSubject,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/components/modals/EditSubjectModal';
+import { SchoolService } from '@/services/SchoolService';
 import './SchoolPage.css';
 
 interface SubjectToAdd {
@@ -40,14 +40,10 @@ const SchoolPage: React.FC = () => {
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
-  // hallo
-
   const { data: school = null, error: schoolError } = useSchool(schoolId);
   const { data: subjectsData = [], error: subjectsError } =
     useSchoolSubjects(schoolId);
   const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
-
-  const { data: grades = [], error: gradesError } = useGrades();
 
   const updateSubjectMutation = useUpdateSubject();
 
@@ -61,30 +57,11 @@ const SchoolPage: React.FC = () => {
   if (subjectsError) {
     console.error('Failed to fetch subjects:', subjectsError);
   }
-  if (gradesError) {
-    console.error('Failed to fetch grades:', gradesError);
-  }
 
   const goToGradesPage = (subject: Subject) => {
     history.push(
       `${Routes.SUBJECT_GRADES.replace(':schoolId', schoolId).replace(':subjectId', subject.id)}`,
     );
-  };
-
-  const calculateAverage = (subject: Subject): number | null => {
-    const subjectGrades = grades.filter(
-      (grade) => grade.exam.subjectId === subject.id,
-    );
-    if (subjectGrades.length === 0) return null;
-    const totalScore = subjectGrades.reduce(
-      (acc, grade) => acc + Number(grade.score) * Number(grade.weight),
-      0,
-    );
-    const totalWeight = subjectGrades.reduce(
-      (acc, grade) => acc + Number(grade.weight),
-      0,
-    );
-    return totalWeight > 0 ? totalScore / totalWeight : null;
   };
 
   const addSubjectMutation = useAddSubject();
@@ -144,45 +121,47 @@ const SchoolPage: React.FC = () => {
       />
       <IonContent>
         <IonList>
-          {subjects.map((subject: Subject) => (
-            <IonItemSliding key={subject.id}>
-              <IonItem button onClick={() => goToGradesPage(subject)}>
-                <IonLabel className="glass-card grade-card">
-                  <div className="grade-subject">{subject.name}</div>
-                  <div className="grade-average">
-                    Durchschnitt:{' '}
-                    {calculateAverage(subject) !== null
-                      ? calculateAverage(subject)?.toFixed(2)
-                      : 'Keine Noten'}
-                  </div>
-                </IonLabel>
-              </IonItem>
-              <IonItemOptions side="end">
-                <IonItemOption
-                  color="primary"
-                  onClick={() => {
-                    setSubjectToEdit(subject);
-                    setEditModalOpen(true);
-                  }}
-                >
-                  Bearbeiten
-                </IonItemOption>
-                <IonItemOption
-                  color="danger"
-                  onClick={(e) => {
-                    const slidingItem = (e.target as Element).closest(
-                      'ion-item-sliding',
-                    ) as HTMLIonItemSlidingElement;
-                    if (slidingItem) {
-                      handleRemoveSubject(subject, slidingItem);
-                    }
-                  }}
-                >
-                  Löschen
-                </IonItemOption>
-              </IonItemOptions>
-            </IonItemSliding>
-          ))}
+          {subjects.map((subject: Subject) => {
+            const average = SchoolService.calculateSubjectAverage(subject);
+
+            return (
+              <IonItemSliding key={subject.id}>
+                <IonItem button onClick={() => goToGradesPage(subject)}>
+                  <IonLabel className="glass-card grade-card">
+                    <div className="grade-subject">{subject.name}</div>
+                    <div className="grade-average">
+                      Durchschnitt:{' '}
+                      {average !== undefined ? average : 'Keine Noten'}
+                    </div>
+                  </IonLabel>
+                </IonItem>
+                <IonItemOptions side="end">
+                  <IonItemOption
+                    color="primary"
+                    onClick={() => {
+                      setSubjectToEdit(subject);
+                      setEditModalOpen(true);
+                    }}
+                  >
+                    Bearbeiten
+                  </IonItemOption>
+                  <IonItemOption
+                    color="danger"
+                    onClick={(e) => {
+                      const slidingItem = (e.target as Element).closest(
+                        'ion-item-sliding',
+                      ) as HTMLIonItemSlidingElement;
+                      if (slidingItem) {
+                        handleRemoveSubject(subject, slidingItem);
+                      }
+                    }}
+                  >
+                    Löschen
+                  </IonItemOption>
+                </IonItemOptions>
+              </IonItemSliding>
+            );
+          })}
         </IonList>
         <SubjectSelectionModal
           isOpen={isModalOpen}

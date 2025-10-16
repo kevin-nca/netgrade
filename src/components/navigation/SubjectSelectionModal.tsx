@@ -49,7 +49,6 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
         name: value.newSubjectName.trim(),
         teacher: null,
         description: null,
-        weight: null,
         schoolId: '',
       };
       setLocalSubjects([...localSubjects, newSubject as Subject]);

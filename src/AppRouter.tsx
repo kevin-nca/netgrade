@@ -8,7 +8,7 @@ import AddExamPage from '@/pages/home/exams/AddExamPage';
 import OnboardingPage from '@/pages/onboarding/OnboardingPage';
 import SchoolPage from '@/pages/home/school/SchoolPage';
 import AddGradePage from '@/pages/home/grades/AddGradePage';
-import HomePage from '@/pages/home/HomePage';
+import MainPage from '@/pages/home/main/MainPage';
 import EditExamPage from '@/pages/home/exams/EditExamPage/EditExamPage';
 import { Routes } from '@/routes';
 
@@ -31,7 +31,7 @@ export function AppRouter() {
 
           <Route exact path={Routes.ONBOARDING} component={OnboardingPage} />
           <Route exact path={Routes.SCHOOL} component={SchoolPage} />
-          <Route exact path={Routes.HOME} component={HomePage} />
+          <Route exact path={Routes.HOME} component={MainPage} />
           <Route exact path={Routes.GRADES_ADD} component={AddGradePage} />
           <Route path={Routes.SUBJECT_GRADES} component={GradeEntryPage} />
           <Route exact path={Routes.CALENDAR} component={CalendarPage} />

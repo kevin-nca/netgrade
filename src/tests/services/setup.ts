@@ -90,6 +90,246 @@ export const seedTestData = async (dataSource: DataSource) => {
   return { school, subject, exam, grade };
 };
 
+// ========== Mock Subjects for Subject Average Tests ==========
+
+// Helper function to create mock subject with grades
+export const createMockSubjectWithGrades = (): Subject => {
+  return {
+    id: 'test-subject-id',
+    name: 'Test Subject',
+    exams: [
+      {
+        id: 'exam1',
+        grade: {
+          id: 'grade1',
+          score: 5.0,
+          weight: 1.0,
+        } as Grade,
+      } as Exam,
+      {
+        id: 'exam2',
+        grade: {
+          id: 'grade2',
+          score: 4.0,
+          weight: 2.0,
+        } as Grade,
+      } as Exam,
+      {
+        id: 'exam3',
+        grade: {
+          id: 'grade3',
+          score: 6.0,
+          weight: 1.0,
+        } as Grade,
+      } as Exam,
+    ],
+  } as Subject;
+};
+
+// Helper function to create mock subject with no grades
+export const createMockSubjectWithNoGrades = (): Subject => {
+  return {
+    id: 'test-subject-id',
+    name: 'Test Subject',
+    exams: [
+      {
+        id: 'exam1',
+        grade: null,
+      } as Exam,
+      {
+        id: 'exam2',
+        grade: null,
+      } as Exam,
+    ],
+  } as Subject;
+};
+
+// Helper function to create mock subject with different weights
+export const createMockSubjectWithDifferentWeights = (): Subject => {
+  return {
+    id: 'test-subject-id',
+    name: 'Test Subject',
+    exams: [
+      {
+        id: 'exam1',
+        grade: {
+          id: 'grade1',
+          score: 6.0,
+          weight: 3.0,
+        } as Grade,
+      } as Exam,
+      {
+        id: 'exam2',
+        grade: {
+          id: 'grade2',
+          score: 4.0,
+          weight: 1.0,
+        } as Grade,
+      } as Exam,
+    ],
+  } as Subject;
+};
+
+// Helper function to create mock subject with zero weight
+export const createMockSubjectWithZeroWeight = (): Subject => {
+  return {
+    id: 'test-subject-id',
+    name: 'Test Subject',
+    exams: [
+      {
+        id: 'exam1',
+        grade: {
+          id: 'grade1',
+          score: 5.0,
+          weight: 0,
+        } as Grade,
+      } as Exam,
+    ],
+  } as Subject;
+};
+
+// Helper function to create mock subject with missing grade
+export const createMockSubjectWithMissingGrade = (): Subject => {
+  return {
+    id: 'test-subject-id',
+    name: 'Test Subject',
+    exams: [
+      {
+        id: 'exam1',
+        grade: {
+          id: 'grade1',
+          score: 5.0,
+          weight: 1.0,
+        } as Grade,
+      } as Exam,
+      {
+        id: 'exam2',
+        grade: null,
+      } as Exam,
+    ],
+  } as Subject;
+};
+
+// ========== Mock Schools for School Average Tests ==========
+
+// Helper function to create mock school with subjects that have grades
+export const createMockSchoolWithSubjects = (): School => {
+  return {
+    id: 'test-school-id',
+    name: 'Test School',
+    subjects: [
+      {
+        id: 'subject1',
+        name: 'Math',
+        exams: [
+          {
+            id: 'exam1',
+            grade: { id: 'grade1', score: 5.0, weight: 1.0 } as Grade,
+          } as Exam,
+        ],
+      } as Subject,
+      {
+        id: 'subject2',
+        name: 'English',
+        exams: [
+          {
+            id: 'exam2',
+            grade: { id: 'grade2', score: 4.0, weight: 1.0 } as Grade,
+          } as Exam,
+          {
+            id: 'exam3',
+            grade: { id: 'grade3', score: 5.0, weight: 1.0 } as Grade,
+          } as Exam,
+        ],
+      } as Subject,
+      {
+        id: 'subject3',
+        name: 'Science',
+        exams: [
+          {
+            id: 'exam4',
+            grade: { id: 'grade4', score: 5.0, weight: 1.0 } as Grade,
+          } as Exam,
+        ],
+      } as Subject,
+    ],
+  } as School;
+};
+
+// Helper function to create mock school with mixed subjects (some with grades, some without)
+export const createMockSchoolWithMixedSubjects = (): School => {
+  return {
+    id: 'test-school-id',
+    name: 'Test School',
+    subjects: [
+      {
+        id: 'subject1',
+        name: 'Math',
+        exams: [
+          {
+            id: 'exam1',
+            grade: { id: 'grade1', score: 5.0, weight: 1.0 } as Grade,
+          } as Exam,
+        ],
+      } as Subject,
+      {
+        id: 'subject2',
+        name: 'English',
+        exams: [
+          {
+            id: 'exam2',
+            grade: null, // No grade
+          } as Exam,
+        ],
+      } as Subject,
+      {
+        id: 'subject3',
+        name: 'Science',
+        exams: [
+          {
+            id: 'exam3',
+            grade: { id: 'grade3', score: 6.0, weight: 1.0 } as Grade,
+          } as Exam,
+        ],
+      } as Subject,
+    ],
+  } as School;
+};
+
+// Helper function to create mock school with different subject averages
+export const createMockSchoolWithDifferentSubjectAverages = (): School => {
+  return {
+    id: 'test-school-id',
+    name: 'Test School',
+    subjects: [
+      {
+        id: 'subject1',
+        name: 'Math',
+        exams: [
+          {
+            id: 'exam1',
+            grade: { id: 'grade1', score: 6.0, weight: 3.0 } as Grade,
+          } as Exam,
+          {
+            id: 'exam2',
+            grade: { id: 'grade2', score: 4.0, weight: 1.0 } as Grade,
+          } as Exam,
+        ],
+      } as Subject,
+      {
+        id: 'subject2',
+        name: 'English',
+        exams: [
+          {
+            id: 'exam3',
+            grade: { id: 'grade3', score: 5.0, weight: 1.0 } as Grade,
+          } as Exam,
+        ],
+      } as Subject,
+    ],
+  } as School;
+};
+
 // Helper function to clean up test data
 export const cleanupTestData = async (dataSource: DataSource) => {
   if (dataSource.isInitialized) {

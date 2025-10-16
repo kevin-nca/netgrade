@@ -18,11 +18,15 @@ export const gradeKeys = {
 };
 
 // Hooks
+
+export const GradeQuery = {
+  queryKey: gradeKeys.lists(),
+  queryFn: () => GradeService.fetchAll(),
+  staleTime: Infinity,
+} as const;
+
 export const useGrades = () => {
-  return useQuery({
-    queryKey: gradeKeys.lists(),
-    queryFn: () => GradeService.fetchAll(),
-  });
+  return useQuery(GradeQuery);
 };
 
 export const useSubjectGrades = (subjectId: string) => {

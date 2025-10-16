@@ -28,6 +28,7 @@ export const useSubjects = () => {
   return useQuery({
     queryKey: subjectKeys.lists(),
     queryFn: () => SubjectService.fetchAll(),
+    staleTime: Infinity,
   });
 };
 
