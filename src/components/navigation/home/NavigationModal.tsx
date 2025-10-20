@@ -20,7 +20,9 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
 
   const goToTab3 = () => {
     closeModal();
-    history.push('/main/home/exams/add');
+    setTimeout(() => {
+      history.push('/main/home/exams/add');
+    }, 100);
   };
 
   return (
