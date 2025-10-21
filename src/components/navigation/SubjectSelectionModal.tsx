@@ -2,17 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import {
   IonContent,
-  IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-  IonLabel,
   IonModal,
 } from '@ionic/react';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import { Subject } from '@/db/entities';
 import { FormElement } from '@/components/Form/FormElements';
+import styles from './SubjectSelectionModal.module.css' ;
 interface SubjectModalFormData {
   searchText: string;
   newSubjectName: string;
@@ -33,7 +29,6 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
   setIsOpen,
   subjectsOrModules = [],
   addToSubjectsOrModules,
-  removeFromSubjectsOrModules,
 }) => {
   const [localSubjects, setLocalSubjects] =
     useState<Subject[]>(subjectsOrModules);
@@ -93,11 +88,6 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
     form.handleSubmit();
   };
 
-  const handleRemoveSubject = (subjectId: string) => {
-    setLocalSubjects(localSubjects.filter((s) => s.id !== subjectId));
-    removeFromSubjectsOrModules(subjectId);
-  };
-
   return (
     <IonModal
       isOpen={isOpen}
@@ -105,45 +95,21 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
       breakpoints={[0, 0.3, 1]}
       initialBreakpoint={0.5}
     >
-      <Header title="Fächer auswählen" backButton={false} />
+      <Header title="Neues Fach erstellen" backButton={false} />
       <IonContent>
-        <FormElement.SearchText
-          form={form}
-          placeholder="Suche Fächer"
-          fieldName="searchText"
+        <div className={styles.inputContainer}>
+          <FormElement.SubjectName
+            form={form}
+            placeholder="Neues Fach hinzufügen"
+            fieldName="newSubjectName"
+            label=""
+          />
+        </div>
+        <Button
+          handleEvent={handleAddSubject}
+          text={'Hinzufügen'}
+          className={styles.addButton}
         />
-
-        {localSubjects
-          .filter((subject: Subject) =>
-            form.state.values.searchText
-              ? subject.name
-                  .toLowerCase()
-                  .includes(form.state.values.searchText.toLowerCase())
-              : true,
-          )
-          .map((subject) => (
-            <IonItemSliding key={subject.id}>
-              <IonItem>
-                <IonLabel>{subject.name}</IonLabel>
-              </IonItem>
-              <IonItemOptions side="end">
-                <IonItemOption
-                  color="danger"
-                  onClick={() => handleRemoveSubject(subject.id)}
-                >
-                  Löschen
-                </IonItemOption>
-              </IonItemOptions>
-            </IonItemSliding>
-          ))}
-
-        <FormElement.SubjectName
-          form={form}
-          placeholder="Neues Fach hinzufügen"
-          fieldName="newSubjectName"
-          label=""
-        />
-        <Button handleEvent={handleAddSubject} text={'Hinzufügen'} />
       </IonContent>
     </IonModal>
   );
