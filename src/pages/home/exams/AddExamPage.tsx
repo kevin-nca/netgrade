@@ -33,11 +33,6 @@ interface ExamAddFormData {
   description: string;
 }
 
-const getLastUsedSchool = () => localStorage.getItem('lastUsedSchool') || '';
-const setLastUsedSchool = (schoolId: string) => {
-  if (schoolId) localStorage.setItem('lastUsedSchool', schoolId);
-};
-
 const FOCUS_DELAY_MS = 100;
 
 const AddExamPage: React.FC = () => {
@@ -53,7 +48,7 @@ const AddExamPage: React.FC = () => {
 
   const form = useForm({
     defaultValues: {
-      selectedSchoolId: getLastUsedSchool(),
+      selectedSchoolId: '',
       selectedSubjectId: '',
       title: '',
       date: format(new Date(), 'yyyy-MM-dd'),
@@ -70,12 +65,10 @@ const AddExamPage: React.FC = () => {
 
       addExamMutation.mutate(examPayload, {
         onSuccess: () => {
-          setLastUsedSchool(value.selectedSchoolId);
           setShowSuccess(true);
 
           form.reset();
-          form.setFieldValue('selectedSchoolId', value.selectedSchoolId);
-          form.setFieldValue('selectedSubjectId', value.selectedSubjectId);
+          setSelectedSchoolId('');
           form.setFieldValue('date', format(new Date(), 'yyyy-MM-dd'));
 
           setTimeout(() => history.push(Routes.HOME), 1200);
@@ -117,7 +110,7 @@ const AddExamPage: React.FC = () => {
   });
 
   const { data: schools = [], error: schoolsError } = useSchools();
-  const [selectedSchoolId, setSelectedSchoolId] = useState(getLastUsedSchool());
+  const [selectedSchoolId, setSelectedSchoolId] = useState('');
   const { data: subjects = [], error: subjectsError } =
     useSchoolSubjects(selectedSchoolId);
   const addExamMutation = useAddExam();
@@ -173,25 +166,6 @@ const AddExamPage: React.FC = () => {
       setTimeout(() => subjectRef.current?.focus(), FOCUS_DELAY_MS);
     }
   }, [selectedSchoolId, subjects.length]);
-
-  useEffect(() => {
-    if (schools.length === 1 && !form.state.values.selectedSchoolId) {
-      const onlySchool = schools[0];
-      form.setFieldValue('selectedSchoolId', onlySchool.id);
-      setSelectedSchoolId(onlySchool.id);
-    }
-  }, [schools, form]);
-
-  useEffect(() => {
-    if (
-      subjects.length === 1 &&
-      selectedSchoolId &&
-      !form.state.values.selectedSubjectId
-    ) {
-      const onlySubject = subjects[0];
-      form.setFieldValue('selectedSubjectId', onlySubject.id);
-    }
-  }, [subjects, selectedSchoolId, form]);
 
   const schoolOptions = useMemo(
     () =>

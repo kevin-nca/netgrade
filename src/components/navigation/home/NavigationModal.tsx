@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useRef } from 'react';
 import { IonContent, IonItem, IonLabel, IonModal } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import Header from '@/components/Header/Header';
@@ -10,23 +10,33 @@ interface SlideUpProps {
 
 const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
   const history = useHistory();
+  const pendingNavigation = useRef<string | null>(null);
 
-  const closeModal = () => setIsOpen(false);
+  const handleDismiss = () => {
+    setIsOpen(false);
+    if (pendingNavigation.current) {
+      history.push(pendingNavigation.current);
+      pendingNavigation.current = null;
+    }
+  };
+
+  const navigateTo = (path: string) => {
+    pendingNavigation.current = path;
+    setIsOpen(false);
+  };
 
   const goToTab2 = () => {
-    closeModal();
-    history.push('/main/home/grades/add');
+    navigateTo('/main/home/grades/add');
   };
 
   const goToTab3 = () => {
-    closeModal();
-    history.push('/main/home/exams/add');
+    navigateTo('/main/home/exams/add');
   };
 
   return (
     <IonModal
       isOpen={isOpen}
-      onWillDismiss={closeModal}
+      onDidDismiss={handleDismiss}
       breakpoints={[0, 0.5, 1]}
       initialBreakpoint={0.8}
     >
