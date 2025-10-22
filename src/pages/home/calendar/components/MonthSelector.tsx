@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonIcon } from '@ionic/react';
+import { IonCard, IonIcon, IonButton } from '@ionic/react';
 import { chevronBack, chevronForward } from 'ionicons/icons';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -14,25 +14,29 @@ const MonthSelector: React.FC<MonthSelectorProps> = ({
   onChangeMonth,
 }) => {
   return (
-    <div className="month-selector">
-      <button
+    <IonCard className="month-selector" color={'light'}>
+      <IonButton
+        shape="round"
+        size="small"
         className="month-button prev"
         onClick={() => onChangeMonth('prev')}
         aria-label="Vorheriger Monat"
       >
-        <IonIcon icon={chevronBack} />
-      </button>
+        <IonIcon slot="icon-only" icon={chevronBack} />
+      </IonButton>
       <h2 className="current-month-title">
         {format(currentMonth, 'MMMM yyyy', { locale: de })}
       </h2>
-      <button
+      <IonButton
+        shape="round"
+        size="small"
         className="month-button next"
         onClick={() => onChangeMonth('next')}
         aria-label="Nächster Monat"
       >
-        <IonIcon icon={chevronForward} />
-      </button>
-    </div>
+        <IonIcon slot="icon-only" icon={chevronForward} />
+      </IonButton>
+    </IonCard>
   );
 };
 
