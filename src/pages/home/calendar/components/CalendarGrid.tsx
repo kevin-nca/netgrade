@@ -28,8 +28,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   }
 
   return (
-    <IonCard className="modern-calendar" color={"light"}>
-      <IonCard className="calendar-weekdays" color={"light"}>
+    <IonCard className="modern-calendar" color={'light'}>
+      <IonCard className="calendar-weekdays" color={'light'}>
         {weekdays.map((day) => (
           <p key={day} className="calendar-weekday">
             {day}
