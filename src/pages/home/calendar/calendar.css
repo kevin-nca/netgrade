@@ -156,13 +156,11 @@
   cursor: pointer;
   transition: all 0.15s ease;
   padding: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .calendar-day:hover,
 .calendar-day:focus {
   --background: #0051d5;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .calendar-day:active {
@@ -185,7 +183,6 @@
   background-color: var(--calendar-day-selected);
   color: white;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .calendar-day.has-exam:not(.selected) {
@@ -246,6 +243,7 @@
 
 .events-list {
   padding: 12px;
+  box-shadow: none;
 }
 
 .event-item {
@@ -319,6 +317,7 @@
 
 .modern-list-container {
   padding: 16px;
+  box-shadow: none;
 }
 
 .month-section {
@@ -445,7 +444,7 @@
   text-align: center;
   padding: 64px 24px;
   border-radius: var(--calendar-radius-lg);
-  box-shadow: var(--calendar-shadow);
+  box-shadow: none;
 }
 
 .empty-icon {
