@@ -64,7 +64,7 @@ const CalendarPage: React.FC = () => {
         backButton={true}
         defaultHref={Routes.HOME}
       />
-      <IonContent fullscreen className='calendar-container'>
+      <IonContent fullscreen className="calendar-container">
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
         </IonRefresher>
