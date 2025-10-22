@@ -50,7 +50,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               className={`calendar-day ${day.isCurrentMonth ? 'current-month' : 'other-month'} ${day.isSelected ? 'selected' : ''} ${day.isToday ? 'today' : ''} ${day.hasExam ? 'has-exam' : ''}`}
               onClick={() => day.isCurrentMonth && onSelectDate(day.date)}
               disabled={!day.isCurrentMonth}
-              type="button"
               aria-label={format(day.date, 'd MMMM', { locale: de })}
               aria-selected={day.isSelected}
             >
