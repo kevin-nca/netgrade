@@ -11,9 +11,6 @@ export class Subject extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   teacher!: string | null;
 
-  @Column({ type: 'varchar', length: 500, nullable: true })
-  description!: string | null;
-
   @Column({ type: 'float', default: 1.0 })
   weight!: number;
 
