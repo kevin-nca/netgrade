@@ -2,17 +2,20 @@ import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
   IonContent,
   IonIcon,
   IonItem,
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
-  IonLabel,
   IonList,
   IonPage,
 } from '@ionic/react';
-import { add } from 'ionicons/icons';
+import { add, statsChartOutline } from 'ionicons/icons';
 import SubjectSelectionModal from '@/components/navigation/SubjectSelectionModal';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
@@ -105,15 +108,25 @@ const SchoolPage: React.FC = () => {
             const average = SchoolService.calculateSubjectAverage(subject);
 
             return (
-              <IonItemSliding key={subject.id}>
-                <IonItem button onClick={() => goToGradesPage(subject)}>
-                  <IonLabel className="glass-card grade-card">
-                    <div className="grade-subject">{subject.name}</div>
-                    <div className="grade-average">
-                      Durchschnitt:{' '}
-                      {average !== undefined ? average : 'Keine Noten'}
-                    </div>
-                  </IonLabel>
+              <IonItemSliding key={subject.id} className='subject-sliding-card'>
+                <IonItem
+                  button
+                  onClick={() => goToGradesPage(subject)}
+                  className="subject-card"
+                >
+                  <IonCard className="grade-card">
+                    <IonCardHeader>
+                      <IonCardTitle>{subject.name}</IonCardTitle>
+                    </IonCardHeader>
+                    <IonCardContent className="subject-content-card">
+                      <p className="teacher">Lehrperson: {" "}
+                        {subject.teacher !== null ? subject.teacher : "Kein Name"} </p>
+                      <p className="average-grade">
+                        Note:{' '}
+                        {average !== undefined ? average + ' Ø' : 'Keine Noten'}
+                      </p>
+                    </IonCardContent>
+                  </IonCard>
                 </IonItem>
                 <IonItemOptions side="end">
                   <IonItemOption
