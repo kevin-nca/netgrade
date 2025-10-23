@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class DropDescriptionFromSubject1761134134122 implements MigrationInterface {
-    name = 'Initdb1745319232244';
+    name = 'DropDescriptionFromSubject1761134134122';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         console.error('Running migration: ' + this.name);
