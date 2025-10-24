@@ -15,7 +15,7 @@ import {
   IonList,
   IonPage,
 } from '@ionic/react';
-import { add, statsChartOutline } from 'ionicons/icons';
+import { add } from 'ionicons/icons';
 import SubjectSelectionModal from '@/components/navigation/SubjectSelectionModal';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
@@ -108,19 +108,24 @@ const SchoolPage: React.FC = () => {
             const average = SchoolService.calculateSubjectAverage(subject);
 
             return (
-              <IonItemSliding key={subject.id} className='subject-sliding-card'>
+              <IonItemSliding key={subject.id} className="subject-sliding-card">
                 <IonItem
                   button
+                  color={'light'}
                   onClick={() => goToGradesPage(subject)}
                   className="subject-card"
                 >
-                  <IonCard className="grade-card">
+                  <IonCard color={'light'} className="grade-card">
                     <IonCardHeader>
                       <IonCardTitle>{subject.name}</IonCardTitle>
                     </IonCardHeader>
                     <IonCardContent className="subject-content-card">
-                      <p className="teacher">Lehrperson: {" "}
-                        {subject.teacher !== null ? subject.teacher : "Kein Name"} </p>
+                      <p className="teacher">
+                        Lehrperson:{' '}
+                        {subject.teacher !== null
+                          ? subject.teacher
+                          : 'Kein Name'}{' '}
+                      </p>
                       <p className="average-grade">
                         Note:{' '}
                         {average !== undefined ? average + ' Ø' : 'Keine Noten'}
@@ -128,9 +133,10 @@ const SchoolPage: React.FC = () => {
                     </IonCardContent>
                   </IonCard>
                 </IonItem>
-                <IonItemOptions side="end">
+                <IonItemOptions side="end" className="option-slide-container">
                   <IonItemOption
                     color="primary"
+                    className="edit-option-slide"
                     onClick={() => {
                       setSubjectToEdit(subject);
                       setEditModalOpen(true);
@@ -140,6 +146,7 @@ const SchoolPage: React.FC = () => {
                   </IonItemOption>
                   <IonItemOption
                     color="danger"
+                    className="remove-option-slide"
                     onClick={(e) => {
                       const slidingItem = (e.target as Element).closest(
                         'ion-item-sliding',
