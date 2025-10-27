@@ -40,18 +40,18 @@ const SchoolPage: React.FC = () => {
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
-  const { data: school  } = useSchoolId(schoolId);
-  const { data: subjectsData = [] } =
-    useSchoolSubjects(schoolId);
-  const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
+  const { data: school } = useSchoolId(schoolId);
+
+  const { data: subjectsData } = useSchoolSubjects(schoolId);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
 
   const updateSubjectMutation = useUpdateSubject();
 
   useEffect(() => {
-    setSubjects(subjectsData);
+    if (subjectsData) {
+      setSubjects(subjectsData);
+    }
   }, [subjectsData]);
-
-
 
   const goToGradesPage = (subject: Subject) => {
     history.push(

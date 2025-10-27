@@ -18,6 +18,5 @@ export async function prefetchData(queryClient: QueryClient, schoolId: string) {
   await queryClient.prefetchQuery(SchoolIdQuery(schoolId));
   await queryClient.prefetchQuery(SchoolSubjectsQuery(schoolId));
 
-
   // Add more prefetch queries as needed
 }
