@@ -31,12 +31,15 @@ export const useSchools = () => {
   return useQuery(SchoolQuery);
 };
 
-export const useSchool = (id: string) => {
-  return useQuery({
-    queryKey: schoolKeys.detail(id),
-    queryFn: () => SchoolService.findById(id),
-    enabled: !!id,
-  });
+export const SchoolIdQuery = (id: string) => ({
+  queryKey: schoolKeys.detail(id),
+  queryFn: () => SchoolService.findById(id),
+  enabled: !!id,
+  staleTime: Infinity,
+} as const);
+
+export const useSchoolId = (id: string) => {
+  return useQuery(SchoolIdQuery(id));
 };
 
 export const useAddSchool = () => {
