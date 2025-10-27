@@ -104,7 +104,6 @@ const SchoolPage: React.FC = () => {
   return (
     <IonPage>
       <Header
-        // 'Schule nicht gefunden' gets shown for a second
         title={school!.name}
         backButton={true}
         defaultHref={Routes.HOME}
