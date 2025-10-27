@@ -18,7 +18,7 @@ import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import { Subject } from '@/db/entities';
 import {
-  useSchool,
+  useSchoolId,
   useSchoolSubjects,
   useAddSubject,
   useDeleteSubject,
@@ -40,8 +40,8 @@ const SchoolPage: React.FC = () => {
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
-  const { data: school = null, error: schoolError } = useSchool(schoolId);
-  const { data: subjectsData = [], error: subjectsError } =
+  const { data: school  } = useSchoolId(schoolId);
+  const { data: subjectsData = [] } =
     useSchoolSubjects(schoolId);
   const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
 
@@ -51,12 +51,7 @@ const SchoolPage: React.FC = () => {
     setSubjects(subjectsData);
   }, [subjectsData]);
 
-  if (schoolError) {
-    console.error('Failed to fetch school:', schoolError);
-  }
-  if (subjectsError) {
-    console.error('Failed to fetch subjects:', subjectsError);
-  }
+
 
   const goToGradesPage = (subject: Subject) => {
     history.push(
