@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { IonContent, IonPage, IonToast, IonIcon } from '@ionic/react';
+import { IonContent, IonPage, IonToast, IonIcon, IonInput } from '@ionic/react';
 import { useHistory, useLocation } from 'react-router-dom';
 import {
   schoolOutline,
@@ -37,6 +37,11 @@ import {
 import { Routes } from '@/routes';
 import './AddGradePage.css';
 
+import type {
+  IonInputCustomEvent,
+  InputInputEventDetail,
+} from '@ionic/core/components';
+
 interface GradeAddFormData {
   selectedSchoolId: string;
   selectedSubjectId: string;
@@ -65,9 +70,9 @@ const AddGradePage: React.FC = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
   const subjectRef = useRef<HTMLSelectElement>(null);
-  const examNameRef = useRef<HTMLInputElement>(null);
-  const weightRef = useRef<HTMLInputElement>(null);
-  const scoreRef = useRef<HTMLInputElement>(null);
+  const examNameRef = useRef<HTMLIonInputElement>(null);
+  const weightRef = useRef<HTMLIonInputElement>(null);
+  const scoreRef = useRef<HTMLIonInputElement>(null);
 
   const form = useForm({
     defaultValues: {
@@ -198,7 +203,7 @@ const AddGradePage: React.FC = () => {
       setFieldErrors((prev) => ({ ...prev, selectedSubjectId: '' }));
 
       if (subjectId && examNameRef.current) {
-        setTimeout(() => examNameRef.current?.focus(), 100);
+        setTimeout(() => examNameRef.current?.setFocus(), 100);
       }
     },
     [form],
@@ -291,19 +296,18 @@ const AddGradePage: React.FC = () => {
     [],
   );
 
-  const handleScoreChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      const numValue = value === '' ? 0 : parseFloat(value) || 0;
-      form.setFieldValue('score', numValue);
-      validateField('score', value);
+  const handleExamNameInput = useCallback(
+    (e: IonInputCustomEvent<InputInputEventDetail>) => {
+      const value = e.detail.value ?? '';
+      form.setFieldValue('examName', value);
+      validateField('examName', value);
     },
     [form, validateField],
   );
 
-  const handleWeightChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
+  const handleWeightInput = useCallback(
+    (e: IonInputCustomEvent<InputInputEventDetail>) => {
+      const value = e.detail.value ?? '';
       const numValue = value === '' ? 0 : parseFloat(value) || 0;
       form.setFieldValue('weight', numValue);
       validateField('weight', value);
@@ -311,10 +315,12 @@ const AddGradePage: React.FC = () => {
     [form, validateField],
   );
 
-  const handleExamNameChange = useCallback(
-    (value: string) => {
-      form.setFieldValue('examName', value);
-      validateField('examName', value);
+  const handleScoreInput = useCallback(
+    (e: IonInputCustomEvent<InputInputEventDetail>) => {
+      const value = e.detail.value ?? '';
+      const numValue = value === '' ? 0 : parseFloat(value) || 0;
+      form.setFieldValue('score', numValue);
+      validateField('score', value);
     },
     [form, validateField],
   );
@@ -324,23 +330,7 @@ const AddGradePage: React.FC = () => {
       setTimeout(() => subjectRef.current?.focus(), 100);
     }
   }, [selectedSchoolId, subjects.length]);
-  useEffect(() => {
-    if (schools.length === 1 && !form.state.values.selectedSchoolId) {
-      const onlySchool = schools[0];
-      form.setFieldValue('selectedSchoolId', onlySchool.id);
-      setSelectedSchoolId(onlySchool.id);
-    }
-  }, [schools, form]);
-  useEffect(() => {
-    if (
-      subjects.length === 1 &&
-      selectedSchoolId &&
-      !form.state.values.selectedSubjectId
-    ) {
-      const onlySubject = subjects[0];
-      form.setFieldValue('selectedSubjectId', onlySubject.id);
-    }
-  }, [subjects, selectedSchoolId, form]);
+
   const schoolOptions = useMemo(
     () =>
       schools.map((school: School) => ({
@@ -370,7 +360,7 @@ const AddGradePage: React.FC = () => {
       'score',
     ];
     const completed = fields.filter((field) => {
-      const value = values[field as keyof GradeAddFormData];
+      const value = (values as any)[field];
       return value !== '' && value !== 0;
     }).length;
     return Math.round((completed / fields.length) * 100);
@@ -389,7 +379,7 @@ const AddGradePage: React.FC = () => {
         backButton={true}
         onBack={() => window.history.back()}
       />
-      <IonContent className="add-grade-content" scrollY={false}>
+      <IonContent className="add-grade-content" scrollY={true}>
         <div className="content-wrapper">
           <div className="gradient-orb" />
           {showSuccess && (
@@ -540,13 +530,14 @@ const AddGradePage: React.FC = () => {
                         <label className="field-label" htmlFor="exam-name">
                           Prüfungsname *
                         </label>
-                        <input
+                        <IonInput
                           id="exam-name"
                           ref={examNameRef}
                           className="form-input"
                           type="text"
-                          value={field.state.value}
-                          onChange={(e) => handleExamNameChange(e.target.value)}
+                          value={String(field.state.value ?? '')}
+                          onIonInput={handleExamNameInput}
+                          onIonBlur={field.handleBlur}
                           placeholder="z.B. Klausur 1, Vokabeltest"
                           aria-describedby={
                             fieldErrors.examName ? 'exam-name-error' : undefined
@@ -611,18 +602,18 @@ const AddGradePage: React.FC = () => {
                           Gewichtung (0-100%)
                         </label>
                         <div className="weight-input-container">
-                          <input
+                          <IonInput
                             id="weight"
                             ref={weightRef}
                             className="form-input weight-input"
                             type="number"
-                            inputMode="decimal"
-                            pattern="[0-9]*\.?[0-9]*"
+                            inputmode="decimal"
                             min="0"
                             max="100"
                             step="0.01"
-                            value={field.state.value}
-                            onChange={handleWeightChange}
+                            value={String(field.state.value ?? '')}
+                            onIonInput={handleWeightInput}
+                            onIonBlur={field.handleBlur}
                             placeholder="100"
                           />
                           <div className="weight-quick-actions">
@@ -679,17 +670,18 @@ const AddGradePage: React.FC = () => {
                         <label className="field-label" htmlFor="score">
                           Note (1-6) *
                         </label>
-                        <input
+                        <IonInput
                           id="score"
                           ref={scoreRef}
                           className="form-input"
                           type="number"
-                          inputMode="decimal"
+                          inputmode="decimal"
                           min="1"
                           max="6"
                           step="0.01"
-                          value={field.state.value || ''}
-                          onChange={handleScoreChange}
+                          value={String(field.state.value ?? '')}
+                          onIonInput={handleScoreInput}
+                          onIonBlur={field.handleBlur}
                           placeholder="6.0"
                           aria-describedby={
                             fieldErrors.score ? 'score-error' : undefined
