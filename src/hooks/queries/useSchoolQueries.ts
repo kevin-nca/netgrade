@@ -31,6 +31,14 @@ export const useSchools = () => {
   return useQuery(SchoolQuery);
 };
 
+export const useSchool = (id: string) => {
+  return useQuery({
+    queryKey: schoolKeys.detail(id),
+    queryFn: () => SchoolService.findById(id),
+    enabled: !!id,
+  });
+};
+
 export const useAddSchool = () => {
   const queryClient = useQueryClient();
 
