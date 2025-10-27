@@ -9,10 +9,7 @@ import {
   SchoolSubjectsQuery,
 } from '@/hooks/queries';
 
-export async function prefetchData(
-  queryClient: QueryClient,
-  schoolId?: string,
-) {
+export async function prefetchData(queryClient: QueryClient, schoolId: string) {
   await queryClient.prefetchQuery(onboardingCompletedQuery);
   await queryClient.prefetchQuery(SchoolQuery);
   await queryClient.prefetchQuery(GradeQuery);
