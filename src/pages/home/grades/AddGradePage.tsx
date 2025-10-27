@@ -27,7 +27,6 @@ import {
   useSchools,
   useSchoolSubjects,
   useAddGradeWithExam,
-  useSubjectGrades,
 } from '@/hooks/queries';
 import {
   validateGrade,
@@ -52,11 +51,6 @@ interface GradeAddFormData {
   comment: string;
 }
 
-const getLastUsedSchool = () => localStorage.getItem('lastUsedSchool') || '';
-const setLastUsedSchool = (schoolId: string) => {
-  if (schoolId) localStorage.setItem('lastUsedSchool', schoolId);
-};
-
 const AddGradePage: React.FC = () => {
   const history = useHistory();
   const location = useLocation<{
@@ -76,8 +70,8 @@ const AddGradePage: React.FC = () => {
 
   const form = useForm({
     defaultValues: {
-      selectedSchoolId: location.state?.schoolId || getLastUsedSchool(),
-      selectedSubjectId: location.state?.subjectId || '',
+      selectedSchoolId: '',
+      selectedSubjectId: '',
       examName: '',
       date: format(new Date(), 'yyyy-MM-dd'),
       weight: 100,
@@ -111,22 +105,14 @@ const AddGradePage: React.FC = () => {
 
       addGradeWithExamMutation.mutate(gradePayload, {
         onSuccess: () => {
-          setLastUsedSchool(value.selectedSchoolId);
           setShowSuccess(true);
-          const nextExamName = generateDefaultExamName(value.selectedSubjectId);
-
           form.reset();
-          form.setFieldValue('selectedSchoolId', value.selectedSchoolId);
-          form.setFieldValue('selectedSubjectId', value.selectedSubjectId);
-          form.setFieldValue('examName', nextExamName);
-          form.setFieldValue('date', format(new Date(), 'yyyy-MM-dd'));
-          form.setFieldValue('weight', 100);
 
           setTimeout(() => history.push(Routes.HOME), 1200);
         },
         onError: (error) => {
           showAndSetToastMessage(
-            `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+            `Fehler: ${error instanceof Error ? error.message : String(error)}`
           );
         },
       });
@@ -159,22 +145,10 @@ const AddGradePage: React.FC = () => {
 
   const { data: schools = [], error: schoolsError } = useSchools();
   const [selectedSchoolId, setSelectedSchoolId] = useState(
-    location.state?.schoolId || getLastUsedSchool(),
+    location.state?.schoolId || '',
   );
   const { data: subjects = [], error: subjectsError } =
     useSchoolSubjects(selectedSchoolId);
-  const selectedSubjectId = form.state.values.selectedSubjectId;
-  const { data: subjectGrades = [] } = useSubjectGrades(selectedSubjectId);
-  useEffect(() => {
-    const state = location.state || {};
-    if (state.schoolId) {
-      form.setFieldValue('selectedSchoolId', state.schoolId);
-      setSelectedSchoolId(state.schoolId); // Also update state for query
-    }
-    if (state.subjectId) {
-      form.setFieldValue('selectedSubjectId', state.subjectId);
-    }
-  }, [form, location.state]);
 
   useEffect(() => {
     if (schoolsError) {
@@ -184,17 +158,6 @@ const AddGradePage: React.FC = () => {
       showAndSetToastMessage('Fehler beim Laden der Fächer');
     }
   }, [schoolsError, subjectsError]);
-
-  const generateDefaultExamName = useCallback(
-    (subjectId: string) => {
-      if (!subjectId || !subjectGrades) return '';
-      const examCount = subjectGrades.length;
-      const nextNumber = examCount + 1;
-
-      return `Prüfung ${nextNumber}`;
-    },
-    [subjectGrades],
-  );
 
   const handleSubjectChange = useCallback(
     (value: string | number | boolean) => {
@@ -208,14 +171,6 @@ const AddGradePage: React.FC = () => {
     },
     [form],
   );
-  useEffect(() => {
-    if (selectedSubjectId && subjectGrades) {
-      const defaultName = generateDefaultExamName(selectedSubjectId);
-      if (defaultName && form.state.values.examName !== defaultName) {
-        form.setFieldValue('examName', defaultName);
-      }
-    }
-  }, [selectedSubjectId, subjectGrades, generateDefaultExamName, form]);
 
   const handleSchoolChange = useCallback(
     (value: string | number | boolean) => {
