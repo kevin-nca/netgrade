@@ -18,7 +18,6 @@ import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import { Subject } from '@/db/entities';
 import {
-  useSchoolSubjects,
   useAddSubject,
   useDeleteSubject,
   useUpdateSubject,
@@ -41,9 +40,11 @@ const SchoolPage: React.FC = () => {
   const history = useHistory();
 
   const { data: schools } = useSchools();
+
   const school = schools?.find((s) => s.id === schoolId);
 
-  const { data: subjectsData } = useSchoolSubjects(schoolId);
+  const subjectsData = school?.subjects;
+
   const [subjects, setSubjects] = useState<Subject[]>([]);
 
   const updateSubjectMutation = useUpdateSubject();
