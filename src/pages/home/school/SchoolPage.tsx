@@ -18,11 +18,11 @@ import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import { Subject } from '@/db/entities';
 import {
-  useSchoolId,
   useSchoolSubjects,
   useAddSubject,
   useDeleteSubject,
   useUpdateSubject,
+  useSchools,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/components/modals/EditSubjectModal';
@@ -40,7 +40,8 @@ const SchoolPage: React.FC = () => {
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
-  const { data: school } = useSchoolId(schoolId);
+  const { data: schools } = useSchools();
+  const school = schools?.find((s) => s.id === schoolId);
 
   const { data: subjectsData } = useSchoolSubjects(schoolId);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -103,7 +104,7 @@ const SchoolPage: React.FC = () => {
     <IonPage>
       <Header
         // 'Schule nicht gefunden' gets shown for a second
-        title={school ? school.name : 'Schule nicht gefunden'}
+        title={school!.name}
         backButton={true}
         defaultHref={Routes.HOME}
         endSlot={
