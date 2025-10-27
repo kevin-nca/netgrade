@@ -6,6 +6,7 @@ import {
   SchoolQuery,
   userNameQuery,
   SchoolIdQuery,
+  SchoolSubjectsQuery,
 } from '@/hooks/queries';
 
 export async function prefetchData(queryClient: QueryClient, schoolId: string) {
@@ -15,6 +16,7 @@ export async function prefetchData(queryClient: QueryClient, schoolId: string) {
   await queryClient.prefetchQuery(userNameQuery);
   await queryClient.prefetchQuery(UpcomingExamsQuery);
   await queryClient.prefetchQuery(SchoolIdQuery(schoolId));
+  await queryClient.prefetchQuery(SchoolSubjectsQuery(schoolId));
 
 
   // Add more prefetch queries as needed

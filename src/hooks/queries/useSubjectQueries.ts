@@ -40,12 +40,15 @@ export const useSubject = (id: string) => {
   });
 };
 
+export const SchoolSubjectsQuery = (schoolId: string) => ({
+  queryKey: subjectKeys.schoolSubjects(schoolId),
+  queryFn: () => SubjectService.findBySchoolId(schoolId),
+  enabled: !!schoolId,
+  staleTime: Infinity,
+} as const);
+
 export const useSchoolSubjects = (schoolId: string) => {
-  return useQuery({
-    queryKey: subjectKeys.schoolSubjects(schoolId),
-    queryFn: () => SubjectService.findBySchoolId(schoolId),
-    enabled: !!schoolId,
-  });
+  return useQuery(SchoolSubjectsQuery(schoolId));
 };
 
 export const useAddSubject = () => {
