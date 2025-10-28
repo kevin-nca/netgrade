@@ -8,8 +8,8 @@ export const schoolKeys = {
   lists: () => [...schoolKeys.all, 'list'] as const,
   list: (filters: Record<string, unknown>) =>
     [...schoolKeys.lists(), { filters }] as const,
-  details: () => [...schoolKeys.all, 'list'] as const,
-  detail: (id: string) => [...schoolKeys.lists(), id] as const,
+  details: () => [...schoolKeys.all, 'detail'] as const, // Fixed
+  detail: (id: string) => [...schoolKeys.details(), id] as const, // Fixed
 };
 
 // Types
@@ -33,8 +33,9 @@ export const useSchools = () => {
 
 export const useSchool = (id: string) => {
   return useQuery({
-    queryKey: schoolKeys.detail(id),
-    queryFn: () => SchoolService.findById(id),
+    queryKey: schoolKeys.lists(),
+    queryFn: () => SchoolService.fetchAll(),
+    select: (schools) => schools.find((school) => school.id === id),
     staleTime: Infinity,
     enabled: !!id,
   });
