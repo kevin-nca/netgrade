@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   IonButtons,
@@ -41,7 +41,7 @@ const SchoolPage: React.FC = () => {
   const history = useHistory();
 
   const { data: school, isLoading: isSchoolLoading } = useSchool(schoolId);
-  const { data: subjectsData = [], isLoading :isSchoolSubjectsLoading } =
+  const { data: subjectsData = [], isLoading: isSchoolSubjectsLoading } =
     useSchoolSubjects(schoolId);
 
   console.log(school, subjectsData, isSchoolLoading, isSchoolSubjectsLoading);
@@ -49,7 +49,6 @@ const SchoolPage: React.FC = () => {
   const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
 
   const updateSubjectMutation = useUpdateSubject();
-
 
   const goToGradesPage = (subject: Subject) => {
     history.push(
