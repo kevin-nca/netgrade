@@ -38,15 +38,16 @@ const SchoolPage: React.FC = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [subjectToEdit, setSubjectToEdit] = useState<Subject | null>(null);
   const { schoolId } = useParams<{ schoolId: string }>();
+  console.log('schoolId123:', schoolId);
   const history = useHistory();
 
   const { data: school, isLoading: isSchoolLoading } = useSchool(schoolId);
-  const { data: subjectsData = [], isLoading: isSchoolSubjectsLoading } =
+  const { data: subjectsData, isLoading: isSchoolSubjectsLoading } =
     useSchoolSubjects(schoolId);
 
   console.log(school, subjectsData, isSchoolLoading, isSchoolSubjectsLoading);
 
-  const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
 
   const updateSubjectMutation = useUpdateSubject();
 
@@ -99,7 +100,7 @@ const SchoolPage: React.FC = () => {
   return (
     <IonPage>
       <Header
-        title={school ? school.name : 'Schule nicht gefunden'}
+        title={school!.name}
         backButton={true}
         defaultHref={Routes.HOME}
         endSlot={
@@ -113,7 +114,7 @@ const SchoolPage: React.FC = () => {
       />
       <IonContent>
         <IonList>
-          {subjects.map((subject: Subject) => {
+          {subjectsData?.map((subject: Subject) => {
             const average = SchoolService.calculateSubjectAverage(subject);
 
             return (
