@@ -18,10 +18,11 @@ import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import { Subject } from '@/db/entities';
 import {
+  useSchool,
+  useSchoolSubjects,
   useAddSubject,
   useDeleteSubject,
   useUpdateSubject,
-  useSchools,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/components/modals/EditSubjectModal';
@@ -39,21 +40,16 @@ const SchoolPage: React.FC = () => {
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
-  const { data: schools } = useSchools();
+  const { data: school, isLoading: isSchoolLoading } = useSchool(schoolId);
+  const { data: subjectsData = [], isLoading :isSchoolSubjectsLoading } =
+    useSchoolSubjects(schoolId);
 
-  const school = schools?.find((s) => s.id === schoolId);
+  console.log(school, subjectsData, isSchoolLoading, isSchoolSubjectsLoading);
 
-  const subjectsData = school?.subjects;
-
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
 
   const updateSubjectMutation = useUpdateSubject();
 
-  useEffect(() => {
-    if (subjectsData) {
-      setSubjects(subjectsData);
-    }
-  }, [subjectsData]);
 
   const goToGradesPage = (subject: Subject) => {
     history.push(
@@ -104,7 +100,7 @@ const SchoolPage: React.FC = () => {
   return (
     <IonPage>
       <Header
-        title={school!.name}
+        title={school ? school.name : 'Schule nicht gefunden'}
         backButton={true}
         defaultHref={Routes.HOME}
         endSlot={

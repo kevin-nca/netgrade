@@ -21,14 +21,14 @@ export const preferencesKeys = {
     [...preferencesKeys.all, 'availableReminderTimes'] as const,
 };
 
-export const userNameQuery = {
+export const UserNameQuery = {
   queryKey: preferencesKeys.userName(),
   queryFn: () => PreferencesService.getName(),
   staleTime: Infinity,
 } as const;
 
 export const useUserName = () => {
-  return useQuery(userNameQuery);
+  return useQuery(UserNameQuery);
 };
 
 export const useSaveUserName = () => {
@@ -42,14 +42,14 @@ export const useSaveUserName = () => {
   });
 };
 
-export const onboardingCompletedQuery = {
+export const OnboardingCompletedQuery = {
   queryKey: preferencesKeys.onboardingCompleted() as QueryKey,
   queryFn: () => PreferencesService.isOnboardingCompleted(),
   staleTime: Infinity,
 } as const;
 
 export const useOnboardingCompleted = () => {
-  return useQuery(onboardingCompletedQuery);
+  return useQuery(OnboardingCompletedQuery);
 };
 
 export const useSetOnboardingCompleted = () => {
