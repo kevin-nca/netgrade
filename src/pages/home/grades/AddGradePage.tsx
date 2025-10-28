@@ -164,10 +164,6 @@ const AddGradePage: React.FC = () => {
       const subjectId = String(value);
       form.setFieldValue('selectedSubjectId', subjectId);
       setFieldErrors((prev) => ({ ...prev, selectedSubjectId: '' }));
-
-      if (subjectId && examNameRef.current) {
-        setTimeout(() => examNameRef.current?.setFocus(), 100);
-      }
     },
     [form],
   );
@@ -279,12 +275,6 @@ const AddGradePage: React.FC = () => {
     },
     [form, validateField],
   );
-
-  useEffect(() => {
-    if (selectedSchoolId && subjects.length > 0 && subjectRef.current) {
-      setTimeout(() => subjectRef.current?.focus(), 100);
-    }
-  }, [selectedSchoolId, subjects.length]);
 
   const schoolOptions = useMemo(
     () =>
