@@ -32,6 +32,14 @@ export const useSubjects = () => {
   });
 };
 
+export const useSubject = (id: string) => {
+  return useQuery({
+    queryKey: subjectKeys.detail(id),
+    queryFn: () => SubjectService.findById(id),
+    enabled: !!id,
+  });
+};
+
 export const useSchoolSubjects = (schoolId: string) => {
   return useQuery({
     queryKey: subjectKeys.schoolSubjects(schoolId),
