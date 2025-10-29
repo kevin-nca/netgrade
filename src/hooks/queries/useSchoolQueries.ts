@@ -32,9 +32,8 @@ export const useSchools = () => {
 
 export const useSchool = (id: string) => {
   return useQuery({
-    queryKey: schoolKeys.lists(),
-    queryFn: () => SchoolService.fetchAll(),
-    select: (schools) => schools.find((school) => school.id === id),
+    queryKey: schoolKeys.list({ id }),
+    queryFn: () => SchoolService.findById(id),
     staleTime: Infinity,
     enabled: !!id,
   });
