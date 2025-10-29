@@ -4,6 +4,7 @@ import React from 'react';
 import { IonApp } from '@ionic/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppRouter } from '@/AppRouter';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 function App({ queryClient }: { queryClient: QueryClient }) {
   return (
@@ -12,6 +13,7 @@ function App({ queryClient }: { queryClient: QueryClient }) {
         <IonApp>
           <AppRouter />
         </IonApp>
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </React.StrictMode>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   IonButtons,
@@ -38,25 +38,21 @@ const SchoolPage: React.FC = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [subjectToEdit, setSubjectToEdit] = useState<Subject | null>(null);
   const { schoolId } = useParams<{ schoolId: string }>();
+  console.log('schoolId123:', schoolId);
   const history = useHistory();
 
-  const { data: school = null, error: schoolError } = useSchool(schoolId);
-  const { data: subjectsData = [], error: subjectsError } =
+  const { data: school, isLoading: isSchoolLoading } = useSchool(schoolId);
+  const { data: subjectsData, isLoading: isSchoolSubjectsLoading } =
     useSchoolSubjects(schoolId);
-  const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
+
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+
+  console.log(school, subjectsData);
+  console.log(subjects);
+  console.log(isSchoolLoading);
+  console.log(isSchoolSubjectsLoading);
 
   const updateSubjectMutation = useUpdateSubject();
-
-  useEffect(() => {
-    setSubjects(subjectsData);
-  }, [subjectsData]);
-
-  if (schoolError) {
-    console.error('Failed to fetch school:', schoolError);
-  }
-  if (subjectsError) {
-    console.error('Failed to fetch subjects:', subjectsError);
-  }
 
   const goToGradesPage = (subject: Subject) => {
     history.push(
@@ -107,7 +103,7 @@ const SchoolPage: React.FC = () => {
   return (
     <IonPage>
       <Header
-        title={school ? school.name : 'Schule nicht gefunden'}
+        title={school!.name}
         backButton={true}
         defaultHref={Routes.HOME}
         endSlot={
@@ -121,7 +117,7 @@ const SchoolPage: React.FC = () => {
       />
       <IonContent>
         <IonList>
-          {subjects.map((subject: Subject) => {
+          {subjectsData?.map((subject: Subject) => {
             const average = SchoolService.calculateSubjectAverage(subject);
 
             return (
