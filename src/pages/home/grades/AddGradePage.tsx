@@ -6,8 +6,8 @@ import React, {
   useCallback,
 } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { IonContent, IonPage, IonToast, IonIcon } from '@ionic/react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { IonContent, IonPage, IonToast, IonIcon, IonInput } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 import {
   schoolOutline,
   libraryOutline,
@@ -27,7 +27,6 @@ import {
   useSchools,
   useSchoolSubjects,
   useAddGradeWithExam,
-  useSubjectGrades,
 } from '@/hooks/queries';
 import {
   validateGrade,
@@ -37,27 +36,23 @@ import {
 import { Routes } from '@/routes';
 import './AddGradePage.css';
 
+import type {
+  IonInputCustomEvent,
+  InputInputEventDetail,
+} from '@ionic/core/components';
+
 interface GradeAddFormData {
   selectedSchoolId: string;
   selectedSubjectId: string;
   examName: string;
   date: string; // Store as ISO string e.g., "YYYY-MM-DD"
-  weight: number;
-  score: number;
+  weight: string;
+  score: string;
   comment: string;
 }
 
-const getLastUsedSchool = () => localStorage.getItem('lastUsedSchool') || '';
-const setLastUsedSchool = (schoolId: string) => {
-  if (schoolId) localStorage.setItem('lastUsedSchool', schoolId);
-};
-
 const AddGradePage: React.FC = () => {
   const history = useHistory();
-  const location = useLocation<{
-    schoolId?: string;
-    subjectId?: string;
-  }>();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
@@ -65,23 +60,20 @@ const AddGradePage: React.FC = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
   const subjectRef = useRef<HTMLSelectElement>(null);
-  const examNameRef = useRef<HTMLInputElement>(null);
-  const weightRef = useRef<HTMLInputElement>(null);
-  const scoreRef = useRef<HTMLInputElement>(null);
 
   const form = useForm({
     defaultValues: {
-      selectedSchoolId: location.state?.schoolId || getLastUsedSchool(),
-      selectedSubjectId: location.state?.subjectId || '',
+      selectedSchoolId: '',
+      selectedSubjectId: '',
       examName: '',
       date: format(new Date(), 'yyyy-MM-dd'),
-      weight: 100,
-      score: 0,
+      weight: '',
+      score: '',
       comment: '',
     } as GradeAddFormData,
     onSubmit: async ({ value }) => {
-      const scoreNumber = Number(value.score);
-      const weightNumber = Number(value.weight);
+      const scoreNumber = +String(value.score).replace(',', '.');
+      const weightNumber = +String(value.weight).replace(',', '.');
 
       const gradeError = validateGrade(scoreNumber);
       if (gradeError) {
@@ -106,16 +98,8 @@ const AddGradePage: React.FC = () => {
 
       addGradeWithExamMutation.mutate(gradePayload, {
         onSuccess: () => {
-          setLastUsedSchool(value.selectedSchoolId);
           setShowSuccess(true);
-          const nextExamName = generateDefaultExamName(value.selectedSubjectId);
-
           form.reset();
-          form.setFieldValue('selectedSchoolId', value.selectedSchoolId);
-          form.setFieldValue('selectedSubjectId', value.selectedSubjectId);
-          form.setFieldValue('examName', nextExamName);
-          form.setFieldValue('date', format(new Date(), 'yyyy-MM-dd'));
-          form.setFieldValue('weight', 100);
 
           setTimeout(() => history.push(Routes.HOME), 1200);
         },
@@ -139,6 +123,9 @@ const AddGradePage: React.FC = () => {
         if (!value.examName.trim()) {
           errors.examName = 'Bitte gib einen Prüfungsnamen ein!';
         }
+        if (!String(value.weight ?? '').trim()) {
+          errors.weight = 'Bitte gib eine Gewichtung ein!';
+        }
 
         if (Object.keys(errors).length > 0) {
           setFieldErrors(errors);
@@ -153,23 +140,9 @@ const AddGradePage: React.FC = () => {
   });
 
   const { data: schools = [], error: schoolsError } = useSchools();
-  const [selectedSchoolId, setSelectedSchoolId] = useState(
-    location.state?.schoolId || getLastUsedSchool(),
-  );
+  const [selectedSchoolId, setSelectedSchoolId] = useState('');
   const { data: subjects = [], error: subjectsError } =
     useSchoolSubjects(selectedSchoolId);
-  const selectedSubjectId = form.state.values.selectedSubjectId;
-  const { data: subjectGrades = [] } = useSubjectGrades(selectedSubjectId);
-  useEffect(() => {
-    const state = location.state || {};
-    if (state.schoolId) {
-      form.setFieldValue('selectedSchoolId', state.schoolId);
-      setSelectedSchoolId(state.schoolId); // Also update state for query
-    }
-    if (state.subjectId) {
-      form.setFieldValue('selectedSubjectId', state.subjectId);
-    }
-  }, [form, location.state]);
 
   useEffect(() => {
     if (schoolsError) {
@@ -180,37 +153,14 @@ const AddGradePage: React.FC = () => {
     }
   }, [schoolsError, subjectsError]);
 
-  const generateDefaultExamName = useCallback(
-    (subjectId: string) => {
-      if (!subjectId || !subjectGrades) return '';
-      const examCount = subjectGrades.length;
-      const nextNumber = examCount + 1;
-
-      return `Prüfung ${nextNumber}`;
-    },
-    [subjectGrades],
-  );
-
   const handleSubjectChange = useCallback(
     (value: string | number | boolean) => {
       const subjectId = String(value);
       form.setFieldValue('selectedSubjectId', subjectId);
       setFieldErrors((prev) => ({ ...prev, selectedSubjectId: '' }));
-
-      if (subjectId && examNameRef.current) {
-        setTimeout(() => examNameRef.current?.focus(), 100);
-      }
     },
     [form],
   );
-  useEffect(() => {
-    if (selectedSubjectId && subjectGrades) {
-      const defaultName = generateDefaultExamName(selectedSubjectId);
-      if (defaultName && form.state.values.examName !== defaultName) {
-        form.setFieldValue('examName', defaultName);
-      }
-    }
-  }, [selectedSubjectId, subjectGrades, generateDefaultExamName, form]);
 
   const handleSchoolChange = useCallback(
     (value: string | number | boolean) => {
@@ -291,56 +241,26 @@ const AddGradePage: React.FC = () => {
     [],
   );
 
-  const handleScoreChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      const numValue = value === '' ? 0 : parseFloat(value) || 0;
-      form.setFieldValue('score', numValue);
-      validateField('score', value);
-    },
-    [form, validateField],
-  );
+  const handleExamNameInput = (
+    e: IonInputCustomEvent<InputInputEventDetail>,
+  ) => {
+    const value = e.detail.value ?? '';
+    form.setFieldValue('examName', value);
+    validateField('examName', value);
+  };
 
-  const handleWeightChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      const numValue = value === '' ? 0 : parseFloat(value) || 0;
-      form.setFieldValue('weight', numValue);
-      validateField('weight', value);
-    },
-    [form, validateField],
-  );
+  const handleWeightInput = (e: IonInputCustomEvent<InputInputEventDetail>) => {
+    const value = e.detail.value ?? '';
+    form.setFieldValue('weight', value);
+    validateField('weight', value);
+  };
 
-  const handleExamNameChange = useCallback(
-    (value: string) => {
-      form.setFieldValue('examName', value);
-      validateField('examName', value);
-    },
-    [form, validateField],
-  );
+  const handleScoreInput = (e: IonInputCustomEvent<InputInputEventDetail>) => {
+    const value = e.detail.value ?? '';
+    form.setFieldValue('score', value);
+    validateField('score', value);
+  };
 
-  useEffect(() => {
-    if (selectedSchoolId && subjects.length > 0 && subjectRef.current) {
-      setTimeout(() => subjectRef.current?.focus(), 100);
-    }
-  }, [selectedSchoolId, subjects.length]);
-  useEffect(() => {
-    if (schools.length === 1 && !form.state.values.selectedSchoolId) {
-      const onlySchool = schools[0];
-      form.setFieldValue('selectedSchoolId', onlySchool.id);
-      setSelectedSchoolId(onlySchool.id);
-    }
-  }, [schools, form]);
-  useEffect(() => {
-    if (
-      subjects.length === 1 &&
-      selectedSchoolId &&
-      !form.state.values.selectedSubjectId
-    ) {
-      const onlySubject = subjects[0];
-      form.setFieldValue('selectedSubjectId', onlySubject.id);
-    }
-  }, [subjects, selectedSchoolId, form]);
   const schoolOptions = useMemo(
     () =>
       schools.map((school: School) => ({
@@ -361,7 +281,7 @@ const AddGradePage: React.FC = () => {
 
   const formProgress = useMemo(() => {
     const values = form.state.values;
-    const fields = [
+    const fields: (keyof GradeAddFormData)[] = [
       'selectedSchoolId',
       'selectedSubjectId',
       'examName',
@@ -370,8 +290,8 @@ const AddGradePage: React.FC = () => {
       'score',
     ];
     const completed = fields.filter((field) => {
-      const value = values[field as keyof GradeAddFormData];
-      return value !== '' && value !== 0;
+      const value = values[field];
+      return value !== '' && value !== null && value !== '';
     }).length;
     return Math.round((completed / fields.length) * 100);
   }, [form.state.values]);
@@ -389,7 +309,7 @@ const AddGradePage: React.FC = () => {
         backButton={true}
         onBack={() => window.history.back()}
       />
-      <IonContent className="add-grade-content" scrollY={false}>
+      <IonContent className="add-grade-content" scrollY={true}>
         <div className="content-wrapper">
           <div className="gradient-orb" />
           {showSuccess && (
@@ -540,13 +460,13 @@ const AddGradePage: React.FC = () => {
                         <label className="field-label" htmlFor="exam-name">
                           Prüfungsname *
                         </label>
-                        <input
+                        <IonInput
                           id="exam-name"
-                          ref={examNameRef}
                           className="form-input"
                           type="text"
-                          value={field.state.value}
-                          onChange={(e) => handleExamNameChange(e.target.value)}
+                          value={String(field.state.value ?? '')}
+                          onIonInput={handleExamNameInput}
+                          onIonBlur={field.handleBlur}
                           placeholder="z.B. Klausur 1, Vokabeltest"
                           aria-describedby={
                             fieldErrors.examName ? 'exam-name-error' : undefined
@@ -611,18 +531,18 @@ const AddGradePage: React.FC = () => {
                           Gewichtung (0-100%)
                         </label>
                         <div className="weight-input-container">
-                          <input
+                          <IonInput
                             id="weight"
-                            ref={weightRef}
                             className="form-input weight-input"
-                            type="number"
-                            inputMode="decimal"
-                            pattern="[0-9]*\.?[0-9]*"
+                            type="text"
+                            inputmode="decimal"
                             min="0"
                             max="100"
                             step="0.01"
-                            value={field.state.value}
-                            onChange={handleWeightChange}
+                            value={String(field.state.value ?? '')}
+                            onIonInput={handleWeightInput}
+                            onIonBlur={field.handleBlur}
+                            required
                             placeholder="100"
                           />
                           <div className="weight-quick-actions">
@@ -630,7 +550,7 @@ const AddGradePage: React.FC = () => {
                               type="button"
                               className="weight-preset-btn"
                               onClick={() => {
-                                form.setFieldValue('weight', 25);
+                                form.setFieldValue('weight', '25');
                                 validateField('weight', '25');
                               }}
                               tabIndex={-1}
@@ -641,7 +561,7 @@ const AddGradePage: React.FC = () => {
                               type="button"
                               className="weight-preset-btn"
                               onClick={() => {
-                                form.setFieldValue('weight', 50);
+                                form.setFieldValue('weight', '50');
                                 validateField('weight', '50');
                               }}
                               tabIndex={-1}
@@ -652,7 +572,7 @@ const AddGradePage: React.FC = () => {
                               type="button"
                               className="weight-preset-btn"
                               onClick={() => {
-                                form.setFieldValue('weight', 100);
+                                form.setFieldValue('weight', '100');
                                 validateField('weight', '100');
                               }}
                               tabIndex={-1}
@@ -661,7 +581,23 @@ const AddGradePage: React.FC = () => {
                             </button>
                           </div>
                         </div>
-                        <div className="message-area"></div>
+                        <div className="message-area">
+                          {fieldErrors.weight && (
+                            <div
+                              id="weight-error"
+                              className="field-error"
+                              role="alert"
+                            >
+                              {fieldErrors.weight}
+                            </div>
+                          )}
+                          {fieldErrors.weight_suggestion &&
+                            !fieldErrors.weight && (
+                              <div className="field-suggestion">
+                                {fieldErrors.weight_suggestion}
+                              </div>
+                            )}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -679,17 +615,17 @@ const AddGradePage: React.FC = () => {
                         <label className="field-label" htmlFor="score">
                           Note (1-6) *
                         </label>
-                        <input
+                        <IonInput
                           id="score"
-                          ref={scoreRef}
                           className="form-input"
-                          type="number"
-                          inputMode="decimal"
+                          type="text"
+                          inputmode="decimal"
                           min="1"
                           max="6"
                           step="0.01"
-                          value={field.state.value || ''}
-                          onChange={handleScoreChange}
+                          value={String(field.state.value ?? '')}
+                          onIonInput={handleScoreInput}
+                          onIonBlur={field.handleBlur}
                           placeholder="6.0"
                           aria-describedby={
                             fieldErrors.score ? 'score-error' : undefined
