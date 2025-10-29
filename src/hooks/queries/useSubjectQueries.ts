@@ -44,7 +44,6 @@ export const useSchoolSubjects = (schoolId: string) => {
   return useQuery({
     queryKey: subjectKeys.schoolSubjects(schoolId),
     queryFn: () => SubjectService.findBySchoolId(schoolId),
-    enabled: !!schoolId,
   });
 };
 
