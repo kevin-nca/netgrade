@@ -41,11 +41,11 @@ const SchoolPage: React.FC = () => {
   console.log('schoolId123:', schoolId);
   const history = useHistory();
 
-  const { data: school, isLoading: isSchoolLoading } = useSchool(schoolId);
+  const { data: school } = useSchool(schoolId);
   const { data: subjectsData, isLoading: isSchoolSubjectsLoading } =
     useSchoolSubjects(schoolId);
 
-  console.log(school, subjectsData, isSchoolLoading, isSchoolSubjectsLoading);
+  console.log(school, subjectsData, isSchoolSubjectsLoading);
 
   const [subjects, setSubjects] = useState<Subject[]>([]);
 
