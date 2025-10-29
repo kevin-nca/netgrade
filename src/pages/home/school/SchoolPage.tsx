@@ -38,12 +38,19 @@ const SchoolPage: React.FC = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [subjectToEdit, setSubjectToEdit] = useState<Subject | null>(null);
   const { schoolId } = useParams<{ schoolId: string }>();
+  console.log('schoolId123:', schoolId);
   const history = useHistory();
 
-  const { data: school } = useSchool(schoolId);
-  const { data: subjectsData } = useSchoolSubjects(schoolId);
+  const { data: school, isLoading: isSchoolLoading } = useSchool(schoolId);
+  const { data: subjectsData, isLoading: isSchoolSubjectsLoading } =
+    useSchoolSubjects(schoolId);
 
   const [subjects, setSubjects] = useState<Subject[]>([]);
+
+  console.log(school, subjectsData);
+  console.log(subjects);
+  console.log(isSchoolLoading);
+  console.log(isSchoolSubjectsLoading);
 
   const updateSubjectMutation = useUpdateSubject();
 
