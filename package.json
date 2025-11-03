@@ -30,7 +30,7 @@
     "@capacitor/local-notifications": "^7.0.2",
     "@capacitor/preferences": "^7.0.2",
     "@capacitor/share": "^7.0.1",
-    "@capacitor/status-bar": "^7.0.1",
+    "@capacitor/status-bar": "^7.0.3",
     "@ionic-native/social-sharing": "^5.36.0",
     "@ionic/core": "^8.7.7",
     "@ionic/react": "^8.7.3",
