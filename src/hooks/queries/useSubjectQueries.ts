@@ -8,8 +8,6 @@ export const subjectKeys = {
   lists: () => [...subjectKeys.all, 'list'] as const,
   list: (filters: Record<string, unknown>) =>
     [...subjectKeys.lists(), { filters }] as const,
-  details: () => [...subjectKeys.all, 'detail'] as const,
-  detail: (id: string) => [...subjectKeys.details(), id] as const,
   schoolSubjects: (schoolId: string) =>
     [...subjectKeys.all, 'school', schoolId] as const,
 };
@@ -34,7 +32,7 @@ export const useSubjects = () => {
 
 export const useSubject = (id: string) => {
   return useQuery({
-    queryKey: subjectKeys.detail(id),
+    queryKey: subjectKeys.list({ id }),
     queryFn: () => SubjectService.findById(id),
     enabled: !!id,
   });
@@ -75,7 +73,7 @@ export const useUpdateSubject = () => {
     onSuccess: (updatedSubject) => {
       // Update the subject in the cache
       queryClient.invalidateQueries({
-        queryKey: subjectKeys.detail(updatedSubject.id),
+        queryKey: subjectKeys.list({ id: updatedSubject.id }),
       });
       // Invalidate and refetch subjects list
       queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
@@ -94,10 +92,10 @@ export const useDeleteSubject = () => {
 
   return useMutation({
     mutationFn: (subjectId: string) => SubjectService.delete(subjectId),
-    onSuccess: (deletedSubjectId) => {
-      // Remove the subject from the cache
+    onSuccess: (id) => {
+      // Remove the specific subject from cache
       queryClient.removeQueries({
-        queryKey: subjectKeys.detail(deletedSubjectId),
+        queryKey: subjectKeys.list({ id }),
       });
       // Invalidate and refetch subjects list
       queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
