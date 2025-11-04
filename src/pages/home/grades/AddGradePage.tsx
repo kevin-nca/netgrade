@@ -1,12 +1,15 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-  useCallback,
-} from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import {
+  IonContent,
+  IonPage,
+  IonToast,
+  IonIcon,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
+} from '@ionic/react';
+
 import { useForm } from '@tanstack/react-form';
-import { IonContent, IonPage, IonToast, IonIcon, IonInput } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
   schoolOutline,
@@ -59,7 +62,6 @@ const AddGradePage: React.FC = () => {
   const [showNavigationModal, setShowNavigationModal] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
-  const subjectRef = useRef<HTMLSelectElement>(null);
 
   const form = useForm({
     defaultValues: {
@@ -354,25 +356,30 @@ const AddGradePage: React.FC = () => {
                         <label className="field-label" htmlFor="school-select">
                           Schule *
                         </label>
-                        <select
+                        <IonSelect
                           id="school-select"
                           className="form-input"
+                          interface="popover"
+                          placeholder="Schule auswählen"
                           value={field.state.value}
-                          onChange={(e) => handleSchoolChange(e.target.value)}
+                          onIonChange={(e) =>
+                            handleSchoolChange(e.detail.value)
+                          }
                           aria-describedby={
                             fieldErrors.selectedSchoolId
                               ? 'school-error'
                               : undefined
                           }
-                          required
                         >
-                          <option value="">Schule auswählen</option>
                           {schoolOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
+                            <IonSelectOption
+                              key={option.value}
+                              value={option.value}
+                            >
                               {option.label}
-                            </option>
+                            </IonSelectOption>
                           ))}
-                        </select>
+                        </IonSelect>
                         <div className="message-area">
                           {fieldErrors.selectedSchoolId && (
                             <div
@@ -401,12 +408,19 @@ const AddGradePage: React.FC = () => {
                         <label className="field-label" htmlFor="subject-select">
                           Fach *
                         </label>
-                        <select
+                        <IonSelect
                           id="subject-select"
-                          ref={subjectRef}
                           className="form-input"
+                          interface="popover"
+                          placeholder={
+                            !form.state.values.selectedSchoolId
+                              ? 'Bitte zuerst Schule wählen'
+                              : 'Fach auswählen'
+                          }
                           value={field.state.value}
-                          onChange={(e) => handleSubjectChange(e.target.value)}
+                          onIonChange={(e) =>
+                            handleSubjectChange(e.detail.value)
+                          }
                           disabled={
                             !form.state.values.selectedSchoolId ||
                             subjects.length === 0
@@ -416,19 +430,16 @@ const AddGradePage: React.FC = () => {
                               ? 'subject-error'
                               : undefined
                           }
-                          required
                         >
-                          <option value="">
-                            {!form.state.values.selectedSchoolId
-                              ? 'Bitte zuerst Schule wählen'
-                              : 'Fach auswählen'}
-                          </option>
                           {subjectOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
+                            <IonSelectOption
+                              key={option.value}
+                              value={option.value}
+                            >
                               {option.label}
-                            </option>
+                            </IonSelectOption>
                           ))}
-                        </select>
+                        </IonSelect>
                         <div className="message-area">
                           {fieldErrors.selectedSubjectId && (
                             <div
@@ -464,6 +475,7 @@ const AddGradePage: React.FC = () => {
                           id="exam-name"
                           className="form-input"
                           type="text"
+                          enterKeyHint="done"
                           value={String(field.state.value ?? '')}
                           onIonInput={handleExamNameInput}
                           onIonBlur={field.handleBlur}
@@ -497,7 +509,9 @@ const AddGradePage: React.FC = () => {
 
                 <form.Field name="date">
                   {(field) => (
-                    <div className="input-row">
+                    <div
+                      className={`input-row ${fieldErrors.date ? 'error' : ''}`}
+                    >
                       <div className="field-icon-wrapper">
                         <IonIcon
                           icon={calendarOutline}
@@ -505,14 +519,35 @@ const AddGradePage: React.FC = () => {
                         />
                       </div>
                       <div className="field-content">
-                        <label className="field-label">Datum</label>
-                        <input
+                        <label className="field-label" htmlFor="exam-date">
+                          Datum *
+                        </label>
+                        <IonInput
+                          id="exam-date"
                           className="form-input"
                           type="date"
                           value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
+                          onIonChange={(e) => {
+                            const val = e.detail.value ?? '';
+                            field.handleChange(val);
+                            setFieldErrors((prev) => ({ ...prev, date: '' }));
+                          }}
+                          aria-describedby={
+                            fieldErrors.date ? 'date-error' : undefined
+                          }
+                          required
                         />
-                        <div className="message-area"></div>
+                        <div className="message-area">
+                          {fieldErrors.date && (
+                            <div
+                              id="date-error"
+                              className="field-error"
+                              role="alert"
+                            >
+                              {fieldErrors.date}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
