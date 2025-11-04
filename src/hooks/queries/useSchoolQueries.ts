@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SchoolService } from '@/services/SchoolService';
 import { School } from '@/db/entities/School';
 
@@ -20,20 +20,28 @@ export interface AddSchoolPayload {
 
 // Hooks
 
-export const SchoolQuery = {
+export const SchoolsQuery = {
   queryKey: schoolKeys.lists(),
   queryFn: () => SchoolService.fetchAll(),
   staleTime: Infinity,
 } as const;
 
 export const useSchools = () => {
-  return useQuery(SchoolQuery);
+  return useQuery(SchoolsQuery);
 };
 
 export const useSchool = (id: string) => {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: schoolKeys.list({ id }),
     queryFn: () => SchoolService.findById(id),
+    // Hack s.t. prefetching works correctly and this
+    // query never fetches if data is already available
+    initialData: () => {
+      return queryClient
+        .getQueryData<School[]>(schoolKeys.lists())
+        ?.find((s) => s.id === id);
+    },
     staleTime: Infinity,
     enabled: !!id,
   });

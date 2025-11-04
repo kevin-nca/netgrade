@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SubjectService } from '@/services/SubjectService';
 import { Subject } from '@/db/entities/Subject';
 
@@ -22,12 +22,14 @@ export interface AddSubjectPayload {
 }
 
 // Hooks
+export const SubjectsQuery = {
+  queryKey: subjectKeys.lists(),
+  queryFn: () => SubjectService.fetchAll(),
+  staleTime: Infinity,
+} as const;
+
 export const useSubjects = () => {
-  return useQuery({
-    queryKey: subjectKeys.lists(),
-    queryFn: () => SubjectService.fetchAll(),
-    staleTime: Infinity,
-  });
+  return useQuery(SubjectsQuery);
 };
 
 export const useSubject = (id: string) => {
@@ -39,12 +41,27 @@ export const useSubject = (id: string) => {
 };
 
 export const useSchoolSubjects = (schoolId: string) => {
+  const queryClient = useQueryClient();
+
   return useQuery({
     queryKey: subjectKeys.schoolSubjects(schoolId),
     queryFn: () => SubjectService.findBySchoolId(schoolId),
+    // Hack s.t. prefetching works correctly and this
+    // query never fetches if data is already available
+    initialData: () => {
+      return queryClient
+        .getQueryData<Subject[]>(subjectKeys.lists())
+        ?.filter((s) => s.schoolId === schoolId);
+    },
+    staleTime: Infinity,
     enabled: !!schoolId,
   });
 };
+
+// page {
+//   useSchools();
+//   useSchool(); // should not fetch
+// }
 
 export const useAddSubject = () => {
   const queryClient = useQueryClient();

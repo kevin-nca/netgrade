@@ -18,10 +18,10 @@ import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import { Subject } from '@/db/entities';
 import {
-  useSchool,
-  useSchoolSubjects,
   useAddSubject,
   useDeleteSubject,
+  useSchool,
+  useSchoolSubjects,
   useUpdateSubject,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
@@ -38,19 +38,21 @@ const SchoolPage: React.FC = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [subjectToEdit, setSubjectToEdit] = useState<Subject | null>(null);
   const { schoolId } = useParams<{ schoolId: string }>();
-  console.log('schoolId123:', schoolId);
   const history = useHistory();
 
   const { data: school, isLoading: isSchoolLoading } = useSchool(schoolId);
   const { data: subjectsData, isLoading: isSchoolSubjectsLoading } =
     useSchoolSubjects(schoolId);
 
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+  console.log({
+    schoolId,
+    isSchoolLoading,
+    isSchoolSubjectsLoading,
+    school,
+    subjectsData,
+  });
 
-  console.log(school, subjectsData);
-  console.log(subjects);
-  console.log(isSchoolLoading);
-  console.log(isSchoolSubjectsLoading);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
 
   const updateSubjectMutation = useUpdateSubject();
 
