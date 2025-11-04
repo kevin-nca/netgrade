@@ -35,8 +35,6 @@ export const useSchool = (id: string) => {
   return useQuery({
     queryKey: schoolKeys.list({ id }),
     queryFn: () => SchoolService.findById(id),
-    // Hack s.t. prefetching works correctly and this
-    // query never fetches if data is already available
     initialData: () => {
       return queryClient
         .getQueryData<School[]>(schoolKeys.lists())

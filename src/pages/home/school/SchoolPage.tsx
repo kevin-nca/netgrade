@@ -40,17 +40,8 @@ const SchoolPage: React.FC = () => {
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
-  const { data: school, isLoading: isSchoolLoading } = useSchool(schoolId);
-  const { data: subjectsData, isLoading: isSchoolSubjectsLoading } =
-    useSchoolSubjects(schoolId);
-
-  console.log({
-    schoolId,
-    isSchoolLoading,
-    isSchoolSubjectsLoading,
-    school,
-    subjectsData,
-  });
+  const { data: school } = useSchool(schoolId);
+  const { data: subjectsData } = useSchoolSubjects(schoolId);
 
   const [subjects, setSubjects] = useState<Subject[]>([]);
 

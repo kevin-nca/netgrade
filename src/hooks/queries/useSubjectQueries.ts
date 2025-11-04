@@ -46,8 +46,6 @@ export const useSchoolSubjects = (schoolId: string) => {
   return useQuery({
     queryKey: subjectKeys.schoolSubjects(schoolId),
     queryFn: () => SubjectService.findBySchoolId(schoolId),
-    // Hack s.t. prefetching works correctly and this
-    // query never fetches if data is already available
     initialData: () => {
       return queryClient
         .getQueryData<Subject[]>(subjectKeys.lists())
@@ -57,11 +55,6 @@ export const useSchoolSubjects = (schoolId: string) => {
     enabled: !!schoolId,
   });
 };
-
-// page {
-//   useSchools();
-//   useSchool(); // should not fetch
-// }
 
 export const useAddSubject = () => {
   const queryClient = useQueryClient();
