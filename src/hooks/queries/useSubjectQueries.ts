@@ -33,9 +33,15 @@ export const useSubjects = () => {
 };
 
 export const useSubject = (id: string) => {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: subjectKeys.list({ id }),
     queryFn: () => SubjectService.findById(id),
+    initialData: () => {
+      return queryClient
+        .getQueryData<Subject[]>(subjectKeys.lists())
+        ?.find((s) => s.id === id);
+    },
     enabled: !!id,
   });
 };
