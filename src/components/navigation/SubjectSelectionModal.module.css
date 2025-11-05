@@ -1,0 +1,60 @@
+.modal {
+  --height: 50%;
+  --width: 100%;
+  --border-radius: 48px;
+  --box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.modalContent {
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.modalContent h1 {
+  text-align: center;
+}
+
+.addSubject {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px;
+  margin: 1px;
+}
+
+.addSubject :global(ion-item) {
+  --background: transparent;
+  text-align: center;
+}
+
+.addButton {
+  height: 52px;
+  border-radius: 12px;
+  padding: 0 2px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  flex: 1;
+  color: #fff;
+  --background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px 24px 16px;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .modalContent {
+    color: #fff;
+  }
+
+  .addSubject :global(ion-item) {
+    --color: #fff;
+    --placeholder-color: rgba(255, 255, 255, 0.5);
+  }
+}
