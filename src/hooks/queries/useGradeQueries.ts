@@ -28,9 +28,15 @@ export const useGrades = () => {
 };
 
 export const useSubjectGrades = (subjectId: string) => {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: gradeKeys.subjectGrades(subjectId),
     queryFn: () => GradeService.findBySubjectId(subjectId),
+    initialData: () => {
+      return queryClient
+        .getQueryData<Grade[]>(gradeKeys.lists())
+        ?.filter((g) => g.exam?.subjectId === subjectId);
+    },
   });
 };
 
