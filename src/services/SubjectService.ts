@@ -9,7 +9,14 @@ export class SubjectService {
   static async fetchAll(): Promise<Subject[]> {
     try {
       const { subject: subjectRepo } = getRepositories();
-      return await subjectRepo.find({ order: { name: 'ASC' } });
+      return await subjectRepo.find({
+        order: { name: 'ASC' },
+        relations: {
+          exams: {
+            grade: true,
+          },
+        },
+      });
     } catch (error) {
       console.error('Failed to fetch subjects:', error);
       throw error;

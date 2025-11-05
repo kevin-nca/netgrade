@@ -1,15 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SchoolService } from '@/services/SchoolService';
 import { School } from '@/db/entities/School';
 
 // Query keys
+
 export const schoolKeys = {
   all: ['schools'] as const,
   lists: () => [...schoolKeys.all, 'list'] as const,
   list: (filters: Record<string, unknown>) =>
     [...schoolKeys.lists(), { filters }] as const,
-  details: () => [...schoolKeys.all, 'detail'] as const,
-  detail: (id: string) => [...schoolKeys.details(), id] as const,
 };
 
 // Types
@@ -21,20 +20,27 @@ export interface AddSchoolPayload {
 
 // Hooks
 
-export const SchoolQuery = {
+export const SchoolsQuery = {
   queryKey: schoolKeys.lists(),
   queryFn: () => SchoolService.fetchAll(),
   staleTime: Infinity,
 } as const;
 
 export const useSchools = () => {
-  return useQuery(SchoolQuery);
+  return useQuery(SchoolsQuery);
 };
 
 export const useSchool = (id: string) => {
+  const queryClient = useQueryClient();
   return useQuery({
-    queryKey: schoolKeys.detail(id),
+    queryKey: schoolKeys.list({ id }),
     queryFn: () => SchoolService.findById(id),
+    initialData: () => {
+      return queryClient
+        .getQueryData<School[]>(schoolKeys.lists())
+        ?.find((s) => s.id === id);
+    },
+    staleTime: Infinity,
     enabled: !!id,
   });
 };
@@ -57,13 +63,8 @@ export const useUpdateSchool = () => {
   return useMutation({
     mutationFn: (schoolData: Partial<School> & { id: string }) =>
       SchoolService.update(schoolData),
-    onSuccess: (updatedSchool) => {
-      // Update the school in the cache
-      queryClient.invalidateQueries({
-        queryKey: schoolKeys.detail(updatedSchool.id),
-      });
-      // Invalidate and refetch schools list
-      queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
+    onSuccess: (id) => {
+      queryClient.invalidateQueries({ queryKey: schoolKeys.list({ id }) });
     },
   });
 };
@@ -73,13 +74,8 @@ export const useDeleteSchool = () => {
 
   return useMutation({
     mutationFn: (schoolId: string) => SchoolService.delete(schoolId),
-    onSuccess: (deletedSchoolId) => {
-      // Remove the school from the cache
-      queryClient.removeQueries({
-        queryKey: schoolKeys.detail(deletedSchoolId),
-      });
-      // Invalidate and refetch schools list
-      queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
+    onSuccess: (id) => {
+      queryClient.invalidateQueries({ queryKey: schoolKeys.list({ id }) });
     },
   });
 };

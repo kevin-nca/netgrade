@@ -10,10 +10,10 @@ export enum Routes {
   HOME = '/main/home',
 
   // School routes
-  SCHOOL = '/main/home/:schoolId',
+  SCHOOL = '/main/home/schools/:schoolId',
 
   // Subject routes
-  SUBJECT_GRADES = '/main/home/:schoolId/:subjectId/grades',
+  SUBJECT_GRADES = '/main/home/schools/:schoolId/subjects/:subjectId/grades',
 
   // Grades routes
   GRADES_ADD = '/main/home/grades/add',

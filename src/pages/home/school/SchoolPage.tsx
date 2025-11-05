@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   IonButtons,
@@ -18,10 +18,10 @@ import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import { Subject } from '@/db/entities';
 import {
-  useSchool,
-  useSchoolSubjects,
   useAddSubject,
   useDeleteSubject,
+  useSchool,
+  useSchoolSubjects,
   useUpdateSubject,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
@@ -40,31 +40,18 @@ const SchoolPage: React.FC = () => {
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
-  const { data: school = null, error: schoolError } = useSchool(schoolId);
-  const { data: subjectsData = [], error: subjectsError } =
-    useSchoolSubjects(schoolId);
-  const [subjects, setSubjects] = useState<Subject[]>(subjectsData);
+  const { data: school } = useSchool(schoolId);
+  const { data: subjects } = useSchoolSubjects(schoolId);
 
+  const addSubjectMutation = useAddSubject();
   const updateSubjectMutation = useUpdateSubject();
-
-  useEffect(() => {
-    setSubjects(subjectsData);
-  }, [subjectsData]);
-
-  if (schoolError) {
-    console.error('Failed to fetch school:', schoolError);
-  }
-  if (subjectsError) {
-    console.error('Failed to fetch subjects:', subjectsError);
-  }
+  const deleteSubjectMutation = useDeleteSubject();
 
   const goToGradesPage = (subject: Subject) => {
     history.push(
       `${Routes.SUBJECT_GRADES.replace(':schoolId', schoolId).replace(':subjectId', subject.id)}`,
     );
   };
-
-  const addSubjectMutation = useAddSubject();
 
   const addSubjectToStore = (subjectData: SubjectToAdd) => {
     const payload = {
@@ -85,29 +72,22 @@ const SchoolPage: React.FC = () => {
     });
   };
 
-  const deleteSubjectMutation = useDeleteSubject();
-
-  const removeSubjectFromStore = (subjectId: string) => {
-    setSubjects((prev) => prev.filter((s) => s.id !== subjectId));
-    deleteSubjectMutation.mutate(subjectId, {
-      onError: (error) => {
-        console.error('Failed to remove subject:', error);
-      },
-    });
-  };
-
   const handleRemoveSubject = (
     subject: Subject,
     slidingItem: HTMLIonItemSlidingElement,
   ) => {
-    removeSubjectFromStore(subject.id);
+    deleteSubjectMutation.mutate(subject.id, {
+      onError: (error) => {
+        console.error('Failed to remove subject:', error);
+      },
+    });
     slidingItem.close();
   };
 
   return (
     <IonPage>
       <Header
-        title={school ? school.name : 'Schule nicht gefunden'}
+        title={school!.name}
         backButton={true}
         defaultHref={Routes.HOME}
         endSlot={
@@ -121,7 +101,7 @@ const SchoolPage: React.FC = () => {
       />
       <IonContent>
         <IonList>
-          {subjects.map((subject: Subject) => {
+          {subjects?.map((subject: Subject) => {
             const average = SchoolService.calculateSubjectAverage(subject);
 
             return (
@@ -167,10 +147,14 @@ const SchoolPage: React.FC = () => {
           isOpen={isModalOpen}
           setIsOpen={setModalOpen}
           isModule={false}
-          subjectsOrModules={subjects}
+          subjectsOrModules={subjects!}
           addToSubjectsOrModules={addSubjectToStore}
           removeFromSubjectsOrModules={(id: string) =>
-            removeSubjectFromStore(id)
+            deleteSubjectMutation.mutate(id, {
+              onError: (error) => {
+                console.error('Failed to remove subject:', error);
+              },
+            })
           }
           availableSubjects={[]}
         />
