@@ -41,7 +41,7 @@ const SchoolPage: React.FC = () => {
   const history = useHistory();
 
   const { data: school } = useSchool(schoolId);
-  const { data: subjectsData } = useSchoolSubjects(schoolId);
+  const { data: subjects } = useSchoolSubjects(schoolId);
 
   const addSubjectMutation = useAddSubject();
   const updateSubjectMutation = useUpdateSubject();
@@ -101,7 +101,7 @@ const SchoolPage: React.FC = () => {
       />
       <IonContent>
         <IonList>
-          {subjectsData?.map((subject: Subject) => {
+          {subjects?.map((subject: Subject) => {
             const average = SchoolService.calculateSubjectAverage(subject);
 
             return (
@@ -147,7 +147,7 @@ const SchoolPage: React.FC = () => {
           isOpen={isModalOpen}
           setIsOpen={setModalOpen}
           isModule={false}
-          subjectsOrModules={subjectsData!}
+          subjectsOrModules={subjects!}
           addToSubjectsOrModules={addSubjectToStore}
           removeFromSubjectsOrModules={(id: string) =>
             deleteSubjectMutation.mutate(id, {
