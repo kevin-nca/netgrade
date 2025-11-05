@@ -77,7 +77,6 @@ const SchoolPage: React.FC = () => {
   const deleteSubjectMutation = useDeleteSubject();
 
   const removeSubjectFromStore = (subjectId: string) => {
-    setSubjects((prev) => prev.filter((s) => s.id !== subjectId));
     deleteSubjectMutation.mutate(subjectId, {
       onError: (error) => {
         console.error('Failed to remove subject:', error);
