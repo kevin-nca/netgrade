@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-  IonContent,
   IonButtons,
+  IonContent,
   IonIcon,
   IonList,
   IonModal,
@@ -19,15 +19,15 @@ import FormField from '@/components/Form/FormField';
 import { Grade } from '@/db/entities';
 import {
   useDeleteGrade,
-  useUpdateExamAndGrade,
-  useSubjectGrades,
   useSubject,
+  useSubjectGrades,
+  useUpdateExamAndGrade,
 } from '@/hooks/queries';
 import {
+  decimalToPercentage,
+  percentageToDecimal,
   validateGrade,
   validateWeight,
-  percentageToDecimal,
-  decimalToPercentage,
 } from '@/utils/validation';
 import { useToast } from '@/hooks/useToast';
 import { Layout } from '@/components/Layout/Layout';
@@ -51,7 +51,7 @@ const GradeEntryPage: React.FC = () => {
   const history = useHistory();
 
   const {
-    data: grades = [],
+    data: grades,
     isLoading: isGradesLoading,
     isError: isGradesError,
   } = useSubjectGrades(subjectId);
@@ -127,7 +127,7 @@ const GradeEntryPage: React.FC = () => {
   const saveEdit = async (formData: GradeFormData) => {
     if (!editingId) return;
 
-    const grade = grades.find((g: Grade) => g.id === editingId);
+    const grade = grades!.find((g: Grade) => g.id === editingId);
     if (!grade) return;
 
     const updatedGrade = {
@@ -193,13 +193,13 @@ const GradeEntryPage: React.FC = () => {
             <div className="ion-padding ion-text-center">
               <p>Fehler beim Laden der Noten.</p>
             </div>
-          ) : grades.length === 0 ? (
+          ) : grades!.length === 0 ? (
             <div className="ion-padding ion-text-center">
               <p>Keine Noten gefunden.</p>
             </div>
           ) : (
             <IonList>
-              {grades.map((grade) => (
+              {grades!.map((grade) => (
                 <GradeListItem
                   key={grade.id}
                   grade={grade}
