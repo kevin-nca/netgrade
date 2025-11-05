@@ -43,7 +43,7 @@ const SchoolPage: React.FC = () => {
   const { data: school } = useSchool(schoolId);
   const { data: subjectsData } = useSchoolSubjects(schoolId);
 
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [subjects] = useState<Subject[]>([]);
 
   const updateSubjectMutation = useUpdateSubject();
 
