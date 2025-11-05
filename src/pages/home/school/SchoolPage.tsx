@@ -43,15 +43,15 @@ const SchoolPage: React.FC = () => {
   const { data: school } = useSchool(schoolId);
   const { data: subjectsData } = useSchoolSubjects(schoolId);
 
+  const addSubjectMutation = useAddSubject();
   const updateSubjectMutation = useUpdateSubject();
+  const deleteSubjectMutation = useDeleteSubject();
 
   const goToGradesPage = (subject: Subject) => {
     history.push(
       `${Routes.SUBJECT_GRADES.replace(':schoolId', schoolId).replace(':subjectId', subject.id)}`,
     );
   };
-
-  const addSubjectMutation = useAddSubject();
 
   const addSubjectToStore = (subjectData: SubjectToAdd) => {
     const payload = {
@@ -72,21 +72,15 @@ const SchoolPage: React.FC = () => {
     });
   };
 
-  const deleteSubjectMutation = useDeleteSubject();
-
-  const removeSubjectFromStore = (subjectId: string) => {
-    deleteSubjectMutation.mutate(subjectId, {
-      onError: (error) => {
-        console.error('Failed to remove subject:', error);
-      },
-    });
-  };
-
   const handleRemoveSubject = (
     subject: Subject,
     slidingItem: HTMLIonItemSlidingElement,
   ) => {
-    removeSubjectFromStore(subject.id);
+    deleteSubjectMutation.mutate(subject.id, {
+      onError: (error) => {
+        console.error('Failed to remove subject:', error);
+      },
+    });
     slidingItem.close();
   };
 
@@ -156,7 +150,11 @@ const SchoolPage: React.FC = () => {
           subjectsOrModules={subjectsData!}
           addToSubjectsOrModules={addSubjectToStore}
           removeFromSubjectsOrModules={(id: string) =>
-            removeSubjectFromStore(id)
+            deleteSubjectMutation.mutate(id, {
+              onError: (error) => {
+                console.error('Failed to remove subject:', error);
+              },
+            })
           }
           availableSubjects={[]}
         />
