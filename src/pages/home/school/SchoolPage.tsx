@@ -43,8 +43,6 @@ const SchoolPage: React.FC = () => {
   const { data: school } = useSchool(schoolId);
   const { data: subjectsData } = useSchoolSubjects(schoolId);
 
-  const [subjects] = useState<Subject[]>([]);
-
   const updateSubjectMutation = useUpdateSubject();
 
   const goToGradesPage = (subject: Subject) => {
@@ -155,7 +153,7 @@ const SchoolPage: React.FC = () => {
           isOpen={isModalOpen}
           setIsOpen={setModalOpen}
           isModule={false}
-          subjectsOrModules={subjects}
+          subjectsOrModules={subjectsData!}
           addToSubjectsOrModules={addSubjectToStore}
           removeFromSubjectsOrModules={(id: string) =>
             removeSubjectFromStore(id)
