@@ -11,7 +11,6 @@ import {
 } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
-  schoolOutline,
   libraryOutline,
   documentTextOutline,
   calendarOutline,
@@ -27,7 +26,8 @@ import { useSchools, useSchoolSubjects, useAddExam } from '@/hooks';
 import { Routes } from '@/routes';
 import '../grades/AddGradePage.css';
 
-import TitleField from '@/components/Form/exams/ExamTitle';
+import TitleField from '@/components/Form/addForms/exams/ExamTitle';
+import SelectedSchoolField from '@/components/Form/addForms/SelectedSchoolField';
 
 interface ExamAddFormData {
   selectedSchoolId: string;
@@ -231,55 +231,13 @@ const AddExamPage: React.FC = () => {
               <div className="form-fields">
                 <form.Field name="selectedSchoolId">
                   {(field) => (
-                    <div
-                      className={`input-row ${fieldErrors.selectedSchoolId ? 'error' : ''}`}
-                    >
-                      <div className="field-icon-wrapper">
-                        <IonIcon icon={schoolOutline} className="field-icon" />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label" htmlFor="school-select">
-                          Schule *
-                        </label>
-
-                        <IonSelect
-                          id="school-select"
-                          className="form-input"
-                          interface="popover"
-                          placeholder="Schule auswählen"
-                          value={field.state.value}
-                          onIonChange={(e) =>
-                            handleSchoolChange(e.detail.value)
-                          }
-                          aria-describedby={
-                            fieldErrors.selectedSchoolId
-                              ? 'school-error'
-                              : undefined
-                          }
-                        >
-                          {schoolOptions.map((option) => (
-                            <IonSelectOption
-                              key={option.value}
-                              value={option.value}
-                            >
-                              {option.label}
-                            </IonSelectOption>
-                          ))}
-                        </IonSelect>
-
-                        <div className="message-area">
-                          {fieldErrors.selectedSchoolId && (
-                            <div
-                              id="school-error"
-                              className="field-error"
-                              role="alert"
-                            >
-                              {fieldErrors.selectedSchoolId}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <SelectedSchoolField
+                      field={field}
+                      fieldErrors={fieldErrors}
+                      setFieldErrors={setFieldErrors}
+                      schoolOptions={schoolOptions}
+                      handleSchoolChange={handleSchoolChange}
+                    />
                   )}
                 </form.Field>
 
