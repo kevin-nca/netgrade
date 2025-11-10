@@ -27,6 +27,8 @@ import { useSchools, useSchoolSubjects, useAddExam } from '@/hooks';
 import { Routes } from '@/routes';
 import '../grades/AddGradePage.css';
 
+import TitleField from '@/components/Form/exams/ExamTitle';
+
 interface ExamAddFormData {
   selectedSchoolId: string;
   selectedSubjectId: string;
@@ -347,48 +349,11 @@ const AddExamPage: React.FC = () => {
 
                 <form.Field name="title">
                   {(field) => (
-                    <div
-                      className={`input-row ${fieldErrors.title ? 'error' : ''}`}
-                    >
-                      <div className="field-icon-wrapper">
-                        <IonIcon
-                          icon={documentTextOutline}
-                          className="field-icon"
-                        />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label" htmlFor="exam-title">
-                          Titel *
-                        </label>
-                        <IonInput
-                          id="exam-title"
-                          className="form-input"
-                          type="text"
-                          value={field.state.value}
-                          onIonChange={(e) => {
-                            const val = e.detail.value ?? '';
-                            field.handleChange(val);
-                            setFieldErrors((prev) => ({ ...prev, title: '' }));
-                          }}
-                          placeholder="z.B. Mathe-Klausur, Vokabeltest"
-                          aria-describedby={
-                            fieldErrors.title ? 'title-error' : undefined
-                          }
-                          required
-                        />
-                        <div className="message-area">
-                          {fieldErrors.title && (
-                            <div
-                              id="title-error"
-                              className="field-error"
-                              role="alert"
-                            >
-                              {fieldErrors.title}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <TitleField
+                      field={field}
+                      fieldErrors={fieldErrors}
+                      setFieldErrors={setFieldErrors}
+                    />
                   )}
                 </form.Field>
 
