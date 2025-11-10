@@ -42,6 +42,7 @@ export const useSubject = (id: string) => {
         .getQueryData<Subject[]>(subjectKeys.lists())
         ?.find((s) => s.id === id);
     },
+    staleTime: Infinity,
     enabled: !!id,
   });
 };
