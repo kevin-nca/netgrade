@@ -6,7 +6,6 @@ import { Subject } from '@/db/entities';
 import { FormElement } from '@/components/Form/FormElements';
 import styles from './SubjectSelectionModal.module.css';
 interface SubjectModalFormData {
-  searchText: string;
   newSubjectName: string;
 }
 
@@ -85,39 +84,37 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
   };
 
   return (
-    <div className={styles.subjectModal}>
-      <IonModal
-        isOpen={isOpen}
-        onDidDismiss={closeModal}
-        className={styles.modal}
-      >
-        <div className={styles.modalContent}>
-          <h1>Fach hinzufügen</h1>
+    <IonModal
+      isOpen={isOpen}
+      onDidDismiss={closeModal}
+      className={styles.modal}
+    >
+      <div className={styles.modalContent}>
+        <h1>Fach hinzufügen</h1>
+      </div>
+      <IonContent scrollY={false}>
+        <div className={styles.addSubject}>
+          <FormElement.SubjectName
+            form={form}
+            placeholder="Neues Fach hinzufügen"
+            fieldName="newSubjectName"
+            label=""
+          />
         </div>
-        <IonContent scrollY={false}>
-          <div className={styles.addSubject}>
-            <FormElement.SubjectName
-              form={form}
-              placeholder="Neues Fach hinzufügen"
-              fieldName="newSubjectName"
-              label=""
-            />
-          </div>
-          <div className={styles.buttons}>
-            <Button
-              className={styles.addButton}
-              handleEvent={handleAddSubject}
-              text={'Hinzufügen'}
-            />
-            <Button
-              className={styles.addButton}
-              handleEvent={closeModal}
-              text={'Abbrechen'}
-            />
-          </div>
-        </IonContent>
-      </IonModal>
-    </div>
+        <div className={styles.buttons}>
+          <Button
+            className={styles.addButton}
+            handleEvent={handleAddSubject}
+            text={'Hinzufügen'}
+          />
+          <Button
+            className={styles.addButton}
+            handleEvent={closeModal}
+            text={'Abbrechen'}
+          />
+        </div>
+      </IonContent>
+    </IonModal>
   );
 };
 
