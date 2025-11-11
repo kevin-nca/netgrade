@@ -63,8 +63,11 @@ export const useUpdateSchool = () => {
   return useMutation({
     mutationFn: (schoolData: Partial<School> & { id: string }) =>
       SchoolService.update(schoolData),
-    onSuccess: (id) => {
-      queryClient.invalidateQueries({ queryKey: schoolKeys.list({ id }) });
+    onSuccess: (updatedSchool) => {
+      queryClient.invalidateQueries({
+        queryKey: schoolKeys.list({ id: updatedSchool.id }),
+      });
+      queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
     },
   });
 };
