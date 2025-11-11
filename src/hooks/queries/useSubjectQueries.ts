@@ -69,6 +69,10 @@ export const useAddSubject = () => {
   return useMutation({
     mutationFn: (payload: AddSubjectPayload) => SubjectService.add(payload),
     onSuccess: (newSubject) => {
+      queryClient.setQueryData(
+        subjectKeys.list({ id: newSubject.id }),
+        newSubject,
+      );
       // Invalidate and refetch subjects list
       queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
       // Invalidate and refetch school subjects
