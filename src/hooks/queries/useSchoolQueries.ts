@@ -78,7 +78,8 @@ export const useDeleteSchool = () => {
   return useMutation({
     mutationFn: (schoolId: string) => SchoolService.delete(schoolId),
     onSuccess: (id) => {
-      queryClient.invalidateQueries({ queryKey: schoolKeys.list({ id }) });
+      queryClient.removeQueries({ queryKey: schoolKeys.list({ id }) });
+      queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
     },
   });
 };
