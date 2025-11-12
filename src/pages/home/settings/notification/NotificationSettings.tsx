@@ -41,7 +41,7 @@ const NotificationSettings: React.FC = () => {
   const [presentAlert] = useIonAlert();
   const { data: notificationSettings } = useNotificationSettings();
   const { data: schedulerStatus } = useSchedulerStatus();
-  const { data: availableReminderTimes = [] } = useAvailableReminderTimes();
+  const { data: availableReminderTimes } = useAvailableReminderTimes();
   const { refetch: checkPermissions } = useNotificationPermissions();
 
   const saveNotificationSettings = useSaveNotificationSettings();
@@ -386,7 +386,7 @@ const NotificationSettings: React.FC = () => {
         showBackdrop={true}
       >
         <IonContent>
-          {availableReminderTimes.map((time, index) => (
+          {availableReminderTimes!.map((time, index) => (
             <IonItem
               key={index}
               button
