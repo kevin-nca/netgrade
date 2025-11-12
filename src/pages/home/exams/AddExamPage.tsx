@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { useForm } from '@tanstack/react-form';
 import {
   IonContent,
   IonPage,
@@ -25,14 +24,15 @@ import { format } from 'date-fns';
 import { useSchools, useSchoolSubjects, useAddExam } from '@/hooks';
 import { Routes } from '@/routes';
 import '../grades/AddGradePage.css';
-
-import TitleField from '@/components/Form/addForms/exams/ExamTitle';
-import SelectedSchoolField from '@/components/Form/addForms/SelectedSchoolField';
+import { useAppForm } from '@/components/Form2/form';
+import { z } from 'zod';
+import { revalidateLogic } from '@tanstack/react-form';
+import { schoolOutline } from 'ionicons/icons';
 
 interface ExamAddFormData {
   selectedSchoolId: string;
   selectedSubjectId: string;
-  title: string;
+  examName: string;
   date: string;
   description: string;
 }
@@ -43,22 +43,34 @@ const AddExamPage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
   const [showNavigationModal, setShowNavigationModal] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({}); //
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const form = useForm({
+  const examFormSchema = z.object({
+    selectedSchoolId: z.string().min(1, 'Bitte wähle eine Schule aus'),
+    selectedSubjectId: z.string().min(1, 'Bitte wähle ein Fach aus'),
+    examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
+    date: z.string().min(1, 'Bitte wähle ein Datum aus'),
+    description: z.string(),
+  });
+
+  const form = useAppForm({
     defaultValues: {
       selectedSchoolId: '',
       selectedSubjectId: '',
-      title: '',
+      examName: '',
       date: format(new Date(), 'yyyy-MM-dd'),
       description: '',
-    } as ExamAddFormData,
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onSubmit: examFormSchema,
+    },
     onSubmit: async ({ value }) => {
       const examPayload = {
         schoolId: value.selectedSchoolId,
         subjectId: value.selectedSubjectId,
-        title: value.title.trim(),
+        title: value.examName.trim(),
         date: new Date(value.date + 'T12:00:00'),
         description: value.description.trim(),
       };
@@ -79,33 +91,6 @@ const AddExamPage: React.FC = () => {
           );
         },
       });
-    },
-    validators: {
-      onSubmit: ({ value }) => {
-        const errors: Record<string, string> = {};
-
-        if (!value.selectedSchoolId) {
-          errors.selectedSchoolId = 'Bitte wähle eine Schule aus!';
-        }
-        if (!value.selectedSubjectId) {
-          errors.selectedSubjectId = 'Bitte wähle ein Fach aus!';
-        }
-        if (!value.title.trim()) {
-          errors.title = 'Bitte gib einen Titel ein!';
-        }
-        if (!value.date) {
-          errors.date = 'Bitte wähle ein Datum aus!';
-        }
-
-        if (Object.keys(errors).length > 0) {
-          setFieldErrors(errors);
-          showAndSetToastMessage('Bitte fülle alle Pflichtfelder aus!');
-          return Object.values(errors).join(', ');
-        }
-
-        setFieldErrors({});
-        return undefined;
-      },
     },
   });
 
@@ -231,13 +216,55 @@ const AddExamPage: React.FC = () => {
               <div className="form-fields">
                 <form.Field name="selectedSchoolId">
                   {(field) => (
-                    <SelectedSchoolField
-                      field={field}
-                      fieldErrors={fieldErrors}
-                      setFieldErrors={setFieldErrors}
-                      schoolOptions={schoolOptions}
-                      handleSchoolChange={handleSchoolChange}
-                    />
+                    <div
+                      className={`input-row ${fieldErrors.selectedSchoolId ? 'error' : ''}`}
+                    >
+                      <div className="field-icon-wrapper">
+                        <IonIcon icon={schoolOutline} className="field-icon" />
+                      </div>
+                      <div className="field-content">
+                        <label className="field-label" htmlFor="school-select">
+                          Schule *
+                        </label>
+
+                        <IonSelect
+                          id="school-select"
+                          className="form-input"
+                          interface="popover"
+                          placeholder="Schule auswählen"
+                          value={field.state.value}
+                          onIonChange={(e) =>
+                            handleSchoolChange(e.detail.value)
+                          }
+                          aria-describedby={
+                            fieldErrors.selectedSchoolId
+                              ? 'school-error'
+                              : undefined
+                          }
+                        >
+                          {schoolOptions.map((option) => (
+                            <IonSelectOption
+                              key={option.value}
+                              value={option.value}
+                            >
+                              {option.label}
+                            </IonSelectOption>
+                          ))}
+                        </IonSelect>
+
+                        <div className="message-area">
+                          {fieldErrors.selectedSchoolId && (
+                            <div
+                              id="school-error"
+                              className="field-error"
+                              role="alert"
+                            >
+                              {fieldErrors.selectedSchoolId}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </form.Field>
 
@@ -305,15 +332,9 @@ const AddExamPage: React.FC = () => {
                   )}
                 </form.Field>
 
-                <form.Field name="title">
-                  {(field) => (
-                    <TitleField
-                      field={field}
-                      fieldErrors={fieldErrors}
-                      setFieldErrors={setFieldErrors}
-                    />
-                  )}
-                </form.Field>
+                <form.AppField name="examName">
+                  {(field) => <field.ExamNameField label="Prüfungsname" />}
+                </form.AppField>
 
                 <form.Field name="date">
                   {(field) => (

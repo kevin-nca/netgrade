@@ -1,22 +1,26 @@
-import React from 'react';
+import { useFieldContext } from '@/components/Form2/form';
 import { IonIcon, IonInput } from '@ionic/react';
 import { documentTextOutline } from 'ionicons/icons';
+import React from 'react';
 
-interface TitleFieldProps {
-  field: any;
-  fieldErrors: Record<string, string>;
-  setFieldErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
-}
+export function ExamNameField({ label }: { label: string }) {
+  const field = useFieldContext<string>();
 
-const TitleField: React.FC<TitleFieldProps> = ({ field, fieldErrors, setFieldErrors }) => {
+  const errors = Array.isArray(field.state.meta.errors)
+    ? field.state.meta.errors
+    : [];
+
+  const firstError =
+    errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
+
   return (
-    <div className={`input-row ${fieldErrors.title ? 'error' : ''}`}>
+    <div className={`input-row ${firstError ? 'error' : ''}`}>
       <div className="field-icon-wrapper">
         <IonIcon icon={documentTextOutline} className="field-icon" />
       </div>
       <div className="field-content">
         <label className="field-label" htmlFor="exam-title">
-          Titel *
+          {label}
         </label>
         <IonInput
           id="exam-title"
@@ -26,22 +30,21 @@ const TitleField: React.FC<TitleFieldProps> = ({ field, fieldErrors, setFieldErr
           onIonChange={(e) => {
             const val = e.detail.value ?? '';
             field.handleChange(val);
-            setFieldErrors((prev) => ({ ...prev, title: '' }));
           }}
           placeholder="z.B. Mathe-Klausur, Vokabeltest"
-          aria-describedby={fieldErrors.title ? 'title-error' : undefined}
+          aria-invalid={!!firstError}
+          aria-describedby={firstError ? 'title-error' : undefined}
           required
+          maxlength={255}
         />
         <div className="message-area">
-          {fieldErrors.title && (
+          {firstError && (
             <div id="title-error" className="field-error" role="alert">
-              {fieldErrors.title}
+              {firstError}
             </div>
           )}
         </div>
       </div>
     </div>
   );
-};
-
-export default TitleField;
+}
