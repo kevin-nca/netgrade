@@ -64,6 +64,10 @@ export const useUpdateSchool = () => {
     mutationFn: (schoolData: Partial<School> & { id: string }) =>
       SchoolService.update(schoolData),
     onSuccess: (updatedSchool) => {
+      queryClient.setQueryData(
+        schoolKeys.list({ id: updatedSchool.id }),
+        updatedSchool,
+      );
       queryClient.invalidateQueries({
         queryKey: schoolKeys.list({ id: updatedSchool.id }),
       });
