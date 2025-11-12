@@ -111,13 +111,15 @@ export const useSaveNotificationSettings = () => {
   });
 };
 
+export const NotificationPermissionsQuery = {
+  queryKey: preferencesKeys.notificationPermissions(),
+  queryFn: () => PreferencesService.requestNotificationPermissions(),
+  staleTime: 1000 * 60 * 5,
+  enabled: false,
+} as const;
+
 export const useNotificationPermissions = () => {
-  return useQuery({
-    queryKey: preferencesKeys.notificationPermissions(),
-    queryFn: () => PreferencesService.requestNotificationPermissions(),
-    staleTime: 1000 * 60 * 5,
-    enabled: false,
-  });
+  return useQuery(NotificationPermissionsQuery);
 };
 
 export const useSchedulerStatus = () => {
