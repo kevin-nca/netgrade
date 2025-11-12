@@ -114,7 +114,7 @@ export const useSaveNotificationSettings = () => {
 export const NotificationPermissionsQuery = {
   queryKey: preferencesKeys.notificationPermissions(),
   queryFn: () => PreferencesService.requestNotificationPermissions(),
-  staleTime: 1000 * 60 * 5,
+  staleTime: Infinity,
   enabled: false,
 } as const;
 
