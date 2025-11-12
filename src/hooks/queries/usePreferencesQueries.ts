@@ -66,12 +66,14 @@ export const useSetOnboardingCompleted = () => {
   });
 };
 
+export const NotificationSettingsQuery = {
+  queryKey: preferencesKeys.notificationSettings(),
+  queryFn: () => PreferencesService.getNotificationSettings(),
+  staleTime: Infinity,
+} as const;
+
 export const useNotificationSettings = () => {
-  return useQuery({
-    queryKey: preferencesKeys.notificationSettings(),
-    queryFn: () => PreferencesService.getNotificationSettings(),
-    staleTime: Infinity,
-  });
+  return useQuery(NotificationSettingsQuery);
 };
 
 export const useSaveNotificationSettings = () => {

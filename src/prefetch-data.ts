@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import {
   GradesQuery,
+  NotificationSettingsQuery,
   OnboardingCompletedQuery,
   SchoolsQuery,
   SubjectsQuery,
@@ -15,6 +16,7 @@ export async function prefetchData(queryClient: QueryClient) {
   await queryClient.prefetchQuery(GradesQuery);
   await queryClient.prefetchQuery(UserNameQuery);
   await queryClient.prefetchQuery(UpcomingExamsQuery);
+  await queryClient.prefetchQuery(NotificationSettingsQuery);
 
   // Add more prefetch queries as needed
 }
