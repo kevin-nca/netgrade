@@ -1,36 +1,36 @@
 import React, { useState } from 'react';
 import {
-  IonIcon,
-  IonLabel,
-  IonToggle,
-  IonPopover,
   IonBadge,
   IonContent,
+  IonIcon,
   IonItem,
+  IonLabel,
+  IonPopover,
+  IonToggle,
   useIonAlert,
   useIonToast,
 } from '@ionic/react';
 import {
-  notificationsOutline,
-  timeOutline,
+  alertCircleOutline,
   calendarOutline,
-  statsChartOutline,
+  notificationsOutline,
+  pauseOutline,
+  playOutline,
+  pulseOutline,
   refreshOutline,
   settingsOutline,
-  playOutline,
-  pauseOutline,
-  alertCircleOutline,
   shieldCheckmarkOutline,
-  pulseOutline,
+  statsChartOutline,
+  timeOutline,
 } from 'ionicons/icons';
 import {
+  useAvailableReminderTimes,
+  useManualNotificationSync,
+  useNotificationPermissions,
   useNotificationSettings,
+  useResetNotifications,
   useSaveNotificationSettings,
   useSchedulerStatus,
-  useAvailableReminderTimes,
-  useNotificationPermissions,
-  useManualNotificationSync,
-  useResetNotifications,
 } from '@/hooks/queries/usePreferencesQueries';
 
 const NotificationSettings: React.FC = () => {
@@ -39,17 +39,16 @@ const NotificationSettings: React.FC = () => {
 
   const [present] = useIonToast();
   const [presentAlert] = useIonAlert();
-  const { data: notificationSettings, isLoading: settingsLoading } =
-    useNotificationSettings();
+  const { data: notificationSettings } = useNotificationSettings();
   const { data: schedulerStatus } = useSchedulerStatus();
-  const { data: availableReminderTimes = [] } = useAvailableReminderTimes();
+  const { data: availableReminderTimes } = useAvailableReminderTimes();
   const { refetch: checkPermissions } = useNotificationPermissions();
 
   const saveNotificationSettings = useSaveNotificationSettings();
   const manualSyncMutation = useManualNotificationSync();
   const resetNotificationsMutation = useResetNotifications();
-  if (settingsLoading || !notificationSettings) {
-    return <div>Loading...</div>;
+  if (!notificationSettings) {
+    return null;
   }
 
   const currentSettings = notificationSettings;
@@ -387,7 +386,7 @@ const NotificationSettings: React.FC = () => {
         showBackdrop={true}
       >
         <IonContent>
-          {availableReminderTimes.map((time, index) => (
+          {availableReminderTimes!.map((time, index) => (
             <IonItem
               key={index}
               button
