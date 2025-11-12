@@ -1,10 +1,10 @@
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
   QueryKey,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
-import { PreferencesService, NotificationSettings } from '@/services';
+import { NotificationSettings, PreferencesService } from '@/services';
 import { notificationScheduler } from '@/notification-scheduler';
 
 export const preferencesKeys = {
@@ -70,7 +70,7 @@ export const useNotificationSettings = () => {
   return useQuery({
     queryKey: preferencesKeys.notificationSettings(),
     queryFn: () => PreferencesService.getNotificationSettings(),
-    staleTime: 1000 * 60,
+    staleTime: Infinity,
   });
 };
 
