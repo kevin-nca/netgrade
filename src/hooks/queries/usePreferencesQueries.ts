@@ -142,14 +142,14 @@ export const useSchedulerStatus = () => {
   });
 };
 
-export const AvailableReminderTimesQuery = {
+export const ReminderTimesQuery = {
   queryKey: preferencesKeys.availableReminderTimes(),
   queryFn: () => PreferencesService.getAvailableReminderTimes(),
   staleTime: Infinity,
 } as const;
 
 export const useAvailableReminderTimes = () => {
-  return useQuery(AvailableReminderTimesQuery);
+  return useQuery(ReminderTimesQuery);
 };
 
 export const useManualNotificationSync = () => {
