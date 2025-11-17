@@ -113,11 +113,7 @@ export const useDeleteSubject = () => {
 
   return useMutation({
     mutationFn: (subjectId: string) => SubjectService.delete(subjectId),
-    onSuccess: (id) => {
-      // Remove the specific subject from cache
-      queryClient.removeQueries({
-        queryKey: subjectKeys.list({ id }),
-      });
+    onSuccess: () => {
       // Invalidate and refetch subjects list
       queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
     },
