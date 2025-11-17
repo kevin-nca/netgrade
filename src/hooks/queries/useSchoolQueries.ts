@@ -68,9 +68,6 @@ export const useUpdateSchool = () => {
         schoolKeys.list({ id: updatedSchool.id }),
         updatedSchool,
       );
-      queryClient.invalidateQueries({
-        queryKey: schoolKeys.list({ id: updatedSchool.id }),
-      });
       queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
     },
   });
@@ -81,8 +78,7 @@ export const useDeleteSchool = () => {
 
   return useMutation({
     mutationFn: (schoolId: string) => SchoolService.delete(schoolId),
-    onSuccess: (id) => {
-      queryClient.invalidateQueries({ queryKey: schoolKeys.list({ id }) });
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
     },
   });
