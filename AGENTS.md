@@ -69,24 +69,20 @@ Commit style:
 This section is for AI agents (Copilot, Codex, Junie, etc.). Follow these steps to minimize errors and maximize utility.
 
 - Read before you change:
-
   1. Identify the requested change and impacted files (search in src/ and config files).
   2. If DB entities are affected, check src/db/data-source.ts migration settings.
   3. Check scripts in package.json to know how to test and build.
 
 - Make minimal, reversible changes:
-
   - Prefer small PRs touching the least number of files.
   - Update or add tests (Vitest/Cypress) as needed.
   - Run lint and format scripts.
 
 - Validate locally:
-
   - Web: npm run dev, verify pages impacted.
   - Unit tests: npm run test; E2E: npm run e2e if relevant.
 
 - Do/Don’t:
-
   - Do add/update TypeORM migrations for native DB schema changes.
   - Do not hardcode secrets or modify CI secrets usage.
   - Do align with existing patterns (services, repositories, hooks).

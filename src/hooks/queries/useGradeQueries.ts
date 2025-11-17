@@ -10,8 +10,6 @@ export const gradeKeys = {
   lists: () => [...gradeKeys.all, 'list'] as const,
   list: (filters: Record<string, unknown>) =>
     [...gradeKeys.lists(), { filters }] as const,
-  details: () => [...gradeKeys.all, 'detail'] as const,
-  detail: (id: string) => [...gradeKeys.details(), id] as const,
   examGrades: (examId: string) => [...gradeKeys.all, 'exam', examId] as const,
   subjectGrades: (subjectId: string) =>
     [...gradeKeys.all, 'subject', subjectId] as const,
@@ -30,9 +28,15 @@ export const useGrades = () => {
 };
 
 export const useSubjectGrades = (subjectId: string) => {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: gradeKeys.subjectGrades(subjectId),
     queryFn: () => GradeService.findBySubjectId(subjectId),
+    initialData: () => {
+      return queryClient
+        .getQueryData<Grade[]>(gradeKeys.lists())
+        ?.filter((g) => g.exam?.subjectId === subjectId);
+    },
   });
 };
 
@@ -60,7 +64,9 @@ export const useDeleteGrade = () => {
     mutationFn: (gradeId: string) => GradeService.delete(gradeId),
     onSuccess: (deletedGradeId) => {
       // Remove the grade from the cache
-      queryClient.removeQueries({ queryKey: gradeKeys.detail(deletedGradeId) });
+      queryClient.removeQueries({
+        queryKey: gradeKeys.list({ id: deletedGradeId }),
+      });
       // Invalidate and refetch grades list
       queryClient.invalidateQueries({ queryKey: gradeKeys.lists() });
     },
@@ -81,7 +87,7 @@ export const useUpdateExamAndGrade = () => {
     onSuccess: (updatedGrade) => {
       // Update the grade in the cache
       queryClient.invalidateQueries({
-        queryKey: gradeKeys.detail(updatedGrade.id),
+        queryKey: gradeKeys.list({ id: updatedGrade.id }),
       });
       // Invalidate and refetch grades list
       queryClient.invalidateQueries({ queryKey: gradeKeys.lists() });

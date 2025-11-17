@@ -33,9 +33,16 @@ export const useSubjects = () => {
 };
 
 export const useSubject = (id: string) => {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: subjectKeys.list({ id }),
     queryFn: () => SubjectService.findById(id),
+    initialData: () => {
+      return queryClient
+        .getQueryData<Subject[]>(subjectKeys.lists())
+        ?.find((s) => s.id === id);
+    },
+    staleTime: Infinity,
     enabled: !!id,
   });
 };
@@ -62,6 +69,10 @@ export const useAddSubject = () => {
   return useMutation({
     mutationFn: (payload: AddSubjectPayload) => SubjectService.add(payload),
     onSuccess: (newSubject) => {
+      queryClient.setQueryData(
+        subjectKeys.list({ id: newSubject.id }),
+        newSubject,
+      );
       // Invalidate and refetch subjects list
       queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
       // Invalidate and refetch school subjects
