@@ -111,7 +111,7 @@ export const useDeleteSubject = () => {
     mutationFn: (subjectId: string) => SubjectService.delete(subjectId),
     onSuccess: () => {
       // Invalidate and refetch subjects list
-      queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: subjectKeys.all });
     },
   });
 };
