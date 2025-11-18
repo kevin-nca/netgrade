@@ -9,3 +9,30 @@ updates:
     directory: '/' # Location of package manifests
     schedule:
       interval: 'weekly'
+    groups:
+      ionic:
+        patterns:
+          - '@ionic/*'
+          - 'ionicons'
+      capacitor:
+        patterns:
+          - '@capacitor/*'
+      react-router:
+        patterns:
+          - 'react-router*'
+          - '@types/react-router*'
+      tanstack:
+        patterns:
+          - '@tanstack/*'
+      testing:
+        patterns:
+          - '@testing-library/*'
+          - 'vitest'
+          - '@vitest/*'
+      linting:
+        patterns:
+          - 'eslint*'
+          - '@eslint/*'
+          - 'eslint-*'
+          - '@typescript-eslint/*'
+          - 'prettier*'
