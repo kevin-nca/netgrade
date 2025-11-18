@@ -5,34 +5,55 @@
 
 version: 2
 updates:
-  - package-ecosystem: 'npm' # See documentation for possible values
-    directory: '/' # Location of package manifests
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
-      interval: 'weekly'
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
     groups:
-      ionic:
-        patterns:
-          - '@ionic/*'
-          - 'ionicons'
-      capacitor:
-        patterns:
-          - '@capacitor/*'
+      # React core should stay in sync
+      react-core:
+        dependencies:
+          - "react"
+          - "react-dom"
+
+      # React types should follow React
+      react-types:
+        dependencies:
+          - "@types/react"
+          - "@types/react-dom"
+
+      # Router packages should stay aligned
       react-router:
-        patterns:
-          - 'react-router*'
-          - '@types/react-router*'
-      tanstack:
-        patterns:
-          - '@tanstack/*'
-      testing:
-        patterns:
-          - '@testing-library/*'
-          - 'vitest'
-          - '@vitest/*'
-      linting:
-        patterns:
-          - 'eslint*'
-          - '@eslint/*'
-          - 'eslint-*'
-          - '@typescript-eslint/*'
-          - 'prettier*'
+        dependencies:
+          - "react-router"
+          - "react-router-dom"
+          - "@types/react-router"
+          - "@types/react-router-dom"
+
+      # TanStack React Query + Devtools are tightly coupled
+      tanstack-react-query:
+        dependencies:
+          - "@tanstack/react-query"
+          - "@tanstack/react-query-devtools"
+
+      # Capacitor core + platforms + CLI should be on the same major
+      capacitor-core:
+        dependencies:
+          - "@capacitor/core"
+          - "@capacitor/cli"
+          - "@capacitor/android"
+          - "@capacitor/ios"
+
+      # Vitest + coverage package
+      vitest:
+        dependencies:
+          - "vitest"
+          - "@vitest/coverage-v8"
+
+      # TS + TS-ESLint should stay compatible
+      typescript-stack:
+        dependencies:
+          - "typescript"
+          - "typescript-eslint"
