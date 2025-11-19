@@ -10,11 +10,8 @@ import {
   IonItem,
   IonModal,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonTitle,
   IonToolbar,
-  RefresherEventDetail,
   useIonAlert,
   useIonToast,
 } from '@ionic/react';
@@ -64,7 +61,7 @@ const SettingsPage: React.FC = () => {
   const [schoolIdToDelete, setSchoolIdToDelete] = useState<string | null>(null);
   const history = useHistory();
 
-  const { data: schools, refetch } = useSchools();
+  const { data: schools } = useSchools();
   const { data: userName } = useUserName();
   const addSchoolMutation = useAddSchool();
   const saveUserNameMutation = useSaveUserName();
@@ -212,14 +209,6 @@ const SettingsPage: React.FC = () => {
     });
   };
 
-  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
-    try {
-      await refetch();
-    } finally {
-      event.detail.complete();
-    }
-  };
-
   const handleDeleteSchool = () => {
     if (!schoolIdToDelete) return;
     deleteSchoolMutation.mutate(schoolIdToDelete, {
@@ -248,10 +237,6 @@ const SettingsPage: React.FC = () => {
       />
 
       <IonContent className="settings-content" scrollY={true}>
-        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
-          <IonRefresherContent />
-        </IonRefresher>
-
         <div className="content-wrapper">
           <div className="profile-section">
             <div className="gradient-orb" />
