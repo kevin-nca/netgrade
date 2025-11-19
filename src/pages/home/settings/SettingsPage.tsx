@@ -10,8 +10,6 @@ import {
   IonItem,
   IonModal,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonTitle,
   IonToolbar,
   useIonAlert,
@@ -239,10 +237,6 @@ const SettingsPage: React.FC = () => {
       />
 
       <IonContent className="settings-content" scrollY={true}>
-        <IonRefresher slot="fixed">
-          <IonRefresherContent />
-        </IonRefresher>
-
         <div className="content-wrapper">
           <div className="profile-section">
             <div className="gradient-orb" />
