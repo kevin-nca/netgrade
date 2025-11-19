@@ -289,7 +289,7 @@ const SettingsPage: React.FC = () => {
                 <IonIcon icon={addOutline} className="section-add-icon" />
               </div>
             </div>
-            /////
+
             <div className="settings-list">
               {schools!.length > 0 ? (
                 schools!.map((school, index) => {
