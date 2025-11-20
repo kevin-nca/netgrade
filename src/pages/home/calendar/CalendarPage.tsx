@@ -11,6 +11,7 @@ import {
   IonAlert,
   IonSkeletonText,
   RefresherEventDetail,
+  IonCard,
 } from '@ionic/react';
 import { calendar, list, informationCircle } from 'ionicons/icons';
 import { format } from 'date-fns';
@@ -63,12 +64,12 @@ const CalendarPage: React.FC = () => {
         backButton={true}
         defaultHref={Routes.HOME}
       />
-      <IonContent fullscreen>
+      <IonContent fullscreen className="calendar-container">
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
         </IonRefresher>
 
-        <div className="view-toggle-container">
+        <IonCard className="view-toggle-container">
           <IonSegment
             value={viewMode}
             onIonChange={(e) =>
@@ -85,7 +86,7 @@ const CalendarPage: React.FC = () => {
               <IonLabel>Liste</IonLabel>
             </IonSegmentButton>
           </IonSegment>
-        </div>
+        </IonCard>
 
         {isLoading ? (
           <div className="loading-container">
@@ -115,7 +116,7 @@ const CalendarPage: React.FC = () => {
         ) : (
           <>
             {viewMode === 'calendar' ? (
-              <div className="modern-calendar-container">
+              <IonCard className="modern-calendar-container">
                 <MonthSelector
                   currentMonth={currentMonth}
                   onChangeMonth={changeMonth}
@@ -131,7 +132,7 @@ const CalendarPage: React.FC = () => {
                   events={eventsForSelectedDate}
                   onSelectExam={handleSelectExam}
                 />
-              </div>
+              </IonCard>
             ) : (
               <ExamListView
                 groupedExams={groupedExams}
