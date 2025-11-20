@@ -1,5 +1,6 @@
 import React from 'react';
 import { IonIcon } from '@ionic/react';
+import './FormInput.module.css';
 
 interface FormFieldRowProps {
   icon: string;
@@ -11,7 +12,7 @@ interface FormFieldRowProps {
   children: React.ReactNode;
 }
 
-const FormFieldRow: React.FC<FormFieldRowProps> = ({
+const FormInput: React.FC<FormFieldRowProps> = ({
   icon,
   label,
   htmlFor,
@@ -47,4 +48,4 @@ const FormFieldRow: React.FC<FormFieldRowProps> = ({
   );
 };
 
-export default FormFieldRow;
+export default FormInput;

@@ -20,7 +20,7 @@ vi.mock('@ionic/react', () => ({
     />
   ),
 }));
-vi.mock('@/components/Form2/FormFieldRow', () => ({
+vi.mock('@/components/Form2/FormInput', () => ({
   default: (props: { children: React.ReactNode }) => (
     <div>{props.children}</div>
   ),

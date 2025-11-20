@@ -2,7 +2,7 @@ import { useFieldContext } from '@/components/Form2/form';
 import { IonInput } from '@ionic/react';
 import { documentTextOutline } from 'ionicons/icons';
 import React from 'react';
-import FormFieldRow from '@/components/Form2/FormFieldRow';
+import FormInput from '@/components/Form2/form-field/FormInput';
 
 export function ExamNameField({ label }: { label: string }) {
   const field = useFieldContext<string>();
@@ -15,7 +15,7 @@ export function ExamNameField({ label }: { label: string }) {
     errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
 
   return (
-    <FormFieldRow
+    <FormInput
       icon={documentTextOutline}
       label={label}
       htmlFor="exam-title"
@@ -38,6 +38,6 @@ export function ExamNameField({ label }: { label: string }) {
         required
         maxlength={255}
       />
-    </FormFieldRow>
+    </FormInput>
   );
 }
