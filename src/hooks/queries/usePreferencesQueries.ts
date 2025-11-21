@@ -1,10 +1,10 @@
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
   QueryKey,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
-import { PreferencesService, NotificationSettings } from '@/services';
+import { NotificationSettings, PreferencesService } from '@/services';
 import { notificationScheduler } from '@/notification-scheduler';
 
 export const preferencesKeys = {
@@ -66,12 +66,14 @@ export const useSetOnboardingCompleted = () => {
   });
 };
 
+export const NotificationSettingsQuery = {
+  queryKey: preferencesKeys.notificationSettings(),
+  queryFn: () => PreferencesService.getNotificationSettings(),
+  staleTime: Infinity,
+} as const;
+
 export const useNotificationSettings = () => {
-  return useQuery({
-    queryKey: preferencesKeys.notificationSettings(),
-    queryFn: () => PreferencesService.getNotificationSettings(),
-    staleTime: 1000 * 60,
-  });
+  return useQuery(NotificationSettingsQuery);
 };
 
 export const useSaveNotificationSettings = () => {
@@ -109,13 +111,15 @@ export const useSaveNotificationSettings = () => {
   });
 };
 
+export const NotificationPermissionsQuery = {
+  queryKey: preferencesKeys.notificationPermissions(),
+  queryFn: () => PreferencesService.requestNotificationPermissions(),
+  staleTime: Infinity,
+  enabled: false,
+} as const;
+
 export const useNotificationPermissions = () => {
-  return useQuery({
-    queryKey: preferencesKeys.notificationPermissions(),
-    queryFn: () => PreferencesService.requestNotificationPermissions(),
-    staleTime: 1000 * 60 * 5,
-    enabled: false,
-  });
+  return useQuery(NotificationPermissionsQuery);
 };
 
 export const useSchedulerStatus = () => {
@@ -138,12 +142,14 @@ export const useSchedulerStatus = () => {
   });
 };
 
+export const ReminderTimesQuery = {
+  queryKey: preferencesKeys.availableReminderTimes(),
+  queryFn: () => PreferencesService.getAvailableReminderTimes(),
+  staleTime: Infinity,
+} as const;
+
 export const useAvailableReminderTimes = () => {
-  return useQuery({
-    queryKey: preferencesKeys.availableReminderTimes(),
-    queryFn: () => PreferencesService.getAvailableReminderTimes(),
-    staleTime: Infinity,
-  });
+  return useQuery(ReminderTimesQuery);
 };
 
 export const useManualNotificationSync = () => {

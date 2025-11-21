@@ -1,49 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  IonAlert,
+  IonButton,
+  IonButtons,
   IonContent,
-  IonPage,
   IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonRefresher,
-  IonRefresherContent,
   IonIcon,
   IonInput,
-  IonModal,
   IonItem,
+  IonModal,
+  IonPage,
+  IonRefresher,
+  IonRefresherContent,
+  IonTitle,
+  IonToolbar,
   useIonAlert,
   useIonToast,
-  RefresherEventDetail,
-  IonButtons,
-  IonButton,
-  IonAlert,
 } from '@ionic/react';
 import { useForm } from '@tanstack/react-form';
 import { useHistory } from 'react-router-dom';
 import {
-  personOutline,
-  schoolOutline,
   addOutline,
-  downloadOutline,
-  trashOutline,
-  settingsOutline,
-  informationCircleOutline,
-  createOutline,
-  pencilOutline,
   checkmarkOutline,
   closeOutline,
+  createOutline,
+  downloadOutline,
+  informationCircleOutline,
+  pencilOutline,
+  personOutline,
+  schoolOutline,
+  settingsOutline,
+  trashOutline,
 } from 'ionicons/icons';
 import { Routes } from '@/routes';
 import { ExportDialog } from '@/components/export/ExportDialog';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import {
-  useSchools,
   useAddSchool,
-  useUserName,
-  useSaveUserName,
   useDeleteSchool,
+  useSaveUserName,
+  useSchools,
   useUpdateSchool,
+  useUserName,
 } from '@/hooks/queries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
@@ -64,7 +63,7 @@ const SettingsPage: React.FC = () => {
   const [schoolIdToDelete, setSchoolIdToDelete] = useState<string | null>(null);
   const history = useHistory();
 
-  const { data: schools = [], refetch } = useSchools();
+  const { data: schools } = useSchools();
   const { data: userName } = useUserName();
   const addSchoolMutation = useAddSchool();
   const saveUserNameMutation = useSaveUserName();
@@ -100,7 +99,6 @@ const SettingsPage: React.FC = () => {
             setEditingSchoolId(null);
             setEditSchoolName('');
             showToast('Schulname erfolgreich geändert');
-            refetch();
           },
           onError: (error) => {
             showToast(
@@ -172,7 +170,6 @@ const SettingsPage: React.FC = () => {
             setShowAddSchoolModal(false);
             setSchoolNameInput('');
             showToast('Schule erfolgreich hinzugefügt');
-            refetch();
           },
           onError: (error) => {
             showToast(
@@ -214,14 +211,6 @@ const SettingsPage: React.FC = () => {
     });
   };
 
-  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
-    try {
-      await refetch();
-    } finally {
-      event.detail.complete();
-    }
-  };
-
   const handleDeleteSchool = () => {
     if (!schoolIdToDelete) return;
     deleteSchoolMutation.mutate(schoolIdToDelete, {
@@ -229,7 +218,6 @@ const SettingsPage: React.FC = () => {
         showToast('Schule wurde gelöscht', true);
         setShowDeleteAlert(false);
         setSchoolIdToDelete(null);
-        refetch();
       },
       onError: (error) => {
         showToast(
@@ -251,7 +239,7 @@ const SettingsPage: React.FC = () => {
       />
 
       <IonContent className="settings-content" scrollY={true}>
-        <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+        <IonRefresher slot="fixed">
           <IonRefresherContent />
         </IonRefresher>
 
@@ -294,8 +282,8 @@ const SettingsPage: React.FC = () => {
             </div>
 
             <div className="settings-list">
-              {schools.length > 0 ? (
-                schools.map((school, index) => {
+              {schools!.length > 0 ? (
+                schools!.map((school, index) => {
                   const isExpanded = expandedSchoolId === school.id;
                   const isEditing = editingSchoolId === school.id;
 
