@@ -2,7 +2,7 @@ import { useFieldContext } from '@/components/Form2/form';
 import { IonSelect, IonSelectOption } from '@ionic/react';
 import { schoolOutline } from 'ionicons/icons';
 import React from 'react';
-import FormFieldRow from '@/components/Form2/FormFieldRow';
+import FormInput from '@/components/Form2/form-field/FormInput';
 import { School } from '@/db/entities';
 
 interface SchoolSelectFieldProps {
@@ -26,7 +26,7 @@ export function SchoolSelectField({
     errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
 
   return (
-    <FormFieldRow
+    <FormInput
       icon={schoolOutline}
       label={label}
       htmlFor="school-select"
@@ -54,6 +54,6 @@ export function SchoolSelectField({
           </IonSelectOption>
         ))}
       </IonSelect>
-    </FormFieldRow>
+    </FormInput>
   );
 }

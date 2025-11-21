@@ -2,7 +2,7 @@ import { useFieldContext } from '@/components/Form2/form';
 import { IonInput } from '@ionic/react';
 import { ribbonOutline } from 'ionicons/icons';
 import React from 'react';
-import FormFieldRow from '@/components/Form2/FormFieldRow';
+import FormInput from '@/components/Form2/form-field/FormInput';
 
 interface ScoreFieldProps {
   label: string;
@@ -26,7 +26,7 @@ export function GradeScoreField({
   const error = fieldErrors.score;
 
   return (
-    <FormFieldRow
+    <FormInput
       icon={ribbonOutline}
       label={label}
       htmlFor="score"
@@ -49,6 +49,6 @@ export function GradeScoreField({
         aria-describedby={error ? 'score-error' : undefined}
         required
       />
-    </FormFieldRow>
+    </FormInput>
   );
 }
