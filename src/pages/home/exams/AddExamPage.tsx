@@ -19,7 +19,7 @@ import {
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-import { School, Subject } from '@/db/entities';
+import { Subject } from '@/db/entities';
 import { format } from 'date-fns';
 import { useSchools, useSchoolSubjects, useAddExam } from '@/hooks';
 import { Routes } from '@/routes';
@@ -27,7 +27,6 @@ import '../grades/AddGradePage.css';
 import { useAppForm } from '@/components/Form2/form';
 import { z } from 'zod';
 import { revalidateLogic } from '@tanstack/react-form';
-import { schoolOutline } from 'ionicons/icons';
 
 interface ExamAddFormData {
   selectedSchoolId: string;
@@ -142,15 +141,6 @@ const AddExamPage: React.FC = () => {
     setShowToast(true);
   };
 
-  const schoolOptions = useMemo(
-    () =>
-      schools.map((school: School) => ({
-        value: school.id,
-        label: school.name,
-      })),
-    [schools],
-  );
-
   const subjectOptions = useMemo(
     () =>
       subjects.map((subject: Subject) => ({
@@ -214,59 +204,15 @@ const AddExamPage: React.FC = () => {
           <div className="form-group">
             <div className="form-card">
               <div className="form-fields">
-                <form.Field name="selectedSchoolId">
+                <form.AppField name="selectedSchoolId">
                   {(field) => (
-                    <div
-                      className={`input-row ${fieldErrors.selectedSchoolId ? 'error' : ''}`}
-                    >
-                      <div className="field-icon-wrapper">
-                        <IonIcon icon={schoolOutline} className="field-icon" />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label" htmlFor="school-select">
-                          Schule *
-                        </label>
-
-                        <IonSelect
-                          id="school-select"
-                          className="form-input"
-                          interface="popover"
-                          placeholder="Schule auswählen"
-                          value={field.state.value}
-                          onIonChange={(e) =>
-                            handleSchoolChange(e.detail.value)
-                          }
-                          aria-describedby={
-                            fieldErrors.selectedSchoolId
-                              ? 'school-error'
-                              : undefined
-                          }
-                        >
-                          {schoolOptions.map((option) => (
-                            <IonSelectOption
-                              key={option.value}
-                              value={option.value}
-                            >
-                              {option.label}
-                            </IonSelectOption>
-                          ))}
-                        </IonSelect>
-
-                        <div className="message-area">
-                          {fieldErrors.selectedSchoolId && (
-                            <div
-                              id="school-error"
-                              className="field-error"
-                              role="alert"
-                            >
-                              {fieldErrors.selectedSchoolId}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <field.SchoolSelectField
+                      label="Schule"
+                      schools={schools}
+                      onSchoolChange={handleSchoolChange}
+                    />
                   )}
-                </form.Field>
+                </form.AppField>
 
                 <form.Field name="selectedSubjectId">
                   {(field) => (
