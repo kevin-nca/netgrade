@@ -11,7 +11,7 @@ interface FormFieldRowProps {
   children: React.ReactNode;
 }
 
-const FormFieldRow: React.FC<FormFieldRowProps> = ({
+const FormInput: React.FC<FormFieldRowProps> = ({
   icon,
   label,
   htmlFor,
@@ -47,4 +47,4 @@ const FormFieldRow: React.FC<FormFieldRowProps> = ({
   );
 };
 
-export default FormFieldRow;
+export default FormInput;
