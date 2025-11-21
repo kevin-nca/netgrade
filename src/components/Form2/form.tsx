@@ -1,4 +1,5 @@
-import { createFormHookContexts, createFormHook } from '@tanstack/react-form';
+import { GradeScoreField } from '@/components/Form2/fields/GradeScoreField';
+import { createFormHook, createFormHookContexts } from '@tanstack/react-form';
 import { ExamNameField } from '@/components/Form2/fields/ExamNameField';
 import { SchoolSelectField } from '@/components/Form2/fields/SchoolSelectField';
 
@@ -11,6 +12,7 @@ const { useAppForm, withForm } = createFormHook({
   formContext,
   fieldComponents: {
     ExamNameField,
+    GradeScoreField,
     SchoolSelectField,
   },
   formComponents: {},

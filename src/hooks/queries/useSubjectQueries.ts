@@ -92,10 +92,6 @@ export const useUpdateSubject = () => {
     mutationFn: (subjectData: Partial<Subject> & { id: string }) =>
       SubjectService.update(subjectData),
     onSuccess: (updatedSubject) => {
-      // Update the subject in the cache
-      queryClient.invalidateQueries({
-        queryKey: subjectKeys.list({ id: updatedSubject.id }),
-      });
       // Invalidate and refetch subjects list
       queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
       // Invalidate and refetch school subjects
@@ -113,13 +109,9 @@ export const useDeleteSubject = () => {
 
   return useMutation({
     mutationFn: (subjectId: string) => SubjectService.delete(subjectId),
-    onSuccess: (id) => {
-      // Remove the specific subject from cache
-      queryClient.removeQueries({
-        queryKey: subjectKeys.list({ id }),
-      });
+    onSuccess: () => {
       // Invalidate and refetch subjects list
-      queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: subjectKeys.all });
     },
   });
 };
