@@ -2,7 +2,7 @@ import { useFieldContext } from '@/components/Form2/form';
 import { IonInput } from '@ionic/react';
 import { documentTextOutline } from 'ionicons/icons';
 import React from 'react';
-import FormInput from '@/components/Form2/form-input/FormInput';
+import FormInput from '@/components/Form2/form-field/FormInput';
 
 export function ExamNameField({ label }: { label: string }) {
   const field = useFieldContext<string>();
