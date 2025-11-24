@@ -12,10 +12,10 @@ interface ScoreFieldProps {
 
 export function GradeScoreField({
   label,
-  fieldErrors,
-  validateField,
+  fieldErrors, // not needed
+  validateField, // two types of validation, if its only the valid field validation (1..6) do the validation here
 }: ScoreFieldProps) {
-  const field = useFieldContext<string>();
+  const field = useFieldContext<number>();
 
   const handleScoreInput = (e: CustomEvent) => {
     const value = e.detail.value ?? '';
@@ -42,7 +42,7 @@ export function GradeScoreField({
         min="1"
         max="6"
         step="0.01"
-        value={String(field.state.value ?? '')}
+        value={field.state.value} // no stringly typing
         onIonInput={handleScoreInput}
         onIonBlur={field.handleBlur}
         placeholder="6.0"

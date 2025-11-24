@@ -1,27 +1,27 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   IonContent,
-  IonPage,
-  IonToast,
   IonIcon,
   IonInput,
+  IonPage,
   IonSelect,
   IonSelectOption,
+  IonToast,
 } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
-  libraryOutline,
-  documentTextOutline,
-  calendarOutline,
   addOutline,
+  calendarOutline,
   checkmarkCircleOutline,
+  documentTextOutline,
+  libraryOutline,
 } from 'ionicons/icons';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import { Subject } from '@/db/entities';
 import { format } from 'date-fns';
-import { useSchools, useSchoolSubjects, useAddExam } from '@/hooks';
+import { useAddExam, useSchools, useSchoolSubjects } from '@/hooks';
 import { Routes } from '@/routes';
 import '../grades/AddGradePage.css';
 import { useAppForm } from '@/components/Form2/form';
@@ -42,7 +42,7 @@ const AddExamPage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
   const [showNavigationModal, setShowNavigationModal] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({}); //
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
 
   const examFormSchema = z.object({
