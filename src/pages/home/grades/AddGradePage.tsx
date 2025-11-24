@@ -194,29 +194,6 @@ const AddGradePage: React.FC = () => {
         let suggestion = '';
 
         switch (fieldName) {
-          case 'score': {
-            const stringValue = String(value);
-            const scoreNum = Number(value);
-            if (stringValue.endsWith('.') || stringValue === '') {
-              error = '';
-              suggestion = '';
-            } else if (isNaN(scoreNum)) {
-              error = 'Bitte eine gültige Zahl eingeben.';
-              suggestion = '';
-            } else {
-              error = validateGrade(scoreNum) || '';
-              if (!error && scoreNum > 0) {
-                if (scoreNum >= 5.5)
-                  suggestion = '💡 Ausgezeichnet! Eine sehr gute Note.';
-                else if (scoreNum >= 4.5) suggestion = '✨ Gute Leistung!';
-                else if (scoreNum >= 3.5) suggestion = '👍 Solide Note.';
-                else if (scoreNum >= 2.5)
-                  suggestion = '📚 Noch Verbesserungspotential.';
-                else suggestion = '🎯 Beim nächsten Mal wird es besser!';
-              }
-            }
-            break;
-          }
           case 'weight': {
             const weightNum = Number(value);
             error = validateWeight(weightNum) || '';
@@ -636,7 +613,7 @@ const AddGradePage: React.FC = () => {
                     <field.GradeScoreField
                       label="Note (1-6)"
                       fieldErrors={fieldErrors}
-                      validateField={validateField}
+                      setFieldErrors={setFieldErrors}
                     />
                   )}
                 </form.AppField>
