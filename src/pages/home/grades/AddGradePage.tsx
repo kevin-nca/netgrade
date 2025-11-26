@@ -29,11 +29,7 @@ import {
   useSchools,
   useSchoolSubjects,
 } from '@/hooks/queries';
-import {
-  percentageToDecimal,
-  validateGrade,
-  validateWeight,
-} from '@/utils/validation';
+import { percentageToDecimal, validateWeight } from '@/utils/validation';
 import { Routes } from '@/routes';
 import './AddGradePage.css';
 import { useAppForm } from '@/components/Form2/form';
@@ -42,6 +38,8 @@ import type {
   InputInputEventDetail,
   IonInputCustomEvent,
 } from '@ionic/core/components';
+import { z } from 'zod';
+import { revalidateLogic } from '@tanstack/react-form';
 
 interface GradeAddFormData {
   selectedSchoolId: string;
@@ -62,6 +60,27 @@ const AddGradePage: React.FC = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const examFormSchema = z.object({
+    selectedSchoolId: z.string().min(1, 'Bitte wähle eine Schule aus'),
+    selectedSubjectId: z.string().min(1, 'Bitte wähle ein Fach aus'),
+    examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
+    date: z.string().min(1, 'Bitte wähle ein Datum aus'),
+    weight: z.string().min(1, 'Bitte wähle eine Gewichtung aus'),
+    score: z
+      .string()
+      .min(1, 'Bitte gib deine Note ein')
+      .refine(
+        (val) => {
+          const num = parseFloat(val);
+          return !isNaN(num) && num >= 1 && num <= 6;
+        },
+        {
+          message: 'Bitte gib eine Note zwischen 1 und 6 ein',
+        },
+      ),
+    comment: z.string(),
+  });
+
   const form = useAppForm({
     defaultValues: {
       selectedSchoolId: '',
@@ -71,23 +90,14 @@ const AddGradePage: React.FC = () => {
       weight: '',
       score: '',
       comment: '',
-    } as GradeAddFormData,
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onSubmit: examFormSchema,
+    },
     onSubmit: async ({ value }) => {
       const scoreNumber = +String(value.score).replace(',', '.');
       const weightNumber = +String(value.weight).replace(',', '.');
-
-      const gradeError = validateGrade(scoreNumber);
-      if (gradeError) {
-        setFieldErrors((prev) => ({ ...prev, score: gradeError }));
-        return;
-      }
-
-      const weightError = validateWeight(weightNumber);
-      if (weightError) {
-        setFieldErrors((prev) => ({ ...prev, weight: weightError }));
-        return;
-      }
-      setFieldErrors({});
 
       const gradePayload = {
         subjectId: value.selectedSubjectId,
@@ -110,33 +120,6 @@ const AddGradePage: React.FC = () => {
           );
         },
       });
-    },
-    validators: {
-      onSubmit: ({ value }) => {
-        const errors: Record<string, string> = {};
-
-        if (!value.selectedSchoolId) {
-          errors.selectedSchoolId = 'Bitte wähle eine Schule aus!';
-        }
-        if (!value.selectedSubjectId) {
-          errors.selectedSubjectId = 'Bitte wähle ein Fach aus!';
-        }
-        if (!value.examName.trim()) {
-          errors.examName = 'Bitte gib einen Prüfungsnamen ein!';
-        }
-        if (!String(value.weight ?? '').trim()) {
-          errors.weight = 'Bitte gib eine Gewichtung ein!';
-        }
-
-        if (Object.keys(errors).length > 0) {
-          setFieldErrors(errors);
-          showAndSetToastMessage('Bitte fülle alle Pflichtfelder aus!');
-          return Object.values(errors).join(', ');
-        }
-
-        setFieldErrors({});
-        return undefined;
-      },
     },
   });
 
@@ -609,13 +592,7 @@ const AddGradePage: React.FC = () => {
                 </form.Field>
 
                 <form.AppField name="score">
-                  {(field) => (
-                    <field.GradeScoreField
-                      label="Note (1-6)"
-                      fieldErrors={fieldErrors}
-                      setFieldErrors={setFieldErrors}
-                    />
-                  )}
+                  {(field) => <field.GradeScoreField label="Note (1-6)" />}
                 </form.AppField>
               </div>
             </div>
