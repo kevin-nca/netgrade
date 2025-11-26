@@ -7,7 +7,7 @@ interface FormFieldRowProps {
   label: string;
   htmlFor: string;
   required?: boolean;
-  error?: string;
+  errors: string[];
   errorId?: string;
   children: React.ReactNode;
 }
@@ -17,14 +17,14 @@ const FormInput: React.FC<FormFieldRowProps> = ({
   label,
   htmlFor,
   required = false,
-  error,
+  errors,
   errorId,
   children,
 }) => {
   const computedErrorId = errorId || `${htmlFor}-error`;
 
   return (
-    <div className={`input-row ${error ? 'error' : ''}`}>
+    <div className={`input-row ${errors.length > 0 ? 'error' : ''}`}>
       <div className="field-icon-wrapper">
         <IonIcon icon={icon} className="field-icon" />
       </div>
@@ -37,11 +37,17 @@ const FormInput: React.FC<FormFieldRowProps> = ({
         {children}
 
         <div className="message-area">
-          {error && (
-            <div id={computedErrorId} className="field-error" role="alert">
-              {error}
-            </div>
-          )}
+          {errors?.length > 0 &&
+            errors?.map((error, idx) => (
+              <div
+                key={idx}
+                id={computedErrorId}
+                className="field-error"
+                role="alert"
+              >
+                {error}
+              </div>
+            ))}
         </div>
       </div>
     </div>
