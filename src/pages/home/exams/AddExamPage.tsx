@@ -166,9 +166,14 @@ const AddExamPage: React.FC = () => {
 
                 <form.Field name="date">
                   {(field) => (
-                    <div className={`input-row ${fieldErrors.date ? 'error' : ''}`}>
+                    <div
+                      className={`input-row ${fieldErrors.date ? 'error' : ''}`}
+                    >
                       <div className="field-icon-wrapper">
-                        <IonIcon icon={calendarOutline} className="field-icon" />
+                        <IonIcon
+                          icon={calendarOutline}
+                          className="field-icon"
+                        />
                       </div>
                       <div className="field-content">
                         <label className="field-label" htmlFor="exam-date">
@@ -184,12 +189,18 @@ const AddExamPage: React.FC = () => {
                             field.handleChange(val);
                             setFieldErrors((prev) => ({ ...prev, date: '' }));
                           }}
-                          aria-describedby={fieldErrors.date ? 'date-error' : undefined}
+                          aria-describedby={
+                            fieldErrors.date ? 'date-error' : undefined
+                          }
                           required
                         />
                         <div className="message-area">
                           {fieldErrors.date && (
-                            <div id="date-error" className="field-error" role="alert">
+                            <div
+                              id="date-error"
+                              className="field-error"
+                              role="alert"
+                            >
                               {fieldErrors.date}
                             </div>
                           )}
@@ -203,10 +214,16 @@ const AddExamPage: React.FC = () => {
                   {(field) => (
                     <div className="input-row">
                       <div className="field-icon-wrapper">
-                        <IonIcon icon={documentTextOutline} className="field-icon" />
+                        <IonIcon
+                          icon={documentTextOutline}
+                          className="field-icon"
+                        />
                       </div>
                       <div className="field-content">
-                        <label className="field-label" htmlFor="exam-description">
+                        <label
+                          className="field-label"
+                          htmlFor="exam-description"
+                        >
                           Beschreibung (optional)
                         </label>
                         <IonInput
@@ -214,7 +231,9 @@ const AddExamPage: React.FC = () => {
                           className="form-input"
                           type="text"
                           value={field.state.value}
-                          onIonChange={(e) => field.handleChange(e.detail.value ?? '')}
+                          onIonChange={(e) =>
+                            field.handleChange(e.detail.value ?? '')
+                          }
                           placeholder="Zusätzliche Notizen..."
                         />
                       </div>

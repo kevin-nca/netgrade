@@ -58,12 +58,7 @@ describe('SubjectSelectField', () => {
 
     (useFieldContext as Mock).mockReturnValue(mockField);
 
-    render(
-      <SubjectSelectField
-        label="Fach"
-        subjects={mockSubjects}
-      />,
-    );
+    render(<SubjectSelectField label="Fach" subjects={mockSubjects} />);
 
     const select = screen.getByRole('combobox') as HTMLSelectElement;
 
@@ -87,12 +82,7 @@ describe('SubjectSelectField', () => {
 
     (useFieldContext as Mock).mockReturnValue(mockField);
 
-    render(
-      <SubjectSelectField
-        label="Fach"
-        subjects={mockSubjects}
-      />,
-    );
+    render(<SubjectSelectField label="Fach" subjects={mockSubjects} />);
 
     const select = screen.getByRole('combobox') as HTMLSelectElement;
     expect(select.value).toBe('2');
