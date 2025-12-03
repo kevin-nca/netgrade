@@ -32,7 +32,7 @@
     "@capacitor/share": "^7.0.1",
     "@capacitor/status-bar": "^7.0.3",
     "@ionic-native/social-sharing": "^5.36.0",
-    "@ionic/core": "^8.7.7",
+    "@ionic/core": "^8.7.10",
     "@ionic/react": "^8.7.3",
     "@ionic/react-router": "^8.7.9",
     "@tanstack/react-form": "^1.23.8",
