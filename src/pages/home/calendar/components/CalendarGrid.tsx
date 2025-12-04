@@ -1,6 +1,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { IonButton, IonCard } from '@ionic/react';
 
 interface CalendarDay {
   date: Date;
@@ -27,34 +28,38 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   }
 
   return (
-    <div className="modern-calendar">
-      <div className="calendar-weekdays">
+    <IonCard className="modern-calendar" color={'light'}>
+      <IonCard className="calendar-weekdays" color={'light'}>
         {weekdays.map((day) => (
-          <div key={day} className="calendar-weekday">
+          <p key={day} className="calendar-weekday">
             {day}
-          </div>
+          </p>
         ))}
-      </div>
-
+      </IonCard>
       {weeks.map((week, weekIndex) => (
-        <div key={`week-${weekIndex}`} className="calendar-week">
+        <IonCard
+          key={`week-${weekIndex}`}
+          className="calendar-week"
+          color={'light'}
+        >
           {week.map((day) => (
-            <button
+            <IonButton
+              size="small"
+              shape="round"
               key={format(day.date, 'yyyy-MM-dd')}
               className={`calendar-day ${day.isCurrentMonth ? 'current-month' : 'other-month'} ${day.isSelected ? 'selected' : ''} ${day.isToday ? 'today' : ''} ${day.hasExam ? 'has-exam' : ''}`}
               onClick={() => day.isCurrentMonth && onSelectDate(day.date)}
               disabled={!day.isCurrentMonth}
-              type="button"
               aria-label={format(day.date, 'd MMMM', { locale: de })}
               aria-selected={day.isSelected}
             >
               <span className="day-number">{format(day.date, 'd')}</span>
               {day.hasExam && <div className="exam-dot"></div>}
-            </button>
+            </IonButton>
           ))}
-        </div>
+        </IonCard>
       ))}
-    </div>
+    </IonCard>
   );
 };
 
