@@ -58,7 +58,6 @@ export const useSchoolSubjects = (schoolId: string) => {
         .getQueryData<Subject[]>(subjectKeys.lists())
         ?.filter((s) => s.schoolId === schoolId);
     },
-    staleTime: Infinity,
     enabled: !!schoolId,
   });
 };
