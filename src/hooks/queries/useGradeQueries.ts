@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AddExamAndGradePayload, GradeService } from '@/services/GradeService';
 import { Grade } from '@/db/entities/Grade';
-import { examKeys, schoolKeys } from '@/hooks';
+import { examKeys, schoolKeys, subjectKeys } from '@/hooks';
 import { Exam } from '@/db/entities';
 
 // Query keys
@@ -53,6 +53,9 @@ export const useAddGradeWithExam = () => {
 
       queryClient.invalidateQueries({
         queryKey: schoolKeys.lists(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: subjectKeys.lists(),
       });
     },
   });
