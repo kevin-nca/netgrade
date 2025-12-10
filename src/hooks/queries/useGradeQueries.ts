@@ -62,11 +62,7 @@ export const useDeleteGrade = () => {
 
   return useMutation({
     mutationFn: (gradeId: string) => GradeService.delete(gradeId),
-    onSuccess: (deletedGradeId) => {
-      // Remove the grade from the cache
-      queryClient.removeQueries({
-        queryKey: gradeKeys.list({ id: deletedGradeId }),
-      });
+    onSuccess: () => {
       // Invalidate and refetch grades list
       queryClient.invalidateQueries({
         queryKey: gradeKeys.all,
