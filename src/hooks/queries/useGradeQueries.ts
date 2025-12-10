@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AddExamAndGradePayload, GradeService } from '@/services/GradeService';
 import { Grade } from '@/db/entities/Grade';
-import { examKeys } from '@/hooks';
+import { examKeys, schoolKeys, subjectKeys } from '@/hooks';
 import { Exam } from '@/db/entities';
 
 // Query keys
@@ -68,7 +68,15 @@ export const useDeleteGrade = () => {
         queryKey: gradeKeys.list({ id: deletedGradeId }),
       });
       // Invalidate and refetch grades list
-      queryClient.invalidateQueries({ queryKey: gradeKeys.lists() });
+      queryClient.invalidateQueries({
+        queryKey: gradeKeys.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: schoolKeys.lists(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: subjectKeys.all,
+      });
     },
   });
 };
