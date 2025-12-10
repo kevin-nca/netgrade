@@ -55,7 +55,7 @@ export const useAddGradeWithExam = () => {
         queryKey: schoolKeys.lists(),
       });
       queryClient.invalidateQueries({
-        queryKey: subjectKeys.lists(),
+        queryKey: subjectKeys.schoolSubjects(newGrade.exam.subject.schoolId),
       });
     },
   });
