@@ -1,39 +1,23 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { useForm } from '@tanstack/react-form';
-import {
-  IonContent,
-  IonPage,
-  IonToast,
-  IonIcon,
-  IonInput,
-  IonSelect,
-  IonSelectOption,
-} from '@ionic/react';
+import React, { useEffect, useState } from 'react';
+import { IonContent, IonIcon, IonInput, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
-  schoolOutline,
-  libraryOutline,
-  documentTextOutline,
-  calendarOutline,
   addOutline,
+  calendarOutline,
   checkmarkCircleOutline,
+  documentTextOutline,
 } from 'ionicons/icons';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-import { School, Subject } from '@/db/entities';
 import { format } from 'date-fns';
-import { useSchools, useSchoolSubjects, useAddExam } from '@/hooks';
+import { useAddExam, useSchools, useSchoolSubjects } from '@/hooks';
 import { Routes } from '@/routes';
 import '../grades/AddGradePage.css';
-
-interface ExamAddFormData {
-  selectedSchoolId: string;
-  selectedSubjectId: string;
-  title: string;
-  date: string;
-  description: string;
-}
+import { useAppForm } from '@/components/Form2/form';
+import { z } from 'zod';
+import { revalidateLogic } from '@tanstack/react-form';
+import { School, Subject } from '@/db/entities';
 
 const AddExamPage: React.FC = () => {
   const history = useHistory();
@@ -44,19 +28,40 @@ const AddExamPage: React.FC = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const form = useForm({
+  const examFormSchema = z.object({
+    selectedSchool: z
+      .instanceof(School)
+      .refine((val) => !!val, 'Bitte wähle eine Schule aus'),
+    selectedSubject: z
+      .instanceof(Subject)
+      .refine((val) => !!val, 'Bitte wähle ein Fach aus'),
+    examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
+    date: z.string().min(1, 'Bitte wähle ein Datum aus'),
+    description: z.string(),
+  });
+
+  const { data: schools = [], error: schoolsError } = useSchools();
+  const [selectedSchool, setSelectedSchool] = useState('');
+  const { data: subjects = [], error: subjectsError } =
+    useSchoolSubjects(selectedSchool);
+
+  const form = useAppForm({
     defaultValues: {
-      selectedSchoolId: '',
-      selectedSubjectId: '',
-      title: '',
+      selectedSchool: schools?.length === 1 ? schools[0] : undefined,
+      selectedSubject: subjects?.length === 1 ? subjects[0] : undefined,
+      examName: '',
       date: format(new Date(), 'yyyy-MM-dd'),
       description: '',
-    } as ExamAddFormData,
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onSubmit: examFormSchema,
+    },
     onSubmit: async ({ value }) => {
       const examPayload = {
-        schoolId: value.selectedSchoolId,
-        subjectId: value.selectedSubjectId,
-        title: value.title.trim(),
+        schoolId: value.selectedSchool!.id,
+        subjectId: value.selectedSubject!.id,
+        title: value.examName.trim(),
         date: new Date(value.date + 'T12:00:00'),
         description: value.description.trim(),
       };
@@ -64,10 +69,8 @@ const AddExamPage: React.FC = () => {
       addExamMutation.mutate(examPayload, {
         onSuccess: () => {
           setShowSuccess(true);
-
           form.reset();
-          setSelectedSchoolId('');
-          form.setFieldValue('date', format(new Date(), 'yyyy-MM-dd'));
+          setSelectedSchool('');
 
           setTimeout(() => history.push(Routes.HOME), 1200);
         },
@@ -78,39 +81,8 @@ const AddExamPage: React.FC = () => {
         },
       });
     },
-    validators: {
-      onSubmit: ({ value }) => {
-        const errors: Record<string, string> = {};
-
-        if (!value.selectedSchoolId) {
-          errors.selectedSchoolId = 'Bitte wähle eine Schule aus!';
-        }
-        if (!value.selectedSubjectId) {
-          errors.selectedSubjectId = 'Bitte wähle ein Fach aus!';
-        }
-        if (!value.title.trim()) {
-          errors.title = 'Bitte gib einen Titel ein!';
-        }
-        if (!value.date) {
-          errors.date = 'Bitte wähle ein Datum aus!';
-        }
-
-        if (Object.keys(errors).length > 0) {
-          setFieldErrors(errors);
-          showAndSetToastMessage('Bitte fülle alle Pflichtfelder aus!');
-          return Object.values(errors).join(', ');
-        }
-
-        setFieldErrors({});
-        return undefined;
-      },
-    },
   });
 
-  const { data: schools = [], error: schoolsError } = useSchools();
-  const [selectedSchoolId, setSelectedSchoolId] = useState('');
-  const { data: subjects = [], error: subjectsError } =
-    useSchoolSubjects(selectedSchoolId);
   const addExamMutation = useAddExam();
 
   useEffect(() => {
@@ -120,31 +92,7 @@ const AddExamPage: React.FC = () => {
     if (subjectsError) {
       showAndSetToastMessage('Fehler beim Laden der Fächer');
     }
-  }, [schoolsError, subjectsError]);
-
-  const handleSchoolChange = useCallback(
-    (value: string | number | boolean) => {
-      const newSchoolId = String(value);
-      form.setFieldValue('selectedSchoolId', newSchoolId);
-      form.setFieldValue('selectedSubjectId', '');
-      setSelectedSchoolId(newSchoolId);
-      setFieldErrors((prev) => ({
-        ...prev,
-        selectedSchoolId: '',
-        selectedSubjectId: '',
-      }));
-    },
-    [form],
-  );
-
-  const handleSubjectChange = useCallback(
-    (value: string | number | boolean) => {
-      const subjectId = String(value);
-      form.setFieldValue('selectedSubjectId', subjectId);
-      setFieldErrors((prev) => ({ ...prev, selectedSubjectId: '' }));
-    },
-    [form],
-  );
+  }, [schoolsError]);
 
   const showAndSetToastMessage = (
     message: string,
@@ -154,34 +102,6 @@ const AddExamPage: React.FC = () => {
     setToastColor(color);
     setShowToast(true);
   };
-
-  const schoolOptions = useMemo(
-    () =>
-      schools.map((school: School) => ({
-        value: school.id,
-        label: school.name,
-      })),
-    [schools],
-  );
-
-  const subjectOptions = useMemo(
-    () =>
-      subjects.map((subject: Subject) => ({
-        value: subject.id,
-        label: subject.name,
-      })),
-    [subjects],
-  );
-
-  const formProgress = useMemo(() => {
-    const values = form.state.values;
-    const fields = ['selectedSchoolId', 'selectedSubjectId', 'title', 'date'];
-    const completed = fields.filter((field) => {
-      const value = values[field as keyof ExamAddFormData];
-      return value !== '';
-    }).length;
-    return Math.round((completed / fields.length) * 100);
-  }, [form.state.values]);
 
   const handleAddExam = () => {
     form.handleSubmit();
@@ -209,188 +129,40 @@ const AddExamPage: React.FC = () => {
               </div>
             </div>
           )}
-          <div className="form-progress-container">
-            <div
-              className="form-progress"
-              role="progressbar"
-              aria-valuenow={formProgress}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
-              <div
-                className="progress-bar"
-                style={{ width: `${formProgress}%` }}
-              />
-            </div>
-            <span className="progress-text">{formProgress}% completed</span>
-          </div>
           <div className="form-group">
             <div className="form-card">
               <div className="form-fields">
-                <form.Field name="selectedSchoolId">
+                <form.AppField name="selectedSchool">
                   {(field) => (
-                    <div
-                      className={`input-row ${fieldErrors.selectedSchoolId ? 'error' : ''}`}
-                    >
-                      <div className="field-icon-wrapper">
-                        <IonIcon icon={schoolOutline} className="field-icon" />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label" htmlFor="school-select">
-                          Schule *
-                        </label>
-
-                        <IonSelect
-                          id="school-select"
-                          className="form-input"
-                          interface="popover"
-                          placeholder="Schule auswählen"
-                          value={field.state.value}
-                          onIonChange={(e) =>
-                            handleSchoolChange(e.detail.value)
-                          }
-                          aria-describedby={
-                            fieldErrors.selectedSchoolId
-                              ? 'school-error'
-                              : undefined
-                          }
-                        >
-                          {schoolOptions.map((option) => (
-                            <IonSelectOption
-                              key={option.value}
-                              value={option.value}
-                            >
-                              {option.label}
-                            </IonSelectOption>
-                          ))}
-                        </IonSelect>
-
-                        <div className="message-area">
-                          {fieldErrors.selectedSchoolId && (
-                            <div
-                              id="school-error"
-                              className="field-error"
-                              role="alert"
-                            >
-                              {fieldErrors.selectedSchoolId}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <field.SchoolSelectField
+                      label="Schule"
+                      schools={schools ?? []}
+                      onSchoolChange={(schoolId) => {
+                        setSelectedSchool(schoolId);
+                        form.setFieldValue('selectedSubject', null);
+                      }}
+                    />
                   )}
-                </form.Field>
+                </form.AppField>
 
-                <form.Field name="selectedSubjectId">
+                <form.AppField name="selectedSubject">
                   {(field) => (
-                    <div
-                      className={`input-row ${fieldErrors.selectedSubjectId ? 'error' : ''}`}
-                    >
-                      <div className="field-icon-wrapper">
-                        <IonIcon icon={libraryOutline} className="field-icon" />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label" htmlFor="subject-select">
-                          Fach *
-                        </label>
-
-                        <div className="select-input">
-                          <IonSelect
-                            id="subject-select"
-                            className="form-input"
-                            interface="popover"
-                            placeholder={
-                              !form.state.values.selectedSchoolId
-                                ? 'Bitte zuerst Schule wählen'
-                                : 'Fach auswählen'
-                            }
-                            value={field.state.value}
-                            onIonChange={(e) =>
-                              handleSubjectChange(e.detail.value)
-                            }
-                            disabled={
-                              !form.state.values.selectedSchoolId ||
-                              subjects.length === 0
-                            }
-                            aria-describedby={
-                              fieldErrors.selectedSubjectId
-                                ? 'subject-error'
-                                : undefined
-                            }
-                          >
-                            {subjectOptions.map((option) => (
-                              <IonSelectOption
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </IonSelectOption>
-                            ))}
-                          </IonSelect>
-                        </div>
-
-                        <div className="message-area">
-                          {fieldErrors.selectedSubjectId && (
-                            <div
-                              id="subject-error"
-                              className="field-error"
-                              role="alert"
-                            >
-                              {fieldErrors.selectedSubjectId}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <field.SubjectSelectField
+                      label="Fach"
+                      subjects={subjects ?? []}
+                      disabled={!selectedSchool || subjects.length === 0}
+                      placeholder={
+                        selectedSchool
+                          ? 'Fach auswählen'
+                          : 'Bitte zuerst eine Schule auswählen'
+                      }
+                    />
                   )}
-                </form.Field>
+                </form.AppField>
 
-                <form.Field name="title">
-                  {(field) => (
-                    <div
-                      className={`input-row ${fieldErrors.title ? 'error' : ''}`}
-                    >
-                      <div className="field-icon-wrapper">
-                        <IonIcon
-                          icon={documentTextOutline}
-                          className="field-icon"
-                        />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label" htmlFor="exam-title">
-                          Titel *
-                        </label>
-                        <IonInput
-                          id="exam-title"
-                          className="form-input"
-                          type="text"
-                          value={field.state.value}
-                          onIonChange={(e) => {
-                            const val = e.detail.value ?? '';
-                            field.handleChange(val);
-                            setFieldErrors((prev) => ({ ...prev, title: '' }));
-                          }}
-                          placeholder="z.B. Mathe-Klausur, Vokabeltest"
-                          aria-describedby={
-                            fieldErrors.title ? 'title-error' : undefined
-                          }
-                          required
-                        />
-                        <div className="message-area">
-                          {fieldErrors.title && (
-                            <div
-                              id="title-error"
-                              className="field-error"
-                              role="alert"
-                            >
-                              {fieldErrors.title}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </form.Field>
+                <form.AppField name="examName">
+                  {(field) => <field.ExamNameField label="Prüfungsname" />}
+                </form.AppField>
 
                 <form.Field name="date">
                   {(field) => (

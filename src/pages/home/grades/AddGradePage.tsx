@@ -1,25 +1,23 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   IonContent,
-  IonPage,
-  IonToast,
   IonIcon,
   IonInput,
+  IonPage,
   IonSelect,
   IonSelectOption,
+  IonToast,
 } from '@ionic/react';
 
-import { useForm } from '@tanstack/react-form';
 import { useHistory } from 'react-router-dom';
 import {
-  schoolOutline,
-  libraryOutline,
-  documentTextOutline,
-  calendarOutline,
-  scaleOutline,
-  ribbonOutline,
   addOutline,
+  calendarOutline,
   checkmarkCircleOutline,
+  documentTextOutline,
+  libraryOutline,
+  scaleOutline,
+  schoolOutline,
 } from 'ionicons/icons';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
@@ -27,21 +25,22 @@ import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import { School, Subject } from '@/db/entities';
 import { format, parseISO } from 'date-fns';
 import {
+  useAddGradeWithExam,
   useSchools,
   useSchoolSubjects,
-  useAddGradeWithExam,
 } from '@/hooks/queries';
 import {
+  percentageToDecimal,
   validateGrade,
   validateWeight,
-  percentageToDecimal,
 } from '@/utils/validation';
 import { Routes } from '@/routes';
 import './AddGradePage.css';
+import { useAppForm } from '@/components/Form2/form';
 
 import type {
-  IonInputCustomEvent,
   InputInputEventDetail,
+  IonInputCustomEvent,
 } from '@ionic/core/components';
 
 interface GradeAddFormData {
@@ -63,7 +62,7 @@ const AddGradePage: React.FC = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       selectedSchoolId: '',
       selectedSubjectId: '',
@@ -255,12 +254,6 @@ const AddGradePage: React.FC = () => {
     const value = e.detail.value ?? '';
     form.setFieldValue('weight', value);
     validateField('weight', value);
-  };
-
-  const handleScoreInput = (e: IonInputCustomEvent<InputInputEventDetail>) => {
-    const value = e.detail.value ?? '';
-    form.setFieldValue('score', value);
-    validateField('score', value);
   };
 
   const schoolOptions = useMemo(
@@ -638,56 +631,15 @@ const AddGradePage: React.FC = () => {
                   )}
                 </form.Field>
 
-                <form.Field name="score">
+                <form.AppField name="score">
                   {(field) => (
-                    <div
-                      className={`input-row ${fieldErrors.score ? 'error' : ''}`}
-                    >
-                      <div className="field-icon-wrapper">
-                        <IonIcon icon={ribbonOutline} className="field-icon" />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label" htmlFor="score">
-                          Note (1-6) *
-                        </label>
-                        <IonInput
-                          id="score"
-                          className="form-input"
-                          type="text"
-                          inputmode="decimal"
-                          min="1"
-                          max="6"
-                          step="0.01"
-                          value={String(field.state.value ?? '')}
-                          onIonInput={handleScoreInput}
-                          onIonBlur={field.handleBlur}
-                          placeholder="6.0"
-                          aria-describedby={
-                            fieldErrors.score ? 'score-error' : undefined
-                          }
-                          required
-                        />
-                        <div className="message-area">
-                          {fieldErrors.score && (
-                            <div
-                              id="score-error"
-                              className="field-error"
-                              role="alert"
-                            >
-                              {fieldErrors.score}
-                            </div>
-                          )}
-                          {fieldErrors.score_suggestion &&
-                            !fieldErrors.score && (
-                              <div className="field-suggestion">
-                                {fieldErrors.score_suggestion}
-                              </div>
-                            )}
-                        </div>
-                      </div>
-                    </div>
+                    <field.GradeScoreField
+                      label="Note (1-6)"
+                      fieldErrors={fieldErrors}
+                      validateField={validateField}
+                    />
                   )}
-                </form.Field>
+                </form.AppField>
               </div>
             </div>
           </div>
