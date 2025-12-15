@@ -1,5 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { IonContent, IonIcon, IonInput, IonPage, IonSelect, IonSelectOption, IonToast, } from '@ionic/react';
+import {
+  IonContent,
+  IonIcon,
+  IonInput,
+  IonPage,
+  IonSelect,
+  IonSelectOption,
+  IonToast,
+} from '@ionic/react';
 
 import { useHistory } from 'react-router-dom';
 import {
@@ -16,13 +24,20 @@ import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import { School, Subject } from '@/db/entities';
 import { format, parseISO } from 'date-fns';
-import { useAddGradeWithExam, useSchools, useSchoolSubjects, } from '@/hooks/queries';
+import {
+  useAddGradeWithExam,
+  useSchools,
+  useSchoolSubjects,
+} from '@/hooks/queries';
 import { percentageToDecimal, validateWeight } from '@/utils/validation';
 import { Routes } from '@/routes';
 import './AddGradePage.css';
 import { useAppForm } from '@/components/Form2/form';
 
-import type { InputInputEventDetail, IonInputCustomEvent, } from '@ionic/core/components';
+import type {
+  InputInputEventDetail,
+  IonInputCustomEvent,
+} from '@ionic/core/components';
 import { z } from 'zod';
 import { revalidateLogic } from '@tanstack/react-form';
 
