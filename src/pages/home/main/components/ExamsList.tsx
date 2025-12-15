@@ -4,8 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { IonIcon } from '@ionic/react';
 import { bookOutline, timeOutline } from 'ionicons/icons';
 import { Routes } from '@/routes';
-import { useUpcomingExams, examKeys } from '@/hooks/queries';
-import { ExamService } from '@/services/ExamService';
+import { useUpcomingExams, createExamDetailQuery } from '@/hooks/queries';
 
 const ExamsList: React.FC = () => {
   const history = useHistory();
@@ -28,10 +27,7 @@ const ExamsList: React.FC = () => {
   };
 
   const handleExamClick = async (examId: string) => {
-    await queryClient.prefetchQuery({
-      queryKey: examKeys.detail(examId),
-      queryFn: () => ExamService.findById(examId),
-    });
+    await queryClient.prefetchQuery(createExamDetailQuery(examId));
 
     history.push(Routes.EXAM_EDIT.replace(':examId', examId));
   };
