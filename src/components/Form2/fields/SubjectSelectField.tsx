@@ -18,7 +18,7 @@ export function SubjectSelectField({
   disabled = false,
   placeholder = 'Fach auswählen',
 }: SubjectSelectFieldProps) {
-  const field = useFieldContext<Subject>();
+  const field = useFieldContext<Subject | null>();
 
   const errors = Array.isArray(field.state.meta.errors)
     ? field.state.meta.errors

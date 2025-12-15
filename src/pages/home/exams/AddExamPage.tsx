@@ -16,8 +16,37 @@ import { Routes } from '@/routes';
 import '../grades/AddGradePage.css';
 import { useAppForm } from '@/components/Form2/form';
 import { z } from 'zod';
-import { revalidateLogic } from '@tanstack/react-form';
-import { School, Subject } from '@/db/entities';
+import type { School, Subject } from '@/db/entities';
+
+const examFormSchema = z
+  .object({
+    selectedSchool: z.any(),
+    selectedSubject: z.any(),
+    examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
+    date: z.string().min(1, 'Bitte wähle ein Datum aus'),
+    description: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.selectedSchool) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Bitte wähle eine Schule aus',
+        path: ['selectedSchool'],
+      });
+    }
+    if (!data.selectedSubject) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Bitte wähle ein Fach aus',
+        path: ['selectedSubject'],
+      });
+    }
+  });
+
+type ExamFormData = z.infer<typeof examFormSchema> & {
+  selectedSchool: School | null;
+  selectedSubject: Subject | null;
+};
 
 const AddExamPage: React.FC = () => {
   const history = useHistory();
@@ -28,32 +57,19 @@ const AddExamPage: React.FC = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const examFormSchema = z.object({
-    selectedSchool: z
-      .instanceof(School)
-      .refine((val) => !!val, 'Bitte wähle eine Schule aus'),
-    selectedSubject: z
-      .instanceof(Subject)
-      .refine((val) => !!val, 'Bitte wähle ein Fach aus'),
-    examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
-    date: z.string().min(1, 'Bitte wähle ein Datum aus'),
-    description: z.string(),
-  });
-
   const { data: schools = [], error: schoolsError } = useSchools();
-  const [selectedSchool, setSelectedSchool] = useState('');
+  const [selectedSchoolId, setSelectedSchoolId] = useState('');
   const { data: subjects = [], error: subjectsError } =
-    useSchoolSubjects(selectedSchool);
+    useSchoolSubjects(selectedSchoolId);
 
   const form = useAppForm({
     defaultValues: {
-      selectedSchool: schools?.length === 1 ? schools[0] : undefined,
-      selectedSubject: subjects?.length === 1 ? subjects[0] : undefined,
+      selectedSchool: schools?.length === 1 ? schools[0] : null,
+      selectedSubject: subjects?.length === 1 ? subjects[0] : null,
       examName: '',
       date: format(new Date(), 'yyyy-MM-dd'),
       description: '',
-    },
-    validationLogic: revalidateLogic(),
+    } as ExamFormData,
     validators: {
       onSubmit: examFormSchema,
     },
@@ -70,7 +86,7 @@ const AddExamPage: React.FC = () => {
         onSuccess: () => {
           setShowSuccess(true);
           form.reset();
-          setSelectedSchool('');
+          setSelectedSchoolId('');
 
           setTimeout(() => history.push(Routes.HOME), 1200);
         },
@@ -92,7 +108,7 @@ const AddExamPage: React.FC = () => {
     if (subjectsError) {
       showAndSetToastMessage('Fehler beim Laden der Fächer');
     }
-  }, [schoolsError]);
+  }, [schoolsError, subjectsError]);
 
   const showAndSetToastMessage = (
     message: string,
@@ -137,8 +153,8 @@ const AddExamPage: React.FC = () => {
                     <field.SchoolSelectField
                       label="Schule"
                       schools={schools ?? []}
-                      onSchoolChange={(schoolId) => {
-                        setSelectedSchool(schoolId);
+                      onSchoolChange={(schoolId: string) => {
+                        setSelectedSchoolId(schoolId);
                         form.setFieldValue('selectedSubject', null);
                       }}
                     />
@@ -150,9 +166,9 @@ const AddExamPage: React.FC = () => {
                     <field.SubjectSelectField
                       label="Fach"
                       subjects={subjects ?? []}
-                      disabled={!selectedSchool || subjects.length === 0}
+                      disabled={!selectedSchoolId || subjects.length === 0}
                       placeholder={
-                        selectedSchool
+                        selectedSchoolId
                           ? 'Fach auswählen'
                           : 'Bitte zuerst eine Schule auswählen'
                       }

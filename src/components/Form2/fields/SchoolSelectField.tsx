@@ -16,7 +16,7 @@ export function SchoolSelectField({
   schools,
   onSchoolChange,
 }: SchoolSelectFieldProps) {
-  const field = useFieldContext<School>();
+  const field = useFieldContext<School | null>();
 
   const errors = Array.isArray(field.state.meta.errors)
     ? field.state.meta.errors

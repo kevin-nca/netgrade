@@ -38,6 +38,7 @@
     "@tanstack/react-form": "^1.23.8",
     "@tanstack/react-query": "^5.90.8",
     "@tanstack/react-query-devtools": "^5.90.2",
+    "@tanstack/zod-form-adapter": "^0.42.1",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
     "cordova-plugin-x-socialsharing": "^6.0.4",
@@ -56,7 +57,7 @@
     "swiper": "^12.0.3",
     "typeorm": "^0.3.22",
     "xlsx": "^0.18.5",
-    "zod": "^4.1.12"
+    "zod": "^4.2.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",
