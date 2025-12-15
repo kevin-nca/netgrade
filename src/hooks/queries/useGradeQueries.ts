@@ -46,13 +46,17 @@ export const useAddGradeWithExam = () => {
   return useMutation({
     mutationFn: (payload: AddExamAndGradePayload) =>
       GradeService.addWithExam(payload),
-    onSuccess: (_, payload) => {
+    onSuccess: (newGrade) => {
+      queryClient.setQueryData(gradeKeys.list({ id: newGrade.id }), newGrade);
+
       queryClient.invalidateQueries({ queryKey: gradeKeys.lists() });
+
       queryClient.invalidateQueries({
-        queryKey: gradeKeys.subjectGrades(payload.subjectId),
+        queryKey: schoolKeys.lists(),
       });
-      queryClient.invalidateQueries({ queryKey: examKeys.all });
-      queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
+      queryClient.invalidateQueries({
+        queryKey: subjectKeys.schoolSubjects(newGrade.exam.subject.schoolId),
+      });
     },
   });
 };
