@@ -1,13 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  IonContent,
-  IonIcon,
-  IonInput,
-  IonPage,
-  IonSelect,
-  IonSelectOption,
-  IonToast,
-} from '@ionic/react';
+import { IonContent, IonIcon, IonInput, IonPage, IonSelect, IonSelectOption, IonToast, } from '@ionic/react';
 
 import { useHistory } from 'react-router-dom';
 import {
@@ -24,20 +16,13 @@ import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import { School, Subject } from '@/db/entities';
 import { format, parseISO } from 'date-fns';
-import {
-  useAddGradeWithExam,
-  useSchools,
-  useSchoolSubjects,
-} from '@/hooks/queries';
+import { useAddGradeWithExam, useSchools, useSchoolSubjects, } from '@/hooks/queries';
 import { percentageToDecimal, validateWeight } from '@/utils/validation';
 import { Routes } from '@/routes';
 import './AddGradePage.css';
 import { useAppForm } from '@/components/Form2/form';
 
-import type {
-  InputInputEventDetail,
-  IonInputCustomEvent,
-} from '@ionic/core/components';
+import type { InputInputEventDetail, IonInputCustomEvent, } from '@ionic/core/components';
 import { z } from 'zod';
 import { revalidateLogic } from '@tanstack/react-form';
 
@@ -47,7 +32,7 @@ interface GradeAddFormData {
   examName: string;
   date: string;
   weight: string;
-  score: string;
+  score: number;
   comment: string;
 }
 
@@ -67,17 +52,9 @@ const AddGradePage: React.FC = () => {
     date: z.string().min(1, 'Bitte wähle ein Datum aus'),
     weight: z.string().min(1, 'Bitte wähle eine Gewichtung aus'),
     score: z
-      .string()
-      .min(1, 'Bitte gib deine Note ein')
-      .refine(
-        (val) => {
-          const num = parseFloat(val);
-          return !isNaN(num) && num >= 1 && num <= 6;
-        },
-        {
-          message: 'Bitte gib eine Note zwischen 1 und 6 ein',
-        },
-      ),
+      .number('Gebe eine gültige Zahl ein')
+      .min(1, 'Die Note muss zwischen 1-6 sein')
+      .max(6, 'Die Note muss zwischen 1-6 sein'),
     comment: z.string(),
   });
 
@@ -88,7 +65,7 @@ const AddGradePage: React.FC = () => {
       examName: '',
       date: format(new Date(), 'yyyy-MM-dd'),
       weight: '',
-      score: '',
+      score: undefined as number | undefined,
       comment: '',
     },
     validationLogic: revalidateLogic(),
@@ -96,7 +73,7 @@ const AddGradePage: React.FC = () => {
       onSubmit: examFormSchema,
     },
     onSubmit: async ({ value }) => {
-      const scoreNumber = +String(value.score).replace(',', '.');
+      const scoreNumber = value.score!;
       const weightNumber = +String(value.weight).replace(',', '.');
 
       const gradePayload = {
