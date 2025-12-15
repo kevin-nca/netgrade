@@ -37,6 +37,11 @@ export const useUpcomingExams = () => {
   return useQuery(UpcomingExamsQuery);
 };
 
+export const createExamDetailQuery = (examId: string) => ({
+  queryKey: examKeys.detail(examId),
+  queryFn: () => ExamService.findById(examId),
+});
+
 export const useExam = (id: string) => {
   return useQuery({
     queryKey: examKeys.detail(id),
