@@ -9,12 +9,14 @@ interface SchoolSelectFieldProps {
   label: string;
   schools: School[];
   onSchoolChange?: (schoolId: string) => void;
+  resetSubjectField?: () => void; // Neue Prop
 }
 
 export function SchoolSelectField({
   label,
   schools,
   onSchoolChange,
+  resetSubjectField,
 }: SchoolSelectFieldProps) {
   const field = useFieldContext<School | null>();
 
@@ -46,6 +48,7 @@ export function SchoolSelectField({
           if (selectedSchool) {
             field.handleChange(selectedSchool);
             onSchoolChange?.(selectedId);
+            resetSubjectField?.(); // Reset das Subject-Field
           }
         }}
         aria-invalid={!!firstError}
