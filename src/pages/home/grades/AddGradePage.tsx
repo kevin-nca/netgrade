@@ -67,9 +67,9 @@ const AddGradePage: React.FC = () => {
     date: z.string().min(1, 'Bitte wähle ein Datum aus'),
     weight: z.string().min(1, 'Bitte wähle eine Gewichtung aus'),
     score: z
-      .number('Gebe eine gültige Zahl ein')
-      .min(1, 'Die Note muss zwischen 1-6 sein')
-      .max(6, 'Die Note muss zwischen 1-6 sein'),
+      .number('Gib eine gültige Zahl ein')
+      .min(1, 'Gib eine Zahl zwischen 1-6 ein')
+      .max(6, 'Gib eine Zahl zwischen 1-6 ein'),
     comment: z.string(),
   });
 
@@ -85,7 +85,7 @@ const AddGradePage: React.FC = () => {
     },
     validationLogic: revalidateLogic(),
     validators: {
-      onSubmit: examFormSchema,
+      onChange: examFormSchema,
     },
     onSubmit: async ({ value }) => {
       const scoreNumber = value.score!;
