@@ -3,7 +3,6 @@ import { IonContent, IonIcon, IonInput, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
   addOutline,
-  calendarOutline,
   checkmarkCircleOutline,
   documentTextOutline,
 } from 'ionicons/icons';
@@ -54,7 +53,6 @@ const AddExamPage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
   const [showNavigationModal, setShowNavigationModal] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
 
   const { data: schools = [], error: schoolsError } = useSchools();
@@ -180,51 +178,9 @@ const AddExamPage: React.FC = () => {
                   {(field) => <field.ExamNameField label="Prüfungsname" />}
                 </form.AppField>
 
-                <form.Field name="date">
-                  {(field) => (
-                    <div
-                      className={`input-row ${fieldErrors.date ? 'error' : ''}`}
-                    >
-                      <div className="field-icon-wrapper">
-                        <IonIcon
-                          icon={calendarOutline}
-                          className="field-icon"
-                        />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label" htmlFor="exam-date">
-                          Datum *
-                        </label>
-                        <IonInput
-                          id="exam-date"
-                          className="form-input"
-                          type="date"
-                          value={field.state.value}
-                          onIonChange={(e) => {
-                            const val = e.detail.value ?? '';
-                            field.handleChange(val);
-                            setFieldErrors((prev) => ({ ...prev, date: '' }));
-                          }}
-                          aria-describedby={
-                            fieldErrors.date ? 'date-error' : undefined
-                          }
-                          required
-                        />
-                        <div className="message-area">
-                          {fieldErrors.date && (
-                            <div
-                              id="date-error"
-                              className="field-error"
-                              role="alert"
-                            >
-                              {fieldErrors.date}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </form.Field>
+                <form.AppField name="date">
+                  {(field) => <field.DateField label="Datum" />}
+                </form.AppField>
 
                 <form.Field name="description">
                   {(field) => (
