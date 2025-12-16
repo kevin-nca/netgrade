@@ -57,7 +57,7 @@
     "swiper": "^12.0.3",
     "typeorm": "^0.3.22",
     "xlsx": "^0.18.5",
-    "zod": "^4.2.0"
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",

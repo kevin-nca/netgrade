@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { IonContent, IonIcon, IonInput, IonPage } from '@ionic/react';
+import React, { useEffect, useState } from 'react';
+import { IonContent, IonIcon, IonInput, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
   addOutline,
@@ -50,13 +50,17 @@ type ExamFormData = z.infer<typeof examFormSchema> & {
 
 const AddExamPage: React.FC = () => {
   const history = useHistory();
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
   const [showNavigationModal, setShowNavigationModal] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const { data: schools = [] } = useSchools();
+  const { data: schools = [], error: schoolsError } = useSchools();
   const [selectedSchoolId, setSelectedSchoolId] = useState('');
-  const { data: subjects = [] } = useSchoolSubjects(selectedSchoolId);
+  const { data: subjects = [], error: subjectsError } =
+    useSchoolSubjects(selectedSchoolId);
 
   const form = useAppForm({
     defaultValues: {
@@ -86,11 +90,34 @@ const AddExamPage: React.FC = () => {
 
           setTimeout(() => history.push(Routes.HOME), 1200);
         },
+        onError: (error) => {
+          showAndSetToastMessage(
+            `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        },
       });
     },
   });
 
   const addExamMutation = useAddExam();
+
+  useEffect(() => {
+    if (schoolsError) {
+      showAndSetToastMessage('Fehler beim Laden der Schulen');
+    }
+    if (subjectsError) {
+      showAndSetToastMessage('Fehler beim Laden der Fächer');
+    }
+  }, [schoolsError, subjectsError]);
+
+  const showAndSetToastMessage = (
+    message: string,
+    color: 'success' | 'danger' = 'danger',
+  ) => {
+    setToastMessage(message);
+    setToastColor(color);
+    setShowToast(true);
+  };
 
   const handleAddExam = () => {
     form.handleSubmit();
@@ -122,12 +149,13 @@ const AddExamPage: React.FC = () => {
             <div className="form-card">
               <div className="form-fields">
                 <form.AppField name="selectedSchool">
-                  {(schoolField) => (
-                    <schoolField.SchoolSelectField
+                  {(field) => (
+                    <field.SchoolSelectField
                       label="Schule"
                       schools={schools ?? []}
                       onSchoolChange={(schoolId: string) => {
                         setSelectedSchoolId(schoolId);
+                        form.setFieldValue('selectedSubject', null);
                       }}
                     />
                   )}
@@ -253,6 +281,14 @@ const AddExamPage: React.FC = () => {
         <NavigationModal
           isOpen={showNavigationModal}
           setIsOpen={setShowNavigationModal}
+        />
+
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={toastMessage}
+          duration={toastColor === 'success' ? 3000 : 2000}
+          color={toastColor}
         />
       </IonContent>
 
