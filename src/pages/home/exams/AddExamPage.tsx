@@ -3,7 +3,6 @@ import { IonContent, IonIcon, IonInput, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import {
   addOutline,
-  calendarOutline,
   checkmarkCircleOutline,
   documentTextOutline,
 } from 'ionicons/icons';
