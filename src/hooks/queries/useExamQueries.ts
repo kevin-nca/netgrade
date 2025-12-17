@@ -37,6 +37,11 @@ export const useUpcomingExams = () => {
   return useQuery(UpcomingExamsQuery);
 };
 
+export const createExamDetailQuery = (examId: string) => ({
+  queryKey: examKeys.detail(examId),
+  queryFn: () => ExamService.findById(examId),
+});
+
 export const useExam = (id: string) => {
   return useQuery({
     queryKey: examKeys.detail(id),
@@ -61,6 +66,7 @@ export const useAddExam = () => {
     onSuccess: (newExam) => {
       // Invalidate and refetch exams list
       queryClient.invalidateQueries({ queryKey: examKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
       // Invalidate and refetch subject exams
       if (newExam.subjectId) {
         queryClient.invalidateQueries({
@@ -84,6 +90,7 @@ export const useUpdateExam = () => {
       });
       // Invalidate and refetch exams list
       queryClient.invalidateQueries({ queryKey: examKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
       // Invalidate and refetch subject exams
       if (updatedExam.subjectId) {
         queryClient.invalidateQueries({
@@ -104,6 +111,7 @@ export const useDeleteExam = () => {
       queryClient.removeQueries({ queryKey: examKeys.detail(deletedExamId) });
       // Invalidate and refetch exams list
       queryClient.invalidateQueries({ queryKey: examKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
     },
   });
 };

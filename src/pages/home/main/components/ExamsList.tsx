@@ -1,12 +1,14 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { IonIcon } from '@ionic/react';
 import { bookOutline, timeOutline } from 'ionicons/icons';
 import { Routes } from '@/routes';
-import { useUpcomingExams } from '@/hooks/queries';
+import { useUpcomingExams, createExamDetailQuery } from '@/hooks/queries';
 
 const ExamsList: React.FC = () => {
   const history = useHistory();
+  const queryClient = useQueryClient();
   const { data: upcomingExams } = useUpcomingExams();
 
   const formatDate = (date: Date) => {
@@ -22,6 +24,12 @@ const ExamsList: React.FC = () => {
       day: '2-digit',
       month: 'short',
     });
+  };
+
+  const handleExamClick = async (examId: string) => {
+    await queryClient.prefetchQuery(createExamDetailQuery(examId));
+
+    history.push(Routes.EXAM_EDIT.replace(':examId', examId));
   };
 
   if (upcomingExams!.length === 0) {
@@ -44,9 +52,7 @@ const ExamsList: React.FC = () => {
           <div
             key={exam.id}
             className="exam-card glass-card"
-            onClick={() =>
-              history.push(Routes.EXAM_EDIT.replace(':examId', exam.id))
-            }
+            onClick={() => handleExamClick(exam.id)}
           >
             <div className="exam-card-content">
               <div className="exam-icon-and-info">
