@@ -47,7 +47,7 @@
     "localforage": "^1.10.0",
     "react": "^19.1.1",
     "react-calendar": "^6.0.0",
-    "react-dom": "^19.2.0",
+    "react-dom": "^19.2.3",
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
     "reflect-metadata": "^0.2.2",
