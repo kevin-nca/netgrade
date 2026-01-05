@@ -48,7 +48,7 @@ describe('SchoolSelectField', () => {
   it('sollte eine Schule auswählen und speichern können', () => {
     const mockField = {
       state: {
-        value: '',
+        value: null,
         meta: { errors: [] },
       },
       handleChange: vi.fn(),
@@ -70,9 +70,14 @@ describe('SchoolSelectField', () => {
 
     fireEvent.change(select, { target: { value: '2' } });
 
-    expect(mockField.handleChange).toHaveBeenCalledWith('2');
+    // handleChange wird mit dem ganzen School-Objekt aufgerufen
+    expect(mockField.handleChange).toHaveBeenCalledWith({
+      id: '2',
+      name: 'Realschule Berlin',
+    });
     expect(mockField.handleChange).toHaveBeenCalledTimes(1);
 
+    // onSchoolChange wird mit der ID aufgerufen
     expect(onSchoolChange).toHaveBeenCalledWith('2');
     expect(onSchoolChange).toHaveBeenCalledTimes(1);
   });
@@ -80,7 +85,7 @@ describe('SchoolSelectField', () => {
   it('sollte den ausgewählten Wert anzeigen', () => {
     const mockField = {
       state: {
-        value: '2',
+        value: { id: '2', name: 'Realschule Berlin' } as School,
         meta: { errors: [] },
       },
       handleChange: vi.fn(),

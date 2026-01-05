@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { IonContent, IonIcon, IonInput, IonPage, IonToast } from '@ionic/react';
+import { IonContent, IonIcon, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import {
-  addOutline,
-  checkmarkCircleOutline,
-  documentTextOutline,
-} from 'ionicons/icons';
+import { addOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
@@ -17,30 +13,17 @@ import { useAppForm } from '@/components/Form2/form';
 import { z } from 'zod';
 import type { School, Subject } from '@/db/entities';
 
-const examFormSchema = z
-  .object({
-    selectedSchool: z.any(),
-    selectedSubject: z.any(),
-    examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
-    date: z.string().min(1, 'Bitte wähle ein Datum aus'),
-    description: z.string(),
-  })
-  .superRefine((data, ctx) => {
-    if (!data.selectedSchool) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Bitte wähle eine Schule aus',
-        path: ['selectedSchool'],
-      });
-    }
-    if (!data.selectedSubject) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Bitte wähle ein Fach aus',
-        path: ['selectedSubject'],
-      });
-    }
-  });
+const examFormSchema = z.object({
+  selectedSchool: z.any().refine((val) => val !== null && val !== undefined, {
+    message: 'Bitte wähle eine Schule aus',
+  }),
+  selectedSubject: z.any().refine((val) => val !== null && val !== undefined, {
+    message: 'Bitte wähle ein Fach aus',
+  }),
+  examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
+  date: z.string().min(1, 'Bitte wähle ein Datum aus'),
+  description: z.string(),
+});
 
 type ExamFormData = z.infer<typeof examFormSchema> & {
   selectedSchool: School | null;
@@ -182,36 +165,11 @@ const AddExamPage: React.FC = () => {
                   {(field) => <field.DateField label="Datum" />}
                 </form.AppField>
 
-                <form.Field name="description">
+                <form.AppField name="description">
                   {(field) => (
-                    <div className="input-row">
-                      <div className="field-icon-wrapper">
-                        <IonIcon
-                          icon={documentTextOutline}
-                          className="field-icon"
-                        />
-                      </div>
-                      <div className="field-content">
-                        <label
-                          className="field-label"
-                          htmlFor="exam-description"
-                        >
-                          Beschreibung (optional)
-                        </label>
-                        <IonInput
-                          id="exam-description"
-                          className="form-input"
-                          type="text"
-                          value={field.state.value}
-                          onIonChange={(e) =>
-                            field.handleChange(e.detail.value ?? '')
-                          }
-                          placeholder="Zusätzliche Notizen..."
-                        />
-                      </div>
-                    </div>
+                    <field.DescriptionField label="Beschreibung (optional)" />
                   )}
-                </form.Field>
+                </form.AppField>
               </div>
             </div>
           </div>

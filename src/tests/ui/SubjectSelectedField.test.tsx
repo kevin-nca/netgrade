@@ -12,6 +12,7 @@ vi.mock('@ionic/react', () => ({
     value?: string;
     placeholder?: string;
     onIonChange?: (e: { detail: { value: string } }) => void;
+    disabled?: boolean;
     children?: React.ReactNode;
   }) => (
     <select
@@ -19,6 +20,7 @@ vi.mock('@ionic/react', () => ({
       onChange={(e) =>
         props.onIonChange?.({ detail: { value: e.target.value } })
       }
+      disabled={props.disabled}
     >
       {props.children}
     </select>
@@ -48,13 +50,11 @@ describe('SubjectSelectField', () => {
   it('sollte ein Fach auswählen und speichern können', () => {
     const mockField = {
       state: {
-        value: '',
+        value: null,
         meta: { errors: [] },
       },
       handleChange: vi.fn(),
     };
-
-    const onSubjectChange = vi.fn();
 
     (useFieldContext as Mock).mockReturnValue(mockField);
 
@@ -64,17 +64,18 @@ describe('SubjectSelectField', () => {
 
     fireEvent.change(select, { target: { value: '2' } });
 
-    expect(mockField.handleChange).toHaveBeenCalledWith('2');
+    // handleChange wird mit dem ganzen Subject-Objekt aufgerufen
+    expect(mockField.handleChange).toHaveBeenCalledWith({
+      id: '2',
+      name: 'Deutsch',
+    });
     expect(mockField.handleChange).toHaveBeenCalledTimes(1);
-
-    expect(onSubjectChange).toHaveBeenCalledWith('2');
-    expect(onSubjectChange).toHaveBeenCalledTimes(1);
   });
 
   it('sollte den ausgewählten Wert anzeigen', () => {
     const mockField = {
       state: {
-        value: '2',
+        value: { id: '2', name: 'Deutsch' } as Subject,
         meta: { errors: [] },
       },
       handleChange: vi.fn(),
@@ -85,6 +86,7 @@ describe('SubjectSelectField', () => {
     render(<SubjectSelectField label="Fach" subjects={mockSubjects} />);
 
     const select = screen.getByRole('combobox') as HTMLSelectElement;
+    // Der Wert im Select ist die ID (field.state.value?.id)
     expect(select.value).toBe('2');
   });
 });
