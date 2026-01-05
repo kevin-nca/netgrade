@@ -1,22 +1,24 @@
 import { useFieldContext } from '@/components/Form2/form';
 import { IonSelect, IonSelectOption } from '@ionic/react';
-import { schoolOutline } from 'ionicons/icons';
+import { libraryOutline } from 'ionicons/icons';
 import React from 'react';
 import FormInput from '@/components/Form2/form-field/FormInput';
-import { School } from '@/db/entities';
+import { Subject } from '@/db/entities';
 
-interface SchoolSelectFieldProps {
+interface SubjectSelectFieldProps {
   label: string;
-  schools: School[];
-  onSchoolChange?: (schoolId: string) => void;
+  subjects: Subject[];
+  disabled?: boolean;
+  placeholder?: string;
 }
 
-export function SchoolSelectField({
+export function SubjectSelectField({
   label,
-  schools,
-  onSchoolChange,
-}: SchoolSelectFieldProps) {
-  const field = useFieldContext<School | null>();
+  subjects,
+  disabled = false,
+  placeholder = 'Fach auswählen',
+}: SubjectSelectFieldProps) {
+  const field = useFieldContext<Subject | null>();
 
   const errors = Array.isArray(field.state.meta.errors)
     ? field.state.meta.errors
@@ -27,33 +29,33 @@ export function SchoolSelectField({
 
   return (
     <FormInput
-      icon={schoolOutline}
+      icon={libraryOutline}
       label={label}
-      htmlFor="school-select"
+      htmlFor="subject-select"
       required
       error={firstError}
-      errorId="school-error"
+      errorId="subject-error"
     >
       <IonSelect
-        id="school-select"
+        id="subject-select"
         className="form-input"
         interface="popover"
-        placeholder="Schule auswählen"
+        placeholder={placeholder}
         value={field.state.value?.id ?? ''}
         onIonChange={(e) => {
           const selectedId = e.detail.value;
-          const selectedSchool = schools.find((s) => s.id === selectedId);
-          if (selectedSchool) {
-            field.handleChange(selectedSchool);
-            onSchoolChange?.(selectedId);
+          const selectedSubject = subjects.find((s) => s.id === selectedId);
+          if (selectedSubject) {
+            field.handleChange(selectedSubject);
           }
         }}
+        disabled={disabled}
         aria-invalid={!!firstError}
         aria-describedby={firstError ? 'school-error' : undefined}
       >
-        {schools.map((school) => (
-          <IonSelectOption key={school.id} value={school.id}>
-            {school.name}
+        {subjects.map((subject) => (
+          <IonSelectOption key={subject.id} value={subject.id}>
+            {subject.name}
           </IonSelectOption>
         ))}
       </IonSelect>

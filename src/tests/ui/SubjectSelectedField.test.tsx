@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { Mock } from 'vitest';
-import { SchoolSelectField } from '@/components/Form2/fields/SchoolSelectField';
+import { SubjectSelectField } from '@/components/Form2/fields/SubjectSelectField';
 import { useFieldContext } from '@/components/Form2/form';
-import type { School } from '@/db/entities';
+import type { Subject } from '@/db/entities';
 
 vi.mock('@/components/Form2/form');
 
@@ -12,6 +12,7 @@ vi.mock('@ionic/react', () => ({
     value?: string;
     placeholder?: string;
     onIonChange?: (e: { detail: { value: string } }) => void;
+    disabled?: boolean;
     children?: React.ReactNode;
   }) => (
     <select
@@ -19,6 +20,7 @@ vi.mock('@ionic/react', () => ({
       onChange={(e) =>
         props.onIonChange?.({ detail: { value: e.target.value } })
       }
+      disabled={props.disabled}
     >
       {props.children}
     </select>
@@ -34,18 +36,18 @@ vi.mock('@/components/Form2/form-field/FormInput', () => ({
   ),
 }));
 
-describe('SchoolSelectField', () => {
-  const mockSchools: School[] = [
-    { id: '1', name: 'Gymnasium München' } as School,
-    { id: '2', name: 'Realschule Berlin' } as School,
-    { id: '3', name: 'Gesamtschule Hamburg' } as School,
+describe('SubjectSelectField', () => {
+  const mockSubjects: Subject[] = [
+    { id: '1', name: 'Mathematik' } as Subject,
+    { id: '2', name: 'Deutsch' } as Subject,
+    { id: '3', name: 'Englisch' } as Subject,
   ];
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('sollte eine Schule auswählen und speichern können', () => {
+  it('sollte ein Fach auswählen und speichern können', () => {
     const mockField = {
       state: {
         value: null,
@@ -54,38 +56,26 @@ describe('SchoolSelectField', () => {
       handleChange: vi.fn(),
     };
 
-    const onSchoolChange = vi.fn();
-
     (useFieldContext as Mock).mockReturnValue(mockField);
 
-    render(
-      <SchoolSelectField
-        label="Schule"
-        schools={mockSchools}
-        onSchoolChange={onSchoolChange}
-      />,
-    );
+    render(<SubjectSelectField label="Fach" subjects={mockSubjects} />);
 
     const select = screen.getByRole('combobox') as HTMLSelectElement;
 
     fireEvent.change(select, { target: { value: '2' } });
 
-    // handleChange wird mit dem ganzen School-Objekt aufgerufen
+    // handleChange wird mit dem ganzen Subject-Objekt aufgerufen
     expect(mockField.handleChange).toHaveBeenCalledWith({
       id: '2',
-      name: 'Realschule Berlin',
+      name: 'Deutsch',
     });
     expect(mockField.handleChange).toHaveBeenCalledTimes(1);
-
-    // onSchoolChange wird mit der ID aufgerufen
-    expect(onSchoolChange).toHaveBeenCalledWith('2');
-    expect(onSchoolChange).toHaveBeenCalledTimes(1);
   });
 
   it('sollte den ausgewählten Wert anzeigen', () => {
     const mockField = {
       state: {
-        value: { id: '2', name: 'Realschule Berlin' } as School,
+        value: { id: '2', name: 'Deutsch' } as Subject,
         meta: { errors: [] },
       },
       handleChange: vi.fn(),
@@ -93,15 +83,10 @@ describe('SchoolSelectField', () => {
 
     (useFieldContext as Mock).mockReturnValue(mockField);
 
-    render(
-      <SchoolSelectField
-        label="Schule"
-        schools={mockSchools}
-        onSchoolChange={vi.fn()}
-      />,
-    );
+    render(<SubjectSelectField label="Fach" subjects={mockSubjects} />);
 
     const select = screen.getByRole('combobox') as HTMLSelectElement;
+    // Der Wert im Select ist die ID (field.state.value?.id)
     expect(select.value).toBe('2');
   });
 });

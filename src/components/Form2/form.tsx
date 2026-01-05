@@ -2,6 +2,9 @@ import { GradeScoreField } from '@/components/Form2/fields/GradeScoreField';
 import { createFormHook, createFormHookContexts } from '@tanstack/react-form';
 import { ExamNameField } from '@/components/Form2/fields/ExamNameField';
 import { SchoolSelectField } from '@/components/Form2/fields/SchoolSelectField';
+import { SubjectSelectField } from '@/components/Form2/fields/SubjectSelectField';
+import { DateField } from '@/components/Form2/fields/DateField';
+import { DescriptionField } from '@/components/Form2/fields/DescriptionField';
 
 // export useFieldContext for use in your custom components
 export const { fieldContext, formContext, useFieldContext } =
@@ -14,6 +17,9 @@ const { useAppForm, withForm } = createFormHook({
     ExamNameField,
     GradeScoreField,
     SchoolSelectField,
+    SubjectSelectField,
+    DateField,
+    DescriptionField,
   },
   formComponents: {},
 });

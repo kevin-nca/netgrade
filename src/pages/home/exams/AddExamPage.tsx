@@ -1,40 +1,34 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  IonContent,
-  IonIcon,
-  IonInput,
-  IonPage,
-  IonSelect,
-  IonSelectOption,
-  IonToast,
-} from '@ionic/react';
+import React, { useEffect, useState } from 'react';
+import { IonContent, IonIcon, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import {
-  addOutline,
-  calendarOutline,
-  checkmarkCircleOutline,
-  documentTextOutline,
-  libraryOutline,
-} from 'ionicons/icons';
+import { addOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-import { Subject } from '@/db/entities';
 import { format } from 'date-fns';
 import { useAddExam, useSchools, useSchoolSubjects } from '@/hooks';
 import { Routes } from '@/routes';
 import '../grades/AddGradePage.css';
 import { useAppForm } from '@/components/Form2/form';
 import { z } from 'zod';
-import { revalidateLogic } from '@tanstack/react-form';
+import type { School, Subject } from '@/db/entities';
 
-interface ExamAddFormData {
-  selectedSchoolId: string;
-  selectedSubjectId: string;
-  examName: string;
-  date: string;
-  description: string;
-}
+const examFormSchema = z.object({
+  selectedSchool: z.any().refine((val) => val !== null && val !== undefined, {
+    message: 'Bitte wähle eine Schule aus',
+  }),
+  selectedSubject: z.any().refine((val) => val !== null && val !== undefined, {
+    message: 'Bitte wähle ein Fach aus',
+  }),
+  examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
+  date: z.string().min(1, 'Bitte wähle ein Datum aus'),
+  description: z.string(),
+});
+
+type ExamFormData = z.infer<typeof examFormSchema> & {
+  selectedSchool: School | null;
+  selectedSubject: Subject | null;
+};
 
 const AddExamPage: React.FC = () => {
   const history = useHistory();
@@ -42,33 +36,28 @@ const AddExamPage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
   const [showNavigationModal, setShowNavigationModal] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const examFormSchema = z.object({
-    selectedSchoolId: z.string().min(1, 'Bitte wähle eine Schule aus'),
-    selectedSubjectId: z.string().min(1, 'Bitte wähle ein Fach aus'),
-    examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
-    date: z.string().min(1, 'Bitte wähle ein Datum aus'),
-    description: z.string(),
-  });
+  const { data: schools = [], error: schoolsError } = useSchools();
+  const [selectedSchoolId, setSelectedSchoolId] = useState('');
+  const { data: subjects = [], error: subjectsError } =
+    useSchoolSubjects(selectedSchoolId);
 
   const form = useAppForm({
     defaultValues: {
-      selectedSchoolId: '',
-      selectedSubjectId: '',
+      selectedSchool: schools?.length === 1 ? schools[0] : null,
+      selectedSubject: subjects?.length === 1 ? subjects[0] : null,
       examName: '',
       date: format(new Date(), 'yyyy-MM-dd'),
       description: '',
-    },
-    validationLogic: revalidateLogic(),
+    } as ExamFormData,
     validators: {
       onSubmit: examFormSchema,
     },
     onSubmit: async ({ value }) => {
       const examPayload = {
-        schoolId: value.selectedSchoolId,
-        subjectId: value.selectedSubjectId,
+        schoolId: value.selectedSchool!.id,
+        subjectId: value.selectedSubject!.id,
         title: value.examName.trim(),
         date: new Date(value.date + 'T12:00:00'),
         description: value.description.trim(),
@@ -77,10 +66,8 @@ const AddExamPage: React.FC = () => {
       addExamMutation.mutate(examPayload, {
         onSuccess: () => {
           setShowSuccess(true);
-
           form.reset();
           setSelectedSchoolId('');
-          form.setFieldValue('date', format(new Date(), 'yyyy-MM-dd'));
 
           setTimeout(() => history.push(Routes.HOME), 1200);
         },
@@ -93,10 +80,6 @@ const AddExamPage: React.FC = () => {
     },
   });
 
-  const { data: schools = [], error: schoolsError } = useSchools();
-  const [selectedSchoolId, setSelectedSchoolId] = useState('');
-  const { data: subjects = [], error: subjectsError } =
-    useSchoolSubjects(selectedSchoolId);
   const addExamMutation = useAddExam();
 
   useEffect(() => {
@@ -108,30 +91,6 @@ const AddExamPage: React.FC = () => {
     }
   }, [schoolsError, subjectsError]);
 
-  const handleSchoolChange = useCallback(
-    (value: string | number | boolean) => {
-      const newSchoolId = String(value);
-      form.setFieldValue('selectedSchoolId', newSchoolId);
-      form.setFieldValue('selectedSubjectId', '');
-      setSelectedSchoolId(newSchoolId);
-      setFieldErrors((prev) => ({
-        ...prev,
-        selectedSchoolId: '',
-        selectedSubjectId: '',
-      }));
-    },
-    [form],
-  );
-
-  const handleSubjectChange = useCallback(
-    (value: string | number | boolean) => {
-      const subjectId = String(value);
-      form.setFieldValue('selectedSubjectId', subjectId);
-      setFieldErrors((prev) => ({ ...prev, selectedSubjectId: '' }));
-    },
-    [form],
-  );
-
   const showAndSetToastMessage = (
     message: string,
     color: 'success' | 'danger' = 'danger',
@@ -140,25 +99,6 @@ const AddExamPage: React.FC = () => {
     setToastColor(color);
     setShowToast(true);
   };
-
-  const subjectOptions = useMemo(
-    () =>
-      subjects.map((subject: Subject) => ({
-        value: subject.id,
-        label: subject.name,
-      })),
-    [subjects],
-  );
-
-  const formProgress = useMemo(() => {
-    const values = form.state.values;
-    const fields = ['selectedSchoolId', 'selectedSubjectId', 'title', 'date'];
-    const completed = fields.filter((field) => {
-      const value = values[field as keyof ExamAddFormData];
-      return value !== '';
-    }).length;
-    return Math.round((completed / fields.length) * 100);
-  }, [form.state.values]);
 
   const handleAddExam = () => {
     form.handleSubmit();
@@ -186,178 +126,50 @@ const AddExamPage: React.FC = () => {
               </div>
             </div>
           )}
-          <div className="form-progress-container">
-            <div
-              className="form-progress"
-              role="progressbar"
-              aria-valuenow={formProgress}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
-              <div
-                className="progress-bar"
-                style={{ width: `${formProgress}%` }}
-              />
-            </div>
-            <span className="progress-text">{formProgress}% completed</span>
-          </div>
           <div className="form-group">
             <div className="form-card">
               <div className="form-fields">
-                <form.AppField name="selectedSchoolId">
+                <form.AppField name="selectedSchool">
                   {(field) => (
                     <field.SchoolSelectField
                       label="Schule"
-                      schools={schools}
-                      onSchoolChange={handleSchoolChange}
+                      schools={schools ?? []}
+                      onSchoolChange={(schoolId: string) => {
+                        setSelectedSchoolId(schoolId);
+                        form.setFieldValue('selectedSubject', null);
+                      }}
                     />
                   )}
                 </form.AppField>
 
-                <form.Field name="selectedSubjectId">
+                <form.AppField name="selectedSubject">
                   {(field) => (
-                    <div
-                      className={`input-row ${fieldErrors.selectedSubjectId ? 'error' : ''}`}
-                    >
-                      <div className="field-icon-wrapper">
-                        <IonIcon icon={libraryOutline} className="field-icon" />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label" htmlFor="subject-select">
-                          Fach *
-                        </label>
-
-                        <div className="select-input">
-                          <IonSelect
-                            id="subject-select"
-                            className="form-input"
-                            interface="popover"
-                            placeholder={
-                              !form.state.values.selectedSchoolId
-                                ? 'Bitte zuerst Schule wählen'
-                                : 'Fach auswählen'
-                            }
-                            value={field.state.value}
-                            onIonChange={(e) =>
-                              handleSubjectChange(e.detail.value)
-                            }
-                            disabled={
-                              !form.state.values.selectedSchoolId ||
-                              subjects.length === 0
-                            }
-                            aria-describedby={
-                              fieldErrors.selectedSubjectId
-                                ? 'subject-error'
-                                : undefined
-                            }
-                          >
-                            {subjectOptions.map((option) => (
-                              <IonSelectOption
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </IonSelectOption>
-                            ))}
-                          </IonSelect>
-                        </div>
-
-                        <div className="message-area">
-                          {fieldErrors.selectedSubjectId && (
-                            <div
-                              id="subject-error"
-                              className="field-error"
-                              role="alert"
-                            >
-                              {fieldErrors.selectedSubjectId}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                    <field.SubjectSelectField
+                      label="Fach"
+                      subjects={subjects ?? []}
+                      disabled={!selectedSchoolId || subjects.length === 0}
+                      placeholder={
+                        selectedSchoolId
+                          ? 'Fach auswählen'
+                          : 'Bitte zuerst eine Schule auswählen'
+                      }
+                    />
                   )}
-                </form.Field>
+                </form.AppField>
 
                 <form.AppField name="examName">
                   {(field) => <field.ExamNameField label="Prüfungsname" />}
                 </form.AppField>
 
-                <form.Field name="date">
-                  {(field) => (
-                    <div
-                      className={`input-row ${fieldErrors.date ? 'error' : ''}`}
-                    >
-                      <div className="field-icon-wrapper">
-                        <IonIcon
-                          icon={calendarOutline}
-                          className="field-icon"
-                        />
-                      </div>
-                      <div className="field-content">
-                        <label className="field-label" htmlFor="exam-date">
-                          Datum *
-                        </label>
-                        <IonInput
-                          id="exam-date"
-                          className="form-input"
-                          type="date"
-                          value={field.state.value}
-                          onIonChange={(e) => {
-                            const val = e.detail.value ?? '';
-                            field.handleChange(val);
-                            setFieldErrors((prev) => ({ ...prev, date: '' }));
-                          }}
-                          aria-describedby={
-                            fieldErrors.date ? 'date-error' : undefined
-                          }
-                          required
-                        />
-                        <div className="message-area">
-                          {fieldErrors.date && (
-                            <div
-                              id="date-error"
-                              className="field-error"
-                              role="alert"
-                            >
-                              {fieldErrors.date}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </form.Field>
+                <form.AppField name="date">
+                  {(field) => <field.DateField label="Datum" />}
+                </form.AppField>
 
-                <form.Field name="description">
+                <form.AppField name="description">
                   {(field) => (
-                    <div className="input-row">
-                      <div className="field-icon-wrapper">
-                        <IonIcon
-                          icon={documentTextOutline}
-                          className="field-icon"
-                        />
-                      </div>
-                      <div className="field-content">
-                        <label
-                          className="field-label"
-                          htmlFor="exam-description"
-                        >
-                          Beschreibung (optional)
-                        </label>
-                        <IonInput
-                          id="exam-description"
-                          className="form-input"
-                          type="text"
-                          value={field.state.value}
-                          onIonChange={(e) =>
-                            field.handleChange(e.detail.value ?? '')
-                          }
-                          placeholder="Zusätzliche Notizen..."
-                        />
-                      </div>
-                    </div>
+                    <field.DescriptionField label="Beschreibung (optional)" />
                   )}
-                </form.Field>
+                </form.AppField>
               </div>
             </div>
           </div>
