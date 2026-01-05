@@ -101,7 +101,7 @@ const SchoolPage: React.FC = () => {
       />
       <IonContent>
         <IonList>
-          {subjects?.map((subject: Subject) => {
+          {subjects!.map((subject: Subject) => {
             const average = SchoolService.calculateSubjectAverage(subject);
 
             return (
