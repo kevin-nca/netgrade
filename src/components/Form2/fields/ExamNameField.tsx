@@ -7,13 +7,20 @@ import FormInput from '@/components/Form2/form-field/FormInput';
 export function ExamNameField({ label }: { label: string }) {
   const field = useFieldContext<string>();
 
+  const errors = Array.isArray(field.state.meta.errors)
+    ? field.state.meta.errors
+    : [];
+
+  const firstError =
+    errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
+
   return (
     <FormInput
       icon={documentTextOutline}
       label={label}
       htmlFor="exam-title"
       required
-      errors={field.state.meta.errors}
+      error={firstError}
       errorId="title-error"
     >
       <IonInput
@@ -26,8 +33,8 @@ export function ExamNameField({ label }: { label: string }) {
           field.handleChange(val);
         }}
         placeholder="z.B. Mathe-Klausur, Vokabeltest"
-        aria-invalid={!!field.state.meta.errors}
-        aria-describedby={field.state.meta.errors ? 'title-error' : undefined}
+        aria-invalid={!!firstError}
+        aria-describedby={firstError ? 'title-error' : undefined}
         required
         maxlength={255}
       />
