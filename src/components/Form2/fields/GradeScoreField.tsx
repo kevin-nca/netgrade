@@ -11,13 +11,20 @@ interface ScoreFieldProps {
 export function GradeScoreField({ label }: ScoreFieldProps) {
   const field = useFieldContext<number>();
 
+  const errors = Array.isArray(field.state.meta.errors)
+    ? field.state.meta.errors
+    : [];
+
+  const firstError =
+    errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
+
   return (
     <FormInput
       icon={ribbonOutline}
       label={label}
       htmlFor="score"
       required // probably not needed here
-      errors={field.state.meta.errors}
+      error={firstError}
       errorId="score-error"
     >
       <IonInput

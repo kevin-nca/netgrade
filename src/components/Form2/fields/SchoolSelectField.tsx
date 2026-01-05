@@ -18,13 +18,20 @@ export function SchoolSelectField({
 }: SchoolSelectFieldProps) {
   const field = useFieldContext<School | null>();
 
+  const errors = Array.isArray(field.state.meta.errors)
+    ? field.state.meta.errors
+    : [];
+
+  const firstError =
+    errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
+
   return (
     <FormInput
       icon={schoolOutline}
       label={label}
       htmlFor="school-select"
       required
-      errors={field.state.meta.errors}
+      error={firstError}
       errorId="school-error"
     >
       <IonSelect
@@ -41,8 +48,8 @@ export function SchoolSelectField({
             onSchoolChange?.(selectedId);
           }
         }}
-        aria-invalid={!!field.state.meta.errors}
-        aria-describedby={field.state.meta.errors ? 'school-error' : undefined}
+        aria-invalid={!!firstError}
+        aria-describedby={firstError ? 'school-error' : undefined}
       >
         {schools.map((school) => (
           <IonSelectOption key={school.id} value={school.id}>
