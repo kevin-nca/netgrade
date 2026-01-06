@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { IonContent, IonIcon, IonPage, IonToast } from '@ionic/react';
-
 import { useHistory } from 'react-router-dom';
 import { addOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-import { School, Subject } from '@/db/entities';
 import { format, parseISO } from 'date-fns';
 import {
   useAddGradeWithExam,
@@ -17,39 +15,10 @@ import { percentageToDecimal } from '@/utils/validation';
 import { Routes } from '@/routes';
 import './AddGradePage.css';
 import { useAppForm } from '@/components/Form2/form';
-import { z } from 'zod';
-
-const examFormSchema = z.object({
-  selectedSchool: z.any().refine((val) => val !== null && val !== undefined, {
-    message: 'Bitte wähle eine Schule aus',
-  }),
-  selectedSubject: z.any().refine((val) => val !== null && val !== undefined, {
-    message: 'Bitte wähle ein Fach aus',
-  }),
-  examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
-  date: z.string().min(1, 'Bitte wähle ein Datum aus'),
-  weight: z
-    .string()
-    .min(1, 'Bitte gib eine Gewichtung ein')
-    .refine(
-      (val) => {
-        const num = parseFloat(val.replace(',', '.'));
-        return !isNaN(num) && num >= 0 && num <= 100;
-      },
-      { message: 'Die Gewichtung muss zwischen 0 und 100 sein' },
-    ),
-
-  score: z
-    .number('Gib eine gültige Zahl ein')
-    .min(1, 'Gib eine Zahl zwischen 1-6 ein')
-    .max(6, 'Gib eine Zahl zwischen 1-6 ein'),
-  comment: z.string(),
-});
-
-type ExamFormData = z.infer<typeof examFormSchema> & {
-  selectedSchool: School | null;
-  selectedSubject: Subject | null;
-};
+import {
+  gradeFormSchema,
+  type GradeFormData,
+} from '@/components/Form2/feature/examFormSchemaGrade';
 
 const AddGradePage: React.FC = () => {
   const history = useHistory();
@@ -73,9 +42,9 @@ const AddGradePage: React.FC = () => {
       weight: '',
       score: undefined as number | undefined,
       comment: '',
-    } as ExamFormData,
+    } as GradeFormData,
     validators: {
-      onChange: examFormSchema,
+      onChange: gradeFormSchema,
     },
     onSubmit: async ({ value }) => {
       const scoreNumber = value.score!;
