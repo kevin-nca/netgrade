@@ -44,7 +44,7 @@ const AddGradePage: React.FC = () => {
       comment: '',
     } as GradeFormData,
     validators: {
-      onChange: gradeFormSchema,
+      onSubmit: gradeFormSchema,
     },
     onSubmit: async ({ value }) => {
       const scoreNumber = value.score!;
