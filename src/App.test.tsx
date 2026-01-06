@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { QueryClient } from '@tanstack/react-query';
-import App from '@/App';
+import App from './App';
 
 vi.mock('@/AppRouter', () => ({
   AppRouter: () => <div>AppRouter</div>,
