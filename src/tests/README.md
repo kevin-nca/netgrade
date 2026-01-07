@@ -5,7 +5,6 @@ the database.
 
 ## Test Files
 
-- `setup.ts`: Contains helper functions to initialize the test database, seed test data, and clean up after tests.
 - `SchoolService.test.ts`: Tests for the SchoolService.
 - `SubjectService.test.ts`: Tests for the SubjectService.
 - `ExamService.test.ts`: Tests for the ExamService.
@@ -30,7 +29,6 @@ npm test -- src/tests/SchoolService.test.ts
 The tests use SQL.js as the database, which is an in-memory SQL database. This allows the tests to run quickly and
 without affecting any external databases.
 
-The `setup.ts` file contains helper functions to:
 
 1. Initialize the test database
 2. Seed the database with test data
@@ -47,7 +45,6 @@ The test data includes:
 - An exam belonging to the subject
 - A grade for the exam
 
-This data is created in the `seedTestData` function in `setup.ts`.
 
 ## Mocking
 
