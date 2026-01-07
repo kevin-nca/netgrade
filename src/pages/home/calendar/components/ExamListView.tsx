@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonIcon } from '@ionic/react';
+import { IonCard, IonIcon } from '@ionic/react';
 import { time, school } from 'ionicons/icons';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -30,43 +30,43 @@ const ExamListView: React.FC<ExamListViewProps> = ({
   };
 
   return (
-    <div className="modern-list-container">
+    <IonCard className="modern-list-container">
       {groupedExams.length > 0 ? (
         groupedExams.map((group) => (
-          <div key={group.monthKey} className="month-section">
-            <div className="month-label">
+          <IonCard key={group.monthKey} className="month-section">
+            <IonCard className="month-label">
               <span>{group.monthName}</span>
-            </div>
+            </IonCard>
 
-            <div className="exams-list">
+            <IonCard className="exams-list">
               {group.exams.map((exam) => (
-                <div
+                <IonCard
                   key={exam.id}
                   className="exam-card"
                   onClick={() => onSelectExam(exam)}
                 >
-                  <div className="exam-date-badge">
-                    <div className="exam-date-day">
+                  <IonCard className="exam-date-badge">
+                    <IonCard className="exam-date-day">
                       {format(exam.date, 'dd')}
-                    </div>
-                    <div className="exam-date-month">
+                    </IonCard>
+                    <IonCard className="exam-date-month">
                       {format(exam.date, 'MMM', { locale: de }).toUpperCase()}
-                    </div>
+                    </IonCard>
                     {isDateToday(exam.date) && (
-                      <div className="today-marker"></div>
+                      <IonCard className="today-marker"></IonCard>
                     )}
-                  </div>
+                  </IonCard>
 
-                  <div className="exam-content">
+                  <IonCard className="exam-content">
                     <h3 className="exam-title">{exam.name}</h3>
-                    <div className="exam-meta">
-                      <div className="exam-time">
+                    <IonCard className="exam-meta">
+                      <IonCard className="exam-time">
                         <IonIcon icon={time} />
                         <span className="relative-date">
                           {getRelativeDate(exam.date)}
                         </span>
-                      </div>
-                    </div>
+                      </IonCard>
+                    </IonCard>
                     {exam.description && (
                       <p className="exam-desc">
                         {exam.description.length > 100
@@ -74,22 +74,22 @@ const ExamListView: React.FC<ExamListViewProps> = ({
                           : exam.description}
                       </p>
                     )}
-                  </div>
-                </div>
+                  </IonCard>
+                </IonCard>
               ))}
-            </div>
-          </div>
+            </IonCard>
+          </IonCard>
         ))
       ) : (
-        <div className="empty-state">
-          <div className="empty-icon">
+        <IonCard className="empty-state" color={'light'}>
+          <IonCard className="empty-icon">
             <IonIcon icon={school} />
-          </div>
+          </IonCard>
           <h3>Keine anstehenden Prüfungen</h3>
           <p>Du hast aktuell keine anstehenden Prüfungen.</p>
-        </div>
+        </IonCard>
       )}
-    </div>
+    </IonCard>
   );
 };
 
