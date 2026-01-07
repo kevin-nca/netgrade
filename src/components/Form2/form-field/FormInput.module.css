@@ -36,28 +36,6 @@
   margin-top: 0;
 }
 
-.input-row {
-  gap: 10px;
-}
-
-.input-row {
-  min-height: 56px;
-}
-
-.input-row {
-  border-bottom-color: rgba(255, 255, 255, 0.08);
-}
-
-.input-row:focus-within {
-  background: rgba(0, 122, 255, 0.05);
-  border-bottom-color: rgba(0, 122, 255, 0.2);
-}
-
-.input-row.error {
-  background: rgba(255, 59, 48, 0.05);
-  border-bottom-color: rgba(255, 59, 48, 0.3);
-}
-
 .field-icon-wrapper {
   width: 32px;
   height: 32px;
@@ -70,17 +48,6 @@
   flex-shrink: 0;
   align-self: flex-start;
   margin-top: 16px;
-}
-
-.field-icon-wrapper {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-}
-
-.field-icon-wrapper {
-  min-width: 40px;
-  min-height: 40px;
 }
 
 .field-content {
@@ -102,20 +69,14 @@
   content: '';
 }
 
-.field-label {
-  color: #ffffff;
-}
-
 ion-input.form-input {
   --padding-start: 10px;
   --padding-end: 10px;
-  --padding-top: 10px; /* gleichmäßiges Vertical Padding */
+  --padding-top: 10px;
   --padding-bottom: 10px;
-
   --background: rgba(255, 255, 255, 0.08);
   --border-radius: 8px;
-
-  height: 44px; /* Host-Höhe */
+  height: 44px;
 }
 
 .form-input {
@@ -135,7 +96,6 @@ ion-input.form-input {
   transition: all 0.2s ease;
   outline: none;
   appearance: none;
-  /* slightly smaller min-height so numeric inputs aren't oversized */
   min-height: 8px;
 }
 
@@ -167,11 +127,21 @@ textarea.form-input {
     font-size: 16px;
     padding: 10px 12px;
   }
+
+  .field-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .input-row {
+    gap: 10px;
+  }
 }
 
 @media (pointer: coarse) {
   .form-input {
-    font-size: 16px; /* Prevent zoom on iOS */
+    font-size: 16px;
     min-height: 44px;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -181,15 +151,42 @@ textarea.form-input {
     user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
+
+  .input-row {
+    min-height: 56px;
+  }
+
+  .field-icon-wrapper {
+    min-width: 40px;
+    min-height: 40px;
+  }
 }
 
-@media (prefers-contrast: more) {
+@media (prefers-contrast: high) {
   .form-input {
     border-width: 2px;
   }
 }
 
 @media (prefers-color-scheme: dark) {
+  .input-row {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .input-row:focus-within {
+    background: rgba(0, 122, 255, 0.05);
+    border-bottom-color: rgba(0, 122, 255, 0.2);
+  }
+
+  .input-row.error {
+    background: rgba(255, 59, 48, 0.05);
+    border-bottom-color: rgba(255, 59, 48, 0.3);
+  }
+
+  .field-label {
+    color: #ffffff;
+  }
+
   .form-input {
     background: rgba(255, 255, 255, 0.08);
     color: #ffffff;
@@ -209,9 +206,12 @@ textarea.form-input {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .input-row.error,
+  .input-row,
   .form-input {
-    animation: none;
     transition: none;
+  }
+
+  .input-row.error .form-input {
+    animation: none;
   }
 }
