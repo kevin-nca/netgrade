@@ -49,8 +49,6 @@ export function WeightField({ label }: WeightFieldProps) {
           }}
           onIonBlur={field.handleBlur}
           placeholder="100"
-          aria-invalid={!!firstError}
-          aria-describedby={firstError ? 'weight-error' : undefined}
           required
         />
         <div className="weight-quick-actions">

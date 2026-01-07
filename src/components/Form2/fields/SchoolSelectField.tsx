@@ -50,8 +50,6 @@ export function SchoolSelectField({
             onSchoolChange?.(selectedId);
           }
         }}
-        aria-invalid={!!firstError}
-        aria-describedby={firstError ? 'school-error' : undefined}
       >
         {schools.map((school) => (
           <IonSelectOption key={school.id} value={school.id}>

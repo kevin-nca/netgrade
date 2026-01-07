@@ -35,8 +35,6 @@ export function ExamNameField({ label }: { label: string }) {
           field.handleChange(val);
         }}
         placeholder="z.B. Mathe-Klausur, Vokabeltest"
-        aria-invalid={!!firstError}
-        aria-describedby={firstError ? 'title-error' : undefined}
         required
         maxlength={255}
       />

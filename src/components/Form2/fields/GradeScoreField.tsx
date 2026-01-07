@@ -45,8 +45,6 @@ export function GradeScoreField({ label }: ScoreFieldProps) {
         }}
         onIonBlur={field.handleBlur}
         placeholder="6.0"
-        aria-invalid={!!field.state.meta.errors}
-        aria-describedby={field.state.meta.errors ? 'score-error' : undefined}
         required // probably not needed here
       />
     </FormInput>

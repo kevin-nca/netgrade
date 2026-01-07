@@ -52,8 +52,6 @@ export function SubjectSelectField({
           }
         }}
         disabled={disabled}
-        aria-invalid={!!firstError}
-        aria-describedby={firstError ? 'school-error' : undefined}
       >
         {subjects.map((subject) => (
           <IonSelectOption key={subject.id} value={subject.id}>

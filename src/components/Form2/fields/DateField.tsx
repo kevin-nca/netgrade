@@ -34,8 +34,6 @@ export function DateField({ label }: { label: string }) {
           const val = e.detail.value ?? '';
           field.handleChange(val);
         }}
-        aria-invalid={!!firstError}
-        aria-describedby={firstError ? 'date-error' : undefined}
         required
       />
     </FormInput>

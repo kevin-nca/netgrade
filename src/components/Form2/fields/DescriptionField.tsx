@@ -34,8 +34,6 @@ export function DescriptionField({ label }: { label: string }) {
           field.handleChange(val);
         }}
         placeholder="Zusätzliche Notizen..."
-        aria-invalid={!!firstError}
-        aria-describedby={firstError ? 'description-error' : undefined}
       />
     </FormInput>
   );
