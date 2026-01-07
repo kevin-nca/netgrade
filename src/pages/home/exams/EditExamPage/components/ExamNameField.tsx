@@ -1,6 +1,12 @@
-// components/ExamNameField.tsx
 import React from 'react';
-import { IonIcon, IonInput, IonItem, IonItemDivider, IonItemGroup, IonLabel, } from '@ionic/react';
+import {
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonItemDivider,
+  IonItemGroup,
+  IonLabel,
+} from '@ionic/react';
 import { documentTextOutline } from 'ionicons/icons';
 import styles from '../styles/FormCommon.module.css';
 
