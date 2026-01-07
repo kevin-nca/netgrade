@@ -15,13 +15,14 @@ import {
   IonSpinner,
 } from '@ionic/react';
 import {
-  documentTextOutline,
   calendarOutline,
   schoolOutline,
   saveOutline,
+  documentTextOutline,
 } from 'ionicons/icons';
 import { Subject } from '@/db/entities';
 import { ExamFormData } from '../types';
+import { ExamNameField } from './ExamNameField';
 import styles from '../styles/FormCommon.module.css';
 
 interface ExamDetailsFormProps {
@@ -42,10 +43,6 @@ export const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
   isSubmitting,
   onSubmit,
 }) => {
-  const handleTitleChange = (value: string) => {
-    onFieldChange('title', value || '');
-  };
-
   const handleDateChange = (value: string) => {
     onFieldChange('date', value || '');
   };
@@ -65,28 +62,10 @@ export const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
       </div>
 
       <IonList className={styles.formCardContent}>
-        <IonItemGroup className={styles.formItemGroup}>
-          <IonItemDivider className={styles.formItemDivider}>
-            <IonIcon
-              icon={documentTextOutline}
-              slot="start"
-              color="primary"
-              className={styles.formItemIcon}
-            />
-            <IonLabel color="primary" className={styles.formItemLabel}>
-              Titel der Prüfung
-            </IonLabel>
-          </IonItemDivider>
-          <IonItem className={styles.formItem}>
-            <IonInput
-              value={formValues.title}
-              onIonInput={(e) => handleTitleChange(e.detail.value || '')}
-              placeholder="Prüfungstitel"
-              required
-              className={styles.formInput}
-            />
-          </IonItem>
-        </IonItemGroup>
+        <ExamNameField
+          value={formValues.title}
+          onChange={(value) => onFieldChange('title', value)}
+        />
 
         <IonItemGroup className={styles.formItemGroup}>
           <IonItemDivider className={styles.formItemDivider}>
