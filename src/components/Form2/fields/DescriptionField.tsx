@@ -12,7 +12,9 @@ export function DescriptionField({ label }: { label: string }) {
     : [];
 
   const firstError =
-    errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
+    errors.length > 0
+      ? errors.map((err) => String(err?.message ?? err)).join(', ')
+      : undefined;
 
   return (
     <FormInput
@@ -32,8 +34,6 @@ export function DescriptionField({ label }: { label: string }) {
           field.handleChange(val);
         }}
         placeholder="Zusätzliche Notizen..."
-        aria-invalid={!!firstError}
-        aria-describedby={firstError ? 'description-error' : undefined}
       />
     </FormInput>
   );

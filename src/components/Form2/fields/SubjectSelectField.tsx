@@ -25,7 +25,9 @@ export function SubjectSelectField({
     : [];
 
   const firstError =
-    errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
+    errors.length > 0
+      ? errors.map((err) => String(err?.message ?? err)).join(', ')
+      : undefined;
 
   return (
     <FormInput
@@ -50,8 +52,6 @@ export function SubjectSelectField({
           }
         }}
         disabled={disabled}
-        aria-invalid={!!firstError}
-        aria-describedby={firstError ? 'school-error' : undefined}
       >
         {subjects.map((subject) => (
           <IonSelectOption key={subject.id} value={subject.id}>

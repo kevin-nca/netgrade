@@ -16,7 +16,9 @@ export function WeightField({ label }: WeightFieldProps) {
     : [];
 
   const firstError =
-    errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
+    errors.length > 0
+      ? errors.map((err) => String(err?.message ?? err)).join(', ')
+      : undefined;
 
   const setPresetWeight = (weight: string) => {
     field.handleChange(weight);
@@ -47,8 +49,6 @@ export function WeightField({ label }: WeightFieldProps) {
           }}
           onIonBlur={field.handleBlur}
           placeholder="100"
-          aria-invalid={!!firstError}
-          aria-describedby={firstError ? 'weight-error' : undefined}
           required
         />
         <div className="weight-quick-actions">

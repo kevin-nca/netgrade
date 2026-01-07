@@ -12,7 +12,9 @@ export function ExamNameField({ label }: { label: string }) {
     : [];
 
   const firstError =
-    errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
+    errors.length > 0
+      ? errors.map((err) => String(err?.message ?? err)).join(', ')
+      : undefined;
 
   return (
     <FormInput
@@ -33,8 +35,6 @@ export function ExamNameField({ label }: { label: string }) {
           field.handleChange(val);
         }}
         placeholder="z.B. Mathe-Klausur, Vokabeltest"
-        aria-invalid={!!firstError}
-        aria-describedby={firstError ? 'title-error' : undefined}
         required
         maxlength={255}
       />

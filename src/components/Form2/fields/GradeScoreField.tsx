@@ -16,7 +16,9 @@ export function GradeScoreField({ label }: ScoreFieldProps) {
     : [];
 
   const firstError =
-    errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
+    errors.length > 0
+      ? errors.map((err) => String(err?.message ?? err)).join(', ')
+      : undefined;
 
   return (
     <FormInput
@@ -43,8 +45,6 @@ export function GradeScoreField({ label }: ScoreFieldProps) {
         }}
         onIonBlur={field.handleBlur}
         placeholder="6.0"
-        aria-invalid={!!field.state.meta.errors}
-        aria-describedby={field.state.meta.errors ? 'score-error' : undefined}
         required // probably not needed here
       />
     </FormInput>

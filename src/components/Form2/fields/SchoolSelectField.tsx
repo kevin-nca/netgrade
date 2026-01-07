@@ -23,7 +23,9 @@ export function SchoolSelectField({
     : [];
 
   const firstError =
-    errors.length > 0 ? String(errors[0]?.message ?? errors[0]) : undefined;
+    errors.length > 0
+      ? errors.map((err) => String(err?.message ?? err)).join(', ')
+      : undefined;
 
   return (
     <FormInput
@@ -48,8 +50,6 @@ export function SchoolSelectField({
             onSchoolChange?.(selectedId);
           }
         }}
-        aria-invalid={!!firstError}
-        aria-describedby={firstError ? 'school-error' : undefined}
       >
         {schools.map((school) => (
           <IonSelectOption key={school.id} value={school.id}>
