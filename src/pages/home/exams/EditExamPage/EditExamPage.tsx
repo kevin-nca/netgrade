@@ -1,59 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonCardContent,
-  IonLabel,
+  IonAlert,
+  IonBackButton,
   IonButton,
   IonButtons,
-  IonBackButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  IonContent,
+  IonHeader,
   IonIcon,
+  IonLabel,
+  IonModal,
+  IonPage,
   IonSegment,
   IonSegmentButton,
-  IonModal,
+  IonTitle,
   IonToast,
-  IonSkeletonText,
-  IonAlert,
+  IonToolbar,
 } from '@ionic/react';
 import {
-  createOutline,
-  trashOutline,
-  schoolOutline,
-  calendarOutline,
-  checkmarkCircleOutline,
   alertCircleOutline,
-  trophyOutline,
+  calendarOutline,
   chatbubbleOutline,
-  scaleOutline,
+  checkmarkCircleOutline,
+  createOutline,
   documentTextOutline,
+  scaleOutline,
+  schoolOutline,
+  trashOutline,
+  trophyOutline,
 } from 'ionicons/icons';
-import { DeepRecord, useForm } from '@tanstack/react-form';
 import type { Updater } from '@tanstack/react-form';
+import { DeepRecord, useForm } from '@tanstack/react-form';
 import {
-  useExam,
-  useUpdateExam,
-  useDeleteExam,
   useAddGradeWithExam,
+  useDeleteExam,
+  useExam,
   useSubjects,
+  useUpdateExam,
 } from '@/hooks';
 import {
+  percentageToDecimal,
   validateGrade,
   validateWeight,
-  percentageToDecimal,
 } from '@/utils/validation';
 import { Routes } from '@/routes';
-import { ExamDetailsForm } from './components/ExamDetailsForm';
+import { ExamDetailsPage } from './components/ExamDetailsPage';
 import { GradeForm } from './components/GradeForm';
 import { formatDate, getGradeColor } from './utils';
-import { ExamFormData, GradeFormData, ExamParams } from './types';
+import { ExamFormData, ExamParams, GradeFormData } from './types';
 import styles from './EditExamPage.module.css';
 import { Layout } from '@/components/Layout/Layout';
 
@@ -61,7 +60,7 @@ const EditExamPage: React.FC = () => {
   const { examId } = useParams<ExamParams>();
   const history = useHistory();
 
-  const { data: exam, isLoading, error } = useExam(examId);
+  const { data: exam, error } = useExam(examId);
   const { data: subjects = [] } = useSubjects();
 
   const [segmentValue, setSegmentValue] = useState<'details' | 'grade'>(
@@ -206,37 +205,6 @@ const EditExamPage: React.FC = () => {
     });
   };
 
-  if (isLoading) {
-    return (
-      <IonPage>
-        <IonHeader>
-          <IonToolbar>
-            <IonButtons slot="start">
-              <IonBackButton defaultHref={Routes.HOME} />
-            </IonButtons>
-            <IonTitle>Lädt...</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent>
-          <Layout>
-            <div className={styles.container}>
-              <IonCard className={styles.loadingCard}>
-                <IonCardContent>
-                  <IonSkeletonText animated className={styles.skeletonTitle} />
-                  <IonSkeletonText animated className={styles.skeletonText} />
-                  <IonSkeletonText
-                    animated
-                    className={styles.skeletonTextShort}
-                  />
-                </IonCardContent>
-              </IonCard>
-            </div>
-          </Layout>
-        </IonContent>
-      </IonPage>
-    );
-  }
-
   if (error) {
     return (
       <IonPage>
@@ -346,7 +314,7 @@ const EditExamPage: React.FC = () => {
               </IonSegmentButton>
             </IonSegment>
             {segmentValue === 'details' ? (
-              <ExamDetailsForm
+              <ExamDetailsPage
                 formValues={examForm.state.values as ExamFormData}
                 onFieldChange={(field, value) =>
                   examForm.setFieldValue(
