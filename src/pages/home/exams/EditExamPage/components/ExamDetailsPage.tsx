@@ -14,15 +14,10 @@ import {
   IonSpinner,
   IonTextarea,
 } from '@ionic/react';
-import {
-  calendarOutline,
-  documentTextOutline,
-  saveOutline,
-  schoolOutline,
-} from 'ionicons/icons';
+import { calendarOutline, documentTextOutline, saveOutline, schoolOutline, } from 'ionicons/icons';
 import { Subject } from '@/db/entities';
 import { ExamFormData } from '../types';
-import { EditExamNameField } from '../../../../../components/Form2/fields/editExamFields/EditExamNameField';
+import { EditExamNameField } from '@/components/Form2/fields/editExamFields/EditExamNameField';
 import styles from '../styles/FormCommon.module.css';
 
 interface ExamDetailsFormProps {
