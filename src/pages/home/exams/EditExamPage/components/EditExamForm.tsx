@@ -36,7 +36,7 @@ interface ExamDetailsFormProps {
   onSubmit: () => void;
 }
 
-export const ExamDetailsPage: React.FC<ExamDetailsFormProps> = ({
+export const EditExamForm: React.FC<ExamDetailsFormProps> = ({
   formValues,
   onFieldChange,
   subjects,

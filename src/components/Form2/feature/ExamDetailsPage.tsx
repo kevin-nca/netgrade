@@ -60,10 +60,10 @@ import {
   formatDate,
   getGradeColor,
 } from '@/pages/home/exams/EditExamPage/utils';
-import { ExamDetailsPage } from '@/pages/home/exams/EditExamPage/components/ExamDetailsPage';
+import { EditExamForm } from '@/pages/home/exams/EditExamPage/components/EditExamForm';
 import { GradeForm } from '@/pages/home/exams/EditExamPage/components/GradeForm';
 
-const EditExamForm: React.FC = () => {
+const ExamDetailsPage: React.FC = () => {
   const { examId } = useParams<ExamParams>();
   const history = useHistory();
 
@@ -321,7 +321,7 @@ const EditExamForm: React.FC = () => {
               </IonSegmentButton>
             </IonSegment>
             {segmentValue === 'details' ? (
-              <ExamDetailsPage
+              <EditExamForm
                 formValues={examForm.state.values as ExamFormData}
                 onFieldChange={(field, value) =>
                   examForm.setFieldValue(
@@ -488,4 +488,4 @@ const EditExamForm: React.FC = () => {
   );
 };
 
-export default EditExamForm;
+export default ExamDetailsPage;
