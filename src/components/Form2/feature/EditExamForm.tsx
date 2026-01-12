@@ -360,10 +360,10 @@ const EditExamForm: React.FC = () => {
           >
             <div className={styles.modalContent}>
               <div className={styles.modalHeader}>
-                <button
+                <IonButton
                   className={styles.closeButton}
                   onClick={() => setShowGradeConfirmModal(false)}
-                ></button>
+                ></IonButton>
                 <h2 className={styles.modalTitle}>Note bestätigen</h2>
                 <p className={styles.modalSubtitle}>
                   Überprüfe deine Eingaben vor dem Speichern
@@ -423,7 +423,7 @@ const EditExamForm: React.FC = () => {
 
               <div className={styles.actionContainer}>
                 <div className={styles.buttonGroup}>
-                  <button
+                  <IonButton
                     className={styles.confirmButton}
                     onClick={handleAddGrade}
                     disabled={addGradeWithExamMutation.isPending}
@@ -442,13 +442,13 @@ const EditExamForm: React.FC = () => {
                         Speichern
                       </>
                     )}
-                  </button>
-                  <button
+                  </IonButton>
+                  <IonButton
                     className={styles.cancelButton}
                     onClick={() => setShowGradeConfirmModal(false)}
                   >
                     Abbrechen
-                  </button>
+                  </IonButton>
                 </div>
               </div>
             </div>
