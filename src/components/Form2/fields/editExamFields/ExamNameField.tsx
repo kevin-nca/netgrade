@@ -8,7 +8,7 @@ import {
   IonLabel,
 } from '@ionic/react';
 import { documentTextOutline } from 'ionicons/icons';
-import styles from '../styles/FormCommon.module.css';
+import styles from '../../../../pages/home/exams/EditExamPage/styles/FormCommon.module.css';
 
 interface ExamNameFieldProps {
   value: string;

@@ -1,28 +1,28 @@
 import React from 'react';
 import {
+  IonButton,
   IonCard,
-  IonList,
-  IonItem,
-  IonItemGroup,
-  IonItemDivider,
-  IonLabel,
+  IonIcon,
   IonInput,
+  IonItem,
+  IonItemDivider,
+  IonItemGroup,
+  IonLabel,
+  IonList,
   IonSelect,
   IonSelectOption,
-  IonTextarea,
-  IonButton,
-  IonIcon,
   IonSpinner,
+  IonTextarea,
 } from '@ionic/react';
 import {
   calendarOutline,
-  schoolOutline,
-  saveOutline,
   documentTextOutline,
+  saveOutline,
+  schoolOutline,
 } from 'ionicons/icons';
 import { Subject } from '@/db/entities';
 import { ExamFormData } from '../types';
-import { ExamNameField } from './ExamNameField';
+import { ExamNameField } from '../../../../../components/Form2/fields/editExamFields/ExamNameField';
 import styles from '../styles/FormCommon.module.css';
 
 interface ExamDetailsFormProps {
@@ -36,7 +36,7 @@ interface ExamDetailsFormProps {
   onSubmit: () => void;
 }
 
-export const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
+export const ExamDetailsPage: React.FC<ExamDetailsFormProps> = ({
   formValues,
   onFieldChange,
   subjects,
