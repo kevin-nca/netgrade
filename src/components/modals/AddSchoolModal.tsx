@@ -1,5 +1,4 @@
 import React from 'react';
-import { useForm } from '@tanstack/react-form';
 import {
   IonModal,
   IonPage,
@@ -8,45 +7,47 @@ import {
   IonTitle,
   IonContent,
   IonIcon,
-  IonItem,
-  IonInput,
+  IonButton,
 } from '@ionic/react';
-import { pencilOutline, school as schoolIcon } from 'ionicons/icons';
+import { school as schoolIcon } from 'ionicons/icons';
+import { useAppForm } from '@/components/Form2/form';
+import { z } from 'zod';
+
+const schoolFormSchema = z.object({
+  schoolName: z.string().min(1, 'Bitte gib einen Schulnamen ein'),
+});
+
+type SchoolFormData = z.infer<typeof schoolFormSchema>;
 
 interface AddSchoolModalProps {
   isOpen: boolean;
   onClose: () => void;
-  schoolName: string;
-  setSchoolName: (value: string) => void;
-  onAdd: () => void;
+  onAdd: (schoolName: string) => void;
   isLoading: boolean;
 }
 
 const AddSchoolModal: React.FC<AddSchoolModalProps> = ({
   isOpen,
   onClose,
-  schoolName,
-  setSchoolName,
   onAdd,
   isLoading,
 }) => {
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
-      schoolName: schoolName,
+      schoolName: '',
+    } as SchoolFormData,
+    validators: {
+      onSubmit: schoolFormSchema,
     },
-    onSubmit: async () => {
-      onAdd();
+    onSubmit: async ({ value }) => {
+      await onAdd(value.schoolName.trim());
     },
   });
 
-  React.useEffect(() => {
-    form.setFieldValue('schoolName', schoolName);
-  }, [schoolName, form]);
-
-  const handleInputChange = (value: string) => {
-    setSchoolName(value);
-    form.setFieldValue('schoolName', value);
+  const handleAdd = () => {
+    form.handleSubmit();
   };
+
   return (
     <IonModal
       isOpen={isOpen}
@@ -80,45 +81,30 @@ const AddSchoolModal: React.FC<AddSchoolModalProps> = ({
               </div>
             </div>
 
-            <div className="modal-input-section">
-              <h2 className="modal-section-title">Schulname eingeben</h2>
-
-              <div className="modal-input-wrapper glass-input">
-                <IonItem lines="none" className="modal-input-item">
-                  <div slot="start" className="modal-input-icon-wrapper">
-                    <IonIcon
-                      icon={pencilOutline}
-                      className="modal-input-icon"
-                    />
-                  </div>
-                  <IonInput
-                    value={schoolName}
-                    placeholder="Name der Schule..."
-                    onIonChange={(e) => handleInputChange(e.detail.value || '')}
-                    className="modal-input-field"
-                    clearInput
-                    autoFocus
-                  />
-                </IonItem>
-              </div>
+            <div className="form-fields">
+              <form.AppField name="schoolName">
+                {(field) => <field.AddSchoolField label="Schulname" />}
+              </form.AppField>
             </div>
 
             <div className="modal-button-section">
               <div className="modal-buttons">
-                <button
+                <IonButton
                   onClick={onClose}
-                  className="modal-button cancel"
+                  fill="clear"
                   disabled={isLoading}
+                  expand="block"
                 >
                   Abbrechen
-                </button>
-                <button
-                  onClick={onAdd}
-                  disabled={!schoolName.trim() || isLoading}
-                  className="modal-button save"
+                </IonButton>
+                <IonButton
+                  onClick={handleAdd}
+                  disabled={isLoading}
+                  expand="block"
+                  color="primary"
                 >
                   {isLoading ? 'Speichert...' : 'Hinzufügen'}
-                </button>
+                </IonButton>
               </div>
             </div>
 
