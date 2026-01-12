@@ -35,31 +35,14 @@ import {
 } from 'ionicons/icons';
 import type { Updater } from '@tanstack/react-form';
 import { DeepRecord, useForm } from '@tanstack/react-form';
-import {
-  useAddGradeWithExam,
-  useDeleteExam,
-  useExam,
-  useSubjects,
-  useUpdateExam,
-} from '@/hooks';
-import {
-  percentageToDecimal,
-  validateGrade,
-  validateWeight,
-} from '@/utils/validation';
+import { useAddGradeWithExam, useDeleteExam, useExam, useSubjects, useUpdateExam, } from '@/hooks';
+import { percentageToDecimal, validateGrade, validateWeight, } from '@/utils/validation';
 import { Routes } from '@/routes';
 
-import styles from './EditExamPage.module.css';
+import styles from '@/pages/home/exams/EditExamPage/EditExamPage.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import {
-  ExamFormData,
-  ExamParams,
-  GradeFormData,
-} from '@/pages/home/exams/EditExamPage/types';
-import {
-  formatDate,
-  getGradeColor,
-} from '@/pages/home/exams/EditExamPage/utils';
+import { ExamFormData, ExamParams, GradeFormData, } from '@/pages/home/exams/EditExamPage/types';
+import { formatDate, getGradeColor, } from '@/pages/home/exams/EditExamPage/utils';
 import { ExamDetailsPage } from '@/pages/home/exams/EditExamPage/components/ExamDetailsPage';
 import { GradeForm } from '@/pages/home/exams/EditExamPage/components/GradeForm';
 
