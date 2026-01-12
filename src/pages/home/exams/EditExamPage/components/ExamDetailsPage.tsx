@@ -22,7 +22,7 @@ import {
 } from 'ionicons/icons';
 import { Subject } from '@/db/entities';
 import { ExamFormData } from '../types';
-import { ExamNameField } from '../../../../../components/Form2/fields/editExamFields/ExamNameField';
+import { EditExamNameField } from '../../../../../components/Form2/fields/editExamFields/EditExamNameField';
 import styles from '../styles/FormCommon.module.css';
 
 interface ExamDetailsFormProps {
@@ -62,7 +62,7 @@ export const ExamDetailsPage: React.FC<ExamDetailsFormProps> = ({
       </div>
 
       <IonList className={styles.formCardContent}>
-        <ExamNameField
+        <EditExamNameField
           value={formValues.title}
           onChange={(value) => onFieldChange('title', value)}
         />

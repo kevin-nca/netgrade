@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { ExamNameField } from '@/components/Form2/fields/ExamNameField';
 import type { Mock } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useFieldContext } from '@/components/Form2/form';
+import { ExamNameField } from '../../components/Form2/fields/ExamNameField';
 
 vi.mock('@/components/Form2/form');
 vi.mock('@ionic/react', () => ({
@@ -26,7 +26,7 @@ vi.mock('@/components/Form2/form-field/FormInput', () => ({
   ),
 }));
 
-describe('ExamNameField', () => {
+describe('EditExamNameField', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

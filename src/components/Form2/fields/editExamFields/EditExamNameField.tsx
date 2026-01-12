@@ -17,7 +17,7 @@ interface ExamNameFieldProps {
   required?: boolean;
 }
 
-export const ExamNameField: React.FC<ExamNameFieldProps> = ({
+export const EditExamNameField: React.FC<ExamNameFieldProps> = ({
   value,
   onChange,
   placeholder = 'Prüfungstitel',
