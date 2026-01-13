@@ -473,12 +473,7 @@ const SettingsPage: React.FC = () => {
 
       <AddSchoolModal
         isOpen={showAddSchoolModal}
-        onClose={() => {
-          setShowAddSchoolModal(false);
-          setSchoolNameInput('');
-        }}
-        schoolName={schoolNameInput}
-        setSchoolName={setSchoolNameInput}
+        onClose={() => setShowAddSchoolModal(false)}
         onAdd={handleAddSchool}
         isLoading={addSchoolMutation.isPending}
       />

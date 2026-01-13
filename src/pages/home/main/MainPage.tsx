@@ -21,21 +21,19 @@ import './MainPage.css';
 function MainPage() {
   const [showNavigationModal, setShowNavigationModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
-  const [schoolNameInput, setSchoolNameInput] = useState('');
   const history = useHistory();
 
   const { data: userName } = useUserName();
 
   const addSchoolMutation = useAddSchool();
 
-  const handleAddSchool = () => {
-    if (schoolNameInput.trim()) {
+  const handleAddSchool = (schoolName: string) => {
+    if (schoolName.trim()) {
       addSchoolMutation.mutate(
-        { name: schoolNameInput.trim() },
+        { name: schoolName.trim() },
         {
           onSuccess: () => {
             setShowAddSchoolModal(false);
-            setSchoolNameInput('');
           },
           onError: (error) => {
             console.error('Error when adding:', error);
@@ -122,12 +120,7 @@ function MainPage() {
 
       <AddSchoolModal
         isOpen={showAddSchoolModal}
-        onClose={() => {
-          setShowAddSchoolModal(false);
-          setSchoolNameInput('');
-        }}
-        schoolName={schoolNameInput}
-        setSchoolName={setSchoolNameInput}
+        onClose={() => setShowAddSchoolModal(false)}
         onAdd={handleAddSchool}
         isLoading={addSchoolMutation.isPending}
       />
