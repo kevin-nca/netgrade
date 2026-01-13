@@ -34,28 +34,13 @@ import {
   trophyOutline,
 } from 'ionicons/icons';
 import { useForm } from '@tanstack/react-form';
-import {
-  useAddGradeWithExam,
-  useDeleteExam,
-  useExam,
-  useSubjects,
-} from '@/hooks';
-import {
-  percentageToDecimal,
-  validateGrade,
-  validateWeight,
-} from '@/utils/validation';
+import { useAddGradeWithExam, useDeleteExam, useExam, useSubjects, } from '@/hooks';
+import { percentageToDecimal, validateGrade, validateWeight, } from '@/utils/validation';
 import { Routes } from '@/routes';
 import styles from '@/pages/home/exams/EditExamPage/EditExamPage.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import {
-  ExamParams,
-  GradeFormData,
-} from '@/pages/home/exams/EditExamPage/types';
-import {
-  formatDate,
-  getGradeColor,
-} from '@/pages/home/exams/EditExamPage/utils';
+import { ExamParams, GradeFormData, } from '@/pages/home/exams/EditExamPage/types';
+import { formatDate, getGradeColor, } from '@/pages/home/exams/EditExamPage/utils';
 import { EditExamForm } from '@/pages/home/exams/EditExamPage/components/EditExamForm';
 import { GradeForm } from '@/pages/home/exams/EditExamPage/components/GradeForm';
 
@@ -107,15 +92,6 @@ const ExamDetailsPage: React.FC = () => {
     setToastMessage(message);
     setToastColor(color);
     setShowToast(true);
-  };
-
-  const handleEditSuccess = () => {
-    showMessage('Prüfung erfolgreich aktualisiert!', 'success');
-    setTimeout(() => history.replace(Routes.HOME), 1500);
-  };
-
-  const handleEditError = (message: string) => {
-    showMessage(`Fehler: ${message}`, 'danger');
   };
 
   const handleAddGrade = () => {
@@ -264,19 +240,8 @@ const ExamDetailsPage: React.FC = () => {
               </IonSegmentButton>
             </IonSegment>
 
-            {segmentValue === 'details' && exam ? (
-              <EditExamForm
-                examId={examId}
-                initialData={{
-                  name: exam.name,
-                  date: exam.date,
-                  subjectId: exam.subjectId,
-                  description: exam.description || '',
-                }}
-                subjects={subjects}
-                onSuccess={handleEditSuccess}
-                onError={handleEditError}
-              />
+            {segmentValue === 'details' ? (
+              <EditExamForm />
             ) : (
               <GradeForm
                 formValues={gradeForm.state.values as GradeFormData}
