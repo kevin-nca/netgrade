@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   IonAlert,
@@ -33,33 +33,14 @@ import {
   trashOutline,
   trophyOutline,
 } from 'ionicons/icons';
-import type { Updater } from '@tanstack/react-form';
-import { DeepRecord, useForm } from '@tanstack/react-form';
-import {
-  useAddGradeWithExam,
-  useDeleteExam,
-  useExam,
-  useSubjects,
-  useUpdateExam,
-} from '@/hooks';
-import {
-  percentageToDecimal,
-  validateGrade,
-  validateWeight,
-} from '@/utils/validation';
+import { useForm } from '@tanstack/react-form';
+import { useAddGradeWithExam, useDeleteExam, useExam, useSubjects, } from '@/hooks';
+import { percentageToDecimal, validateGrade, validateWeight, } from '@/utils/validation';
 import { Routes } from '@/routes';
-
 import styles from '@/pages/home/exams/EditExamPage/EditExamPage.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import {
-  ExamFormData,
-  ExamParams,
-  GradeFormData,
-} from '@/pages/home/exams/EditExamPage/types';
-import {
-  formatDate,
-  getGradeColor,
-} from '@/pages/home/exams/EditExamPage/utils';
+import { ExamParams, GradeFormData, } from '@/pages/home/exams/EditExamPage/types';
+import { formatDate, getGradeColor, } from '@/pages/home/exams/EditExamPage/utils';
 import { EditExamForm } from '@/pages/home/exams/EditExamPage/components/EditExamForm';
 import { GradeForm } from '@/pages/home/exams/EditExamPage/components/GradeForm';
 
@@ -78,39 +59,6 @@ const ExamDetailsPage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState('primary');
   const [showToast, setShowToast] = useState(false);
-
-  const examForm = useForm({
-    defaultValues: {
-      title: '',
-      date: '',
-      subject: '',
-      description: '',
-    } as ExamFormData,
-    onSubmit: async ({ value }) => {
-      if (!value.title || !value.date || !value.subject) {
-        showMessage('Bitte fülle alle erforderlichen Felder aus.', 'warning');
-        return;
-      }
-
-      const updatedExam = {
-        id: examId,
-        name: value.title.trim(),
-        date: new Date(value.date),
-        subjectId: value.subject,
-        description: value.description.trim(),
-      };
-
-      updateExamMutation.mutate(updatedExam, {
-        onSuccess: () => {
-          showMessage('Prüfung erfolgreich aktualisiert!', 'success');
-          setTimeout(() => history.replace(Routes.HOME), 1500);
-        },
-        onError: (error: Error) => {
-          showMessage(`Fehler: ${error.message}`, 'danger');
-        },
-      });
-    },
-  });
 
   const gradeForm = useForm({
     defaultValues: {
@@ -135,19 +83,8 @@ const ExamDetailsPage: React.FC = () => {
     },
   });
 
-  const examFormValues = examForm.state.values as ExamFormData;
   const gradeFormValues = gradeForm.state.values as GradeFormData;
 
-  useEffect(() => {
-    if (exam) {
-      examForm.setFieldValue('title', exam.name);
-      examForm.setFieldValue('date', exam.date.toISOString().split('T')[0]);
-      examForm.setFieldValue('subject', exam.subjectId);
-      examForm.setFieldValue('description', exam.description || '');
-    }
-  }, [exam, examForm]);
-
-  const updateExamMutation = useUpdateExam();
   const addGradeWithExamMutation = useAddGradeWithExam();
   const deleteExamMutation = useDeleteExam();
 
@@ -157,45 +94,38 @@ const ExamDetailsPage: React.FC = () => {
     setShowToast(true);
   };
 
+  const handleEditSuccess = () => {
+    showMessage('Prüfung erfolgreich aktualisiert!', 'success');
+    setTimeout(() => history.replace(Routes.HOME), 1500);
+  };
+
+  const handleEditError = (message: string) => {
+    showMessage(`Fehler: ${message}`, 'danger');
+  };
+
   const handleAddGrade = () => {
     if (!exam) return;
 
-    const updatedExam = {
-      id: examId,
-      name: examFormValues.title.trim(),
-      date: new Date(examFormValues.date),
-      subjectId: examFormValues.subject,
-      description: examFormValues.description.trim(),
-      isCompleted: true,
+    const gradePayload = {
+      subjectId: exam.subjectId,
+      examName: exam.name,
+      date: exam.date,
+      score: gradeFormValues.score,
+      weight: percentageToDecimal(gradeFormValues.weight),
+      comment: gradeFormValues.comment.trim() || undefined,
     };
 
-    updateExamMutation.mutate(updatedExam, {
+    addGradeWithExamMutation.mutate(gradePayload, {
       onSuccess: () => {
-        const gradePayload = {
-          subjectId: exam.subjectId,
-          examName: exam.name,
-          date: exam.date,
-          score: gradeFormValues.score,
-          weight: percentageToDecimal(gradeFormValues.weight),
-          comment: gradeFormValues.comment.trim() || undefined,
-        };
-
-        addGradeWithExamMutation.mutate(gradePayload, {
-          onSuccess: () => {
-            showMessage('Note erfolgreich eingetragen!', 'success');
-            setShowGradeConfirmModal(false);
-            setTimeout(() => history.replace(Routes.HOME), 1500);
-          },
-          onError: (error: Error) => {
-            showMessage(
-              `Fehler beim Eintragen der Note: ${error.message}`,
-              'danger',
-            );
-          },
-        });
+        showMessage('Note erfolgreich eingetragen!', 'success');
+        setShowGradeConfirmModal(false);
+        setTimeout(() => history.replace(Routes.HOME), 1500);
       },
       onError: (error: Error) => {
-        showMessage(`Fehler: ${error.message}`, 'danger');
+        showMessage(
+          `Fehler beim Eintragen der Note: ${error.message}`,
+          'danger',
+        );
       },
     });
   };
@@ -276,20 +206,18 @@ const ExamDetailsPage: React.FC = () => {
               <IonCard className={styles.headerCard}>
                 <IonCardHeader className={styles.headerCardContent}>
                   <IonCardTitle className={styles.headerCardTitle}>
-                    {examFormValues.title || exam.name}
+                    {exam.name}
                   </IonCardTitle>
                   <IonCardSubtitle className={styles.headerCardSubtitle}>
                     <div className={styles.headerCardInfo}>
                       <div className={styles.headerCardInfoRow}>
                         <IonIcon icon={calendarOutline} />
-                        {formatDate(new Date(examFormValues.date || exam.date))}
+                        {formatDate(exam.date)}
                       </div>
                       <div className={styles.headerCardInfoRow}>
                         <IonIcon icon={schoolOutline} />
-                        {subjects.find(
-                          (s) =>
-                            s.id === (examFormValues.subject || exam.subjectId),
-                        )?.name || 'Unbekanntes Fach'}
+                        {subjects.find((s) => s.id === exam.subjectId)?.name ||
+                          'Unbekanntes Fach'}
                       </div>
                     </div>
                   </IonCardSubtitle>
@@ -320,31 +248,25 @@ const ExamDetailsPage: React.FC = () => {
                 </IonLabel>
               </IonSegmentButton>
             </IonSegment>
-            {segmentValue === 'details' ? (
+
+            {segmentValue === 'details' && exam ? (
               <EditExamForm
-                formValues={examForm.state.values as ExamFormData}
-                onFieldChange={(field, value) =>
-                  examForm.setFieldValue(
-                    field as keyof ExamFormData,
-                    value as Updater<
-                      DeepRecord<ExamFormData>[keyof ExamFormData]
-                    >,
-                  )
-                }
+                examId={examId}
+                initialData={{
+                  name: exam.name,
+                  date: exam.date,
+                  subjectId: exam.subjectId,
+                  description: exam.description || '',
+                }}
                 subjects={subjects}
-                isSubmitting={updateExamMutation.isPending}
-                onSubmit={examForm.handleSubmit}
+                onSuccess={handleEditSuccess}
+                onError={handleEditError}
               />
             ) : (
               <GradeForm
                 formValues={gradeForm.state.values as GradeFormData}
                 onFieldChange={(field, value) =>
-                  gradeForm.setFieldValue(
-                    field as keyof GradeFormData,
-                    value as Updater<
-                      DeepRecord<GradeFormData>[keyof GradeFormData]
-                    >,
-                  )
+                  gradeForm.setFieldValue(field as keyof GradeFormData, value)
                 }
                 getGradeColor={getGradeColor}
                 onSubmit={gradeForm.handleSubmit}
@@ -352,7 +274,6 @@ const ExamDetailsPage: React.FC = () => {
             )}
           </div>
 
-          {/* Grade Confirmation Modal */}
           <IonModal
             isOpen={showGradeConfirmModal}
             onDidDismiss={() => setShowGradeConfirmModal(false)}
@@ -390,9 +311,7 @@ const ExamDetailsPage: React.FC = () => {
                       </div>
                       <span className={styles.infoLabel}>Prüfung</span>
                     </div>
-                    <div className={styles.infoValue}>
-                      {examFormValues.title || exam?.name}
-                    </div>
+                    <div className={styles.infoValue}>{exam?.name}</div>
                   </div>
                   <div className={styles.infoCard}>
                     <div className={styles.infoCardHeader}>
@@ -453,12 +372,12 @@ const ExamDetailsPage: React.FC = () => {
               </div>
             </div>
           </IonModal>
-          {/* Delete Alert */}
+
           <IonAlert
             isOpen={showDeleteAlert}
             onDidDismiss={() => setShowDeleteAlert(false)}
             header="Prüfung löschen?"
-            message={`Möchtest du die Prüfung "${examFormValues.title || exam?.name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
+            message={`Möchtest du die Prüfung "${exam?.name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
             buttons={[
               {
                 text: 'Abbrechen',

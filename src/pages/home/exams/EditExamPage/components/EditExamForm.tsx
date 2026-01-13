@@ -1,58 +1,84 @@
-import React from 'react';
-import {
-  IonButton,
-  IonCard,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonItemDivider,
-  IonItemGroup,
-  IonLabel,
-  IonList,
-  IonSelect,
-  IonSelectOption,
-  IonSpinner,
-  IonTextarea,
-} from '@ionic/react';
-import {
-  calendarOutline,
-  documentTextOutline,
-  saveOutline,
-  schoolOutline,
-} from 'ionicons/icons';
+import React, { useEffect } from 'react';
+import { IonButton, IonCard, IonIcon, IonSpinner } from '@ionic/react';
+import { saveOutline } from 'ionicons/icons';
+import { z } from 'zod';
+import { useAppForm } from '@/components/Form2/form';
 import { Subject } from '@/db/entities';
-import { ExamFormData } from '../types';
-import { EditExamNameField } from '@/components/Form2/fields/editExamFields/EditExamNameField';
+import { useUpdateExam } from '@/hooks';
 import styles from '../styles/FormCommon.module.css';
 
-interface ExamDetailsFormProps {
-  formValues: ExamFormData;
-  onFieldChange: <K extends keyof ExamFormData>(
-    field: K,
-    value: ExamFormData[K],
-  ) => void;
+const editExamSchema = z.object({
+  title: z.string().min(1, 'Bitte gib einen Titel ein'),
+  date: z.string().min(1, 'Bitte wähle ein Datum aus'),
+  subject: z.string().min(1, 'Bitte wähle ein Fach aus'),
+  description: z.string(),
+});
+
+type EditExamFormData = z.infer<typeof editExamSchema>;
+
+interface EditExamFormProps {
+  examId: string;
+  initialData: {
+    name: string;
+    date: Date;
+    subjectId: string;
+    description: string;
+  };
   subjects: Subject[];
-  isSubmitting: boolean;
-  onSubmit: () => void;
+  onSuccess: () => void;
+  onError: (message: string) => void;
 }
 
-export const EditExamForm: React.FC<ExamDetailsFormProps> = ({
-  formValues,
-  onFieldChange,
+export function EditExamForm({
+  examId,
+  initialData,
   subjects,
-  isSubmitting,
-  onSubmit,
-}) => {
-  const handleDateChange = (value: string) => {
-    onFieldChange('date', value || '');
-  };
+  onSuccess,
+  onError,
+}: EditExamFormProps) {
+  const updateExamMutation = useUpdateExam();
 
-  const handleSubjectChange = (value: string) => {
-    onFieldChange('subject', value);
-  };
+  const form = useAppForm({
+    defaultValues: {
+      title: '',
+      date: '',
+      subject: '',
+      description: '',
+    } as EditExamFormData,
+    validators: {
+      onSubmit: editExamSchema,
+    },
+    onSubmit: async ({ value }) => {
+      const updatedExam = {
+        id: examId,
+        name: value.title.trim(),
+        date: new Date(value.date),
+        subjectId: value.subject,
+        description: value.description.trim(),
+      };
 
-  const handleDescriptionChange = (value: string) => {
-    onFieldChange('description', value || '');
+      updateExamMutation.mutate(updatedExam, {
+        onSuccess: () => {
+          onSuccess();
+        },
+        onError: (error: Error) => {
+          onError(error.message);
+        },
+      });
+    },
+  });
+
+  useEffect(() => {
+    if (initialData) {
+      form.setFieldValue('title', initialData.name);
+      form.setFieldValue('date', initialData.date.toISOString().split('T')[0]);
+      form.setFieldValue('subject', initialData.subjectId);
+      form.setFieldValue('description', initialData.description || '');
+    }
+  }, [initialData, form]);
+
+  const handleSubmit = () => {
+    form.handleSubmit();
   };
 
   return (
@@ -61,97 +87,39 @@ export const EditExamForm: React.FC<ExamDetailsFormProps> = ({
         <h2 className={styles.formCardTitle}>Prüfungsdetails bearbeiten</h2>
       </div>
 
-      <IonList className={styles.formCardContent}>
-        <EditExamNameField
-          value={formValues.title}
-          onChange={(value) => onFieldChange('title', value)}
-        />
+      <div className={styles.formCardContent}>
+        <form.AppField name="title">
+          {(field) => <field.EditExamNameField label="Prüfungsname" />}
+        </form.AppField>
 
-        <IonItemGroup className={styles.formItemGroup}>
-          <IonItemDivider className={styles.formItemDivider}>
-            <IonIcon
-              icon={calendarOutline}
-              slot="start"
-              color="primary"
-              className={styles.formItemIcon}
-            />
-            <IonLabel color="primary" className={styles.formItemLabel}>
-              Prüfungsdatum
-            </IonLabel>
-          </IonItemDivider>
-          <IonItem className={styles.formItem}>
-            <IonInput
-              type="date"
-              value={formValues.date}
-              onIonInput={(e) => handleDateChange(e.detail.value || '')}
-              required
-              className={styles.formInput}
-            />
-          </IonItem>
-        </IonItemGroup>
+        <form.AppField name="date">
+          {(field) => <field.DateField label="Prüfungsdatum" />}
+        </form.AppField>
 
-        <IonItemGroup className={styles.formItemGroup}>
-          <IonItemDivider className={styles.formItemDivider}>
-            <IonIcon
-              icon={schoolOutline}
-              slot="start"
-              color="primary"
-              className={styles.formItemIcon}
+        <form.AppField name="subject">
+          {(field) => (
+            <field.EditExamSubjectSelectField
+              label="Fach"
+              subjects={subjects}
             />
-            <IonLabel color="primary" className={styles.formItemLabel}>
-              Fach
-            </IonLabel>
-          </IonItemDivider>
-          <IonItem className={styles.formItem}>
-            <IonSelect
-              value={formValues.subject}
-              onIonChange={(e) => handleSubjectChange(e.detail.value)}
-              placeholder="Fach wählen"
-              required
-              className={styles.formInput}
-              interface="popover"
-            >
-              {subjects.map((subject) => (
-                <IonSelectOption key={subject.id} value={subject.id}>
-                  {subject.name}
-                </IonSelectOption>
-              ))}
-            </IonSelect>
-          </IonItem>
-        </IonItemGroup>
+          )}
+        </form.AppField>
 
-        <IonItemGroup className={styles.formItemGroup}>
-          <IonItemDivider className={styles.formItemDivider}>
-            <IonIcon
-              icon={documentTextOutline}
-              slot="start"
-              color="primary"
-              className={styles.formItemIcon}
-            />
-            <IonLabel color="primary" className={styles.formItemLabel}>
-              Beschreibung (optional)
-            </IonLabel>
-          </IonItemDivider>
-          <IonItem className={styles.formItem}>
-            <IonTextarea
-              value={formValues.description}
-              onIonChange={(e) => handleDescriptionChange(e.detail.value || '')}
-              placeholder="Notizen zur Prüfung..."
-              rows={3}
-              className={styles.formInput}
-            />
-          </IonItem>
-        </IonItemGroup>
-      </IonList>
+        <form.AppField name="description">
+          {(field) => (
+            <field.DescriptionField label="Beschreibung (optional)" />
+          )}
+        </form.AppField>
+      </div>
 
       <div className={styles.formCardFooter}>
         <IonButton
           expand="block"
           className={styles.formButton}
-          onClick={onSubmit}
-          disabled={isSubmitting}
+          onClick={handleSubmit}
+          disabled={updateExamMutation.isPending}
         >
-          {isSubmitting ? (
+          {updateExamMutation.isPending ? (
             <div className={styles.buttonContent}>
               <IonSpinner name="crescent" className={styles.spinner} />
               Wird gespeichert...
@@ -166,4 +134,4 @@ export const EditExamForm: React.FC<ExamDetailsFormProps> = ({
       </div>
     </IonCard>
   );
-};
+}

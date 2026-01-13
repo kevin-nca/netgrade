@@ -6,6 +6,9 @@ import { SubjectSelectField } from '@/components/Form2/fields/SubjectSelectField
 import { DateField } from '@/components/Form2/fields/DateField';
 import { DescriptionField } from '@/components/Form2/fields/DescriptionField';
 import { WeightField } from '@/components/Form2/fields/WeightField';
+import { EditExamNameField } from '@/components/Form2/fields/editExamFields/EditExamNameField';
+import { EditExamSubjectSelectField } from '@/components/Form2/fields/editExamFields/EditExamSubjectSelectField';
+
 export const { fieldContext, formContext, useFieldContext } =
   createFormHookContexts();
 
@@ -20,6 +23,8 @@ const { useAppForm, withForm } = createFormHook({
     DateField,
     DescriptionField,
     WeightField,
+    EditExamNameField,
+    EditExamSubjectSelectField,
   },
   formComponents: {},
 });

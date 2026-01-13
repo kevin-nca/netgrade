@@ -1,54 +1,44 @@
 import React from 'react';
-import {
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonItemDivider,
-  IonItemGroup,
-  IonLabel,
-} from '@ionic/react';
+
 import { documentTextOutline } from 'ionicons/icons';
-import styles from '../../../../pages/home/exams/EditExamPage/styles/FormCommon.module.css';
+import { useFieldContext } from '@/components/Form2/form';
+import FormInput from '@/components/Form2/form-field/FormInput';
+import { IonInput } from '@ionic/react';
 
-interface ExamNameFieldProps {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  required?: boolean;
-}
+export function EditExamNameField({ label }: { label: string }) {
+  const field = useFieldContext<string>();
 
-export const EditExamNameField: React.FC<ExamNameFieldProps> = ({
-  value,
-  onChange,
-  placeholder = 'Prüfungstitel',
-  required = true,
-}) => {
-  const handleChange = (inputValue: string | null | undefined) => {
-    onChange(inputValue || '');
-  };
+  const errors = Array.isArray(field.state.meta.errors)
+    ? field.state.meta.errors
+    : [];
+
+  const firstError =
+    errors.length > 0
+      ? errors.map((err) => String(err?.message ?? err)).join(', ')
+      : undefined;
 
   return (
-    <IonItemGroup className={styles.formItemGroup}>
-      <IonItemDivider className={styles.formItemDivider}>
-        <IonIcon
-          icon={documentTextOutline}
-          slot="start"
-          color="primary"
-          className={styles.formItemIcon}
-        />
-        <IonLabel color="primary" className={styles.formItemLabel}>
-          Titel der Prüfung
-        </IonLabel>
-      </IonItemDivider>
-      <IonItem className={styles.formItem}>
-        <IonInput
-          value={value}
-          onIonInput={(e) => handleChange(e.detail.value)}
-          placeholder={placeholder}
-          required={required}
-          className={styles.formInput}
-        />
-      </IonItem>
-    </IonItemGroup>
+    <FormInput
+      icon={documentTextOutline}
+      label={label}
+      htmlFor="exam-name"
+      required
+      error={firstError}
+      errorId="title-error"
+    >
+      <IonInput
+        id="exam-title"
+        className="form-input"
+        type="text"
+        value={field.state.value}
+        onIonChange={(e) => {
+          const val = e.detail.value ?? '';
+          field.handleChange(val);
+        }}
+        placeholder="z.B. Mathe-Klausur, Vokabeltest"
+        required
+        maxlength={255}
+      />
+    </FormInput>
   );
-};
+}
