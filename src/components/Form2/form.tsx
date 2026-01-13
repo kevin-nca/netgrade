@@ -7,6 +7,7 @@ import { DateField } from '@/components/Form2/fields/DateField';
 import { DescriptionField } from '@/components/Form2/fields/DescriptionField';
 import { WeightField } from '@/components/Form2/fields/WeightField';
 import { AddSchoolField } from '@/components/Form2/fields/AddSchoolField';
+import { EditSubjectField } from '@/components/Form2/fields/EditSubjectField';
 export const { fieldContext, formContext, useFieldContext } =
   createFormHookContexts();
 
@@ -22,6 +23,7 @@ const { useAppForm, withForm } = createFormHook({
     DescriptionField,
     WeightField,
     AddSchoolField,
+    EditSubjectField,
   },
   formComponents: {},
 });
