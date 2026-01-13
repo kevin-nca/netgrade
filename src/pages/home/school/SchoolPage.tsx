@@ -29,10 +29,6 @@ import EditSubjectModal from '@/components/modals/EditSubjectModal';
 import { SchoolService } from '@/services/SchoolService';
 import './SchoolPage.css';
 
-interface SubjectToAdd {
-  name: string;
-}
-
 const SchoolPage: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -53,7 +49,7 @@ const SchoolPage: React.FC = () => {
     );
   };
 
-  const addSubjectToStore = (subjectData: SubjectToAdd) => {
+  const addSubjectToStore = (subjectData: Subject) => {
     const payload = {
       name: subjectData.name,
       schoolId: schoolId,
