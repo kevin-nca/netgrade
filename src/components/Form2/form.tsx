@@ -9,6 +9,7 @@ import { WeightField } from '@/components/Form2/fields/WeightField';
 import { EditExamNameField } from '@/components/Form2/fields/editExamFields/EditExamNameField';
 import { EditExamSubjectSelectField } from '@/components/Form2/fields/editExamFields/EditExamSubjectSelectField';
 
+import { EditSubjectField } from '@/components/Form2/fields/EditSubjectField';
 export const { fieldContext, formContext, useFieldContext } =
   createFormHookContexts();
 
@@ -25,6 +26,7 @@ const { useAppForm, withForm } = createFormHook({
     WeightField,
     EditExamNameField,
     EditExamSubjectSelectField,
+    EditSubjectField,
   },
   formComponents: {},
 });
