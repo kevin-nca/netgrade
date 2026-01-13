@@ -89,7 +89,7 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
       <IonContent scrollY={false}>
         <div className={styles.addSubject}>
           <form.AppField name="newSubjectName">
-            {(field) => <field.SubjectNameField label="Fachname" />}
+            {(field) => <field.EditSubjectField label="Fachname" />}
           </form.AppField>
         </div>
         <div className={styles.buttons}>
