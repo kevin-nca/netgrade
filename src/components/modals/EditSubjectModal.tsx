@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useForm } from '@tanstack/react-form';
 import {
   IonModal,
   IonPage,
@@ -8,10 +7,10 @@ import {
   IonTitle,
   IonContent,
   IonIcon,
-  IonItem,
-  IonInput,
 } from '@ionic/react';
-import { pencilOutline, bookOutline } from 'ionicons/icons';
+import { bookOutline } from 'ionicons/icons';
+import { useAppForm } from '@/components/Form2/form';
+import { z } from 'zod';
 
 interface EditSubjectModalProps {
   isOpen: boolean;
@@ -21,6 +20,15 @@ interface EditSubjectModalProps {
   loading?: boolean;
 }
 
+const subjectFormSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Bitte gib einen Fachnamen ein')
+    .max(100, 'Fachname ist zu lang'),
+});
+
+type SubjectFormData = z.infer<typeof subjectFormSchema>;
+
 const EditSubjectModal: React.FC<EditSubjectModalProps> = ({
   isOpen,
   onClose,
@@ -28,9 +36,12 @@ const EditSubjectModal: React.FC<EditSubjectModalProps> = ({
   onSave,
   loading,
 }) => {
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       name: subject?.name || '',
+    } as SubjectFormData,
+    validators: {
+      onSubmit: subjectFormSchema,
     },
     onSubmit: async ({ value }) => {
       onSave(value.name.trim());
@@ -75,30 +86,10 @@ const EditSubjectModal: React.FC<EditSubjectModalProps> = ({
             </div>
             <div className="modal-input-section">
               <h2 className="modal-section-title">Fachname eingeben</h2>
-              <div className="modal-input-wrapper glass-input">
-                <IonItem lines="none" className="modal-input-item">
-                  <div slot="start" className="modal-input-icon-wrapper">
-                    <IonIcon
-                      icon={pencilOutline}
-                      className="modal-input-icon"
-                    />
-                  </div>
-                  <form.Field name="name">
-                    {(field) => (
-                      <IonInput
-                        value={field.state.value}
-                        placeholder="Fachname..."
-                        onIonChange={(e) =>
-                          field.handleChange(e.detail.value || '')
-                        }
-                        className="modal-input-field"
-                        clearInput
-                        autoFocus
-                        disabled={loading}
-                      />
-                    )}
-                  </form.Field>
-                </IonItem>
+              <div className="modal-input-wrapper">
+                <form.AppField name="name">
+                  {(field) => <field.EditSubjectField label="Fachname" />}
+                </form.AppField>
               </div>
             </div>
             <div className="modal-button-section">
