@@ -121,21 +121,18 @@ const SchoolPage: React.FC = () => {
                     </IonCardHeader>
                     <IonCardContent className="subject-content-card">
                       <p className="teacher">
-                        Lehrperson:{' '}
                         {subject.teacher !== null
                           ? subject.teacher
-                          : 'Kein Name'}{' '}
+                          : 'Kein Name'}
                       </p>
                       <p className="average-grade">
-                        Note:{' '}
-                        {average !== undefined ? average + ' Ø' : 'Keine Noten'}
+                        {average !== undefined ? `${average} Ø` : 'Keine Noten'}
                       </p>
                     </IonCardContent>
                   </IonCard>
                 </IonItem>
                 <IonItemOptions side="end" className="option-slide-container">
                   <IonItemOption
-                    color="primary"
                     className="edit-option-slide"
                     onClick={() => {
                       setSubjectToEdit(subject);
@@ -145,7 +142,6 @@ const SchoolPage: React.FC = () => {
                     Bearbeiten
                   </IonItemOption>
                   <IonItemOption
-                    color="danger"
                     className="remove-option-slide"
                     onClick={(e) => {
                       const slidingItem = (e.target as Element).closest(
