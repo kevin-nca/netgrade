@@ -1,0 +1,148 @@
+import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import {
+  IonButton,
+  IonCard,
+  IonIcon,
+  IonSpinner,
+  IonToast,
+} from '@ionic/react';
+import { saveOutline } from 'ionicons/icons';
+import { z } from 'zod';
+import { useAppForm } from '@/components/Form2/form';
+import { useExam, useSubjects, useUpdateExam } from '@/hooks';
+import { Routes } from '@/routes';
+import styles from '../styles/FormCommon.module.css';
+
+const editExamSchema = z.object({
+  title: z.string().min(1, 'Bitte gib einen Titel ein'),
+  date: z.string().min(1, 'Bitte wähle ein Datum aus'),
+  subject: z.string().min(1, 'Bitte wähle ein Fach aus'),
+  description: z.string(),
+});
+
+type EditExamFormData = z.infer<typeof editExamSchema>;
+
+export function EditExamForm() {
+  const { examId } = useParams<{ examId: string }>();
+  const history = useHistory();
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
+
+  const { data: exam } = useExam(examId);
+  const { data: subjects = [] } = useSubjects();
+  const updateExamMutation = useUpdateExam();
+
+  const form = useAppForm({
+    defaultValues: {
+      title: '',
+      date: '',
+      subject: '',
+      description: '',
+    } as EditExamFormData,
+    validators: {
+      onSubmit: editExamSchema,
+    },
+    onSubmit: async ({ value }) => {
+      const updatedExam = {
+        id: examId,
+        name: value.title.trim(),
+        date: new Date(value.date),
+        subjectId: value.subject,
+        description: value.description.trim(),
+      };
+
+      updateExamMutation.mutate(updatedExam, {
+        onSuccess: () => {
+          setToastMessage('Prüfung erfolgreich aktualisiert!');
+          setToastColor('success');
+          setShowToast(true);
+          setTimeout(() => history.replace(Routes.HOME), 1500);
+        },
+        onError: (error: Error) => {
+          setToastMessage(`Fehler: ${error.message}`);
+          setToastColor('danger');
+          setShowToast(true);
+        },
+      });
+    },
+  });
+
+  useEffect(() => {
+    if (exam) {
+      form.setFieldValue('title', exam.name);
+      form.setFieldValue('date', exam.date.toISOString().split('T')[0]);
+      form.setFieldValue('subject', exam.subjectId);
+      form.setFieldValue('description', exam.description || '');
+    }
+  }, [exam, form]);
+
+  const handleSubmit = () => {
+    form.handleSubmit();
+  };
+
+  return (
+    <>
+      <IonCard className={styles.formCard}>
+        <div className={styles.formCardHeader}>
+          <h2 className={styles.formCardTitle}>Prüfungsdetails bearbeiten</h2>
+        </div>
+
+        <div className={styles.formCardContent}>
+          <form.AppField name="title">
+            {(field) => <field.EditExamNameField label="Prüfungsname" />}
+          </form.AppField>
+
+          <form.AppField name="date">
+            {(field) => <field.DateField label="Prüfungsdatum" />}
+          </form.AppField>
+
+          <form.AppField name="subject">
+            {(field) => (
+              <field.EditExamSubjectSelectField
+                label="Fach"
+                subjects={subjects}
+              />
+            )}
+          </form.AppField>
+
+          <form.AppField name="description">
+            {(field) => (
+              <field.DescriptionField label="Beschreibung (optional)" />
+            )}
+          </form.AppField>
+        </div>
+
+        <div className={styles.formCardFooter}>
+          <IonButton
+            expand="block"
+            className={styles.formButton}
+            onClick={handleSubmit}
+            disabled={updateExamMutation.isPending}
+          >
+            {updateExamMutation.isPending ? (
+              <div className={styles.buttonContent}>
+                <IonSpinner name="crescent" className={styles.spinner} />
+                Wird gespeichert...
+              </div>
+            ) : (
+              <div className={styles.buttonContentSave}>
+                <IonIcon icon={saveOutline} className={styles.saveIcon} />
+                Änderungen speichern
+              </div>
+            )}
+          </IonButton>
+        </div>
+      </IonCard>
+
+      <IonToast
+        isOpen={showToast}
+        onDidDismiss={() => setShowToast(false)}
+        message={toastMessage}
+        duration={toastColor === 'success' ? 3000 : 2000}
+        color={toastColor}
+      />
+    </>
+  );
+}
