@@ -1,3 +1,6 @@
+# .github/dependabot.yml
+# Dependabot configuration for npm dependencies
+
 version: 2
 updates:
   - package-ecosystem: 'npm'
@@ -7,157 +10,136 @@ updates:
     open-pull-requests-limit: 10
 
     groups:
-      # React core should stay in sync
+      # =====================
+      # React
+      # =====================
       react-core:
-        dependencies:
+        patterns:
           - 'react'
           - 'react-dom'
 
-      # React types should follow React
       react-types:
-        dependencies:
-          - '@types/react'
-          - '@types/react-dom'
+        patterns:
+          - '@types/react*'
 
-      # Router packages should stay aligned
       react-router:
-        dependencies:
-          - 'react-router'
-          - 'react-router-dom'
-          - '@types/react-router'
-          - '@types/react-router-dom'
+        patterns:
+          - 'react-router*'
+          - '@types/react-router*'
 
       # =====================
-      # Ionic Stack
+      # Ionic
       # =====================
       ionic-core:
-        dependencies:
-          - '@ionic/core'
-          - '@ionic/react'
-          - '@ionic/react-router'
+        patterns:
+          - '@ionic/*'
           - 'ionicons'
 
       ionic-native:
-        dependencies:
-          - '@ionic-native/social-sharing'
-          - '@awesome-cordova-plugins/social-sharing'
-          - 'cordova-plugin-x-socialsharing'
+        patterns:
+          - '@ionic-native/*'
+          - '@awesome-cordova-plugins/*'
+          - 'cordova-plugin-*'
 
       # =====================
-      # Capacitor Core + Plugins
+      # Capacitor
       # =====================
       capacitor-core:
-        dependencies:
+        patterns:
           - '@capacitor/core'
           - '@capacitor/cli'
           - '@capacitor/android'
           - '@capacitor/ios'
 
       capacitor-plugins:
-        dependencies:
-          - '@capacitor/app'
-          - '@capacitor/device'
-          - '@capacitor/filesystem'
-          - '@capacitor/haptics'
-          - '@capacitor/keyboard'
-          - '@capacitor/local-notifications'
-          - '@capacitor/preferences'
-          - '@capacitor/share'
-          - '@capacitor/status-bar'
-          - '@capacitor-community/sqlite'
+        patterns:
+          - '@capacitor/*'
+        exclude-patterns:
+          - '@capacitor/core'
+          - '@capacitor/cli'
+          - '@capacitor/android'
+          - '@capacitor/ios'
 
       # =====================
       # TanStack
       # =====================
-      tanstack-react-query:
-        dependencies:
-          - '@tanstack/react-query'
-          - '@tanstack/react-query-devtools'
-
-      tanstack-react-form:
-        dependencies:
-          - '@tanstack/react-form'
+      tanstack:
+        patterns:
+          - '@tanstack/*'
 
       # =====================
-      # Testing Stack
+      # Testing
       # =====================
       vitest:
-        dependencies:
+        patterns:
           - 'vitest'
-          - '@vitest/coverage-v8'
+          - '@vitest/*'
 
       testing-library:
-        dependencies:
-          - '@testing-library/dom'
-          - '@testing-library/jest-dom'
-          - '@testing-library/react'
-          - '@testing-library/user-event'
+        patterns:
+          - '@testing-library/*'
 
       cypress:
-        dependencies:
+        patterns:
           - 'cypress'
 
       # =====================
-      # Build & Tooling
+      # Build / Tooling
       # =====================
       vite-stack:
-        dependencies:
+        patterns:
           - 'vite'
-          - '@vitejs/plugin-react'
-          - '@vitejs/plugin-legacy'
-          - 'vite-plugin-wasm'
+          - '@vitejs/*'
+          - 'vite-plugin-*'
           - 'terser'
 
       typescript-stack:
-        dependencies:
+        patterns:
           - 'typescript'
           - 'typescript-eslint'
 
       # =====================
-      # Linting & Formatting
+      # Linting / Formatting
       # =====================
       eslint-stack:
-        dependencies:
+        patterns:
           - 'eslint'
-          - '@eslint/js'
-          - '@eslint/compat'
-          - 'eslint-plugin-react'
-          - 'eslint-plugin-react-hooks'
-          - 'eslint-config-prettier'
+          - 'eslint-*'
+          - '@eslint/*'
           - 'globals'
 
       prettier:
-        dependencies:
+        patterns:
           - 'prettier'
 
       # =====================
       # DOM / Browser
       # =====================
       jsdom:
-        dependencies:
+        patterns:
           - 'jsdom'
 
       # =====================
-      # Data / Utilities
+      # Data / DB / Utils
       # =====================
       data-libs:
-        dependencies:
+        patterns:
           - 'date-fns'
           - 'localforage'
           - 'reselect'
           - 'reflect-metadata'
 
       database:
-        dependencies:
+        patterns:
           - 'typeorm'
           - 'sql.js'
 
       misc-ui:
-        dependencies:
+        patterns:
           - 'react-calendar'
           - 'swiper'
 
       misc-utils:
-        dependencies:
+        patterns:
           - 'xlsx'
           - 'es6-promise-plugin'
