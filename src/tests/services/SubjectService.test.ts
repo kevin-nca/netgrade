@@ -47,7 +47,6 @@ describe('SubjectService', () => {
       name: 'New Test Subject',
       schoolId: testData.school.id,
       teacher: 'New Test Teacher',
-      description: 'New Test Description',
       weight: 1.5,
     };
 
@@ -56,7 +55,6 @@ describe('SubjectService', () => {
     expect(newSubject.id).toBeDefined();
     expect(newSubject.name).toBe(newSubjectData.name);
     expect(newSubject.teacher).toBe(newSubjectData.teacher);
-    expect(newSubject.description).toBe(newSubjectData.description);
     expect(newSubject.weight).toBe(newSubjectData.weight);
     expect(newSubject.schoolId).toBe(newSubjectData.schoolId);
 
@@ -113,7 +111,6 @@ describe('SubjectService', () => {
       name: 'Subject to Delete',
       schoolId: testData.school.id,
       teacher: 'Delete Teacher',
-      description: 'Delete Description',
     };
     const newSubject = await SubjectService.add(newSubjectData);
 
