@@ -1,163 +1,163 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
     open-pull-requests-limit: 10
 
     groups:
       # React core should stay in sync
       react-core:
         dependencies:
-          - "react"
-          - "react-dom"
+          - 'react'
+          - 'react-dom'
 
       # React types should follow React
       react-types:
         dependencies:
-          - "@types/react"
-          - "@types/react-dom"
+          - '@types/react'
+          - '@types/react-dom'
 
       # Router packages should stay aligned
       react-router:
         dependencies:
-          - "react-router"
-          - "react-router-dom"
-          - "@types/react-router"
-          - "@types/react-router-dom"
+          - 'react-router'
+          - 'react-router-dom'
+          - '@types/react-router'
+          - '@types/react-router-dom'
 
       # =====================
       # Ionic Stack
       # =====================
       ionic-core:
         dependencies:
-          - "@ionic/core"
-          - "@ionic/react"
-          - "@ionic/react-router"
-          - "ionicons"
+          - '@ionic/core'
+          - '@ionic/react'
+          - '@ionic/react-router'
+          - 'ionicons'
 
       ionic-native:
         dependencies:
-          - "@ionic-native/social-sharing"
-          - "@awesome-cordova-plugins/social-sharing"
-          - "cordova-plugin-x-socialsharing"
+          - '@ionic-native/social-sharing'
+          - '@awesome-cordova-plugins/social-sharing'
+          - 'cordova-plugin-x-socialsharing'
 
       # =====================
       # Capacitor Core + Plugins
       # =====================
       capacitor-core:
         dependencies:
-          - "@capacitor/core"
-          - "@capacitor/cli"
-          - "@capacitor/android"
-          - "@capacitor/ios"
+          - '@capacitor/core'
+          - '@capacitor/cli'
+          - '@capacitor/android'
+          - '@capacitor/ios'
 
       capacitor-plugins:
         dependencies:
-          - "@capacitor/app"
-          - "@capacitor/device"
-          - "@capacitor/filesystem"
-          - "@capacitor/haptics"
-          - "@capacitor/keyboard"
-          - "@capacitor/local-notifications"
-          - "@capacitor/preferences"
-          - "@capacitor/share"
-          - "@capacitor/status-bar"
-          - "@capacitor-community/sqlite"
+          - '@capacitor/app'
+          - '@capacitor/device'
+          - '@capacitor/filesystem'
+          - '@capacitor/haptics'
+          - '@capacitor/keyboard'
+          - '@capacitor/local-notifications'
+          - '@capacitor/preferences'
+          - '@capacitor/share'
+          - '@capacitor/status-bar'
+          - '@capacitor-community/sqlite'
 
       # =====================
       # TanStack
       # =====================
       tanstack-react-query:
         dependencies:
-          - "@tanstack/react-query"
-          - "@tanstack/react-query-devtools"
+          - '@tanstack/react-query'
+          - '@tanstack/react-query-devtools'
 
       tanstack-react-form:
         dependencies:
-          - "@tanstack/react-form"
+          - '@tanstack/react-form'
 
       # =====================
       # Testing Stack
       # =====================
       vitest:
         dependencies:
-          - "vitest"
-          - "@vitest/coverage-v8"
+          - 'vitest'
+          - '@vitest/coverage-v8'
 
       testing-library:
         dependencies:
-          - "@testing-library/dom"
-          - "@testing-library/jest-dom"
-          - "@testing-library/react"
-          - "@testing-library/user-event"
+          - '@testing-library/dom'
+          - '@testing-library/jest-dom'
+          - '@testing-library/react'
+          - '@testing-library/user-event'
 
       cypress:
         dependencies:
-          - "cypress"
+          - 'cypress'
 
       # =====================
       # Build & Tooling
       # =====================
       vite-stack:
         dependencies:
-          - "vite"
-          - "@vitejs/plugin-react"
-          - "@vitejs/plugin-legacy"
-          - "vite-plugin-wasm"
-          - "terser"
+          - 'vite'
+          - '@vitejs/plugin-react'
+          - '@vitejs/plugin-legacy'
+          - 'vite-plugin-wasm'
+          - 'terser'
 
       typescript-stack:
         dependencies:
-          - "typescript"
-          - "typescript-eslint"
+          - 'typescript'
+          - 'typescript-eslint'
 
       # =====================
       # Linting & Formatting
       # =====================
       eslint-stack:
         dependencies:
-          - "eslint"
-          - "@eslint/js"
-          - "@eslint/compat"
-          - "eslint-plugin-react"
-          - "eslint-plugin-react-hooks"
-          - "eslint-config-prettier"
-          - "globals"
+          - 'eslint'
+          - '@eslint/js'
+          - '@eslint/compat'
+          - 'eslint-plugin-react'
+          - 'eslint-plugin-react-hooks'
+          - 'eslint-config-prettier'
+          - 'globals'
 
       prettier:
         dependencies:
-          - "prettier"
+          - 'prettier'
 
       # =====================
       # DOM / Browser
       # =====================
       jsdom:
         dependencies:
-          - "jsdom"
+          - 'jsdom'
 
       # =====================
       # Data / Utilities
       # =====================
       data-libs:
         dependencies:
-          - "date-fns"
-          - "localforage"
-          - "reselect"
-          - "reflect-metadata"
+          - 'date-fns'
+          - 'localforage'
+          - 'reselect'
+          - 'reflect-metadata'
 
       database:
         dependencies:
-          - "typeorm"
-          - "sql.js"
+          - 'typeorm'
+          - 'sql.js'
 
       misc-ui:
         dependencies:
-          - "react-calendar"
-          - "swiper"
+          - 'react-calendar'
+          - 'swiper'
 
       misc-utils:
         dependencies:
-          - "xlsx"
-          - "es6-promise-plugin"
+          - 'xlsx'
+          - 'es6-promise-plugin'
