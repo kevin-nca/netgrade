@@ -1,8 +1,3 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
 version: 2
 updates:
   - package-ecosystem: "npm"
@@ -32,13 +27,25 @@ updates:
           - "@types/react-router"
           - "@types/react-router-dom"
 
-      # TanStack React Query + Devtools are tightly coupled
-      tanstack-react-query:
+      # =====================
+      # Ionic Stack
+      # =====================
+      ionic-core:
         dependencies:
-          - "@tanstack/react-query"
-          - "@tanstack/react-query-devtools"
+          - "@ionic/core"
+          - "@ionic/react"
+          - "@ionic/react-router"
+          - "ionicons"
 
-      # Capacitor core + platforms + CLI should be on the same major
+      ionic-native:
+        dependencies:
+          - "@ionic-native/social-sharing"
+          - "@awesome-cordova-plugins/social-sharing"
+          - "cordova-plugin-x-socialsharing"
+
+      # =====================
+      # Capacitor Core + Plugins
+      # =====================
       capacitor-core:
         dependencies:
           - "@capacitor/core"
@@ -46,14 +53,111 @@ updates:
           - "@capacitor/android"
           - "@capacitor/ios"
 
-      # Vitest + coverage package
+      capacitor-plugins:
+        dependencies:
+          - "@capacitor/app"
+          - "@capacitor/device"
+          - "@capacitor/filesystem"
+          - "@capacitor/haptics"
+          - "@capacitor/keyboard"
+          - "@capacitor/local-notifications"
+          - "@capacitor/preferences"
+          - "@capacitor/share"
+          - "@capacitor/status-bar"
+          - "@capacitor-community/sqlite"
+
+      # =====================
+      # TanStack
+      # =====================
+      tanstack-react-query:
+        dependencies:
+          - "@tanstack/react-query"
+          - "@tanstack/react-query-devtools"
+
+      tanstack-react-form:
+        dependencies:
+          - "@tanstack/react-form"
+
+      # =====================
+      # Testing Stack
+      # =====================
       vitest:
         dependencies:
           - "vitest"
           - "@vitest/coverage-v8"
 
-      # TS + TS-ESLint should stay compatible
+      testing-library:
+        dependencies:
+          - "@testing-library/dom"
+          - "@testing-library/jest-dom"
+          - "@testing-library/react"
+          - "@testing-library/user-event"
+
+      cypress:
+        dependencies:
+          - "cypress"
+
+      # =====================
+      # Build & Tooling
+      # =====================
+      vite-stack:
+        dependencies:
+          - "vite"
+          - "@vitejs/plugin-react"
+          - "@vitejs/plugin-legacy"
+          - "vite-plugin-wasm"
+          - "terser"
+
       typescript-stack:
         dependencies:
           - "typescript"
           - "typescript-eslint"
+
+      # =====================
+      # Linting & Formatting
+      # =====================
+      eslint-stack:
+        dependencies:
+          - "eslint"
+          - "@eslint/js"
+          - "@eslint/compat"
+          - "eslint-plugin-react"
+          - "eslint-plugin-react-hooks"
+          - "eslint-config-prettier"
+          - "globals"
+
+      prettier:
+        dependencies:
+          - "prettier"
+
+      # =====================
+      # DOM / Browser
+      # =====================
+      jsdom:
+        dependencies:
+          - "jsdom"
+
+      # =====================
+      # Data / Utilities
+      # =====================
+      data-libs:
+        dependencies:
+          - "date-fns"
+          - "localforage"
+          - "reselect"
+          - "reflect-metadata"
+
+      database:
+        dependencies:
+          - "typeorm"
+          - "sql.js"
+
+      misc-ui:
+        dependencies:
+          - "react-calendar"
+          - "swiper"
+
+      misc-utils:
+        dependencies:
+          - "xlsx"
+          - "es6-promise-plugin"
