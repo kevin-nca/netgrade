@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { IonButtons, IonContent, IonIcon, IonList, IonModal, IonPage, IonToast, } from '@ionic/react';
+import {
+  IonButtons,
+  IonContent,
+  IonIcon,
+  IonList,
+  IonModal,
+  IonPage,
+  IonToast,
+} from '@ionic/react';
 import { add } from 'ionicons/icons';
 import { useHistory, useParams } from 'react-router-dom';
 import { z } from 'zod';
@@ -7,7 +15,12 @@ import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import GradeListItem from '@/components/List/GradeListItem';
 import { Grade } from '@/db/entities';
-import { useDeleteGrade, useSubject, useSubjectGrades, useUpdateExamAndGrade, } from '@/hooks/queries';
+import {
+  useDeleteGrade,
+  useSubject,
+  useSubjectGrades,
+  useUpdateExamAndGrade,
+} from '@/hooks/queries';
 import { decimalToPercentage, percentageToDecimal } from '@/utils/validation';
 import { Layout } from '@/components/Layout/Layout';
 import { Routes } from '@/routes';
