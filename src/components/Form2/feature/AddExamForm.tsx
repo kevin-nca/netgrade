@@ -9,26 +9,8 @@ import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import { Routes } from '@/routes';
-import { z } from 'zod';
-import type { School, Subject } from '@/db/entities';
 import '@/components/Form2/feature/AddGradePage.css';
-
-const examFormSchema = z.object({
-  selectedSchool: z.any().refine((val) => val !== null && val !== undefined, {
-    message: 'Bitte wähle eine Schule aus',
-  }),
-  selectedSubject: z.any().refine((val) => val !== null && val !== undefined, {
-    message: 'Bitte wähle ein Fach aus',
-  }),
-  examName: z.string().min(1, 'Bitte gib einen Prüfungsnamen ein'),
-  date: z.string().min(1, 'Bitte wähle ein Datum aus'),
-  description: z.string(),
-});
-
-type ExamFormData = z.infer<typeof examFormSchema> & {
-  selectedSchool: School | null;
-  selectedSubject: Subject | null;
-};
+import { examFormSchema, type ExamFormData } from '@/components/Form2/feature/examFormSchemaExam';
 
 const AddExamForm: React.FC = () => {
   const history = useHistory();
