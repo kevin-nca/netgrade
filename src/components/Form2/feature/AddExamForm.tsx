@@ -10,7 +10,10 @@ import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import { Routes } from '@/routes';
 import '@/components/Form2/feature/AddGradePage.css';
-import { examFormSchema, type ExamFormData } from '@/components/Form2/feature/examFormSchemaExam';
+import {
+  examFormSchema,
+  type ExamFormData,
+} from '@/components/Form2/feature/examFormSchemaExam';
 
 const AddExamForm: React.FC = () => {
   const history = useHistory();

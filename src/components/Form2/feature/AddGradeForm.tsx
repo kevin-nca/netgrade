@@ -15,7 +15,10 @@ import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import '@/components/Form2/feature/AddGradePage.css';
-import { gradeFormSchema, type GradeFormData, } from '@/components/Form2/feature/examFormSchemaGrade';
+import {
+  gradeFormSchema,
+  type GradeFormData,
+} from '@/components/Form2/feature/examFormSchemaGrade';
 
 const AddGradeForm: React.FC = () => {
   const history = useHistory();
