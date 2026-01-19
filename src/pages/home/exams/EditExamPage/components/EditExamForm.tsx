@@ -8,20 +8,14 @@ import {
   IonToast,
 } from '@ionic/react';
 import { saveOutline } from 'ionicons/icons';
-import { z } from 'zod';
 import { useAppForm } from '@/components/Form2/form';
 import { useExam, useSubjects, useUpdateExam } from '@/hooks';
 import { Routes } from '@/routes';
 import styles from '../styles/FormCommon.module.css';
-
-const editExamSchema = z.object({
-  title: z.string().min(1, 'Bitte gib einen Titel ein'),
-  date: z.string().min(1, 'Bitte wähle ein Datum aus'),
-  subject: z.string().min(1, 'Bitte wähle ein Fach aus'),
-  description: z.string(),
-});
-
-type EditExamFormData = z.infer<typeof editExamSchema>;
+import {
+  editExamSchema,
+  type EditExamFormData,
+} from '@/components/Form2/feature/editExamSchema';
 
 export function EditExamForm() {
   const { examId } = useParams<{ examId: string }>();
