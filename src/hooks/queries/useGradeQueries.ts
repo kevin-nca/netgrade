@@ -106,7 +106,6 @@ export const useUpdateExamAndGrade = () => {
         });
       }
       queryClient.invalidateQueries({ queryKey: examKeys.all });
-      queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
     },
   });
 };
