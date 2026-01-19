@@ -11,13 +11,10 @@ import {
 } from '@ionic/react';
 import { school as schoolIcon } from 'ionicons/icons';
 import { useAppForm } from '@/components/Form2/form';
-import { z } from 'zod';
-
-const schoolFormSchema = z.object({
-  schoolName: z.string().min(1, 'Bitte gib einen Schulnamen ein'),
-});
-
-type SchoolFormData = z.infer<typeof schoolFormSchema>;
+import {
+  schoolFormSchema,
+  type SchoolFormData,
+} from '@/components/Form2/feature/addSchoolFormSchema';
 
 interface AddSchoolModalProps {
   isOpen: boolean;
