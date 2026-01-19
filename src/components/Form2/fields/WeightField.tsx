@@ -18,10 +18,6 @@ export function WeightField({ label }: WeightFieldProps) {
       ? errors.map((err) => String(err?.message ?? err)).join(', ')
       : undefined;
 
-  const setPresetWeight = (weight: string) => {
-    field.handleChange(weight);
-  };
-
   return (
     <FormInput
       icon={scaleOutline}
@@ -53,7 +49,7 @@ export function WeightField({ label }: WeightFieldProps) {
           <button
             type="button"
             className="weight-preset-btn"
-            onClick={() => setPresetWeight('25')}
+            onClick={() => field.handleChange('25')}
             tabIndex={-1}
           >
             25%
@@ -61,7 +57,7 @@ export function WeightField({ label }: WeightFieldProps) {
           <button
             type="button"
             className="weight-preset-btn"
-            onClick={() => setPresetWeight('50')}
+            onClick={() => field.handleChange('50')}
             tabIndex={-1}
           >
             50%
@@ -69,7 +65,7 @@ export function WeightField({ label }: WeightFieldProps) {
           <button
             type="button"
             className="weight-preset-btn"
-            onClick={() => setPresetWeight('100')}
+            onClick={() => field.handleChange('100')}
             tabIndex={-1}
           >
             100%

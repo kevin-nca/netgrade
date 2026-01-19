@@ -14,7 +14,7 @@ import { useAppForm } from '@/components/Form2/form';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-import '@/components/Form2/feature/AddGradePage.css';
+import '@/components/Form2/feature/AddGradeExamForm.css';
 import {
   gradeFormSchema,
   type GradeFormData,

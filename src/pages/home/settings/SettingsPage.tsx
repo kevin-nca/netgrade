@@ -51,7 +51,6 @@ import './SettingsPage.css';
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
-  const [schoolNameInput, setSchoolNameInput] = useState('');
   const [showNameEditModal, setShowNameEditModal] = useState(false);
   const [appVersion] = useState('');
   const [showNavigationModal, setShowNavigationModal] = useState(false);
@@ -159,14 +158,13 @@ const SettingsPage: React.FC = () => {
     setShowNameEditModal(false);
   };
 
-  const handleAddSchool = () => {
-    if (schoolNameInput.trim()) {
+  const handleAddSchool = (schoolName: string) => {
+    if (schoolName.trim()) {
       addSchoolMutation.mutate(
-        { name: schoolNameInput.trim() },
+        { name: schoolName.trim() },
         {
           onSuccess: () => {
             setShowAddSchoolModal(false);
-            setSchoolNameInput('');
             showToast('Schule erfolgreich hinzugefügt');
           },
           onError: (error) => {

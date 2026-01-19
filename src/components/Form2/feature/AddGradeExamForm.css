@@ -811,7 +811,7 @@ select.form-input option {
 }
 
 /* High Contrast Mode */
-@media (prefers-contrast: high) {
+@media (prefers-contrast: more) {
   .form-card,
   .form-input {
     border-width: 2px;
