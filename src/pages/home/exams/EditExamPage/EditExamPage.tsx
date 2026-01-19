@@ -1,6 +1,6 @@
 import React from 'react';
 import { IonPage } from '@ionic/react';
-import ExamDetailsPage from '@/components/Form2/feature/ExamDetailsPage';
+import ExamDetailsPage from '@/pages/home/exams/EditExamPage/ExamDetailsPage';
 
 const EditExamPage: React.FC = () => {
   return (

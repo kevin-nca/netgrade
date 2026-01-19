@@ -7,14 +7,9 @@ import {
   IonTitle,
   IonContent,
   IonIcon,
-  IonButton,
 } from '@ionic/react';
 import { school as schoolIcon } from 'ionicons/icons';
-import { useAppForm } from '@/components/Form2/form';
-import {
-  schoolFormSchema,
-  type SchoolFormData,
-} from '@/components/Form2/feature/addSchoolFormSchema';
+import { AddSchoolForm } from '@/components/Form2/feature/AddSchoolForm';
 
 interface AddSchoolModalProps {
   isOpen: boolean;
@@ -29,22 +24,6 @@ const AddSchoolModal: React.FC<AddSchoolModalProps> = ({
   onAdd,
   isLoading,
 }) => {
-  const form = useAppForm({
-    defaultValues: {
-      schoolName: '',
-    } as SchoolFormData,
-    validators: {
-      onSubmit: schoolFormSchema,
-    },
-    onSubmit: async ({ value }) => {
-      await onAdd(value.schoolName.trim());
-    },
-  });
-
-  const handleAdd = () => {
-    form.handleSubmit();
-  };
-
   return (
     <IonModal
       isOpen={isOpen}
@@ -78,32 +57,11 @@ const AddSchoolModal: React.FC<AddSchoolModalProps> = ({
               </div>
             </div>
 
-            <div className="form-fields">
-              <form.AppField name="schoolName">
-                {(field) => <field.AddSchoolField label="Schulname" />}
-              </form.AppField>
-            </div>
-
-            <div className="modal-button-section">
-              <div className="modal-buttons">
-                <IonButton
-                  onClick={onClose}
-                  fill="clear"
-                  disabled={isLoading}
-                  expand="block"
-                >
-                  Abbrechen
-                </IonButton>
-                <IonButton
-                  onClick={handleAdd}
-                  disabled={isLoading}
-                  expand="block"
-                  color="primary"
-                >
-                  {isLoading ? 'Speichert...' : 'Hinzufügen'}
-                </IonButton>
-              </div>
-            </div>
+            <AddSchoolForm
+              onSubmit={onAdd}
+              onCancel={onClose}
+              isLoading={isLoading}
+            />
 
             <div className="modal-bottom-spacer" />
           </div>
