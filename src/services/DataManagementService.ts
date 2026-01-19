@@ -385,7 +385,6 @@ export class DataManagementService {
           school.name,
           subject.name,
           subject.teacher || '',
-          subject.description || '',
           subject.weight || 1,
           subject.createdAt.toLocaleDateString('de-DE'),
         ]),
@@ -494,7 +493,6 @@ export class DataManagementService {
       ...school.subjects.map((subject) => [
         subject.name,
         subject.teacher || '',
-        subject.description || '',
         subject.weight || 1,
         subject.createdAt.toLocaleDateString('de-DE'),
       ]),
