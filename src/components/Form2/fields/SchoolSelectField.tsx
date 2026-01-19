@@ -18,9 +18,7 @@ export function SchoolSelectField({
 }: SchoolSelectFieldProps) {
   const field = useFieldContext<School | null>();
 
-  const errors = Array.isArray(field.state.meta.errors)
-    ? field.state.meta.errors
-    : [];
+  const errors = field.state.meta.errors;
 
   const firstError =
     errors.length > 0

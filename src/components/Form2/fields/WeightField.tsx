@@ -11,9 +11,7 @@ interface WeightFieldProps {
 export function WeightField({ label }: WeightFieldProps) {
   const field = useFieldContext<string>();
 
-  const errors = Array.isArray(field.state.meta.errors)
-    ? field.state.meta.errors
-    : [];
+  const errors = field.state.meta.errors;
 
   const firstError =
     errors.length > 0

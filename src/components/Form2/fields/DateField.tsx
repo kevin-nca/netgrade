@@ -7,9 +7,7 @@ import FormInput from '@/components/Form2/form-field/FormInput';
 export function DateField({ label }: { label: string }) {
   const field = useFieldContext<string>();
 
-  const errors = Array.isArray(field.state.meta.errors)
-    ? field.state.meta.errors
-    : [];
+  const errors = field.state.meta.errors;
 
   const firstError =
     errors.length > 0
