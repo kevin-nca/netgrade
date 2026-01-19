@@ -10,7 +10,10 @@ import {
 } from '@ionic/react';
 import { bookOutline } from 'ionicons/icons';
 import { useAppForm } from '@/components/Form2/form';
-import { z } from 'zod';
+import {
+  editSubjectFormSchema,
+  type EditSubjectFormData,
+} from '@/components/Form2/feature/editSubjectFormSchema';
 
 interface EditSubjectModalProps {
   isOpen: boolean;
@@ -19,15 +22,6 @@ interface EditSubjectModalProps {
   onSave: (newName: string) => void;
   loading?: boolean;
 }
-
-const subjectFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Bitte gib einen Fachnamen ein')
-    .max(100, 'Fachname ist zu lang'),
-});
-
-type SubjectFormData = z.infer<typeof subjectFormSchema>;
 
 const EditSubjectModal: React.FC<EditSubjectModalProps> = ({
   isOpen,
@@ -39,9 +33,9 @@ const EditSubjectModal: React.FC<EditSubjectModalProps> = ({
   const form = useAppForm({
     defaultValues: {
       name: subject?.name || '',
-    } as SubjectFormData,
+    } as EditSubjectFormData,
     validators: {
-      onSubmit: subjectFormSchema,
+      onSubmit: editSubjectFormSchema,
     },
     onSubmit: async ({ value }) => {
       onSave(value.name.trim());

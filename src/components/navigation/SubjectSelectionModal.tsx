@@ -32,7 +32,6 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
       onSubmit: subjectFormSchema,
     },
     onSubmit: async ({ value }) => {
-      // Check for duplicate subjects
       const isDuplicate = subjectsOrModules.some(
         (subject) =>
           subject.name.toLowerCase() ===
