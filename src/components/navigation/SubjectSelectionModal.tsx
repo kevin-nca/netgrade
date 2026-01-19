@@ -2,17 +2,11 @@ import React, { useEffect } from 'react';
 import { IonContent, IonModal, IonButton } from '@ionic/react';
 import { Subject } from '@/db/entities';
 import { useAppForm } from '@/components/Form2/form';
-import { z } from 'zod';
+import {
+  subjectFormSchema,
+  type SubjectFormData,
+} from '@/components/Form2/feature/subjectFormSchema';
 import styles from './SubjectSelectionModal.module.css';
-
-const subjectFormSchema = z.object({
-  newSubjectName: z
-    .string()
-    .min(1, 'Bitte gib einen Fachnamen ein')
-    .max(255, 'Name zu lang'),
-});
-
-type SubjectFormData = z.infer<typeof subjectFormSchema>;
 
 interface SubjectSelectionSlideUpProps {
   isOpen: boolean;
