@@ -1,6 +1,7 @@
 import { Entity, Column, OneToMany } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { Subject } from './Subject';
+import { Semester } from './Semester';
 
 @Entity('school')
 export class School extends BaseEntity {
@@ -15,4 +16,7 @@ export class School extends BaseEntity {
 
   @OneToMany(() => Subject, (subject) => subject.school)
   subjects!: Subject[];
+
+  @OneToMany(() => Semester, (semester) => semester.school)
+  semesters!: Semester[];
 }
