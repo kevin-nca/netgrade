@@ -21,17 +21,18 @@ export class Subject extends BaseEntity {
   @Column({ type: 'uuid' })
   semesterId!: string;
 
+  @ManyToOne(() => Semester, (semester) => semester.subjects, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'semesterId' })
+  semester!: Semester | null;
+
   @ManyToOne(() => School, (school) => school.subjects, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'schoolId' })
   school!: School;
-
-  @ManyToOne(() => Semester, (semester) => semester.subjects, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'semesterId' })
-  semester!: Semester;
 
   @OneToMany(() => Exam, (exam) => exam.subject)
   exams!: Exam[];
