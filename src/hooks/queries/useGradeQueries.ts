@@ -98,7 +98,9 @@ export const useUpdateExamAndGrade = () => {
         queryKey: gradeKeys.list({ id: updatedGrade.id }),
       });
       // Invalidate and refetch grades list
-      queryClient.invalidateQueries({ queryKey: gradeKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: gradeKeys.all });
+      queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: subjectKeys.all });
       // If the grade is associated with an exam, invalidate that query too
       if (updatedGrade.exam?.id) {
         queryClient.invalidateQueries({
@@ -106,7 +108,6 @@ export const useUpdateExamAndGrade = () => {
         });
       }
       queryClient.invalidateQueries({ queryKey: examKeys.all });
-      queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
     },
   });
 };
