@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import {
   IonCard,
   IonList,
@@ -10,6 +10,7 @@ import {
   IonButton,
   IonIcon,
   IonRange,
+  IonInput,
 } from '@ionic/react';
 import {
   checkmarkCircleOutline,
@@ -17,8 +18,6 @@ import {
   scaleOutline,
   chatbubbleOutline,
 } from 'ionicons/icons';
-import ValidatedNumberInput from '@/components/Form/validated-number-input/validatedNumberInput';
-import { validateGrade, validateWeight } from '@/utils/validation';
 import { GradeFormData } from '../types';
 import styles from '../styles/GradeForm.module.css';
 
@@ -38,35 +37,6 @@ export const GradeForm: React.FC<GradeFormProps> = ({
   getGradeColor,
   onSubmit,
 }) => {
-  const currentScore = formValues.score;
-  const currentWeight = formValues.weight;
-
-  const [localScore, setLocalScore] = useState(currentScore || 5.5);
-  const [localWeight, setLocalWeight] = useState(currentWeight || 100);
-
-  const handleScoreChange = useCallback(
-    (value: number) => {
-      setLocalScore(value);
-      onFieldChange('score', value);
-    },
-    [onFieldChange],
-  );
-
-  const handleWeightChange = useCallback(
-    (value: number) => {
-      setLocalWeight(value);
-      onFieldChange('weight', value);
-    },
-    [onFieldChange],
-  );
-
-  const handleCommentChange = useCallback(
-    (value: string) => {
-      onFieldChange('comment', value || '');
-    },
-    [onFieldChange],
-  );
-
   return (
     <>
       <IonCard className={styles.formCard}>
@@ -91,26 +61,28 @@ export const GradeForm: React.FC<GradeFormProps> = ({
             <IonItem className={styles.formItem}>
               <div className={styles.gradeInputContainer}>
                 <div className={styles.gradeInputSmall}>
-                  <ValidatedNumberInput
-                    value={localScore}
-                    onChange={handleScoreChange}
-                    validation={validateGrade}
+                  <IonInput
+                    type="number"
+                    value={formValues.score}
+                    onIonInput={(e) =>
+                      onFieldChange('score', parseFloat(e.detail.value!) || 1)
+                    }
                     step="0.1"
-                    min="1"
-                    max="6"
+                    min={1}
+                    max={6}
                   />
                 </div>
                 <div className={styles.rangeContainer}>
                   <IonRange
-                    value={localScore}
+                    value={formValues.score}
                     onIonChange={(e) =>
-                      handleScoreChange(e.detail.value as number)
+                      onFieldChange('score', e.detail.value as number)
                     }
                     min={1}
                     max={6}
                     step={0.5}
                     snaps
-                    color={getGradeColor(localScore)}
+                    color={getGradeColor(formValues.score)}
                     className={styles.rangeInput}
                   />
                 </div>
@@ -134,19 +106,21 @@ export const GradeForm: React.FC<GradeFormProps> = ({
             <IonItem className={styles.formItem}>
               <div className={styles.gradeInputContainer}>
                 <div className={styles.gradeInputSmall}>
-                  <ValidatedNumberInput
-                    value={localWeight}
-                    onChange={handleWeightChange}
-                    validation={validateWeight}
-                    min="0"
-                    max="100"
+                  <IonInput
+                    type="number"
+                    value={formValues.weight}
+                    onIonInput={(e) =>
+                      onFieldChange('weight', parseFloat(e.detail.value!) || 0)
+                    }
+                    min={0}
+                    max={100}
                   />
                 </div>
                 <div className={styles.rangeContainer}>
                   <IonRange
-                    value={localWeight}
+                    value={formValues.weight}
                     onIonChange={(e) =>
-                      handleWeightChange(e.detail.value as number)
+                      onFieldChange('weight', e.detail.value as number)
                     }
                     min={0}
                     max={100}
@@ -175,7 +149,9 @@ export const GradeForm: React.FC<GradeFormProps> = ({
             <IonItem className={styles.formItem}>
               <IonTextarea
                 value={formValues.comment}
-                onIonChange={(e) => handleCommentChange(e.detail.value || '')}
+                onIonChange={(e) =>
+                  onFieldChange('comment', e.detail.value || '')
+                }
                 placeholder="Notizen zur Note..."
                 rows={3}
                 className={styles.formInput}

@@ -8,14 +8,14 @@ import {
   IonToast,
 } from '@ionic/react';
 import { saveOutline } from 'ionicons/icons';
-import { useAppForm } from '@/components/Form2/form';
+import { useAppForm } from '@/shared/Form/ui/form';
 import { useExam, useSubjects, useUpdateExam } from '@/hooks';
 import { Routes } from '@/routes';
 import styles from '../styles/FormCommon.module.css';
 import {
   editExamSchema,
   type EditExamFormData,
-} from '@/components/Form2/feature/editExamSchema';
+} from '@/features/Form/edit-exam/schema/editExamSchema';
 
 export function EditExamForm() {
   const { examId } = useParams<{ examId: string }>();

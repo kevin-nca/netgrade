@@ -9,7 +9,7 @@ import {
   IonIcon,
 } from '@ionic/react';
 import { school as schoolIcon } from 'ionicons/icons';
-import { AddSchoolForm } from '@/components/Form2/feature/AddSchoolForm';
+import { AddSchoolForm } from '@/features/Form/add-school/components/AddSchoolForm';
 
 interface AddSchoolModalProps {
   isOpen: boolean;

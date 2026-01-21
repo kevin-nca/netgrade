@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { IonContent, IonModal, IonButton } from '@ionic/react';
 import { Subject } from '@/db/entities';
-import { useAppForm } from '@/components/Form2/form';
+import { useAppForm } from '@/shared/Form/ui/form';
 import {
   subjectFormSchema,
   type SubjectFormData,
-} from '@/components/Form2/feature/subjectFormSchema';
+} from '@/features/Form/add-subject/subjectFormSchema';
 import styles from './SubjectSelectionModal.module.css';
 
 interface SubjectSelectionSlideUpProps {

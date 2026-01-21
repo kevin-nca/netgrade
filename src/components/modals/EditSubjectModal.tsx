@@ -9,11 +9,11 @@ import {
   IonIcon,
 } from '@ionic/react';
 import { bookOutline } from 'ionicons/icons';
-import { useAppForm } from '@/components/Form2/form';
+import { useAppForm } from '@/shared/Form/ui/form';
 import {
   editSubjectFormSchema,
   type EditSubjectFormData,
-} from '@/components/Form2/feature/editSubjectFormSchema';
+} from '@/features/Form/edit-subject/schema/editSubjectFormSchema';
 
 interface EditSubjectModalProps {
   isOpen: boolean;
