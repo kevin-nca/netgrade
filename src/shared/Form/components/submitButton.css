@@ -302,7 +302,7 @@
 
 /* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
-  .glass-button{
+  .glass-button {
     transition: none;
   }
 
@@ -310,8 +310,7 @@
     transform: none;
   }
 
-  .glass-button.primary::before{
+  .glass-button.primary::before {
     animation: none;
   }
-  }
-
+}

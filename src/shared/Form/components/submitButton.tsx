@@ -1,7 +1,7 @@
 import React from 'react';
 import { IonIcon } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
-import '@/shared/components/submitButton.css';
+import '@/shared/Form/components/submitButton.css';
 
 interface SubmitButtonProps {
   onClick: () => void;

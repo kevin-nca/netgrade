@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { IonContent, IonIcon, IonToast } from '@ionic/react';
+import { IonContent, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { checkmarkCircleOutline } from 'ionicons/icons';
 import { format } from 'date-fns';
 import { useAddExam, useSchools, useSchoolSubjects } from '@/hooks';
 import { useAppForm } from '@/shared/Form/ui/form';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
+import SubmitButton from '@/shared/Form/components/submitButton';
+import FormContainer from '@/shared/Form/components/form-layout/formContainer';
+import SuccessOverlay from '@/shared/Form/components/form-layout/succesOverlay';
 import { Routes } from '@/routes';
-import '@/features/Form/AddGradeExamForm.css';
 import {
   examFormSchema,
   type ExamFormData,
 } from '@/features/Form/add-exam/schema/examFormSchemaExam';
-import SubmitButton from '@/shared/components/submitButton';
 
 const AddExamForm: React.FC = () => {
   const history = useHistory();
@@ -95,71 +95,61 @@ const AddExamForm: React.FC = () => {
       />
 
       <IonContent className="add-exam-content" scrollY>
-        <div className="gradient-orb" />
+        <SuccessOverlay
+          show={showSuccess}
+          title="Erfolgreich hinzugefügt!"
+          message="Die Prüfung wurde gespeichert"
+        />
 
-        {showSuccess && (
-          <div className="success-overlay">
-            <div className="success-content">
-              <IonIcon icon={checkmarkCircleOutline} className="success-icon" />
-              <h3 className="success-title">Erfolgreich hinzugefügt!</h3>
-              <p className="success-message">Die Prüfung wurde gespeichert</p>
-            </div>
-          </div>
-        )}
+        <FormContainer>
+          <form.AppField name="selectedSchool">
+            {(field) => (
+              <field.SchoolSelectField
+                label="Schule"
+                schools={schools ?? []}
+                onSchoolChange={(schoolId: string) => {
+                  setSelectedSchoolId(schoolId);
+                  form.setFieldValue('selectedSubject', null);
+                }}
+              />
+            )}
+          </form.AppField>
 
-        <div className="form-group">
-          <div className="form-card">
-            <div className="form-fields">
-              <form.AppField name="selectedSchool">
-                {(field) => (
-                  <field.SchoolSelectField
-                    label="Schule"
-                    schools={schools ?? []}
-                    onSchoolChange={(schoolId: string) => {
-                      setSelectedSchoolId(schoolId);
-                      form.setFieldValue('selectedSubject', null);
-                    }}
-                  />
-                )}
-              </form.AppField>
+          <form.AppField name="selectedSubject">
+            {(field) => (
+              <field.SubjectSelectField
+                label="Fach"
+                subjects={subjects ?? []}
+                disabled={!selectedSchoolId || subjects.length === 0}
+                placeholder={
+                  selectedSchoolId
+                    ? 'Fach auswählen'
+                    : 'Bitte zuerst eine Schule auswählen'
+                }
+              />
+            )}
+          </form.AppField>
 
-              <form.AppField name="selectedSubject">
-                {(field) => (
-                  <field.SubjectSelectField
-                    label="Fach"
-                    subjects={subjects ?? []}
-                    disabled={!selectedSchoolId || subjects.length === 0}
-                    placeholder={
-                      selectedSchoolId
-                        ? 'Fach auswählen'
-                        : 'Bitte zuerst eine Schule auswählen'
-                    }
-                  />
-                )}
-              </form.AppField>
+          <form.AppField name="examName">
+            {(field) => <field.ExamNameField label="Prüfungsname" />}
+          </form.AppField>
 
-              <form.AppField name="examName">
-                {(field) => <field.ExamNameField label="Prüfungsname" />}
-              </form.AppField>
+          <form.AppField name="date">
+            {(field) => <field.DateField label="Datum" />}
+          </form.AppField>
 
-              <form.AppField name="date">
-                {(field) => <field.DateField label="Datum" />}
-              </form.AppField>
-
-              <form.AppField name="description">
-                {(field) => (
-                  <field.DescriptionField label="Beschreibung (optional)" />
-                )}
-              </form.AppField>
-            </div>
-          </div>
-        </div>
+          <form.AppField name="description">
+            {(field) => (
+              <field.DescriptionField label="Beschreibung (optional)" />
+            )}
+          </form.AppField>
+        </FormContainer>
 
         <SubmitButton
           onClick={handleAddExam}
           isLoading={addExamMutation.isPending}
           loadingText="Wird hinzugefügt..."
-          text="Note hinzufügen"
+          text="Prüfung hinzufügen"
         />
 
         <NavigationModal

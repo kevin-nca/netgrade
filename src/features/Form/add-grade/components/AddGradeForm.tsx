@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { IonContent, IonIcon, IonToast } from '@ionic/react';
+import { IonContent, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { checkmarkCircleOutline } from 'ionicons/icons';
 import { format, parseISO } from 'date-fns';
 import {
   useAddGradeWithExam,
@@ -14,8 +13,9 @@ import { useAppForm } from '@/shared/Form/ui/form';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-import SubmitButton from '@/shared/components/submitButton';
-import '@/features/Form/AddGradeExamForm.css';
+import SubmitButton from '@/shared/Form/components/submitButton';
+import FormContainer from '@/shared/Form/components/form-layout/formContainer';
+import SuccessOverlay from '@/shared/Form/components/form-layout/succesOverlay';
 import {
   gradeFormSchema,
   type GradeFormData,
@@ -105,67 +105,57 @@ const AddGradeForm: React.FC = () => {
       />
 
       <IonContent className="add-exam-content" scrollY>
-        <div className="gradient-orb" />
+        <SuccessOverlay
+          show={showSuccess}
+          title="Erfolgreich hinzugefügt!"
+          message="Die Note wurde gespeichert"
+        />
 
-        {showSuccess && (
-          <div className="success-overlay">
-            <div className="success-content">
-              <IonIcon icon={checkmarkCircleOutline} className="success-icon" />
-              <h3 className="success-title">Erfolgreich hinzugefügt!</h3>
-              <p className="success-message">Die Note wurde gespeichert</p>
-            </div>
-          </div>
-        )}
+        <FormContainer>
+          <form.AppField name="selectedSchool">
+            {(field) => (
+              <field.SchoolSelectField
+                label="Schule"
+                schools={schools ?? []}
+                onSchoolChange={(schoolId: string) => {
+                  setSelectedSchoolId(schoolId);
+                  form.setFieldValue('selectedSubject', null);
+                }}
+              />
+            )}
+          </form.AppField>
 
-        <div className="form-group">
-          <div className="form-card">
-            <div className="form-fields">
-              <form.AppField name="selectedSchool">
-                {(field) => (
-                  <field.SchoolSelectField
-                    label="Schule"
-                    schools={schools ?? []}
-                    onSchoolChange={(schoolId: string) => {
-                      setSelectedSchoolId(schoolId);
-                      form.setFieldValue('selectedSubject', null);
-                    }}
-                  />
-                )}
-              </form.AppField>
+          <form.AppField name="selectedSubject">
+            {(field) => (
+              <field.SubjectSelectField
+                label="Fach"
+                subjects={subjects ?? []}
+                disabled={!selectedSchoolId || subjects.length === 0}
+                placeholder={
+                  selectedSchoolId
+                    ? 'Fach auswählen'
+                    : 'Bitte zuerst eine Schule auswählen'
+                }
+              />
+            )}
+          </form.AppField>
 
-              <form.AppField name="selectedSubject">
-                {(field) => (
-                  <field.SubjectSelectField
-                    label="Fach"
-                    subjects={subjects ?? []}
-                    disabled={!selectedSchoolId || subjects.length === 0}
-                    placeholder={
-                      selectedSchoolId
-                        ? 'Fach auswählen'
-                        : 'Bitte zuerst eine Schule auswählen'
-                    }
-                  />
-                )}
-              </form.AppField>
+          <form.AppField name="examName">
+            {(field) => <field.ExamNameField label="Prüfungsname" />}
+          </form.AppField>
 
-              <form.AppField name="examName">
-                {(field) => <field.ExamNameField label="Prüfungsname" />}
-              </form.AppField>
+          <form.AppField name="date">
+            {(field) => <field.DateField label="Datum" />}
+          </form.AppField>
 
-              <form.AppField name="date">
-                {(field) => <field.DateField label="Datum" />}
-              </form.AppField>
+          <form.AppField name="weight">
+            {(field) => <field.WeightField label="Gewichtung (0-100%)" />}
+          </form.AppField>
 
-              <form.AppField name="weight">
-                {(field) => <field.WeightField label="Gewichtung (0-100%)" />}
-              </form.AppField>
-
-              <form.AppField name="score">
-                {(field) => <field.GradeScoreField label="Note (1-6)" />}
-              </form.AppField>
-            </div>
-          </div>
-        </div>
+          <form.AppField name="score">
+            {(field) => <field.GradeScoreField label="Note (1-6)" />}
+          </form.AppField>
+        </FormContainer>
 
         <SubmitButton
           onClick={handleAddGrade}

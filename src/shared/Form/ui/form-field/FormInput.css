@@ -1,3 +1,20 @@
+ion-select.form-input {
+  --padding-bottom: 20px;
+}
+
+ion-input.form-input {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --padding-top: 10px; /* gleichmäßiges Vertical Padding */
+  --padding-bottom: 10px;
+
+  --background: rgba(255, 255, 255, 0.08);
+  --border-radius: 8px;
+
+  height: 44px; /* Host-Höhe */
+}
+
+/* Input Row */
 .input-row {
   display: flex;
   align-items: flex-start;
@@ -25,17 +42,6 @@
   border-bottom: 1px solid rgba(255, 59, 48, 0.2);
 }
 
-.input-row.error .form-input {
-  border: 1px solid rgba(255, 59, 48, 0.3);
-  background: rgba(255, 59, 48, 0.05);
-  animation: errorShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
-}
-
-.input-row.error .feedback-area {
-  height: 0;
-  margin-top: 0;
-}
-
 .field-icon-wrapper {
   width: 32px;
   height: 32px;
@@ -48,6 +54,36 @@
   flex-shrink: 0;
   align-self: flex-start;
   margin-top: 16px;
+}
+
+.field-error {
+  color: #ff3b30;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  animation: errorSlideIn 0.3s ease-out;
+  margin-bottom: 4px;
+}
+
+.field-error::before {
+  content: '⚠';
+  font-size: 10px;
+}
+
+.message-area {
+  height: 13px;
+  margin-top: 2px;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.input-row.error .feedback-area {
+  height: 0;
+  margin-top: 0;
 }
 
 .field-content {
@@ -122,7 +158,80 @@ textarea.form-input {
   overflow: hidden;
 }
 
+/* Field Icon */
+.field-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 16px;
+}
+
+.field-icon {
+  width: 14px;
+  height: 14px;
+  color: white;
+}
+
+/* Field Content */
+.field-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 4px;
+  letter-spacing: -0.1px;
+  line-height: 1.2;
+}
+
+/* Input Styling - iOS native feel */
+.form-input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  font-weight: 400;
+  color: #000000;
+  transition: all 0.2s ease;
+  outline: none;
+  appearance: none;
+  /* slightly smaller min-height so numeric inputs aren't oversized */
+  min-height: 8px;
+}
+
+.success-icon {
+  width: 64px;
+  height: 64px;
+  color: #22c55e;
+  margin-bottom: 16px;
+  animation: successIconScale 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s
+    both;
+}
+
 @media (max-width: 450px) {
+  .field-icon {
+    width: 18px;
+    height: 18px;
+  }
+
   .form-input {
     font-size: 16px;
     padding: 10px 12px;
@@ -162,9 +271,13 @@ textarea.form-input {
   }
 }
 
-@media (prefers-contrast: high) {
+@media (prefers-contrast: more) {
   .form-input {
     border-width: 2px;
+  }
+
+  .field-error {
+    font-weight: 600;
   }
 }
 

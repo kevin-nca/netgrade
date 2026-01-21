@@ -1,6 +1,6 @@
 import React from 'react';
 import { IonIcon } from '@ionic/react';
-import './FormInput.module.css';
+import './FormInput.css';
 
 interface FormFieldRowProps {
   icon: string;
