@@ -10,6 +10,7 @@ import initSqlJs from 'sql.js';
 // Migrations
 import { Initdb1745319232244 } from './migrations/1745319232244-initdb';
 import { DropDescriptionFromSubject1761134134122 } from './migrations/1761134134122-drop_description_from_subject';
+import { Semester } from '@/db/entities/Semester';
 
 // Reference: https://github.com/sql-js/react-sqljs-demo/blob/master/src/App.js
 (window as { localforage?: typeof localforage }).localforage = localforage;
@@ -19,7 +20,7 @@ import { DropDescriptionFromSubject1761134134122 } from './migrations/1761134134
 const DATABASE_NAME = 'netgrade-db';
 const BROWSER_DB_LOCATION = 'netgrade-db-browser';
 
-export const ENTITIES = [Exam, Grade, School, Subject];
+export const ENTITIES = [Exam, Grade, School, Subject, Semester];
 
 let AppDataSource: DataSource | null = null;
 
@@ -28,6 +29,7 @@ interface AppRepositories {
   grade: Repository<Grade>;
   school: Repository<School>;
   subject: Repository<Subject>;
+  semester: Repository<Semester>;
 }
 
 let repositories: AppRepositories | null = null;
@@ -120,6 +122,7 @@ export const initializeDatabase = async (): Promise<DataSource> => {
       grade: AppDataSource.getRepository(Grade),
       school: AppDataSource.getRepository(School),
       subject: AppDataSource.getRepository(Subject),
+      semester: AppDataSource.getRepository(Semester),
     };
     console.log('Repositories initialized.');
 
