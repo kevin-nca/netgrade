@@ -47,7 +47,6 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
         id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name: value.newSubjectName.trim(),
         teacher: null,
-        description: null,
         schoolId: '',
       };
 
