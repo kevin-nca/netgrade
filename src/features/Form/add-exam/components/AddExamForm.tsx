@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { IonContent, IonIcon, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { addOutline, checkmarkCircleOutline } from 'ionicons/icons';
+import { checkmarkCircleOutline } from 'ionicons/icons';
 import { format } from 'date-fns';
 import { useAddExam, useSchools, useSchoolSubjects } from '@/hooks';
-import { useAppForm } from '@/components/Form2/form';
+import { useAppForm } from '@/shared/Form/ui/form';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import { Routes } from '@/routes';
-import '@/components/Form2/feature/AddGradeExamForm.css';
+import '@/features/Form/AddGradeExamForm.css';
 import {
   examFormSchema,
   type ExamFormData,
-} from '@/components/Form2/feature/examFormSchemaExam';
+} from '@/features/Form/add-exam/schema/examFormSchemaExam';
+import SubmitButton from '@/shared/components/submitButton';
 
 const AddExamForm: React.FC = () => {
   const history = useHistory();
@@ -32,8 +33,8 @@ const AddExamForm: React.FC = () => {
 
   const form = useAppForm({
     defaultValues: {
-      selectedSchool: schools?.length === 1 ? schools[0] : null,
-      selectedSubject: subjects?.length === 1 ? subjects[0] : null,
+      selectedSchool: null,
+      selectedSubject: null,
       examName: '',
       date: format(new Date(), 'yyyy-MM-dd'),
       description: '',
@@ -154,22 +155,12 @@ const AddExamForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="button-section">
-          <button
-            className="glass-button primary"
-            onClick={handleAddExam}
-            disabled={addExamMutation.isPending}
-          >
-            <IonIcon icon={addOutline} className="button-icon" />
-            <span className="button-text">
-              {addExamMutation.isPending
-                ? 'Wird hinzugefügt...'
-                : 'Prüfung hinzufügen'}
-            </span>
-          </button>
-        </div>
-
-        <div className="bottom-spacer" />
+        <SubmitButton
+          onClick={handleAddExam}
+          isLoading={addExamMutation.isPending}
+          loadingText="Wird hinzugefügt..."
+          text="Note hinzufügen"
+        />
 
         <NavigationModal
           isOpen={showNavigationModal}

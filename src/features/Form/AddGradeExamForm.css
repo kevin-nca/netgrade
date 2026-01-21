@@ -1,0 +1,738 @@
+/* Base glassmorphism card styles */
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* Page Layout */
+.add-grade-page {
+  background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+  --background: transparent;
+  overflow: hidden;
+}
+
+.add-grade-content {
+  --background: transparent;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content-wrapper {
+  padding: 0 20px 0 20px;
+  max-width: 100%;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Gradient Orb for visual interest */
+.gradient-orb {
+  position: absolute;
+  top: -100px;
+  left: -120px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 122, 255, 0.08) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* Form Group - Subtle container for form only */
+.form-group {
+  position: relative;
+  padding: 12px 12px 8px 12px;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 122, 255, 0.02) 0%,
+    rgba(0, 122, 255, 0.01) 100%
+  );
+  border: 1px solid rgba(0, 122, 255, 0.08);
+  margin-bottom: 160px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+
+  /* nudge the whole form slightly upward so inputs sit closer to the header */
+  transform: translateY(-8px);
+}
+
+/* Form Card - Cleaner iOS style */
+.form-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: none;
+  box-shadow:
+    0 2px 20px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(255, 255, 255, 1) inset;
+  border-radius: 12px;
+  padding: 16px 16px;
+  margin-bottom: 0;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+  -webkit-scroll-behavior: smooth;
+  scroll-behavior: smooth;
+  position: relative;
+}
+
+.form-card::-webkit-scrollbar {
+  display: none;
+}
+
+/* Form Fields Container */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+ion-select.form-input {
+  --padding-bottom: 20px;
+}
+
+ion-input.form-input {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --padding-top: 10px; /* gleichmäßiges Vertical Padding */
+  --padding-bottom: 10px;
+
+  --background: rgba(255, 255, 255, 0.08);
+  --border-radius: 8px;
+
+  height: 44px; /* Host-Höhe */
+}
+
+/* Input Row */
+.input-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+  min-height: 58px;
+}
+
+.input-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: -12px;
+}
+
+.input-row:focus-within {
+  background: rgba(0, 122, 255, 0.02);
+  border-bottom: 1px solid rgba(0, 122, 255, 0.1);
+}
+
+.input-row.error {
+  background: rgba(255, 59, 48, 0.02);
+  border-bottom: 1px solid rgba(255, 59, 48, 0.2);
+}
+
+/* Field Icon */
+.field-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 16px;
+}
+
+.field-icon {
+  width: 14px;
+  height: 14px;
+  color: white;
+}
+
+/* Field Content */
+.field-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 4px;
+  letter-spacing: -0.1px;
+  line-height: 1.2;
+}
+
+/* Input Styling - iOS native feel */
+.form-input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  font-weight: 400;
+  color: #000000;
+  transition: all 0.2s ease;
+  outline: none;
+  appearance: none;
+  /* slightly smaller min-height so numeric inputs aren't oversized */
+  min-height: 8px;
+}
+
+.form-input,
+input.form-input,
+textarea.form-input,
+select.form-input {
+  box-sizing: border-box;
+  height: 44px;
+  min-height: 44px;
+  line-height: 1.2;
+}
+
+select.form-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 8px center;
+  background-repeat: no-repeat;
+  background-size: 16px 12px;
+  padding-right: 32px;
+}
+
+select.form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+select.form-input option {
+  background: #ffffff;
+  color: #000000;
+  padding: 8px;
+}
+
+/* Weight Input Container */
+.weight-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weight-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.weight-quick-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.weight-preset-btn {
+  background: rgba(0, 122, 255, 0.1);
+  border: 1px solid rgba(0, 122, 255, 0.2);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #007aff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.weight-preset-btn:hover {
+  background: rgba(0, 122, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.3);
+}
+
+.weight-preset-btn:active {
+  background: rgba(0, 122, 255, 0.2);
+}
+
+/* Success Overlay */
+.success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeInOverlay 0.3s ease-out;
+}
+
+.success-content {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+  padding: 48px 32px;
+  text-align: center;
+  max-width: 320px;
+  margin: 0 20px;
+  animation: successBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.success-icon {
+  width: 64px;
+  height: 64px;
+  color: #22c55e;
+  margin-bottom: 16px;
+  animation: successIconScale 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s
+  both;
+}
+
+.success-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.4px;
+}
+
+.success-message {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Form Progress Indicator */
+.form-progress-container {
+  margin: 8px 0 12px;
+  padding: 0 2px;
+}
+
+.form-progress {
+  height: 3px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: progressShimmer 2s infinite;
+}
+
+.progress-text {
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.4);
+  font-weight: 500;
+  text-align: center;
+  display: block;
+}
+
+/* Error States */
+.input-row.error .form-input {
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  background: rgba(255, 59, 48, 0.05);
+  animation: errorShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+.field-error {
+  color: #ff3b30;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  animation: errorSlideIn 0.3s ease-out;
+  margin-bottom: 4px;
+}
+
+.field-error::before {
+  content: '⚠';
+  font-size: 10px;
+}
+
+.message-area {
+  height: 13px;
+  margin-top: 2px;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.feedback-area {
+  /* height: 20px; */
+  /* margin-top: 2px; */
+  /* display: flex; */
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+.input-row.error .feedback-area {
+  height: 0;
+  margin-top: 0;
+}
+
+.field-suggestion {
+  color: #007aff;
+  font-size: 9px;
+  font-weight: 550;
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  animation: suggestionFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 1px 8px;
+  background: rgba(0, 122, 255, 0.05);
+  border-radius: 4px;
+  border-left: 2px solid rgba(0, 122, 255, 0.2);
+  transform-origin: top;
+}
+
+
+
+/* Enhanced Focus States */
+.form-input:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Required field indicator */
+.field-label::after {
+  content: '';
+}
+
+/* Responsive Design */
+@media (max-width: 450px) {
+  .content-wrapper {
+    padding: 0 16px 16px;
+  }
+
+  .form-card {
+    padding: 16px;
+  }
+
+  .input-row {
+    gap: 10px;
+  }
+
+  .field-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .field-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .form-input {
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+}
+
+/* iPhone SE and smaller screens */
+@media (max-width: 375px) {
+  .form-fields {
+    gap: 14px;
+  }
+
+  .form-section {
+    margin-bottom: 20px;
+  }
+}
+
+/* Enhanced Mobile Input Support */
+@media (pointer: coarse) {
+  .form-input {
+    font-size: 16px; /* Prevent zoom on iOS */
+    min-height: 44px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .input-row {
+    min-height: 56px;
+  }
+
+  .field-icon-wrapper {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: more) {
+  .form-card,
+  .form-input {
+    border-width: 2px;
+  }
+
+  .field-error {
+    font-weight: 600;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .add-grade-page {
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  }
+
+  .form-group {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.04) 0%,
+      rgba(0, 122, 255, 0.02) 100%
+    );
+    border: 1px solid rgba(0, 122, 255, 0.15);
+  }
+
+  .form-group::before {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.2),
+      transparent 30%,
+      transparent 70%,
+      rgba(0, 122, 255, 0.1)
+    );
+  }
+
+  .form-card {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow:
+      0 2px 20px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  }
+
+  .input-row {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .input-row:focus-within {
+    background: rgba(0, 122, 255, 0.05);
+    border-bottom-color: rgba(0, 122, 255, 0.2);
+  }
+
+  .input-row.error {
+    background: rgba(255, 59, 48, 0.05);
+    border-bottom-color: rgba(255, 59, 48, 0.3);
+  }
+
+  .form-input {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .form-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .form-input:focus {
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      inset 0 1px 2px rgba(0, 0, 0, 0.3),
+      0 0 0 2px rgba(0, 122, 255, 0.3);
+  }
+
+  select.form-input:disabled {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .field-label {
+    color: #ffffff;
+  }
+
+  .section-icon {
+    color: #007aff;
+  }
+
+  .gradient-orb {
+    background: radial-gradient(
+      circle,
+      rgba(0, 122, 255, 0.12) 0%,
+      transparent 70%
+    );
+  }
+
+  .success-content {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.08) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .success-title {
+    color: #ffffff;
+  }
+
+  .success-message {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .form-progress {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .progress-text {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .field-error {
+    color: #ff6b6b;
+  }
+
+  .field-suggestion {
+    color: #4da6ff;
+    background: rgba(0, 122, 255, 0.08);
+    border-left-color: rgba(0, 122, 255, 0.3);
+  }
+
+  .feedback-area {
+    background: transparent;
+  }
+
+  .weight-preset-btn {
+    background: rgba(0, 122, 255, 0.15);
+    border-color: rgba(0, 122, 255, 0.3);
+    color: #4da6ff;
+  }
+
+  .weight-preset-btn:hover {
+    background: rgba(0, 122, 255, 0.2);
+    border-color: rgba(0, 122, 255, 0.4);
+  }
+
+  .form-progress {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .progress-text {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .input-row,
+  .form-input {
+    transition: none;
+  }
+
+  .progress-bar::after {
+    animation: none;
+  }
+
+  .success-overlay,
+  .success-content,
+  .success-icon {
+    animation: none;
+  }
+
+  .input-row.error .form-input {
+    animation: none;
+  }
+
+  .field-error {
+    animation: none;
+  }
+
+  .field-suggestion {
+    animation: none;
+  }
+
+  .weight-preset-btn:hover {
+    transform: none;
+  }
+}

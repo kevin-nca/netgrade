@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { IonContent, IonIcon, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { addOutline, checkmarkCircleOutline } from 'ionicons/icons';
+import { checkmarkCircleOutline } from 'ionicons/icons';
 import { format, parseISO } from 'date-fns';
 import {
   useAddGradeWithExam,
@@ -10,15 +10,16 @@ import {
 } from '@/hooks/queries';
 import { percentageToDecimal } from '@/utils/validation';
 import { Routes } from '@/routes';
-import { useAppForm } from '@/components/Form2/form';
+import { useAppForm } from '@/shared/Form/ui/form';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-import '@/components/Form2/feature/AddGradeExamForm.css';
+import SubmitButton from '@/shared/components/submitButton';
+import '@/features/Form/AddGradeExamForm.css';
 import {
   gradeFormSchema,
   type GradeFormData,
-} from '@/components/Form2/feature/examFormSchemaGrade';
+} from '@/features/Form/add-grade/schema/examFormSchemaGrade';
 
 const AddGradeForm: React.FC = () => {
   const history = useHistory();
@@ -37,8 +38,8 @@ const AddGradeForm: React.FC = () => {
 
   const form = useAppForm({
     defaultValues: {
-      selectedSchool: schools?.length === 1 ? schools[0] : null,
-      selectedSubject: subjects?.length === 1 ? subjects[0] : null,
+      selectedSchool: null,
+      selectedSubject: null,
       examName: '',
       date: format(new Date(), 'yyyy-MM-dd'),
       weight: '',
@@ -166,22 +167,12 @@ const AddGradeForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="button-section">
-          <button
-            className="glass-button primary"
-            onClick={handleAddGrade}
-            disabled={addGradeWithExamMutation.isPending}
-          >
-            <IonIcon icon={addOutline} className="button-icon" />
-            <span className="button-text">
-              {addGradeWithExamMutation.isPending
-                ? 'Wird hinzugefügt...'
-                : 'Note hinzufügen'}
-            </span>
-          </button>
-        </div>
-
-        <div className="bottom-spacer" />
+        <SubmitButton
+          onClick={handleAddGrade}
+          isLoading={addGradeWithExamMutation.isPending}
+          loadingText="Wird hinzugefügt..."
+          text="Note hinzufügen"
+        />
 
         <NavigationModal
           isOpen={showNavigationModal}

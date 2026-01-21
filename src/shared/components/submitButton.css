@@ -1,0 +1,317 @@
+.glass-button:hover:not(:disabled) {
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.35);
+}
+
+.glass-button:active:not(:disabled) {
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.25);
+}
+
+.glass-button {
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.25);
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Button Section - Fixed position with optimal visual width */
+.button-section {
+  position: fixed;
+  bottom: 100px;
+  left: 16px;
+  right: 16px;
+  z-index: 100;
+  padding: 12px;
+  padding-bottom: 12px;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 122, 255, 0.02) 0%,
+    rgba(0, 122, 255, 0.01) 100%
+  );
+  border: 1px solid rgba(0, 122, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    0 -4px 20px rgba(245, 245, 247, 0.8);
+}
+
+.button-section .glass-button {
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.25);
+  margin: 0;
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-button.primary {
+  width: 100%;
+  height: 54px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 600;
+  color: white;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.glass-button.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.15);
+}
+
+.button-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.button-text {
+  font-weight: 600;
+}
+
+/* Loading state shimmer effect */
+.glass-button.primary:disabled::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(20px);
+  }
+}
+
+@keyframes successBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(100px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translateY(-10px);
+  }
+  70% {
+    transform: scale(0.98) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes successIconScale {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes errorShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes errorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes loadingShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes suggestionFadeIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0.3) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
+}
+
+@keyframes suggestionSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Improved button states */
+.glass-button.primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-button.primary:disabled::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: loadingShimmer 1.5s infinite;
+}
+
+/* Bottom Spacer - Removed since button is now sticky */
+.bottom-spacer {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 450px) {
+  .glass-button.primary {
+    height: 52px;
+    font-size: 16px;
+  }
+}
+
+/* Enhanced Mobile Input Support */
+@media (pointer: coarse) {
+  .glass-button.primary {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: more) {
+  .glass-button.primary {
+    border: 2px solid #0051d5;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .button-section {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 122, 255, 0.04) 0%,
+      rgba(0, 122, 255, 0.02) 100%
+    );
+    border: 1px solid rgba(0, 122, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 -4px 20px rgba(26, 26, 26, 0.8);
+  }
+
+  .button-section .glass-button {
+    background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+    color: white;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .glass-button{
+    transition: none;
+  }
+
+  .glass-button:hover {
+    transform: none;
+  }
+
+  .glass-button.primary::before{
+    animation: none;
+  }
+  }
+
