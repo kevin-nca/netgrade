@@ -31,7 +31,7 @@ export class AddSemester1737400000000 implements MigrationInterface {
                                "teacher"       varchar,
                                "weight"        float                        DEFAULT (1),
                                "schoolId"      varchar             NOT NULL,
-                               "semesterId"    varchar,  -- Ohne NOT NULL!
+                               "semesterId"    varchar,
                                CONSTRAINT "FK_c59658ffb3910e021a307b44b3c" FOREIGN KEY ("schoolId") REFERENCES "school" ("id") ON DELETE CASCADE ON UPDATE NO ACTION,
                                CONSTRAINT "FK_subject_semester" FOREIGN KEY ("semesterId") REFERENCES "semester" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
                              )`);
@@ -47,7 +47,7 @@ export class AddSemester1737400000000 implements MigrationInterface {
                                     "teacher",
                                     "weight",
                                     "schoolId",
-                                    NULL  -- NULL statt ''
+                                    NULL
                              FROM "subject"`);
 
     await queryRunner.query(`DROP TABLE "subject"`);
