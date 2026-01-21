@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { DescriptionField } from '@/components/Form2/fields/DescriptionField';
+import { DescriptionField } from '@/shared/Form/ui/form-fields/DescriptionField';
 import type { Mock } from 'vitest';
-import { useFieldContext } from '@/components/Form2/form';
+import { useFieldContext } from '@/shared/Form/ui/form';
 
-vi.mock('@/components/Form2/form');
+vi.mock('@/shared/Form/ui/form');
 vi.mock('@ionic/react', () => ({
   IonInput: (props: {
     value?: string;
@@ -20,7 +20,7 @@ vi.mock('@ionic/react', () => ({
     />
   ),
 }));
-vi.mock('@/components/Form2/form-field/FormInput', () => ({
+vi.mock('@/shared/Form/ui/form-field/FormInput.tsx', () => ({
   default: (props: { children: React.ReactNode }) => (
     <div>{props.children}</div>
   ),

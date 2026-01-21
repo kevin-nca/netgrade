@@ -1,11 +1,11 @@
 import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { GradeScoreField } from '@/components/Form2/fields/GradeScoreField';
-import { useFieldContext } from '@/components/Form2/form';
+import { GradeScoreField } from '@/shared/Form/ui/form-fields/GradeScoreField';
+import { useFieldContext } from '@/shared/Form/ui/form';
 import '@testing-library/jest-dom';
 
-vi.mock('@/components/Form2/form');
+vi.mock('@/shared/Form/ui/form');
 vi.mock('@ionic/react', () => ({
   IonInput: (props: {
     value?: number;
@@ -23,7 +23,7 @@ vi.mock('@ionic/react', () => ({
     />
   ),
 }));
-vi.mock('@/components/Form2/form-field/FormInput', () => ({
+vi.mock('@/shared/Form/ui/form-field/FormInput.tsx', () => ({
   default: (props: { children: React.ReactNode; error?: string }) => (
     <div>
       {props.error && <span data-testid="error-message">{props.error}</span>}

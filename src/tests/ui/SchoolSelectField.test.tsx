@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { Mock } from 'vitest';
-import { SchoolSelectField } from '@/components/Form2/fields/SchoolSelectField';
-import { useFieldContext } from '@/components/Form2/form';
+import { SchoolSelectField } from '@/shared/Form/ui/form-fields/SchoolSelectField';
+import { useFieldContext } from '@/shared/Form/ui/form';
 import type { School } from '@/db/entities';
 
-vi.mock('@/components/Form2/form');
+vi.mock('@/shared/Form/ui/form');
 
 vi.mock('@ionic/react', () => ({
   IonSelect: (props: {
@@ -28,7 +28,7 @@ vi.mock('@ionic/react', () => ({
   ),
 }));
 
-vi.mock('@/components/Form2/form-field/FormInput', () => ({
+vi.mock('@/shared/Form/ui/form-field/FormInput.tsx', () => ({
   default: (props: { children: React.ReactNode }) => (
     <div>{props.children}</div>
   ),
