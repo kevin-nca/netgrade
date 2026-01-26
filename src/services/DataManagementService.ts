@@ -2,7 +2,7 @@ import { PreferencesService } from './PreferencesService';
 import { getDataSource, getRepositories } from '@/db/data-source';
 import { School } from '@/db/entities';
 import * as XLSX from 'xlsx';
-import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
 
@@ -55,6 +55,7 @@ export class DataManagementService {
         await transactionManager.query('DELETE FROM grade');
         await transactionManager.query('DELETE FROM exam');
         await transactionManager.query('DELETE FROM subject');
+        await transactionManager.query('DELETE FROM semester');
         await transactionManager.query('DELETE FROM school');
       });
 
