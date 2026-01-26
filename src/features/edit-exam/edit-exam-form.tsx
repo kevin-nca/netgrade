@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import {
   IonButton,
   IonCard,
@@ -10,18 +9,18 @@ import {
 import { saveOutline } from 'ionicons/icons';
 import { useAppForm } from '@/shared/components/form';
 import { useExam, useSubjects, useUpdateExam } from '@/hooks';
-import styles from '../../../pages/home/exams/EditExamPage/styles/FormCommon.module.css';
+import styles from '@/features/edit-exam/styles/FormCommon.module.css';
 import {
   editExamSchema,
   type EditExamFormData,
 } from '@/features/edit-exam/schema/edit-exam-schema';
 
 interface EditExamFormProps {
+  examId: string;
   onSuccess?: () => void;
 }
 
-export function EditExamForm({ onSuccess }: EditExamFormProps) {
-  const { examId } = useParams<{ examId: string }>();
+export function EditExamForm({ examId, onSuccess }: EditExamFormProps) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
 import {
   IonAlert,
   IonBackButton,
@@ -48,10 +47,7 @@ import {
 import { Routes } from '@/routes';
 import styles from '@/pages/home/exams/EditExamPage/EditExamPage.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import {
-  ExamParams,
-  GradeFormData,
-} from '@/pages/home/exams/EditExamPage/types';
+import { GradeFormData } from '@/pages/home/exams/EditExamPage/types';
 import {
   formatDate,
   getGradeColor,
@@ -59,21 +55,21 @@ import {
 import { EditExamForm } from '@/features/edit-exam/edit-exam-form';
 import { GradeForm } from '@/pages/home/exams/EditExamPage/components/GradeForm';
 
-interface ExamDetailsPageProps {
+interface ExamDetailsFormProps {
+  examId: string;
   onGradeSuccess?: () => void;
   onDeleteSuccess?: () => void;
   onEditSuccess?: () => void;
   onError?: () => void;
 }
 
-const ExamDetailsForm: React.FC<ExamDetailsPageProps> = ({
+const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
+  examId,
   onGradeSuccess,
   onDeleteSuccess,
   onEditSuccess,
   onError,
 }) => {
-  const { examId } = useParams<ExamParams>();
-
   const { data: exam, error } = useExam(examId);
   const { data: subjects = [] } = useSubjects();
 
@@ -269,7 +265,7 @@ const ExamDetailsForm: React.FC<ExamDetailsPageProps> = ({
             </IonSegment>
 
             {segmentValue === 'details' ? (
-              <EditExamForm onSuccess={onEditSuccess} />
+              <EditExamForm examId={examId} onSuccess={onEditSuccess} />
             ) : (
               <GradeForm
                 formValues={gradeForm.state.values as GradeFormData}

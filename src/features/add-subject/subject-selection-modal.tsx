@@ -6,7 +6,7 @@ import {
   subjectFormSchema,
   type SubjectFormData,
 } from '@/features/add-subject/subject-form-schema';
-import styles from '../../../components/navigation/SubjectSelectionModal.module.css';
+import styles from '@/components/navigation/SubjectSelectionModal.module.css';
 
 interface SubjectSelectionSlideUpProps {
   isOpen: boolean;

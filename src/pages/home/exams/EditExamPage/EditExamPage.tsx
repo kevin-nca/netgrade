@@ -1,11 +1,12 @@
 import React from 'react';
 import { IonPage } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import ExamDetailsForm from '@/features/edit-exam/exam-details-form';
 import { Routes } from '@/routes';
 
 const EditExamPage: React.FC = () => {
   const history = useHistory();
+  const { examId } = useParams<{ examId: string }>();
 
   const handleSubmit = () => {
     history.replace(Routes.HOME);
@@ -14,6 +15,7 @@ const EditExamPage: React.FC = () => {
   return (
     <IonPage>
       <ExamDetailsForm
+        examId={examId}
         onGradeSuccess={handleSubmit}
         onDeleteSuccess={handleSubmit}
         onEditSuccess={handleSubmit}

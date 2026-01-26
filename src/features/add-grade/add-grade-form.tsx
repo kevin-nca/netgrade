@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { IonContent, IonToast } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import {
   useAddGradeWithExam,
@@ -8,7 +7,6 @@ import {
   useSchoolSubjects,
 } from '@/hooks/queries';
 import { percentageToDecimal } from '@/utils/validation';
-import { Routes } from '@/routes';
 import { useAppForm } from '@/shared/components/form';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
@@ -21,8 +19,11 @@ import {
   type GradeFormData,
 } from '@/features/add-grade/schema/exam-form-schema-grade';
 
-const AddGradeForm: React.FC = () => {
-  const history = useHistory();
+interface AddGradeFormProps {
+  onSuccess?: () => void;
+}
+
+const AddGradeForm: React.FC<AddGradeFormProps> = ({ onSuccess }) => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
@@ -66,7 +67,9 @@ const AddGradeForm: React.FC = () => {
           setShowSuccess(true);
           form.reset();
           setSelectedSchoolId('');
-          setTimeout(() => history.push(Routes.HOME), 1200);
+          setTimeout(() => {
+            onSuccess?.();
+          }, 1200);
         },
         onError: (error) => {
           setToastMessage(

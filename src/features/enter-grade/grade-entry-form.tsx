@@ -8,7 +8,6 @@ import {
   IonToast,
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
-import { useHistory, useParams } from 'react-router-dom';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import GradeListItem from '@/components/List/GradeListItem';
@@ -21,20 +20,23 @@ import {
 } from '@/hooks/queries';
 import { decimalToPercentage, percentageToDecimal } from '@/utils/validation';
 import { Layout } from '@/components/Layout/Layout';
-import { Routes } from '@/routes';
 import { useAppForm } from '@/shared/components/form';
 import {
   type EditGradeFormData,
   editGradeSchema,
-  type GradeEntryParams,
 } from '@/features/enter-grade/schema/grade-entry-form-schema';
 import SubmitButton from '@/shared/components/submitt-button/submit-button';
 import CancelButton from '@/shared/components/cancel-button/cancel-button';
 
-const GradeEntryForm: React.FC = () => {
-  const { subjectId } = useParams<GradeEntryParams>();
-  const history = useHistory();
+interface GradeEntryFormProps {
+  subjectId: string;
+  onAddGrade?: () => void;
+}
 
+const GradeEntryForm: React.FC<GradeEntryFormProps> = ({
+  subjectId,
+  onAddGrade,
+}) => {
   const { data: grades } = useSubjectGrades(subjectId);
   const { data: subject } = useSubject(subjectId);
 
@@ -141,14 +143,11 @@ const GradeEntryForm: React.FC = () => {
         backButton
         onBack={() => window.history.back()}
         endSlot={
-          <IonButtons slot="end">
-            <Button
-              handleEvent={() => {
-                history.push(Routes.GRADES_ADD);
-              }}
-              text={<IonIcon icon={add} />}
-            />
-          </IonButtons>
+          onAddGrade ? (
+            <IonButtons slot="end">
+              <Button handleEvent={onAddGrade} text={<IonIcon icon={add} />} />
+            </IonButtons>
+          ) : undefined
         }
       />
       <IonContent>
