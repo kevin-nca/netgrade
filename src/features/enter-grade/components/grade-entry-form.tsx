@@ -27,7 +27,7 @@ import {
   type EditGradeFormData,
   editGradeSchema,
   type GradeEntryParams,
-} from '@/features/enter-grade/schema/gradeEntryFormShema';
+} from '@/features/enter-grade/schema/grade-entry-form-schema';
 import SubmitButton from '@/shared/components/submitt-button/submit-button';
 import CancelButton from '@/shared/components/cancel-button/cancel-button';
 

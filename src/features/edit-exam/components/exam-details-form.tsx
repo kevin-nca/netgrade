@@ -56,7 +56,7 @@ import {
   formatDate,
   getGradeColor,
 } from '@/pages/home/exams/EditExamPage/utils';
-import { EditExamForm } from '@/features/edit-exam/components/EditExamForm';
+import { EditExamForm } from '@/features/edit-exam/components/edit-exam-form';
 import { GradeForm } from '@/pages/home/exams/EditExamPage/components/GradeForm';
 
 interface ExamDetailsPageProps {

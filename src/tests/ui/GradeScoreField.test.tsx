@@ -1,7 +1,7 @@
 import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { GradeScoreField } from '@/features/add-grade/fields/GradeScoreField';
+import { GradeScoreField } from '@/features/add-grade/fields/grade-score-field';
 import { useFieldContext } from '@/shared/components/form';
 import '@testing-library/jest-dom';
 

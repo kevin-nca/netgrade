@@ -5,7 +5,7 @@ import { useAppForm } from '@/shared/components/form';
 import {
   subjectFormSchema,
   type SubjectFormData,
-} from '@/features/add-subject/subjectFormSchema';
+} from '@/features/add-subject/subject-form-schema';
 import styles from '../../../components/navigation/SubjectSelectionModal.module.css';
 
 interface SubjectSelectionSlideUpProps {

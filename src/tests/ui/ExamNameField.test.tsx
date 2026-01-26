@@ -2,7 +2,7 @@ import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useFieldContext } from '@/shared/components/form';
-import { ExamNameField } from '../../features/add-exam/fields/ExamNameField';
+import { ExamNameField } from '@/features/add-exam/fields/exam-name-field';
 
 vi.mock('@/shared/components/form');
 vi.mock('@ionic/react', () => ({

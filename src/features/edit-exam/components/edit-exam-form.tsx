@@ -14,7 +14,7 @@ import styles from '../../../pages/home/exams/EditExamPage/styles/FormCommon.mod
 import {
   editExamSchema,
   type EditExamFormData,
-} from '@/features/edit-exam/schema/editExamSchema';
+} from '@/features/edit-exam/schema/edit-exam-schema';
 
 interface EditExamFormProps {
   onSuccess?: () => void;

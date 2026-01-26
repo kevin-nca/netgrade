@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { DescriptionField } from '@/features/form-fields/DescriptionField';
+import { DescriptionField } from '@/features/form-fields/description-field';
 import type { Mock } from 'vitest';
 import { useFieldContext } from '@/shared/components/form';
 

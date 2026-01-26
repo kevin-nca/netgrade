@@ -1,7 +1,7 @@
 import React from 'react';
 import { IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import ExamDetailsForm from '../../../../features/edit-exam/components/ExamDetailsForm';
+import ExamDetailsForm from '@/features/edit-exam/components/exam-details-form';
 import { Routes } from '@/routes';
 
 const EditExamPage: React.FC = () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { Mock } from 'vitest';
-import { SchoolSelectField } from '@/features/add-school/fields/SchoolSelectField';
+import { SchoolSelectField } from '@/features/add-school/fields/school-select-field';
 import { useFieldContext } from '@/shared/components/form';
 import type { School } from '@/db/entities';
 

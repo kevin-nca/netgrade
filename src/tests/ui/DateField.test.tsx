@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { DateField } from '@/features/form-fields/DateField';
+import { DateField } from '@/features/form-fields/date-field';
 import type { Mock } from 'vitest';
 import { useFieldContext } from '@/shared/components/form';
 

@@ -13,7 +13,7 @@ import { useAppForm } from '@/shared/components/form';
 import {
   editSubjectFormSchema,
   type EditSubjectFormData,
-} from '@/features/edit-subject/schema/editSubjectFormSchema';
+} from '@/features/edit-subject/schema/edit-subject-form-schema';
 
 interface EditSubjectModalProps {
   isOpen: boolean;

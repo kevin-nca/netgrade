@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { IonContent, IonToast } from '@ionic/react';
-import { format } from 'date-fns';
-import { useAddExam, useSchools, useSchoolSubjects } from '@/hooks';
+import { useHistory } from 'react-router-dom';
+import { format, parseISO } from 'date-fns';
+import {
+  useAddGradeWithExam,
+  useSchools,
+  useSchoolSubjects,
+} from '@/hooks/queries';
+import { percentageToDecimal } from '@/utils/validation';
+import { Routes } from '@/routes';
 import { useAppForm } from '@/shared/components/form';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
@@ -10,15 +17,12 @@ import SubmitButton from '@/shared/components/submitt-button/submit-button';
 import FormContainer from '@/shared/components/form-layout/form-container';
 import SuccessOverlay from '@/shared/components/form-layout/succes-overlay';
 import {
-  examFormSchema,
-  type ExamFormData,
-} from '@/features/add-exam/schema/examFormSchemaExam';
+  gradeFormSchema,
+  type GradeFormData,
+} from '@/features/add-grade/schema/exam-form-schema-grade';
 
-interface AddExamFormProps {
-  onSuccess?: () => void;
-}
-
-const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
+const AddGradeForm: React.FC = () => {
+  const history = useHistory();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
@@ -30,7 +34,7 @@ const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
   const { data: subjects = [], error: subjectsError } =
     useSchoolSubjects(selectedSchoolId);
 
-  const addExamMutation = useAddExam();
+  const addGradeWithExamMutation = useAddGradeWithExam();
 
   const form = useAppForm({
     defaultValues: {
@@ -38,28 +42,31 @@ const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
       selectedSubject: null,
       examName: '',
       date: format(new Date(), 'yyyy-MM-dd'),
-      description: '',
-    } as ExamFormData,
+      weight: '',
+      score: undefined as number | undefined,
+      comment: '',
+    } as GradeFormData,
     validators: {
-      onSubmit: examFormSchema,
+      onSubmit: gradeFormSchema,
     },
     onSubmit: async ({ value }) => {
-      const examPayload = {
-        schoolId: value.selectedSchool!.id,
+      const scoreNumber = value.score!;
+      const weightNumber = +String(value.weight).replace(',', '.');
+
+      const gradePayload = {
         subjectId: value.selectedSubject!.id,
-        title: value.examName.trim(),
-        date: new Date(value.date + 'T12:00:00'),
-        description: value.description.trim(),
+        examName: value.examName.trim(),
+        date: parseISO(value.date),
+        score: scoreNumber,
+        weight: percentageToDecimal(weightNumber),
       };
 
-      addExamMutation.mutate(examPayload, {
+      addGradeWithExamMutation.mutate(gradePayload, {
         onSuccess: () => {
           setShowSuccess(true);
           form.reset();
           setSelectedSchoolId('');
-          setTimeout(() => {
-            onSuccess?.();
-          }, 1200);
+          setTimeout(() => history.push(Routes.HOME), 1200);
         },
         onError: (error) => {
           setToastMessage(
@@ -85,14 +92,14 @@ const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
     }
   }, [schoolsError, subjectsError]);
 
-  const handleAddExam = () => {
+  const handleAddGrade = () => {
     form.handleSubmit();
   };
 
   return (
     <>
       <Header
-        title="Prüfung hinzufügen"
+        title="Note hinzufügen"
         backButton
         onBack={() => window.history.back()}
       />
@@ -101,7 +108,7 @@ const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
         <SuccessOverlay
           show={showSuccess}
           title="Erfolgreich hinzugefügt!"
-          message="Die Prüfung wurde gespeichert"
+          message="Die Note wurde gespeichert"
         />
 
         <FormContainer>
@@ -141,18 +148,20 @@ const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
             {(field) => <field.DateField label="Datum" />}
           </form.AppField>
 
-          <form.AppField name="description">
-            {(field) => (
-              <field.DescriptionField label="Beschreibung (optional)" />
-            )}
+          <form.AppField name="weight">
+            {(field) => <field.WeightField label="Gewichtung (0-100%)" />}
+          </form.AppField>
+
+          <form.AppField name="score">
+            {(field) => <field.GradeScoreField label="Note (1-6)" />}
           </form.AppField>
         </FormContainer>
 
         <SubmitButton
-          onClick={handleAddExam}
-          isLoading={addExamMutation.isPending}
+          onClick={handleAddGrade}
+          isLoading={addGradeWithExamMutation.isPending}
           loadingText="Wird hinzugefügt..."
-          text="Prüfung hinzufügen"
+          text="Note hinzufügen"
         />
 
         <NavigationModal
@@ -177,4 +186,4 @@ const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
   );
 };
 
-export default AddExamForm;
+export default AddGradeForm;

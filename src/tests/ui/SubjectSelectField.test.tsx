@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { Mock } from 'vitest';
-import { SubjectSelectField } from '@/features/add-subject/fields/SubjectSelectField';
+import { SubjectSelectField } from '@/features/add-subject/fields/subject-select-field';
 import { useFieldContext } from '@/shared/components/form';
 import type { Subject } from '@/db/entities';
 
