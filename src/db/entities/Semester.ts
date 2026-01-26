@@ -1,21 +1,24 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '@/db/entities/BaseEntity';
-import { School } from './School';
 import { Subject } from './Subject';
+import { dateTransformer } from '@/db/utils';
 
 @Entity('semester')
 export class Semester extends BaseEntity {
   @Column({ type: 'varchar' })
   year!: string;
 
-  @Column({ type: 'uuid' })
-  schoolId!: string;
-
-  @ManyToOne(() => School, (school) => school.semesters, {
-    onDelete: 'CASCADE',
+  @Column({
+    type: 'date',
+    transformer: dateTransformer,
   })
-  @JoinColumn({ name: 'schoolId' })
-  school!: School;
+  startDate!: Date;
+
+  @Column({
+    type: 'date',
+    transformer: dateTransformer,
+  })
+  endDate!: Date;
 
   @OneToMany(() => Subject, (subject) => subject.semester)
   subjects!: Subject[];
