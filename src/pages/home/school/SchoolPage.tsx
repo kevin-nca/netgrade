@@ -16,7 +16,7 @@ import {
   IonPage,
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
-import SubjectSelectionModal from '@/features/add-subject/components/subject-selection-modal';
+import SubjectSelectionModal from '@/features/add-subject/subject-selection-modal';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import { Subject } from '@/db/entities';
@@ -28,7 +28,7 @@ import {
   useUpdateSubject,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
-import EditSubjectModal from '@/features/edit-subject/components/edit-subject-modal';
+import EditSubjectModal from '@/features/edit-subject/edit-subject-modal';
 import { SchoolService } from '@/services/SchoolService';
 import './SchoolPage.css';
 
