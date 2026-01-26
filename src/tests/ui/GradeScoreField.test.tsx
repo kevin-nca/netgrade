@@ -23,7 +23,7 @@ vi.mock('@ionic/react', () => ({
     />
   ),
 }));
-vi.mock('@/shared/Form/ui/form-field/FormInput.tsx', () => ({
+vi.mock('@/shared/Form/ui/form-field/form-input.tsx', () => ({
   default: (props: { children: React.ReactNode; error?: string }) => (
     <div>
       {props.error && <span data-testid="error-message">{props.error}</span>}

@@ -20,7 +20,7 @@ vi.mock('@ionic/react', () => ({
     />
   ),
 }));
-vi.mock('@/shared/Form/ui/form-field/FormInput.tsx', () => ({
+vi.mock('@/shared/Form/ui/form-field/form-input.tsx', () => ({
   default: (props: { children: React.ReactNode }) => (
     <div>{props.children}</div>
   ),

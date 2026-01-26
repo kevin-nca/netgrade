@@ -2,7 +2,7 @@ import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useFieldContext } from '@/shared/Form/ui/form';
-import { ExamNameField } from '../../shared/Form/ui/form-fields/ExamNameField';
+import { ExamNameField } from '../../features/add-exam/fields/ExamNameField';
 
 vi.mock('@/shared/Form/ui/form');
 vi.mock('@ionic/react', () => ({
@@ -20,7 +20,7 @@ vi.mock('@ionic/react', () => ({
     />
   ),
 }));
-vi.mock('@/shared/Form/ui/form-field/FormInput.tsx', () => ({
+vi.mock('@/shared/Form/ui/form-field/form-input.tsx', () => ({
   default: (props: { children: React.ReactNode }) => (
     <div>{props.children}</div>
   ),
