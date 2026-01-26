@@ -1,11 +1,145 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# .github/dependabot.yml
+# Dependabot configuration for npm dependencies
 
 version: 2
 updates:
-  - package-ecosystem: 'npm' # See documentation for possible values
-    directory: '/' # Location of package manifests
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
       interval: 'weekly'
+    open-pull-requests-limit: 10
+
+    groups:
+      # =====================
+      # React
+      # =====================
+      react-core:
+        patterns:
+          - 'react'
+          - 'react-dom'
+
+      react-types:
+        patterns:
+          - '@types/react*'
+
+      react-router:
+        patterns:
+          - 'react-router*'
+          - '@types/react-router*'
+
+      # =====================
+      # Ionic
+      # =====================
+      ionic-core:
+        patterns:
+          - '@ionic/*'
+          - 'ionicons'
+
+      ionic-native:
+        patterns:
+          - '@ionic-native/*'
+          - '@awesome-cordova-plugins/*'
+          - 'cordova-plugin-*'
+
+      # =====================
+      # Capacitor
+      # =====================
+      capacitor-core:
+        patterns:
+          - '@capacitor/core'
+          - '@capacitor/cli'
+          - '@capacitor/android'
+          - '@capacitor/ios'
+
+      capacitor-plugins:
+        patterns:
+          - '@capacitor/*'
+        exclude-patterns:
+          - '@capacitor/core'
+          - '@capacitor/cli'
+          - '@capacitor/android'
+          - '@capacitor/ios'
+
+      # =====================
+      # TanStack
+      # =====================
+      tanstack:
+        patterns:
+          - '@tanstack/*'
+
+      # =====================
+      # Testing
+      # =====================
+      vitest:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+
+      testing-library:
+        patterns:
+          - '@testing-library/*'
+
+      cypress:
+        patterns:
+          - 'cypress'
+
+      # =====================
+      # Build / Tooling
+      # =====================
+      vite-stack:
+        patterns:
+          - 'vite'
+          - '@vitejs/*'
+          - 'vite-plugin-*'
+          - 'terser'
+
+      typescript-stack:
+        patterns:
+          - 'typescript'
+          - 'typescript-eslint'
+
+      # =====================
+      # Linting / Formatting
+      # =====================
+      eslint-stack:
+        patterns:
+          - 'eslint'
+          - 'eslint-*'
+          - '@eslint/*'
+          - 'globals'
+
+      prettier:
+        patterns:
+          - 'prettier'
+
+      # =====================
+      # DOM / Browser
+      # =====================
+      jsdom:
+        patterns:
+          - 'jsdom'
+
+      # =====================
+      # Data / DB / Utils
+      # =====================
+      data-libs:
+        patterns:
+          - 'date-fns'
+          - 'localforage'
+          - 'reselect'
+          - 'reflect-metadata'
+
+      database:
+        patterns:
+          - 'typeorm'
+          - 'sql.js'
+
+      misc-ui:
+        patterns:
+          - 'react-calendar'
+          - 'swiper'
+
+      misc-utils:
+        patterns:
+          - 'xlsx'
+          - 'es6-promise-plugin'
