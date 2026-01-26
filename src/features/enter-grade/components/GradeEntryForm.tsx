@@ -28,6 +28,9 @@ import {
   editGradeSchema,
   type GradeEntryParams,
 } from '@/features/enter-grade/schema/gradeEntryFormShema';
+import SubmitButton from '@/shared/components/submitt-button/submit-button';
+import CancelButton from '@/shared/components/cancel-button/cancel-button';
+
 
 const GradeEntryForm: React.FC = () => {
   const { subjectId } = useParams<GradeEntryParams>();
@@ -194,11 +197,10 @@ const GradeEntryForm: React.FC = () => {
                   )}
                 </form.AppField>
 
-                <Button handleEvent={handleSaveEdit} text="Speichern" />
-                <Button
-                  handleEvent={cancelEdit}
+                <SubmitButton onClick={handleSaveEdit} text="Speichern" />
+                <CancelButton
                   text="Abbrechen"
-                  color="medium"
+                  onClick={cancelEdit}
                 />
               </div>
             </IonContent>

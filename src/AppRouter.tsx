@@ -10,11 +10,11 @@ import SchoolPage from '@/pages/home/school/SchoolPage';
 import AddGradePage from '@/pages/home/grades/AddGradePage';
 import MainPage from '@/pages/home/main/MainPage';
 import EditExamPage from '@/pages/home/exams/EditExamPage/EditExamPage';
-import { Routes } from '@/routes';
 
 import { EdgeSwipeBack } from '@/components/navigation/EdgeSwipeBack';
 import { IonReactRouter } from '@ionic/react-router';
 import { useOnboardingCompleted } from '@/hooks/queries';
+import { Routes } from '@/routes';
 
 export function AppRouter() {
   const { data: isOnboarded } = useOnboardingCompleted();

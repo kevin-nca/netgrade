@@ -18,7 +18,7 @@
 /* Button Section - Fixed position with optimal visual width */
 .button-section {
   position: fixed;
-  bottom: 100px;
+  bottom: 180px;
   left: 16px;
   right: 16px;
   z-index: 100;
