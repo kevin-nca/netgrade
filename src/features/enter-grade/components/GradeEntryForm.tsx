@@ -31,7 +31,6 @@ import {
 import SubmitButton from '@/shared/components/submitt-button/submit-button';
 import CancelButton from '@/shared/components/cancel-button/cancel-button';
 
-
 const GradeEntryForm: React.FC = () => {
   const { subjectId } = useParams<GradeEntryParams>();
   const history = useHistory();
@@ -198,10 +197,7 @@ const GradeEntryForm: React.FC = () => {
                 </form.AppField>
 
                 <SubmitButton onClick={handleSaveEdit} text="Speichern" />
-                <CancelButton
-                  text="Abbrechen"
-                  onClick={cancelEdit}
-                />
+                <CancelButton text="Abbrechen" onClick={cancelEdit} />
               </div>
             </IonContent>
           </IonModal>
