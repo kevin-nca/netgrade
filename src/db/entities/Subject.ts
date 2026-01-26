@@ -19,10 +19,11 @@ export class Subject extends BaseEntity {
   schoolId!: string;
 
   @Column({ type: 'uuid' })
-  semesterId!: string;
+  semesterId!: string | null;
 
   @ManyToOne(() => Semester, (semester) => semester.subjects, {
     onDelete: 'CASCADE',
+    nullable: true,
   })
   @JoinColumn({ name: 'semesterId' })
   semester!: Semester | null;
