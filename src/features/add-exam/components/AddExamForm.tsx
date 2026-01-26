@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { IonContent, IonToast } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAddExam, useSchools, useSchoolSubjects } from '@/hooks';
 import { useAppForm } from '@/shared/components/form';
@@ -10,14 +9,16 @@ import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import SubmitButton from '@/shared/components/submitt-button/submit-button';
 import FormContainer from '@/shared/components/form-layout/form-container';
 import SuccessOverlay from '@/shared/components/form-layout/succes-overlay';
-import { Routes } from '@/routes';
 import {
   examFormSchema,
   type ExamFormData,
 } from '@/features/add-exam/schema/examFormSchemaExam';
 
-const AddExamForm: React.FC = () => {
-  const history = useHistory();
+interface AddExamFormProps {
+  onSuccess?: () => void;
+}
+
+const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
@@ -56,7 +57,9 @@ const AddExamForm: React.FC = () => {
           setShowSuccess(true);
           form.reset();
           setSelectedSchoolId('');
-          setTimeout(() => history.push(Routes.HOME), 1200);
+          setTimeout(() => {
+            onSuccess?.();
+          }, 1200);
         },
         onError: (error) => {
           setToastMessage(

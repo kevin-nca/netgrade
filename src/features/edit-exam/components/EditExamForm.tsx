@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   IonButton,
   IonCard,
@@ -10,16 +10,18 @@ import {
 import { saveOutline } from 'ionicons/icons';
 import { useAppForm } from '@/shared/components/form';
 import { useExam, useSubjects, useUpdateExam } from '@/hooks';
-import { Routes } from '@/routes';
 import styles from '../../../pages/home/exams/EditExamPage/styles/FormCommon.module.css';
 import {
   editExamSchema,
   type EditExamFormData,
 } from '@/features/edit-exam/schema/editExamSchema';
 
-export function EditExamForm() {
+interface EditExamFormProps {
+  onSuccess?: () => void;
+}
+
+export function EditExamForm({ onSuccess }: EditExamFormProps) {
   const { examId } = useParams<{ examId: string }>();
-  const history = useHistory();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
@@ -52,7 +54,9 @@ export function EditExamForm() {
           setToastMessage('Prüfung erfolgreich aktualisiert!');
           setToastColor('success');
           setShowToast(true);
-          setTimeout(() => history.replace(Routes.HOME), 1500);
+          setTimeout(() => {
+            onSuccess?.();
+          }, 1500);
         },
         onError: (error: Error) => {
           setToastMessage(`Fehler: ${error.message}`);

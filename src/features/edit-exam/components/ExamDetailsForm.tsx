@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   IonAlert,
   IonBackButton,
@@ -59,9 +59,20 @@ import {
 import { EditExamForm } from '@/features/edit-exam/components/EditExamForm';
 import { GradeForm } from '@/pages/home/exams/EditExamPage/components/GradeForm';
 
-const ExamDetailsPage: React.FC = () => {
+interface ExamDetailsPageProps {
+  onGradeSuccess?: () => void;
+  onDeleteSuccess?: () => void;
+  onEditSuccess?: () => void;
+  onError?: () => void;
+}
+
+const ExamDetailsForm: React.FC<ExamDetailsPageProps> = ({
+  onGradeSuccess,
+  onDeleteSuccess,
+  onEditSuccess,
+  onError,
+}) => {
   const { examId } = useParams<ExamParams>();
-  const history = useHistory();
 
   const { data: exam, error } = useExam(examId);
   const { data: subjects = [] } = useSubjects();
@@ -125,7 +136,9 @@ const ExamDetailsPage: React.FC = () => {
       onSuccess: () => {
         showMessage('Note erfolgreich eingetragen!', 'success');
         setShowGradeConfirmModal(false);
-        setTimeout(() => history.replace(Routes.HOME), 1500);
+        setTimeout(() => {
+          onGradeSuccess?.();
+        }, 1500);
       },
       onError: (error: Error) => {
         showMessage(
@@ -140,7 +153,7 @@ const ExamDetailsPage: React.FC = () => {
     deleteExamMutation.mutate(examId, {
       onSuccess: () => {
         showMessage('Prüfung wurde gelöscht', 'warning');
-        history.replace(Routes.HOME);
+        onDeleteSuccess?.();
       },
       onError: (error: Error) => {
         showMessage(`Fehler: ${error.message}`, 'danger');
@@ -176,7 +189,7 @@ const ExamDetailsPage: React.FC = () => {
                     fill="solid"
                     color="light"
                     className="modern-button"
-                    onClick={() => history.replace(Routes.HOME)}
+                    onClick={onError}
                   >
                     Zurück zur Übersicht
                   </IonButton>
@@ -256,7 +269,7 @@ const ExamDetailsPage: React.FC = () => {
             </IonSegment>
 
             {segmentValue === 'details' ? (
-              <EditExamForm />
+              <EditExamForm onSuccess={onEditSuccess} />
             ) : (
               <GradeForm
                 formValues={gradeForm.state.values as GradeFormData}
@@ -402,4 +415,4 @@ const ExamDetailsPage: React.FC = () => {
   );
 };
 
-export default ExamDetailsPage;
+export default ExamDetailsForm;
