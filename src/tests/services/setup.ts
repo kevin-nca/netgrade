@@ -1,6 +1,7 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { ENTITIES } from '@/db/data-source';
 import { Exam, Grade, School, Subject } from '@/db/entities';
+import { Semester } from '@/db/entities/Semester';
 // @ts-expect-error SQL.js is not typed
 import initSqlJs from 'sql.js';
 import { AppInfo } from '@/AppInfo';
@@ -41,6 +42,7 @@ export const getTestRepositories = (dataSource: DataSource) => {
     grade: dataSource.getRepository(Grade),
     school: dataSource.getRepository(School),
     subject: dataSource.getRepository(Subject),
+    semester: dataSource.getRepository(Semester),
   };
 };
 
@@ -56,13 +58,21 @@ export const seedTestData = async (dataSource: DataSource) => {
   });
   await repositories.school.save(school);
 
+  // Create a semester
+  const semester = repositories.semester.create({
+    year: '2024/2025',
+    startDate: new Date('2024-08-15'),
+    endDate: new Date('2025-07-31'),
+  });
+  await repositories.semester.save(semester);
+
   // Create a subject
   const subject = repositories.subject.create({
     name: 'Test Subject',
     teacher: 'Test Teacher',
-    description: 'Test Description',
     weight: 1.0,
     schoolId: school.id,
+    semesterId: semester.id, // WICHTIG: semesterId hinzugefügt
   });
   await repositories.subject.save(subject);
 
@@ -87,7 +97,7 @@ export const seedTestData = async (dataSource: DataSource) => {
   });
   await repositories.grade.save(grade);
 
-  return { school, subject, exam, grade };
+  return { school, semester, subject, exam, grade };
 };
 
 // ========== Mock Subjects for Subject Average Tests ==========
