@@ -4,6 +4,7 @@ import { SubjectService } from '@/services/SubjectService';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Subject } from '@/db/entities/Subject';
 import { Exam, Grade, School } from '@/db/entities';
+import { Semester } from '../../db/entities/Semester';
 
 describe('SubjectService', () => {
   let dataSource: DataSource;
@@ -21,6 +22,7 @@ describe('SubjectService', () => {
       subject: dataSource.getRepository(Subject),
       exam: dataSource.getRepository(Exam),
       grade: dataSource.getRepository(Grade),
+      semester: dataSource.getRepository(Semester),
     });
 
     testData = await seedTestData(dataSource);

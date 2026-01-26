@@ -1,11 +1,12 @@
-import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { DataSource } from 'typeorm';
 import {
   DataManagementService,
   ExportError,
 } from '@/services/DataManagementService';
-import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
+import { cleanupTestData, initializeTestDatabase, seedTestData } from './setup';
 import { Exam, Grade, School, Subject } from '@/db/entities';
+import { Semester } from '../../db/entities/Semester';
 
 global.URL.createObjectURL = vi.fn(() => 'blob:mocked-url');
 global.URL.revokeObjectURL = vi.fn();
@@ -23,6 +24,7 @@ describe('DataManagementService', () => {
       subject: dataSource.getRepository(Subject),
       exam: dataSource.getRepository(Exam),
       grade: dataSource.getRepository(Grade),
+      semester: dataSource.getRepository(Semester),
     });
 
     await seedTestData(dataSource);
@@ -38,11 +40,13 @@ describe('DataManagementService', () => {
     const subjectRepo = dataSource.getRepository(Subject);
     const examRepo = dataSource.getRepository(Exam);
     const gradeRepo = dataSource.getRepository(Grade);
+    const semesterRepo = dataSource.getRepository(Semester);
 
     expect(await schoolRepo.count()).toBeGreaterThan(0);
     expect(await subjectRepo.count()).toBeGreaterThan(0);
     expect(await examRepo.count()).toBeGreaterThan(0);
     expect(await gradeRepo.count()).toBeGreaterThan(0);
+    expect(await semesterRepo.count()).toBeGreaterThan(0);
 
     await DataManagementService.resetAllData();
 
@@ -50,6 +54,7 @@ describe('DataManagementService', () => {
     expect(await subjectRepo.count()).toBe(0);
     expect(await examRepo.count()).toBe(0);
     expect(await gradeRepo.count()).toBe(0);
+    expect(await semesterRepo.count()).toBe(0);
   });
 
   it('should throw an error if data reset fails', async () => {
