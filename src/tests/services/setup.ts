@@ -60,7 +60,7 @@ export const seedTestData = async (dataSource: DataSource) => {
 
   // Create a semester
   const semester = repositories.semester.create({
-    year: '2024/2025',
+    name: '2024/2025',
     startDate: new Date('2024-08-15'),
     endDate: new Date('2025-07-31'),
   });

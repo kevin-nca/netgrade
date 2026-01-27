@@ -14,7 +14,7 @@ export class AddSemester1737400000000 implements MigrationInterface {
                                 "updatedAt"     datetime NOT NULL DEFAULT (datetime('now')),
                                 "version"       integer NOT NULL DEFAULT 1,
                                 "appInstanceId" varchar(255),
-                                "year"          varchar NOT NULL,
+                                "name"          varchar NOT NULL,
                                 "startDate"     date NOT NULL,
                                 "endDate"       date NOT NULL
       )
@@ -29,7 +29,7 @@ export class AddSemester1737400000000 implements MigrationInterface {
     const endDate = `${nextYear}-07-31`;
 
     await queryRunner.query(
-      `INSERT INTO "semester" ("id", "createdAt", "updatedAt", "version", "appInstanceId", "year", "startDate", "endDate")
+      `INSERT INTO "semester" ("id", "createdAt", "updatedAt", "version", "appInstanceId", "name", "startDate", "endDate")
        VALUES (?, datetime('now'), datetime('now'), 1, '', ?, ?, ?)`,
       [defaultSemesterId, defaultYear, startDate, endDate],
     );

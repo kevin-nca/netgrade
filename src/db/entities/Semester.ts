@@ -1,12 +1,12 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import { BaseEntity } from '@/db/entities/BaseEntity';
+import { BaseEntity } from './BaseEntity';
 import { Subject } from './Subject';
-import { dateTransformer } from '@/db/utils';
+import { dateTransformer } from '../utils';
 
 @Entity('semester')
 export class Semester extends BaseEntity {
   @Column({ type: 'varchar' })
-  year!: string;
+  name!: string;
 
   @Column({
     type: 'date',
