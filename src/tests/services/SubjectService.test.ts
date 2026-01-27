@@ -1,7 +1,7 @@
-import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { DataSource } from 'typeorm';
 import { SubjectService } from '@/services/SubjectService';
-import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
+import { cleanupTestData, initializeTestDatabase, seedTestData } from './setup';
 import { Subject } from '@/db/entities/Subject';
 import { Exam, Grade, School } from '@/db/entities';
 import { Semester } from '../../db/entities/Semester';
@@ -128,5 +128,60 @@ describe('SubjectService', () => {
   // Test error handling for delete method
   it('should throw an error when deleting a non-existent subject', async () => {
     await expect(SubjectService.delete('non-existent-id')).rejects.toThrow();
+  });
+
+  // Test getOrCreateDefaultSemester - creates default semester if none exists
+  it('should create a default semester when adding a subject without semesterId', async () => {
+    const semesterRepo = dataSource.getRepository(Semester);
+
+    // Ensure no default semester exists
+    const defaultSemesterId = 'default-semester-id';
+    await semesterRepo.delete(defaultSemesterId);
+
+    const newSubjectData = {
+      name: 'Subject Without Semester',
+      schoolId: testData.school.id,
+      teacher: 'Test Teacher',
+      weight: 1.0,
+      // No semesterId provided
+    };
+
+    const newSubject = await SubjectService.add(newSubjectData);
+
+    expect(newSubject).toBeInstanceOf(Subject);
+    expect(newSubject.semesterId).toBeDefined();
+    expect(newSubject.semesterId).toBe(defaultSemesterId);
+
+    // Verify the default semester was created
+    const defaultSemester = await semesterRepo.findOne({
+      where: { id: defaultSemesterId },
+    });
+    expect(defaultSemester).toBeDefined();
+    expect(defaultSemester?.name).toMatch(/\d{4}\/\d{4}/); // Matches format like "2025/2026"
+  });
+
+  // Test getOrCreateDefaultSemester - reuses existing default semester
+  it('should reuse existing default semester when adding a subject without semesterId', async () => {
+    const semesterRepo = dataSource.getRepository(Semester);
+
+    // Get the current count of semesters
+    const initialSemesterCount = await semesterRepo.count();
+
+    const newSubjectData = {
+      name: 'Another Subject Without Semester',
+      schoolId: testData.school.id,
+      teacher: 'Test Teacher',
+      weight: 1.0,
+      // No semesterId provided
+    };
+
+    const newSubject = await SubjectService.add(newSubjectData);
+
+    expect(newSubject).toBeInstanceOf(Subject);
+    expect(newSubject.semesterId).toBe('default-semester-id');
+
+    // Verify no new semester was created (count should be the same)
+    const finalSemesterCount = await semesterRepo.count();
+    expect(finalSemesterCount).toBe(initialSemesterCount);
   });
 });
