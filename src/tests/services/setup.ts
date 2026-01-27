@@ -72,7 +72,7 @@ export const seedTestData = async (dataSource: DataSource) => {
     teacher: 'Test Teacher',
     weight: 1.0,
     schoolId: school.id,
-    semesterId: semester.id, // WICHTIG: semesterId hinzugefügt
+    semesterId: semester.id,
   });
   await repositories.subject.save(subject);
 
