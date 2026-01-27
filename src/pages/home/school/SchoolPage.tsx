@@ -16,7 +16,7 @@ import {
   IonPage,
 } from '@ionic/react';
 import { add } from 'ionicons/icons';
-import SubjectSelectionModal from '@/components/navigation/SubjectSelectionModal';
+import SubjectSelectionModal from '@/features/add-subject/subject-selection-modal';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import { Subject } from '@/db/entities';
@@ -28,13 +28,9 @@ import {
   useUpdateSubject,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
-import EditSubjectModal from '@/components/modals/EditSubjectModal';
+import EditSubjectModal from '@/features/edit-subject/edit-subject-modal';
 import { SchoolService } from '@/services/SchoolService';
 import './SchoolPage.css';
-
-interface SubjectToAdd {
-  name: string;
-}
 
 const SchoolPage: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -56,7 +52,7 @@ const SchoolPage: React.FC = () => {
     );
   };
 
-  const addSubjectToStore = (subjectData: SubjectToAdd) => {
+  const addSubjectToStore = (subjectData: Subject) => {
     const payload = {
       name: subjectData.name,
       schoolId: schoolId,
