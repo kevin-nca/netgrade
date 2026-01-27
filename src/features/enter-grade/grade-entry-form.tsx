@@ -24,7 +24,7 @@ import { useAppForm } from '@/shared/components/form';
 import {
   type EditGradeFormData,
   editGradeSchema,
-} from '@/features/enter-grade/schema/grade-entry-form-schema';
+} from './schema/grade-entry-form-schema';
 import SubmitButton from '@/shared/components/submitt-button/submit-button';
 import CancelButton from '@/shared/components/cancel-button/cancel-button';
 

@@ -3,7 +3,7 @@ import { IonInput } from '@ionic/react';
 import { scaleOutline } from 'ionicons/icons';
 import React from 'react';
 import FormInput from '@/shared/components/form-field/form-input';
-import '@/features/add-grade/fields/weight-field.css';
+import './weight-field.css';
 
 interface WeightFieldProps {
   label: string;

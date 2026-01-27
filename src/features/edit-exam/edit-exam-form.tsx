@@ -9,11 +9,11 @@ import {
 import { saveOutline } from 'ionicons/icons';
 import { useAppForm } from '@/shared/components/form';
 import { useExam, useSubjects, useUpdateExam } from '@/hooks';
-import styles from '@/features/edit-exam/styles/FormCommon.module.css';
+import styles from './styles/form-common.module.css';
 import {
   editExamSchema,
   type EditExamFormData,
-} from '@/features/edit-exam/schema/edit-exam-schema';
+} from './schema/edit-exam-schema';
 
 interface EditExamFormProps {
   examId: string;

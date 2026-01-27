@@ -17,7 +17,7 @@ import SuccessOverlay from '@/shared/components/form-layout/succes-overlay';
 import {
   gradeFormSchema,
   type GradeFormData,
-} from '@/features/add-grade/schema/exam-form-schema-grade';
+} from './schema/exam-form-schema-grade';
 
 interface AddGradeFormProps {
   onSuccess?: () => void;

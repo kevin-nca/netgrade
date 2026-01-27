@@ -4,7 +4,7 @@ import { useAppForm } from '@/shared/components/form';
 import {
   schoolFormSchema,
   type SchoolFormData,
-} from '@/features/add-school/schema/add-school-form-schema';
+} from './schema/add-school-form-schema';
 
 interface AddSchoolFormProps {
   onSubmit: (schoolName: string) => void;

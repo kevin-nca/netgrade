@@ -45,15 +45,12 @@ import {
   validateWeight,
 } from '@/utils/validation';
 import { Routes } from '@/routes';
-import styles from '@/pages/home/exams/EditExamPage/EditExamPage.module.css';
+import styles from './styles/edit-exam-page.module.css';
 import { Layout } from '@/components/Layout/Layout';
-import { GradeFormData } from '@/pages/home/exams/EditExamPage/types';
-import {
-  formatDate,
-  getGradeColor,
-} from '@/pages/home/exams/EditExamPage/utils';
-import { EditExamForm } from '@/features/edit-exam/edit-exam-form';
-import { GradeForm } from '@/pages/home/exams/EditExamPage/components/GradeForm';
+import { GradeFormData } from './types';
+import { formatDate, getGradeColor } from './utils';
+import { EditExamForm } from './edit-exam-form';
+import { GradeForm } from './grade-form';
 
 interface ExamDetailsFormProps {
   examId: string;

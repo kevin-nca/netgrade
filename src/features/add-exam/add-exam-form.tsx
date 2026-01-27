@@ -12,7 +12,7 @@ import SuccessOverlay from '@/shared/components/form-layout/succes-overlay';
 import {
   examFormSchema,
   type ExamFormData,
-} from '@/features/add-exam/schema/exam-form-schema-exam';
+} from './schema/exam-form-schema-exam';
 
 interface AddExamFormProps {
   onSuccess?: () => void;

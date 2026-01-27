@@ -18,8 +18,8 @@ import {
   scaleOutline,
   chatbubbleOutline,
 } from 'ionicons/icons';
-import { GradeFormData } from '../types';
-import styles from '../styles/GradeForm.module.css';
+import { GradeFormData } from './types';
+import styles from './styles/grade-form.module.css';
 
 interface GradeFormProps {
   formValues: GradeFormData;

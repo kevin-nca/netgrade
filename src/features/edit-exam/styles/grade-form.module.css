@@ -1,4 +1,4 @@
-@import '../../../../../features/edit-exam/styles/FormCommon.module.css';
+@import 'form-common.module.css';
 
 .warningCard {
   margin: 8px;

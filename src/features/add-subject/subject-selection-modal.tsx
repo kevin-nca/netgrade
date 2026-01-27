@@ -5,8 +5,8 @@ import { useAppForm } from '@/shared/components/form';
 import {
   subjectFormSchema,
   type SubjectFormData,
-} from '@/features/add-subject/subject-form-schema';
-import styles from '@/components/navigation/SubjectSelectionModal.module.css';
+} from './schema/subject-form-schema';
+import styles from './styles/subject-selection-modal.module.css';
 
 interface SubjectSelectionSlideUpProps {
   isOpen: boolean;
