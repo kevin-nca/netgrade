@@ -166,13 +166,13 @@ export class SubjectService {
 
       defaultSemester = semesterRepo.create({
         id: defaultSemesterId,
-        year: `${currentYear}/${nextYear}`,
+        name: `${currentYear}/${nextYear}`,
         startDate: new Date(`${currentYear}-08-15`),
         endDate: new Date(`${nextYear}-07-31`),
       });
 
       await semesterRepo.save(defaultSemester);
-      console.log('Created default semester:', defaultSemester.year);
+      console.log('Created default semester:', defaultSemester.name);
     }
 
     return defaultSemester.id;
