@@ -72,7 +72,7 @@ platform :ios do
       expire_previous_builds: false,
       uses_non_exempt_encryption: false,
       distribute_external: true,
-      groups: ["internal", "nca"]
+      groups: ["nca"]
     )
   end
 end
