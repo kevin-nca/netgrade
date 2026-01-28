@@ -1,9 +1,8 @@
 import React from 'react';
-import { IonCard, IonIcon } from '@ionic/react';
-import { time, school } from 'ionicons/icons';
-import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { IonIcon } from '@ionic/react';
+import { time, book } from 'ionicons/icons';
 import { Exam } from '@/db/entities/Exam';
+import './ExamListView.css';
 
 interface ExamListViewProps {
   groupedExams: {
@@ -20,76 +19,42 @@ const ExamListView: React.FC<ExamListViewProps> = ({
   onSelectExam,
   getRelativeDate,
 }) => {
-  const isDateToday = (date: Date) => {
-    const today = new Date();
-    return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
-    );
-  };
+  const allExams = groupedExams.flatMap((group) => group.exams);
 
   return (
-    <IonCard className="modern-list-container">
-      {groupedExams.length > 0 ? (
-        groupedExams.map((group) => (
-          <IonCard key={group.monthKey} className="month-section">
-            <IonCard className="month-label">
-              <span>{group.monthName}</span>
-            </IonCard>
+    <div className="exams-container">
+      {allExams.length > 0 ? (
+        allExams.map((exam) => (
+          <div
+            key={exam.id}
+            className="exam-item"
+            onClick={() => onSelectExam(exam)}
+          >
+            <div className="exam-icon-badge">
+              <IonIcon icon={book} />
+            </div>
 
-            <IonCard className="exams-list">
-              {group.exams.map((exam) => (
-                <IonCard
-                  key={exam.id}
-                  className="exam-card"
-                  onClick={() => onSelectExam(exam)}
-                >
-                  <IonCard className="exam-date-badge">
-                    <IonCard className="exam-date-day">
-                      {format(exam.date, 'dd')}
-                    </IonCard>
-                    <IonCard className="exam-date-month">
-                      {format(exam.date, 'MMM', { locale: de }).toUpperCase()}
-                    </IonCard>
-                    {isDateToday(exam.date) && (
-                      <IonCard className="today-marker"></IonCard>
-                    )}
-                  </IonCard>
+            <div className="exam-info">
+              <h3 className="exam-name">{exam.name}</h3>
+              <div className="exam-date-text">
+                <IonIcon icon={time} />
+                <span>{getRelativeDate(exam.date)}</span>
+              </div>
+            </div>
 
-                  <IonCard className="exam-content">
-                    <h3 className="exam-title">{exam.name}</h3>
-                    <IonCard className="exam-meta">
-                      <IonCard className="exam-time">
-                        <IonIcon icon={time} />
-                        <span className="relative-date">
-                          {getRelativeDate(exam.date)}
-                        </span>
-                      </IonCard>
-                    </IonCard>
-                    {exam.description && (
-                      <p className="exam-desc">
-                        {exam.description.length > 100
-                          ? `${exam.description.substring(0, 100)}...`
-                          : exam.description}
-                      </p>
-                    )}
-                  </IonCard>
-                </IonCard>
-              ))}
-            </IonCard>
-          </IonCard>
+            <div className="exam-status-dot"></div>
+          </div>
         ))
       ) : (
-        <IonCard className="empty-state" color={'light'}>
-          <IonCard className="empty-icon">
-            <IonIcon icon={school} />
-          </IonCard>
+        <div className="exams-empty-state">
+          <div className="exams-empty-icon">
+            <IonIcon icon={book} />
+          </div>
           <h3>Keine anstehenden Prüfungen</h3>
           <p>Du hast aktuell keine anstehenden Prüfungen.</p>
-        </IonCard>
+        </div>
       )}
-    </IonCard>
+    </div>
   );
 };
 
