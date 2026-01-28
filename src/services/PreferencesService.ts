@@ -1,6 +1,8 @@
 import { Preferences } from '@capacitor/preferences';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+import { getRepositories } from '@/db/data-source';
+import { Semester } from '@/db/entities/Semester';
 
 export interface AppPreferences {
   userName: string | null;
@@ -190,6 +192,28 @@ export class PreferencesService {
    */
   static getAvailableReminderTimes(): [number, number][] {
     return [...this.AVAILABLE_REMINDER_TIMES];
+  }
+
+  /**
+   * Gets the current active semester based on today's date
+   * @returns Promise<Semester | null> - The current semester or null if none found
+   */
+  static async getCurrentSemester(): Promise<Semester | null> {
+    try {
+      const { semester: semesterRepo } = getRepositories();
+      const today = new Date();
+
+      const currentSemester = await semesterRepo
+        .createQueryBuilder('semester')
+        .where('semester.startDate <= :today', { today })
+        .andWhere('semester.endDate >= :today', { today })
+        .getOne();
+
+      return currentSemester;
+    } catch (error) {
+      console.error('Failed to get current semester:', error);
+      throw error;
+    }
   }
 
   private static async setPreference<K extends keyof AppPreferences>(
