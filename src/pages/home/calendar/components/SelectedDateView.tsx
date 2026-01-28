@@ -1,5 +1,5 @@
 import React from 'react';
-import { IonIcon } from '@ionic/react';
+import { IonCard, IonIcon } from '@ionic/react';
 import { school } from 'ionicons/icons';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -27,29 +27,27 @@ const SelectedDateView: React.FC<SelectedDateViewProps> = ({
   };
 
   return (
-    <div className="selected-date-section">
-      <div className="date-header">
+    <IonCard className="selected-date-section">
+      <IonCard className="date-header" color={'light'}>
         <h3>{format(selectedDate, 'EEEE, d. MMMM', { locale: de })}</h3>
         <span className={isDateToday(selectedDate) ? 'today-badge' : ''}>
           {isDateToday(selectedDate) ? 'Heute' : ''}
         </span>
-      </div>
+      </IonCard>
 
       {events.length > 0 ? (
-        <div className="events-list">
+        <IonCard className="events-list">
           {events.map((exam) => (
             <EventItem key={exam.id} exam={exam} onSelect={onSelectExam} />
           ))}
-        </div>
+        </IonCard>
       ) : (
-        <div className="no-events">
-          <div className="no-events-icon">
-            <IonIcon icon={school} />
-          </div>
+        <IonCard className="no-events" color={'light'}>
+          <IonIcon icon={school} size="large" />
           <p>Keine Prüfungen an diesem Tag</p>
-        </div>
+        </IonCard>
       )}
-    </div>
+    </IonCard>
   );
 };
 
