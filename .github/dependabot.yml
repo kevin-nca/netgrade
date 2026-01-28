@@ -22,18 +22,15 @@ updates:
         patterns:
           - '@types/react*'
 
-      react-router:
-        patterns:
-          - 'react-router*'
-          - '@types/react-router*'
-
       # =====================
-      # Ionic
+      # Ionic + React Router
       # =====================
-      ionic-core:
+      ionic-and-routing:
         patterns:
           - '@ionic/*'
           - 'ionicons'
+          - 'react-router*'
+          - '@types/react-router*'
 
       ionic-native:
         patterns:
