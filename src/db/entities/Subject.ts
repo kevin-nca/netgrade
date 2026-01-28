@@ -1,7 +1,8 @@
-import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { School } from './School';
 import { Exam } from './Exam';
+import { Semester } from '@/db/entities/Semester';
 
 @Entity('subject')
 export class Subject extends BaseEntity {
@@ -16,6 +17,16 @@ export class Subject extends BaseEntity {
 
   @Column({ type: 'uuid' })
   schoolId!: string;
+
+  @Column({ type: 'uuid' })
+  semesterId!: string | null;
+
+  @ManyToOne(() => Semester, (semester) => semester.subjects, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'semesterId' })
+  semester!: Semester | null;
 
   @ManyToOne(() => School, (school) => school.subjects, {
     onDelete: 'CASCADE',

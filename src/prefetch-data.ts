@@ -10,6 +10,7 @@ import {
   UpcomingExamsQuery,
   UserNameQuery,
 } from '@/hooks/queries';
+import { SemestersQuery } from '@/hooks/queries/useSemesterQueries';
 
 export async function prefetchData(queryClient: QueryClient) {
   await queryClient.prefetchQuery(OnboardingCompletedQuery);
@@ -21,6 +22,7 @@ export async function prefetchData(queryClient: QueryClient) {
   await queryClient.prefetchQuery(NotificationSettingsQuery);
   await queryClient.prefetchQuery(ReminderTimesQuery);
   await queryClient.prefetchQuery(NotificationPermissionsQuery);
+  await queryClient.prefetchQuery(SemestersQuery);
 
   // Add more prefetch queries as needed
 }
