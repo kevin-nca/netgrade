@@ -340,6 +340,18 @@ export const createMockSchoolWithDifferentSubjectAverages = (): School => {
   } as School;
 };
 
+// ========== Mock Semester for Semester Tests ==========
+
+// Helper function to create mock current semester
+export const createMockCurrentSemester = (): Semester => {
+  return {
+    id: 'semester-1',
+    name: 'Current Semester',
+    startDate: new Date('2024-08-01'),
+    endDate: new Date('2024-12-31'),
+  } as Semester;
+};
+
 // Helper function to clean up test data
 export const cleanupTestData = async (dataSource: DataSource) => {
   if (dataSource.isInitialized) {
