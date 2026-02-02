@@ -5,3 +5,4 @@ export * from './useSchoolQueries';
 export * from './useSubjectQueries';
 export * from './usePreferencesQueries';
 export * from './useDataManagementQueries';
+export * from './useSemesterQueries';

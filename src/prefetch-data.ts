@@ -6,11 +6,11 @@ import {
   OnboardingCompletedQuery,
   ReminderTimesQuery,
   SchoolsQuery,
+  SemestersQuery,
   SubjectsQuery,
   UpcomingExamsQuery,
   UserNameQuery,
 } from '@/hooks/queries';
-import { SemestersQuery } from '@/hooks/queries/useSemesterQueries';
 
 export async function prefetchData(queryClient: QueryClient) {
   await queryClient.prefetchQuery(OnboardingCompletedQuery);
