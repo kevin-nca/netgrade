@@ -48,6 +48,29 @@ describe('SemesterService', () => {
     expect(semesters[0].name).toBe('2024/2025');
   });
 
+  // Test fetchAll error handling
+  it('should throw error and log when fetchAll fails', async () => {
+    // Arrange
+    const testError = new Error('Database fetch error');
+    const consoleSpy = vi.spyOn(console, 'error');
+    const dataSourceModule = await import('@/db/data-source');
+
+    vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValueOnce({
+      semester: {
+        find: vi.fn().mockRejectedValue(testError),
+      },
+    } as never);
+
+    // Act & Assert
+    await expect(SemesterService.fetchAll()).rejects.toThrow(
+      'Database fetch error',
+    );
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Failed to fetch semesters:',
+      testError,
+    );
+  });
+
   // Test add method
   it('should add a new semester', async () => {
     const newSemesterData = {
@@ -72,12 +95,67 @@ describe('SemesterService', () => {
     expect(foundSemester?.name).toBe(newSemesterData.name);
   });
 
+  // Test add error handling
+  it('should throw error and log when add fails', async () => {
+    // Arrange
+    const testError = new Error('Database add error');
+    const consoleSpy = vi.spyOn(console, 'error');
+    const dataSourceModule = await import('@/db/data-source');
+
+    vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValueOnce({
+      semester: {
+        create: vi.fn().mockReturnValue({}),
+        save: vi.fn().mockRejectedValue(testError),
+      },
+    } as never);
+
+    const newSemesterData = {
+      name: '2025/2026',
+      startDate: new Date('2025-08-15'),
+      endDate: new Date('2026-07-31'),
+    };
+
+    // Act & Assert
+    await expect(SemesterService.add(newSemesterData)).rejects.toThrow(
+      'Database add error',
+    );
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Failed to add semester:',
+      testError,
+    );
+  });
+
   // Test findById method
   it('should find a semester by id', async () => {
     const semester = await SemesterService.findById(testData.semester.id);
     expect(semester).toBeInstanceOf(Semester);
     expect(semester?.id).toBe(testData.semester.id);
     expect(semester?.name).toBe(testData.semester.name);
+  });
+
+  // Test findById error handling
+  it('should throw error and log when findById fails', async () => {
+    // Arrange
+    const testError = new Error('Database findById error');
+    const consoleSpy = vi.spyOn(console, 'error');
+    const dataSourceModule = await import('@/db/data-source');
+
+    vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValueOnce({
+      semester: {
+        findOne: vi.fn().mockRejectedValue(testError),
+      },
+    } as never);
+
+    const testId = 'test-id';
+
+    // Act & Assert
+    await expect(SemesterService.findById(testId)).rejects.toThrow(
+      'Database findById error',
+    );
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `Failed to find semester with ID ${testId}:`,
+      testError,
+    );
   });
 
   // Test update method
