@@ -1,7 +1,7 @@
 import { DataSource, DataSourceOptions, Repository } from 'typeorm'; // Import Repository
 import { Capacitor } from '@capacitor/core';
 import { CapacitorSQLite, SQLiteConnection } from '@capacitor-community/sqlite';
-import { Exam, Grade, School, Subject } from './entities';
+import { Exam, Grade, School, Semester, Subject } from './entities';
 import localforage from 'localforage';
 
 // @ts-expect-error SQL.js is not typed
@@ -10,7 +10,6 @@ import initSqlJs from 'sql.js';
 // Migrations
 import { Initdb1745319232244 } from './migrations/1745319232244-initdb';
 import { DropDescriptionFromSubject1761134134122 } from './migrations/1761134134122-drop_description_from_subject';
-import { Semester } from '@/db/entities/Semester';
 import { AddSemester1737400000000 } from '@/db/migrations/1737400000000-add-semester';
 
 // Reference: https://github.com/sql-js/react-sqljs-demo/blob/master/src/App.js
