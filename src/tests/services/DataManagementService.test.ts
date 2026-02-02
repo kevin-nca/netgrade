@@ -6,7 +6,7 @@ import {
 } from '@/services/DataManagementService';
 import { cleanupTestData, initializeTestDatabase, seedTestData } from './setup';
 import { Exam, Grade, School, Subject } from '@/db/entities';
-import { Semester } from '../../db/entities/Semester';
+import { Semester } from '@/db/entities/Semester';
 
 global.URL.createObjectURL = vi.fn(() => 'blob:mocked-url');
 global.URL.revokeObjectURL = vi.fn();
