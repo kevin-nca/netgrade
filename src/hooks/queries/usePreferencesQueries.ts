@@ -197,7 +197,7 @@ export const useCurrentSemester = () => {
         (s) => new Date(s.startDate) <= today && new Date(s.endDate) >= today,
       );
     },
-    staleTime: 1000 * 60 * 60, // 1 hour - current semester changes less frequently
+    staleTime: Infinity,
     enabled: true,
   });
 };
