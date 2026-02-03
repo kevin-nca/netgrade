@@ -1,6 +1,6 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 
-export class AddSemester1737400000000 implements MigrationInterface {
+export class AddSemester1737400000000 {
   name = 'AddSemester1737400000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -42,19 +42,5 @@ export class AddSemester1737400000000 implements MigrationInterface {
     `);
 
     console.log('Migration completed successfully');
-  }
-
-  public async down(queryRunner: QueryRunner): Promise<void> {
-    console.log('Rolling back migration: ' + this.name);
-
-    await queryRunner.query(`
-      ALTER TABLE "subject" DROP COLUMN "semesterId"
-    `);
-
-    await queryRunner.query(`
-      DROP TABLE "semester"
-    `);
-
-    console.log('Rollback completed successfully');
   }
 }
