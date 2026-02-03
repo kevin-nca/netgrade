@@ -70,20 +70,26 @@ export class DataManagementService {
     const schools = await getRepositories().school.find({
       relations: { subjects: { exams: { grade: true } } },
     });
-    const json = JSON.stringify({ schools }, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
 
-    return {
-      success: true,
-      message: 'Export erfolgreich',
-      filename: a.download,
-    };
+    const json = JSON.stringify(
+      { schools },
+      (key, value) => {
+        if (value instanceof Date) {
+          return value.toISOString().split('T')[0];
+        }
+        return value;
+      },
+      2,
+    );
+
+    const filename = `backup_${new Date().toISOString().split('T')[0]}.json`;
+    const blob = new Blob([json], { type: 'application/json' });
+
+    if (Capacitor.isNativePlatform()) {
+      return await this.exportNativeJSON(blob, filename);
+    } else {
+      return this.exportWeb(blob, filename);
+    }
   }
 
   static async importFromJSON(jsonString: string): Promise<void> {
@@ -99,6 +105,41 @@ export class DataManagementService {
     await getDataSource().query('DELETE FROM subject');
     await getDataSource().query('DELETE FROM school');
     await getRepositories().school.save(schools);
+  }
+
+  private static async exportNativeJSON(
+    blob: Blob,
+    filename: string,
+  ): Promise<ExportResult> {
+    try {
+      const base64Data = await this.blobToBase64(blob);
+
+      await Filesystem.writeFile({
+        path: filename,
+        data: base64Data,
+        directory: Directory.Documents,
+      });
+
+      const fileUri = await Filesystem.getUri({
+        path: filename,
+        directory: Directory.Documents,
+      });
+
+      await Share.share({
+        title: 'NetGrade Backup',
+        url: fileUri.uri,
+      });
+
+      return {
+        success: true,
+        message: 'Export erfolgreich',
+        filename,
+      };
+    } catch (error) {
+      console.error('Native JSON export failed:', error);
+      const message = this.getErrorMessage(error);
+      throw new ExportError(message, 'SAVE_FAILED');
+    }
   }
 
   /**

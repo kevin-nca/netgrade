@@ -13,6 +13,6 @@ export class School extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   type!: string | null;
 
-  @OneToMany(() => Subject, (subject) => subject.school, {cascade: true})
+  @OneToMany(() => Subject, (subject) => subject.school, { cascade: true })
   subjects!: Subject[];
 }
