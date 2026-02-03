@@ -15,8 +15,8 @@ export class AddSemester1737400000000 implements MigrationInterface {
                                 "version"       integer NOT NULL DEFAULT 1,
                                 "appInstanceId" varchar(255),
                                 "name"          varchar NOT NULL,
-                                "startDate"     date NOT NULL,
-                                "endDate"       date NOT NULL
+                                "startDate"     text NOT NULL,
+                                "endDate"       text NOT NULL
       )
     `);
 

@@ -61,8 +61,8 @@ export const seedTestData = async (dataSource: DataSource) => {
   // Create a semester
   const semester = repositories.semester.create({
     name: '2024/2025',
-    startDate: new Date('2024-08-15'),
-    endDate: new Date('2025-07-31'),
+    startDate: '2024-08-15',
+    endDate: '2025-07-31',
   });
   await repositories.semester.save(semester);
 
@@ -347,8 +347,8 @@ export const createMockCurrentSemester = (): Semester => {
   return {
     id: 'semester-1',
     name: 'Current Semester',
-    startDate: new Date('2024-08-01'),
-    endDate: new Date('2024-12-31'),
+    startDate: '2024-08-01',
+    endDate: '2024-12-31',
   } as Semester;
 };
 

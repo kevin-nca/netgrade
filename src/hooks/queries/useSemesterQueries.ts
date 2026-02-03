@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SemesterService } from '@/services/SemesterService';
 import { Semester } from '@/db/entities/Semester';
 import { subjectKeys } from '@/hooks';
+import { Temporal } from '@js-temporal/polyfill';
 
 export const semesterKeys = {
   all: ['semesters'] as const,
@@ -15,8 +16,8 @@ export const semesterKeys = {
 // Types
 export interface AddSemesterPayload {
   name: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: Temporal.PlainDate;
+  endDate: Temporal.PlainDate;
 }
 
 // Hooks

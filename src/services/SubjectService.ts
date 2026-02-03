@@ -1,5 +1,6 @@
 import { getRepositories } from '@/db/data-source';
-import { Subject } from '@/db/entities/Subject';
+import { Temporal } from '@js-temporal/polyfill';
+import { Subject } from '@/db/entities';
 
 export class SubjectService {
   /**
@@ -161,18 +162,18 @@ export class SubjectService {
     });
 
     if (!defaultSemester) {
-      const currentYear = new Date().getFullYear();
+      const currentYear = Temporal.Now.plainDateISO().year;
       const nextYear = currentYear + 1;
 
       defaultSemester = semesterRepo.create({
         id: defaultSemesterId,
         name: `${currentYear}/${nextYear}`,
-        startDate: new Date(`${currentYear}-08-15`),
-        endDate: new Date(`${nextYear}-07-31`),
+        startDate: `${currentYear}-08-15`,
+        endDate: `${nextYear}-07-31`,
       });
 
       await semesterRepo.save(defaultSemester);
-      console.log('Created default semester:', defaultSemester.name);
+      console.log(`Created default semester: ${currentYear}/${nextYear}`);
     }
 
     return defaultSemester.id;
