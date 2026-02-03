@@ -3,6 +3,8 @@ import { Preferences } from '@capacitor/preferences';
 import { PreferencesService } from '@/services/PreferencesService';
 import { getRepositories } from '../../db/data-source';
 import { createMockCurrentSemester } from './setup';
+import { Temporal } from '@js-temporal/polyfill';
+import { Semester } from '../../db/entities';
 
 vi.mock('@capacitor/preferences', () => ({
   Preferences: {
@@ -154,20 +156,15 @@ describe('PreferencesService', () => {
 
     it('should return the current semester when today is within range', async () => {
       // Arrange
-      const today = new Date('2024-10-15');
-      vi.setSystemTime(today);
+      const today = Temporal.PlainDate.from('2024-10-15');
+      vi.spyOn(Temporal.Now, 'plainDateISO').mockReturnValue(today);
 
       const mockSemester = createMockCurrentSemester();
-
-      const mockCreateQueryBuilder = {
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        getOne: vi.fn().mockResolvedValue(mockSemester),
-      };
+      const allSemesters = [mockSemester];
 
       mockGetRepositories.mockReturnValue({
         semester: {
-          createQueryBuilder: vi.fn().mockReturnValue(mockCreateQueryBuilder),
+          find: vi.fn().mockResolvedValue(allSemesters),
         },
       } as never);
 
@@ -176,32 +173,24 @@ describe('PreferencesService', () => {
 
       // Assert
       expect(result).toEqual(mockSemester);
-      expect(mockCreateQueryBuilder.where).toHaveBeenCalledWith(
-        'semester.startDate <= :today',
-        { today },
-      );
-      expect(mockCreateQueryBuilder.andWhere).toHaveBeenCalledWith(
-        'semester.endDate >= :today',
-        { today },
-      );
-
-      vi.useRealTimers();
+      expect(mockGetRepositories).toHaveBeenCalled();
     });
 
     it('should return null when no semester matches today', async () => {
       // Arrange
-      const today = new Date('2024-10-15');
-      vi.setSystemTime(today);
+      const today = Temporal.PlainDate.from('2024-10-15');
+      vi.spyOn(Temporal.Now, 'plainDateISO').mockReturnValue(today);
 
-      const mockCreateQueryBuilder = {
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        getOne: vi.fn().mockResolvedValue(null),
-      };
+      const pastSemester = {
+        id: 'semester-1',
+        name: 'Past Semester',
+        startDate: '2023-08-01',
+        endDate: '2024-07-31',
+      } as Semester;
 
       mockGetRepositories.mockReturnValue({
         semester: {
-          createQueryBuilder: vi.fn().mockReturnValue(mockCreateQueryBuilder),
+          find: vi.fn().mockResolvedValue([pastSemester]),
         },
       } as never);
 
@@ -210,8 +199,6 @@ describe('PreferencesService', () => {
 
       // Assert
       expect(result).toBeNull();
-
-      vi.useRealTimers();
     });
 
     it('should throw error when database operation fails', async () => {
@@ -221,9 +208,7 @@ describe('PreferencesService', () => {
 
       mockGetRepositories.mockReturnValue({
         semester: {
-          createQueryBuilder: vi.fn().mockImplementation(() => {
-            throw testError;
-          }),
+          find: vi.fn().mockRejectedValue(testError),
         },
       } as never);
 
