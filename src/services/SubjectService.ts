@@ -1,6 +1,6 @@
 import { getRepositories } from '@/db/data-source';
-import { Subject } from '@/db/entities';
 import { Temporal } from '@js-temporal/polyfill';
+import { Subject } from '@/db/entities';
 
 export class SubjectService {
   /**
@@ -40,14 +40,13 @@ export class SubjectService {
     try {
       const { subject: subjectRepo } = getRepositories();
 
-      const semesterId =
-        newSubjectData.semesterId || (await this.getOrCreateDefaultSemester());
+      if (!newSubjectData.semesterId) {
+        newSubjectData.semesterId = await this.getOrCreateDefaultSemester();
+      }
 
       const newSubject = subjectRepo.create({
         ...newSubjectData,
-        semesterId,
       });
-
       return await subjectRepo.save(newSubject);
     } catch (error) {
       console.error('Failed to add subject:', error);
@@ -169,8 +168,8 @@ export class SubjectService {
       defaultSemester = semesterRepo.create({
         id: defaultSemesterId,
         name: `${currentYear}/${nextYear}`,
-        startDate: new Date(`${currentYear}-08-15`),
-        endDate: new Date(`${nextYear}-07-31`),
+        startDate: `${currentYear}-08-15`,
+        endDate: `${nextYear}-07-31`,
       });
 
       await semesterRepo.save(defaultSemester);
