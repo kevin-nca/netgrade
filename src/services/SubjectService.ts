@@ -1,6 +1,6 @@
 import { getRepositories } from '@/db/data-source';
-import { Temporal } from '@js-temporal/polyfill';
 import { Subject } from '@/db/entities';
+import { Temporal } from '@js-temporal/polyfill';
 
 export class SubjectService {
   /**

@@ -1,7 +1,6 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { ENTITIES } from '@/db/data-source';
-import { Exam, Grade, School, Subject } from '@/db/entities';
-import { Semester } from '@/db/entities/Semester';
+import { Exam, Grade, School, Subject, Semester } from '@/db/entities';
 // @ts-expect-error SQL.js is not typed
 import initSqlJs from 'sql.js';
 import { AppInfo } from '@/AppInfo';

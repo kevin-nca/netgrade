@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ExamService } from '@/services/ExamService';
 import { Exam } from '@/db/entities/Exam';
 

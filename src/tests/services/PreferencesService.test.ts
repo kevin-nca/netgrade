@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { Preferences } from '@capacitor/preferences';
 import { PreferencesService } from '@/services/PreferencesService';
 import { getRepositories } from '../../db/data-source';

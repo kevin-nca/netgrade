@@ -1,10 +1,8 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
 import { SubjectService } from '@/services/SubjectService';
-import { cleanupTestData, initializeTestDatabase, seedTestData } from './setup';
-import { Subject } from '@/db/entities/Subject';
-import { Exam, Grade, School } from '@/db/entities';
-import { Semester } from '../../db/entities/Semester';
+import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
+import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
 
 describe('SubjectService', () => {
   let dataSource: DataSource;

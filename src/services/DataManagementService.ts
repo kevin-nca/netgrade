@@ -2,7 +2,7 @@ import { PreferencesService } from './PreferencesService';
 import { getDataSource, getRepositories } from '@/db/data-source';
 import { School } from '@/db/entities';
 import * as XLSX from 'xlsx';
-import { Directory, Filesystem } from '@capacitor/filesystem';
+import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
 

@@ -1,12 +1,11 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
 import {
   DataManagementService,
   ExportError,
 } from '@/services/DataManagementService';
-import { cleanupTestData, initializeTestDatabase, seedTestData } from './setup';
-import { Exam, Grade, School, Subject } from '@/db/entities';
-import { Semester } from '@/db/entities/Semester';
+import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
+import { Exam, Grade, School, Subject, Semester } from '@/db/entities';
 
 global.URL.createObjectURL = vi.fn(() => 'blob:mocked-url');
 global.URL.revokeObjectURL = vi.fn();
