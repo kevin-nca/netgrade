@@ -1,9 +1,10 @@
-import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { DataSource } from 'typeorm';
 import { SemesterService } from '@/services/SemesterService';
-import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
+import { cleanupTestData, initializeTestDatabase, seedTestData } from './setup';
 import { Semester } from '@/db/entities/Semester';
 import { Exam, Grade, School, Subject } from '@/db/entities';
+import { Temporal } from '@js-temporal/polyfill';
 
 describe('SemesterService', () => {
   let dataSource: DataSource;
@@ -75,16 +76,16 @@ describe('SemesterService', () => {
   it('should add a new semester', async () => {
     const newSemesterData = {
       name: '2025/2026',
-      startDate: new Date('2025-08-15'),
-      endDate: new Date('2026-07-31'),
+      startDate: Temporal.PlainDate.from('2025-08-15'),
+      endDate: Temporal.PlainDate.from('2026-07-31'),
     };
 
     const newSemester = await SemesterService.add(newSemesterData);
     expect(newSemester).toBeInstanceOf(Semester);
     expect(newSemester.id).toBeDefined();
     expect(newSemester.name).toBe(newSemesterData.name);
-    expect(newSemester.startDate).toEqual(newSemesterData.startDate);
-    expect(newSemester.endDate).toEqual(newSemesterData.endDate);
+    expect(newSemester.startDate).toBe('2025-08-15');
+    expect(newSemester.endDate).toBe('2026-07-31');
 
     // Verify the semester was actually added to the database
     const semesters = await SemesterService.fetchAll();
@@ -93,6 +94,8 @@ describe('SemesterService', () => {
     );
     expect(foundSemester).toBeDefined();
     expect(foundSemester?.name).toBe(newSemesterData.name);
+    expect(foundSemester?.startDate).toBe('2025-08-15');
+    expect(foundSemester?.endDate).toBe('2026-07-31');
   });
 
   // Test add error handling
@@ -111,8 +114,8 @@ describe('SemesterService', () => {
 
     const newSemesterData = {
       name: '2025/2026',
-      startDate: new Date('2025-08-15'),
-      endDate: new Date('2026-07-31'),
+      startDate: Temporal.PlainDate.from('2025-08-15'),
+      endDate: Temporal.PlainDate.from('2026-07-31'),
     };
 
     // Act & Assert
@@ -163,19 +166,19 @@ describe('SemesterService', () => {
     const updatedSemesterData = {
       ...testData.semester,
       name: '2024/2025 - Updated',
-      startDate: new Date('2024-08-20'),
+      startDate: '2024-08-20',
     };
 
     const updatedSemester = await SemesterService.update(updatedSemesterData);
     expect(updatedSemester).toBeInstanceOf(Semester);
     expect(updatedSemester.id).toBe(testData.semester.id);
     expect(updatedSemester.name).toBe(updatedSemesterData.name);
-    expect(updatedSemester.startDate).toEqual(updatedSemesterData.startDate);
+    expect(updatedSemester.startDate).toBe('2024-08-20');
 
     // Verify the semester was actually updated in the database
     const semester = await SemesterService.findById(testData.semester.id);
     expect(semester?.name).toBe(updatedSemesterData.name);
-    expect(semester?.startDate).toEqual(updatedSemesterData.startDate);
+    expect(semester?.startDate).toBe('2024-08-20');
   });
 
   // Test delete method
@@ -183,8 +186,8 @@ describe('SemesterService', () => {
     // First, add a new semester to delete
     const newSemesterData = {
       name: 'Semester to Delete',
-      startDate: new Date('2026-08-15'),
-      endDate: new Date('2027-07-31'),
+      startDate: Temporal.PlainDate.from('2025-08-15'),
+      endDate: Temporal.PlainDate.from('2026-07-31'),
     };
     const newSemester = await SemesterService.add(newSemesterData);
 
