@@ -2,20 +2,14 @@ import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import {
   IonButtons,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
   IonContent,
   IonIcon,
-  IonItem,
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
-  IonList,
   IonPage,
 } from '@ionic/react';
-import { add } from 'ionicons/icons';
+import { add, person } from 'ionicons/icons';
 import SubjectSelectionModal from '@/features/add-subject/subject-selection-modal';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
@@ -99,62 +93,81 @@ const SchoolPage: React.FC = () => {
         }
       />
       <IonContent>
-        <IonList>
-          {subjects!.map((subject: Subject) => {
-            const average = SchoolService.calculateSubjectAverage(subject);
+        <div className="subjects-container">
+          {subjects!.length > 0 ? (
+            subjects!.map((subject: Subject) => {
+              const average = SchoolService.calculateSubjectAverage(subject);
 
-            return (
-              <IonItemSliding key={subject.id} className="subject-sliding-card">
-                <IonItem
-                  button
-                  color={'light'}
-                  onClick={() => goToGradesPage(subject)}
-                  className="subject-card"
+              return (
+                <IonItemSliding
+                  key={subject.id}
+                  className="subject-sliding-item"
                 >
-                  <IonCard color={'light'} className="grade-card">
-                    <IonCardHeader>
-                      <IonCardTitle>{subject.name}</IonCardTitle>
-                    </IonCardHeader>
-                    <IonCardContent className="subject-content-card">
-                      <p className="teacher">
-                        {subject.teacher !== null
-                          ? subject.teacher
-                          : 'Kein Name'}
-                      </p>
-                      <p className="average-grade">
-                        {average !== undefined ? `${average} Ø` : 'Keine Noten'}
-                      </p>
-                    </IonCardContent>
-                  </IonCard>
-                </IonItem>
-                <IonItemOptions side="end" className="option-slide-container">
-                  <IonItemOption
-                    className="edit-option-slide"
-                    onClick={() => {
-                      setSubjectToEdit(subject);
-                      setEditModalOpen(true);
-                    }}
+                  <div
+                    className="subject-item"
+                    onClick={() => goToGradesPage(subject)}
                   >
-                    Bearbeiten
-                  </IonItemOption>
-                  <IonItemOption
-                    className="remove-option-slide"
-                    onClick={(e) => {
-                      const slidingItem = (e.target as Element).closest(
-                        'ion-item-sliding',
-                      ) as HTMLIonItemSlidingElement;
-                      if (slidingItem) {
-                        handleRemoveSubject(subject, slidingItem);
-                      }
-                    }}
-                  >
-                    Löschen
-                  </IonItemOption>
-                </IonItemOptions>
-              </IonItemSliding>
-            );
-          })}
-        </IonList>
+                    <div className="subject-icon-badge">
+                      <span className="subject-initial">
+                        {subject.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+
+                    <div className="subject-info">
+                      <h3 className="subject-name">{subject.name}</h3>
+                      <div className="subject-teacher-text">
+                        <IonIcon icon={person} />
+                        <span>
+                          {subject.teacher !== null
+                            ? subject.teacher
+                            : 'Kein Name'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="subject-average-badge">
+                      {average !== undefined ? `${average}` : '—'}
+                    </div>
+                  </div>
+
+                  <IonItemOptions side="end" className="subject-options">
+                    <IonItemOption
+                      className="edit-option-slide"
+                      onClick={() => {
+                        setSubjectToEdit(subject);
+                        setEditModalOpen(true);
+                      }}
+                    >
+                      Bearbeiten
+                    </IonItemOption>
+                    <IonItemOption
+                      className="remove-option-slide"
+                      onClick={(e) => {
+                        const slidingItem = (e.target as Element).closest(
+                          'ion-item-sliding',
+                        ) as HTMLIonItemSlidingElement;
+                        if (slidingItem) {
+                          handleRemoveSubject(subject, slidingItem);
+                        }
+                      }}
+                    >
+                      Löschen
+                    </IonItemOption>
+                  </IonItemOptions>
+                </IonItemSliding>
+              );
+            })
+          ) : (
+            <div className="subjects-empty-state">
+              <div className="subjects-empty-icon">
+                <IonIcon icon={add} />
+              </div>
+              <h3>Keine Fächer</h3>
+              <p>Füge dein erstes Fach hinzu um zu starten.</p>
+            </div>
+          )}
+        </div>
+
         <SubjectSelectionModal
           isOpen={isModalOpen}
           setIsOpen={setModalOpen}

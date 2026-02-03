@@ -1,101 +1,115 @@
-.grade-card {
+.subjects-container {
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 16px;
+  background: transparent;
   display: flex;
   flex-direction: column;
-  border-radius: 16px;
-  padding: 20px;
-  margin: 0;
-  background: rgba(45, 45, 45, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  width: 100%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  gap: 8px;
 }
 
-.grade-card:active {
-  transform: scale(0.98);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+.subject-sliding-item {
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.grade-card ion-card-header {
-  padding: 0;
-  margin-bottom: 16px;
-}
-
-.grade-card ion-card-title {
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-  color: var(--ion-color-light);
-  margin: 0;
-  line-height: 1.3;
-}
-
-.subject-card {
-  --padding-start: 0;
-  --padding-end: 0;
-  --inner-padding-end: 0;
-  --background: transparent;
-  margin: 0;
-}
-
-.subject-content-card {
-  padding: 0 !important;
+.subject-item {
+  border-radius: 12px;
+  padding: 16px;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.teacher {
-  font-size: 14px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.6);
-  margin: 0;
+.subject-item:active {
+  transform: scale(0.98);
+}
+
+.subject-icon-badge {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+}
+
+.subject-initial {
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+.subject-info {
   flex: 1;
-  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.subject-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subject-teacher-text {
   display: flex;
   align-items: center;
   gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.5);
 }
 
-.teacher::before {
-  font-size: 16px;
-  opacity: 0.7;
+.subject-teacher-text ion-icon {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.5);
 }
 
-.average-grade {
+.subject-average-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 10px 18px;
-  border-radius: 14px;
-  margin: 0 !important;
+  border-radius: 10px;
   background: linear-gradient(135deg, #007aff, #0051d5);
   color: white;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
   letter-spacing: 0.3px;
-  min-width: 85px;
-  transition: all 0.2s ease;
+  min-width: 65px;
 }
 
-.average-grade:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
-}
-
-.subject-sliding-card {
-  margin-bottom: 16px;
-  padding: 0;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.subject-sliding-card ion-item-options {
+.subject-options {
   border: none;
 }
 
@@ -115,4 +129,94 @@
   --padding-start: 20px;
   --padding-end: 20px;
   min-width: 100px;
+}
+
+.subjects-empty-state {
+  text-align: center;
+  padding: 24px 16px;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.subjects-empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(0, 122, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.subjects-empty-icon ion-icon {
+  font-size: 22px;
+  color: #007aff;
+  opacity: 0.6;
+}
+
+.subjects-empty-state h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.2px;
+}
+
+.subjects-empty-state p {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+  line-height: 1.3;
+}
+
+@media (prefers-color-scheme: dark) {
+  .subject-item,
+  .subjects-empty-state {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .subject-name,
+  .subjects-empty-state h3 {
+    color: #ffffff;
+  }
+
+  .subject-teacher-text,
+  .subjects-empty-state p {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .subject-teacher-text ion-icon {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subject-item {
+    transition: none !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .subject-item {
+    min-height: 44px;
+  }
 }
