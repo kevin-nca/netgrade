@@ -8,6 +8,7 @@ import { NotificationSettings, PreferencesService } from '@/services';
 import { notificationScheduler } from '@/notification-scheduler';
 import { Semester } from '@/db/entities/Semester';
 import { semesterKeys } from '@/hooks/queries/useSemesterQueries';
+import { Temporal } from '@js-temporal/polyfill';
 
 export const preferencesKeys = {
   all: ['preferences'] as const,
@@ -185,16 +186,23 @@ export const useCurrentSemester = () => {
 
   return useQuery({
     queryKey: semesterKeys.current(),
-    queryFn: () => PreferencesService.getCurrentSemester(),
-    initialData: () => {
+    queryFn: () => {
       const allSemesters = queryClient.getQueryData<Semester[]>(
         semesterKeys.lists(),
       );
-      if (!allSemesters) return undefined;
 
-      const today = new Date();
-      return allSemesters.find(
-        (s) => new Date(s.startDate) <= today && new Date(s.endDate) >= today,
+      if (!allSemesters) return null;
+
+      const today = Temporal.Now.plainDateISO();
+      return (
+        allSemesters.find((semester) => {
+          const start = Temporal.PlainDate.from(semester.startDate);
+          const end = Temporal.PlainDate.from(semester.endDate);
+          return (
+            Temporal.PlainDate.compare(today, start) >= 0 &&
+            Temporal.PlainDate.compare(today, end) <= 0
+          );
+        })
       );
     },
     staleTime: Infinity,
