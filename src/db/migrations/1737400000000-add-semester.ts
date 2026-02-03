@@ -1,3 +1,4 @@
+import { getRepositories } from '@/db/data-source';
 import { QueryRunner } from 'typeorm';
 
 export class AddSemester1737400000000 {
@@ -20,27 +21,31 @@ export class AddSemester1737400000000 {
       )
     `);
 
-    // 2. Create default semester
-    const defaultSemesterId = 'default-semester-id';
+    // 2. Add semesterId column to subject
+    await queryRunner.query(`
+      ALTER TABLE "subject" ADD COLUMN "semesterId" varchar
+    `);
+
+    // 3. Create default semester using repository
+    const { semester: semesterRepo } = getRepositories();
+
     const currentYear = new Date().getFullYear();
     const nextYear = currentYear + 1;
     const defaultYear = `${currentYear}/${nextYear}`;
     const startDate = `${currentYear}-08-15`;
     const endDate = `${nextYear}-07-31`;
 
-    await queryRunner.query(
-      `INSERT INTO "semester" ("id", "createdAt", "updatedAt", "version", "appInstanceId", "name", "startDate", "endDate")
-       VALUES (?, datetime('now'), datetime('now'), 1, '', ?, ?, ?)`,
-      [defaultSemesterId, defaultYear, startDate, endDate],
+    const defaultSemester = semesterRepo.create({
+      name: defaultYear,
+      startDate: startDate,
+      endDate: endDate,
+    });
+
+    await semesterRepo.save(defaultSemester);
+
+    console.log(
+      `Created default semester: ${defaultYear} with ID: ${defaultSemester.id}`,
     );
-
-    console.log(`Created default semester: ${defaultYear}`);
-
-    // 3. Add semesterId column to subject
-    await queryRunner.query(`
-      ALTER TABLE "subject" ADD COLUMN "semesterId" varchar
-    `);
-
     console.log('Migration completed successfully');
   }
 }
