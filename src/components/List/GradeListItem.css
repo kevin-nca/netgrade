@@ -1,0 +1,174 @@
+ion-list {
+  background: transparent !important;
+  padding: 16px;
+}
+
+ion-item {
+  --background: transparent;
+  --ion-item-background: transparent;
+}
+
+.grade-sliding-item {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  --background: transparent;
+  --ion-item-background: transparent;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.grade-sliding-item {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  --background: transparent;
+  --ion-item-background: transparent;
+}
+
+.grade-item {
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.grade-item:active {
+  transform: scale(0.98);
+}
+
+.grade-icon-badge {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+}
+
+.grade-score {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+.grade-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.grade-exam-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+}
+
+.grade-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.grade-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.grade-detail-item ion-icon {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+.grade-detail-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grade-options {
+  border: none;
+}
+
+.edit-option-slide {
+  --background: linear-gradient(135deg, #007aff, #0051d5);
+  --color: white;
+  font-weight: 500;
+  --padding-start: 20px;
+  --padding-end: 20px;
+  min-width: 120px;
+}
+
+.remove-option-slide {
+  --background: linear-gradient(135deg, #ff3b30, #e60000);
+  --color: white;
+  font-weight: 500;
+  --padding-start: 20px;
+  --padding-end: 20px;
+  min-width: 100px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .grade-item {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .grade-exam-name {
+    color: #ffffff;
+  }
+
+  .grade-detail-item,
+  .grade-detail-item ion-icon {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grade-item {
+    transition: none !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .grade-item {
+    min-height: 44px;
+  }
+}
