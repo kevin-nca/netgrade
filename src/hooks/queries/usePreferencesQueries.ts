@@ -194,16 +194,14 @@ export const useCurrentSemester = () => {
       if (!allSemesters) return null;
 
       const today = Temporal.Now.plainDateISO();
-      return (
-        allSemesters.find((semester) => {
-          const start = Temporal.PlainDate.from(semester.startDate);
-          const end = Temporal.PlainDate.from(semester.endDate);
-          return (
-            Temporal.PlainDate.compare(today, start) >= 0 &&
-            Temporal.PlainDate.compare(today, end) <= 0
-          );
-        })
-      );
+      return allSemesters.find((semester) => {
+        const start = Temporal.PlainDate.from(semester.startDate);
+        const end = Temporal.PlainDate.from(semester.endDate);
+        return (
+          Temporal.PlainDate.compare(today, start) >= 0 &&
+          Temporal.PlainDate.compare(today, end) <= 0
+        );
+      });
     },
     staleTime: Infinity,
     enabled: true,
