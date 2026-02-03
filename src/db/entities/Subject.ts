@@ -23,6 +23,6 @@ export class Subject extends BaseEntity {
   @JoinColumn({ name: 'schoolId' })
   school!: School;
 
-  @OneToMany(() => Exam, (exam) => exam.subject)
+  @OneToMany(() => Exam, (exam) => exam.subject, { cascade: true })
   exams!: Exam[];
 }

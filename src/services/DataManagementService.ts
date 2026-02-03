@@ -66,6 +66,41 @@ export class DataManagementService {
     }
   }
 
+  static async exportAsJSON(): Promise<ExportResult> {
+    const schools = await getRepositories().school.find({
+      relations: { subjects: { exams: { grade: true } } },
+    });
+    const json = JSON.stringify({ schools }, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    return {
+      success: true,
+      message: 'Export erfolgreich',
+      filename: a.download,
+    };
+  }
+
+  static async importFromJSON(jsonString: string): Promise<void> {
+    const { schools } = JSON.parse(jsonString, (key, value) => {
+      if (key === 'date' && typeof value === 'string') {
+        return new Date(value);
+      }
+      return value;
+    });
+
+    await getDataSource().query('DELETE FROM grade');
+    await getDataSource().query('DELETE FROM exam');
+    await getDataSource().query('DELETE FROM subject');
+    await getDataSource().query('DELETE FROM school');
+    await getRepositories().school.save(schools);
+  }
+
   /**
    * Main export method that handles all platforms
    * @param options - Export options including format, filename, and schoolId ('all' for all schools)

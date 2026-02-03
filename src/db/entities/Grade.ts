@@ -17,6 +17,7 @@ export class Grade extends BaseEntity {
   @Column({
     type: 'date',
     transformer: dateTransformer,
+    default: () => 'CURRENT_DATE',
   })
   date!: Date;
 
