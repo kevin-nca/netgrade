@@ -6,9 +6,8 @@ import {
 } from '@tanstack/react-query';
 import { NotificationSettings, PreferencesService } from '@/services';
 import { notificationScheduler } from '@/notification-scheduler';
-import { Semester } from '@/db/entities/Semester';
 import { semesterKeys } from '@/hooks/queries/useSemesterQueries';
-import { Temporal } from '@js-temporal/polyfill';
+import { getRepositories } from '@/db/data-source';
 
 export const preferencesKeys = {
   all: ['preferences'] as const,
@@ -182,34 +181,18 @@ export const useResetNotifications = () => {
 };
 
 export const useCurrentSemester = () => {
-  const queryClient = useQueryClient();
-
   return useQuery({
     queryKey: semesterKeys.current(),
-    queryFn: () => {
-      const allSemesters = queryClient.getQueryData<Semester[]>(
-        semesterKeys.lists(),
-      );
+    queryFn: async () => {
+      const { semester: semesterRepo } = getRepositories();
+      const today = new Date();
 
-      if (!allSemesters) {
-        return null;
-      }
-
-      const today = Temporal.Now.plainDateISO();
-      return allSemesters.find((semester) => {
-        const start = Temporal.PlainDate.from(
-          semester.startDate.toString().split('T')[0],
-        );
-        const end = Temporal.PlainDate.from(
-          semester.endDate.toString().split('T')[0],
-        );
-        return (
-          Temporal.PlainDate.compare(today, start) >= 0 &&
-          Temporal.PlainDate.compare(today, end) <= 0
-        );
-      });
+      return await semesterRepo
+        .createQueryBuilder('semester')
+        .where('semester.startDate <= :today', { today })
+        .andWhere('semester.endDate >= :today', { today })
+        .getOne();
     },
     staleTime: Infinity,
-    enabled: true,
   });
 };
