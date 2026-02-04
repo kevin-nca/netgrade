@@ -6,9 +6,34 @@ import {
 } from '@/services/DataManagementService';
 import { initializeTestDatabase, seedTestData } from './setup';
 import { Exam, Grade, School, Subject } from '@/db/entities';
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 
 global.URL.createObjectURL = vi.fn(() => 'blob:mocked-url');
 global.URL.revokeObjectURL = vi.fn();
+
+vi.mock('@capacitor/core', () => ({
+  Capacitor: {
+    isNativePlatform: vi.fn(() => false),
+  },
+}));
+
+vi.mock('@capacitor/filesystem', () => ({
+  Filesystem: {
+    writeFile: vi.fn(),
+    getUri: vi.fn(),
+  },
+  Directory: {
+    Documents: 'DOCUMENTS',
+  },
+}));
+
+vi.mock('@capacitor/share', () => ({
+  Share: {
+    share: vi.fn(),
+  },
+}));
 
 describe('DataManagementService', () => {
   let dataSource: DataSource;
@@ -94,7 +119,9 @@ describe('DataManagementService', () => {
   });
 
   describe('exportAsJSON', () => {
-    it('should export all data as JSON successfully', async () => {
+    it('should export all data as JSON successfully on web', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+
       const result = await DataManagementService.exportAsJSON();
 
       expect(result.success).toBe(true);
@@ -102,7 +129,54 @@ describe('DataManagementService', () => {
       expect(result.filename).toMatch(/^backup_\d{4}-\d{2}-\d{2}\.json$/);
     });
 
+    it('should export JSON on native platform', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+      vi.mocked(Filesystem.writeFile).mockResolvedValue({
+        uri: 'file://test.json',
+      });
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://test.json',
+      });
+      vi.mocked(Share.share).mockResolvedValue({ activityType: 'share' });
+
+      const result = await DataManagementService.exportAsJSON();
+
+      expect(Filesystem.writeFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          directory: Directory.Documents,
+          data: expect.any(String),
+        }),
+      );
+      expect(Share.share).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'NetGrade Backup',
+        }),
+      );
+      expect(result.success).toBe(true);
+      expect(result.message).toBe('Export erfolgreich');
+    });
+
+    it('should handle export errors gracefully', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+      vi.mocked(Filesystem.writeFile).mockResolvedValue({
+        uri: 'file://test.json',
+      });
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://test.json',
+      });
+      vi.mocked(Share.share).mockRejectedValue(new Error('Share failed'));
+
+      await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
+        ExportError,
+      );
+      await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
+        'Datei wurde gespeichert, Teilen war nicht möglich.',
+      );
+    });
+
     it('should handle empty database', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+
       const freshDataSource = await initializeTestDatabase();
 
       const dataSourceModule = await import('@/db/data-source');
