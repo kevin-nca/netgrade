@@ -100,11 +100,14 @@ export class DataManagementService {
       return value;
     });
 
-    await getDataSource().query('DELETE FROM grade');
-    await getDataSource().query('DELETE FROM exam');
-    await getDataSource().query('DELETE FROM subject');
-    await getDataSource().query('DELETE FROM school');
-    await getRepositories().school.save(schools);
+    const dataSource = getDataSource();
+    await dataSource.transaction(async (transactionManager) => {
+      await transactionManager.query('DELETE FROM grade');
+      await transactionManager.query('DELETE FROM exam');
+      await transactionManager.query('DELETE FROM subject');
+      await transactionManager.query('DELETE FROM school');
+      await transactionManager.getRepository(School).save(schools);
+    });
   }
 
   private static async exportNativeJSON(
