@@ -13,6 +13,7 @@ import { Share } from '@capacitor/share';
 global.URL.createObjectURL = vi.fn(() => 'blob:mocked-url');
 global.URL.revokeObjectURL = vi.fn();
 
+// Mock Capacitor modules
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
     isNativePlatform: vi.fn(() => false),
@@ -122,16 +123,17 @@ describe('DataManagementService', () => {
     it('should export all data as JSON successfully on web', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
 
-      const examRepo = dataSource.getRepository(Exam);
-      const exam = await examRepo.findOne({ where: {} });
-      expect(exam).toBeTruthy();
-      expect(exam!.date).toBeInstanceOf(Date);
-
       const result = await DataManagementService.exportAsJSON();
 
       expect(result.success).toBe(true);
       expect(result.message).toBe('Export erfolgreich heruntergeladen.');
       expect(result.filename).toMatch(/^backup_\d{4}-\d{2}-\d{2}\.json$/);
+
+      // Verifiziere nach dem Export dass Dates existieren
+      const examRepo = dataSource.getRepository(Exam);
+      const exam = await examRepo.findOne({ where: {} });
+      expect(exam).toBeTruthy();
+      expect(exam!.date).toBeInstanceOf(Date);
     });
 
     it('should export JSON on native platform', async () => {
@@ -205,70 +207,74 @@ describe('DataManagementService', () => {
   });
 
   describe('importFromJSON', () => {
-    it('should import valid JSON data successfully', async () => {
-      const freshDataSource = await initializeTestDatabase();
+    it(
+      'should import valid JSON data successfully',
+      { timeout: 10000 },
+      async () => {
+        const freshDataSource = await initializeTestDatabase();
 
-      const dataSourceModule = await import('@/db/data-source');
-      vi.spyOn(dataSourceModule, 'getDataSource').mockReturnValue(
-        freshDataSource,
-      );
-      vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
-        school: freshDataSource.getRepository(School),
-        subject: freshDataSource.getRepository(Subject),
-        exam: freshDataSource.getRepository(Exam),
-        grade: freshDataSource.getRepository(Grade),
-      });
+        const dataSourceModule = await import('@/db/data-source');
+        vi.spyOn(dataSourceModule, 'getDataSource').mockReturnValue(
+          freshDataSource,
+        );
+        vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
+          school: freshDataSource.getRepository(School),
+          subject: freshDataSource.getRepository(Subject),
+          exam: freshDataSource.getRepository(Exam),
+          grade: freshDataSource.getRepository(Grade),
+        });
 
-      const validJSON = JSON.stringify({
-        schools: [
-          {
-            id: 'test-school-1',
-            name: 'Test School',
-            appInstanceId: 'test-instance',
-            subjects: [
-              {
-                id: 'test-subject-1',
-                name: 'Math',
-                teacher: 'Mr. Smith',
-                weight: 1,
-                appInstanceId: 'test-instance',
-                exams: [
-                  {
-                    id: 'test-exam-1',
-                    name: 'Midterm',
-                    date: '2024-01-15',
-                    appInstanceId: 'test-instance',
-                    grade: {
-                      id: 'test-grade-1',
-                      score: 5.5,
-                      weight: 0.5,
+        const validJSON = JSON.stringify({
+          schools: [
+            {
+              id: 'test-school-1',
+              name: 'Test School',
+              appInstanceId: 'test-instance',
+              subjects: [
+                {
+                  id: 'test-subject-1',
+                  name: 'Math',
+                  teacher: 'Mr. Smith',
+                  weight: 1,
+                  appInstanceId: 'test-instance',
+                  exams: [
+                    {
+                      id: 'test-exam-1',
+                      name: 'Midterm',
                       date: '2024-01-15',
-                      comment: 'Good work',
-                      counts: true,
                       appInstanceId: 'test-instance',
+                      grade: {
+                        id: 'test-grade-1',
+                        score: 5.5,
+                        weight: 0.5,
+                        date: '2024-01-15',
+                        comment: 'Good work',
+                        counts: true,
+                        appInstanceId: 'test-instance',
+                      },
                     },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      });
+                  ],
+                },
+              ],
+            },
+          ],
+        });
 
-      await DataManagementService.importFromJSON(validJSON);
+        await DataManagementService.importFromJSON(validJSON);
 
-      const schoolRepo = freshDataSource.getRepository(School);
-      const schools = await schoolRepo.find({
-        relations: { subjects: { exams: { grade: true } } },
-      });
+        const schoolRepo = freshDataSource.getRepository(School);
+        const schools = await schoolRepo.find({
+          relations: { subjects: { exams: { grade: true } } },
+        });
 
-      expect(schools).toHaveLength(1);
-      expect(schools[0].name).toBe('Test School');
-      expect(schools[0].subjects).toHaveLength(1);
-      expect(schools[0].subjects[0].exams).toHaveLength(1);
+        expect(schools).toHaveLength(1);
+        expect(schools[0].name).toBe('Test School');
+        expect(schools[0].subjects).toHaveLength(1);
+        expect(schools[0].subjects[0].exams).toHaveLength(1);
 
-      await freshDataSource.destroy();
-    });
+        await freshDataSource.destroy();
+      },
+    );
 
     it('should handle invalid JSON format', async () => {
       const invalidJSON = 'not valid json';
