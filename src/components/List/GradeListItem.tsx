@@ -1,11 +1,12 @@
 import React from 'react';
+import { IonIcon } from '@ionic/react';
 import {
-  IonIcon,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-} from '@ionic/react';
-import { calendar, chatbubble, scale } from 'ionicons/icons';
+  calendar,
+  chatbubble,
+  scale,
+  createOutline,
+  trashOutline,
+} from 'ionicons/icons';
 import { Grade } from '@/db/entities';
 import { decimalToPercentage } from '@/utils/validation';
 import './GradeListItem.css';
@@ -19,14 +20,13 @@ interface GradeListItemProps {
 
 const GradeListItem: React.FC<GradeListItemProps> = ({
   grade,
-  index,
   onEdit,
   onDelete,
 }) => {
   const weightPercentage = decimalToPercentage(grade.weight);
 
   return (
-    <IonItemSliding key={index} className="grade-sliding-item">
+    <div className="grade-item-container">
       <div className="grade-item">
         <div className="grade-icon-badge">
           <span className="grade-score">{grade.score}</span>
@@ -51,17 +51,29 @@ const GradeListItem: React.FC<GradeListItemProps> = ({
             )}
           </div>
         </div>
-      </div>
 
-      <IonItemOptions side="end" className="grade-options">
-        <IonItemOption className="edit-option-slide" onClick={onEdit}>
-          Bearbeiten
-        </IonItemOption>
-        <IonItemOption className="remove-option-slide" onClick={onDelete}>
-          Löschen
-        </IonItemOption>
-      </IonItemOptions>
-    </IonItemSliding>
+        <div className="grade-actions">
+          <button
+            className="grade-action-button edit"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+          >
+            <IonIcon icon={createOutline} />
+          </button>
+          <button
+            className="grade-action-button delete"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+          >
+            <IonIcon icon={trashOutline} />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

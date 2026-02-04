@@ -5,20 +5,20 @@
   background: transparent;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 
-.subject-sliding-item {
-  border-radius: 12px;
+.subject-item-container {
+  border-radius: 16px;
   overflow: hidden;
 }
 
 .subject-item {
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 16px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
@@ -93,48 +93,58 @@
   color: rgba(0, 0, 0, 0.5);
 }
 
-.subject-average-badge {
-  display: inline-flex;
+.subject-average-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.7);
+  letter-spacing: -0.1px;
+}
+
+.subject-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.subject-action-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 18px;
-  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 20px;
+}
+
+.subject-action-button.edit {
   background: linear-gradient(135deg, #007aff, #0051d5);
   color: white;
-  font-size: 15px;
-  font-weight: 700;
-  white-space: nowrap;
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-  letter-spacing: 0.3px;
-  min-width: 65px;
 }
 
-.subject-options {
-  border: none;
+.subject-action-button.edit:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(0, 122, 255, 0.3);
 }
 
-.edit-option-slide {
-  --background: linear-gradient(135deg, #007aff, #0051d5);
-  --color: white;
-  font-weight: 500;
-  --padding-start: 20px;
-  --padding-end: 20px;
-  min-width: 120px;
+.subject-action-button.delete {
+  background: linear-gradient(135deg, #ff3b30, #e60000);
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
 }
 
-.remove-option-slide {
-  --background: linear-gradient(135deg, #ff3b30, #e60000);
-  --color: white;
-  font-weight: 500;
-  --padding-start: 20px;
-  --padding-end: 20px;
-  min-width: 100px;
+.subject-action-button.delete:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(255, 59, 48, 0.3);
 }
 
 .subjects-empty-state {
   text-align: center;
   padding: 24px 16px;
-  border-radius: 12px;
+  border-radius: 16px;
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.8) 0%,
@@ -149,8 +159,8 @@
 }
 
 .subjects-empty-icon {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 12px;
   background: rgba(0, 122, 255, 0.1);
   display: flex;
@@ -207,16 +217,26 @@
   .subject-teacher-text ion-icon {
     color: rgba(255, 255, 255, 0.6);
   }
+
+  .subject-average-text {
+    color: rgba(255, 255, 255, 0.8);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .subject-item {
+  .subject-item,
+  .subject-action-button {
     transition: none !important;
   }
 }
 
 @media (pointer: coarse) {
   .subject-item {
+    min-height: 44px;
+  }
+
+  .subject-action-button {
+    min-width: 44px;
     min-height: 44px;
   }
 }

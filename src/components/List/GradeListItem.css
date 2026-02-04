@@ -3,39 +3,27 @@ ion-list {
   padding: 16px;
 }
 
-ion-item {
-  --background: transparent;
-  --ion-item-background: transparent;
-}
-
-.grade-sliding-item {
-  border-radius: 12px;
+.grade-item-container {
+  border-radius: 16px;
   overflow: hidden;
-  margin-bottom: 8px;
-  --background: transparent;
-  --ion-item-background: transparent;
-  padding-left: 16px;
   padding-right: 16px;
+  padding-left: 16px;
+  padding-top: 16px;
 }
 
-.grade-sliding-item {
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 8px;
-  --background: transparent;
-  --ion-item-background: transparent;
+.grade-item-container:first-child {
+  margin-top: 0;
 }
 
 .grade-item {
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 16px;
+  padding: 20px;
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  align-items: center;
+  gap: 16px;
   position: relative;
   overflow: hidden;
+  width: 100%;
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.8) 0%,
@@ -47,10 +35,6 @@ ion-item {
   box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.grade-item:active {
-  transform: scale(0.98);
 }
 
 .grade-icon-badge {
@@ -116,26 +100,45 @@ ion-item {
   text-overflow: ellipsis;
 }
 
-.grade-options {
+.grade-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.grade-action-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 20px;
 }
 
-.edit-option-slide {
-  --background: linear-gradient(135deg, #007aff, #0051d5);
-  --color: white;
-  font-weight: 500;
-  --padding-start: 20px;
-  --padding-end: 20px;
-  min-width: 120px;
+.grade-action-button.edit {
+  background: linear-gradient(135deg, #007aff, #0051d5);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
-.remove-option-slide {
-  --background: linear-gradient(135deg, #ff3b30, #e60000);
-  --color: white;
-  font-weight: 500;
-  --padding-start: 20px;
-  --padding-end: 20px;
-  min-width: 100px;
+.grade-action-button.edit:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(0, 122, 255, 0.3);
+}
+
+.grade-action-button.delete {
+  background: linear-gradient(135deg, #ff3b30, #e60000);
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+}
+
+.grade-action-button.delete:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(255, 59, 48, 0.3);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -162,13 +165,18 @@ ion-item {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .grade-item {
+  .grade-action-button {
     transition: none !important;
   }
 }
 
 @media (pointer: coarse) {
   .grade-item {
+    min-height: 44px;
+  }
+
+  .grade-action-button {
+    min-width: 44px;
     min-height: 44px;
   }
 }

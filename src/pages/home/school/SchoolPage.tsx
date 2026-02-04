@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import {
-  IonButtons,
-  IonContent,
-  IonIcon,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-  IonPage,
-} from '@ionic/react';
-import { add, person } from 'ionicons/icons';
+import { IonButtons, IonContent, IonIcon, IonPage } from '@ionic/react';
+import { add, person, createOutline, trashOutline } from 'ionicons/icons';
 import SubjectSelectionModal from '@/features/add-subject/subject-selection-modal';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
@@ -65,16 +57,12 @@ const SchoolPage: React.FC = () => {
     });
   };
 
-  const handleRemoveSubject = (
-    subject: Subject,
-    slidingItem: HTMLIonItemSlidingElement,
-  ) => {
+  const handleRemoveSubject = (subject: Subject) => {
     deleteSubjectMutation.mutate(subject.id, {
       onError: (error) => {
         console.error('Failed to remove subject:', error);
       },
     });
-    slidingItem.close();
   };
 
   return (
@@ -99,10 +87,7 @@ const SchoolPage: React.FC = () => {
               const average = SchoolService.calculateSubjectAverage(subject);
 
               return (
-                <IonItemSliding
-                  key={subject.id}
-                  className="subject-sliding-item"
-                >
+                <div key={subject.id} className="subject-item-container">
                   <div
                     className="subject-item"
                     onClick={() => goToGradesPage(subject)}
@@ -123,38 +108,35 @@ const SchoolPage: React.FC = () => {
                             : 'Kein Name'}
                         </span>
                       </div>
+                      <div className="subject-average-text">
+                        Durchschnitt:{' '}
+                        {average !== undefined ? `${average}` : '—'}
+                      </div>
                     </div>
 
-                    <div className="subject-average-badge">
-                      {average !== undefined ? `${average}` : '—'}
+                    <div className="subject-actions">
+                      <button
+                        className="subject-action-button edit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSubjectToEdit(subject);
+                          setEditModalOpen(true);
+                        }}
+                      >
+                        <IonIcon icon={createOutline} />
+                      </button>
+                      <button
+                        className="subject-action-button delete"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveSubject(subject);
+                        }}
+                      >
+                        <IonIcon icon={trashOutline} />
+                      </button>
                     </div>
                   </div>
-
-                  <IonItemOptions side="end" className="subject-options">
-                    <IonItemOption
-                      className="edit-option-slide"
-                      onClick={() => {
-                        setSubjectToEdit(subject);
-                        setEditModalOpen(true);
-                      }}
-                    >
-                      Bearbeiten
-                    </IonItemOption>
-                    <IonItemOption
-                      className="remove-option-slide"
-                      onClick={(e) => {
-                        const slidingItem = (e.target as Element).closest(
-                          'ion-item-sliding',
-                        ) as HTMLIonItemSlidingElement;
-                        if (slidingItem) {
-                          handleRemoveSubject(subject, slidingItem);
-                        }
-                      }}
-                    >
-                      Löschen
-                    </IonItemOption>
-                  </IonItemOptions>
-                </IonItemSliding>
+                </div>
               );
             })
           ) : (
