@@ -191,12 +191,18 @@ export const useCurrentSemester = () => {
         semesterKeys.lists(),
       );
 
-      if (!allSemesters) return null;
+      if (!allSemesters) {
+        return null;
+      }
 
       const today = Temporal.Now.plainDateISO();
       return allSemesters.find((semester) => {
-        const start = Temporal.PlainDate.from(semester.startDate);
-        const end = Temporal.PlainDate.from(semester.endDate);
+        const start = Temporal.PlainDate.from(
+          semester.startDate.toString().split('T')[0],
+        );
+        const end = Temporal.PlainDate.from(
+          semester.endDate.toString().split('T')[0],
+        );
         return (
           Temporal.PlainDate.compare(today, start) >= 0 &&
           Temporal.PlainDate.compare(today, end) <= 0

@@ -1,20 +1,7 @@
-import { Column, Entity, OneToMany, ValueTransformer } from 'typeorm';
-import { Temporal } from '@js-temporal/polyfill';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { Subject } from './Subject';
-
-const TemporalDateTransformer: ValueTransformer = {
-  to(value: Temporal.PlainDate): Date {
-    return new Date(value.toString());
-  },
-
-  from(value: Date | string): string {
-    if (value instanceof Date) {
-      return value.toISOString().split('T')[0];
-    }
-    return value;
-  },
-};
+import { dateTransformer } from '@/db/utils';
 
 @Entity('semester')
 export class Semester extends BaseEntity {
@@ -23,15 +10,15 @@ export class Semester extends BaseEntity {
 
   @Column({
     type: 'date',
-    transformer: TemporalDateTransformer,
+    transformer: dateTransformer,
   })
-  startDate!: string;
+  startDate!: Date;
 
   @Column({
     type: 'date',
-    transformer: TemporalDateTransformer,
+    transformer: dateTransformer,
   })
-  endDate!: string;
+  endDate!: Date;
 
   @OneToMany(() => Subject, (subject) => subject.semester)
   subjects!: Subject[];

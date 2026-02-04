@@ -207,8 +207,12 @@ export class PreferencesService {
       const semesters = await semesterRepo.find();
 
       const currentSemester = semesters.find((semester) => {
-        const start = Temporal.PlainDate.from(semester.startDate);
-        const end = Temporal.PlainDate.from(semester.endDate);
+        const start = Temporal.PlainDate.from(
+          semester.startDate.toString().split('T')[0],
+        );
+        const end = Temporal.PlainDate.from(
+          semester.endDate.toString().split('T')[0],
+        );
 
         return (
           Temporal.PlainDate.compare(today, start) >= 0 &&
