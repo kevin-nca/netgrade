@@ -122,6 +122,11 @@ describe('DataManagementService', () => {
     it('should export all data as JSON successfully on web', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
 
+      const examRepo = dataSource.getRepository(Exam);
+      const exam = await examRepo.findOne({ where: {} });
+      expect(exam).toBeTruthy();
+      expect(exam!.date).toBeInstanceOf(Date);
+
       const result = await DataManagementService.exportAsJSON();
 
       expect(result.success).toBe(true);
@@ -202,7 +207,6 @@ describe('DataManagementService', () => {
   describe('importFromJSON', () => {
     it(
       'should import valid JSON data successfully',
-      { timeout: 10000 },
       async () => {
         const freshDataSource = await initializeTestDatabase();
 
