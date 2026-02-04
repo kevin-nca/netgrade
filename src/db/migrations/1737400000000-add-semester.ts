@@ -1,5 +1,6 @@
 import { getRepositories } from '@/db/data-source';
 import { QueryRunner } from 'typeorm';
+import { Temporal } from '@js-temporal/polyfill';
 
 export class AddSemester1737400000000 {
   name = 'AddSemester1737400000000';
@@ -29,16 +30,16 @@ export class AddSemester1737400000000 {
     // 3. Create default semester using repository
     const { semester: semesterRepo } = getRepositories();
 
-    const currentYear = new Date().getFullYear();
+    const currentYear = Temporal.Now.plainDateISO().year;
     const nextYear = currentYear + 1;
     const defaultYear = `${currentYear}/${nextYear}`;
-    const startDate = `${currentYear}-08-15`;
-    const endDate = `${nextYear}-07-31`;
+    const startDate = Temporal.PlainDate.from(`${currentYear}-08-15`);
+    const endDate = Temporal.PlainDate.from(`${nextYear}-07-31`);
 
     const defaultSemester = semesterRepo.create({
       name: defaultYear,
-      startDate: startDate,
-      endDate: endDate,
+      startDate: new Date(startDate.toString()),
+      endDate: new Date(endDate.toString()),
     });
 
     await semesterRepo.save(defaultSemester);
