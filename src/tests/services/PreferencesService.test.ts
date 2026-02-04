@@ -184,8 +184,8 @@ describe('PreferencesService', () => {
       const pastSemester = {
         id: 'semester-1',
         name: 'Past Semester',
-        startDate: '2023-08-01',
-        endDate: '2024-07-31',
+        startDate: new Date('2023-08-01'),
+        endDate: new Date('2024-07-31'),
       } as Semester;
 
       mockGetRepositories.mockReturnValue({

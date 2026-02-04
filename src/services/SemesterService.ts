@@ -37,8 +37,8 @@ export class SemesterService {
 
       const newSemester = semesterRepo.create({
         name: newSemesterData.name,
-        startDate: newSemesterData.startDate.toString(),
-        endDate: newSemesterData.endDate.toString(),
+        startDate: new Date(newSemesterData.startDate.toString()),
+        endDate: new Date(newSemesterData.endDate.toString()),
       });
       return await semesterRepo.save(newSemester);
     } catch (error) {
