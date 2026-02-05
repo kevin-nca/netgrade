@@ -8,6 +8,7 @@ import { NotificationSettings, PreferencesService } from '@/services';
 import { notificationScheduler } from '@/notification-scheduler';
 import { semesterKeys } from '@/hooks/queries/useSemesterQueries';
 import { getRepositories } from '@/db/data-source';
+import { Temporal } from '@js-temporal/polyfill';
 
 export const preferencesKeys = {
   all: ['preferences'] as const,
@@ -185,7 +186,7 @@ export const useCurrentSemester = () => {
     queryKey: semesterKeys.current(),
     queryFn: async () => {
       const { semester: semesterRepo } = getRepositories();
-      const today = new Date();
+      const today = new Date(Temporal.Now.plainDateISO().toString());
 
       return await semesterRepo
         .createQueryBuilder('semester')

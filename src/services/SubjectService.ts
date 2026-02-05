@@ -40,13 +40,14 @@ export class SubjectService {
     try {
       const { subject: subjectRepo } = getRepositories();
 
-      if (!newSubjectData.semesterId) {
-        newSubjectData.semesterId = await this.getOrCreateDefaultSemester();
-      }
+      const semesterId =
+        newSubjectData.semesterId || (await this.getOrCreateDefaultSemester());
 
       const newSubject = subjectRepo.create({
         ...newSubjectData,
+        semesterId,
       });
+
       return await subjectRepo.save(newSubject);
     } catch (error) {
       console.error('Failed to add subject:', error);
