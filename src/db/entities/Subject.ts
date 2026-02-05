@@ -17,7 +17,7 @@ export class Subject extends BaseEntity {
   schoolId!: string;
 
   @Column({ type: 'uuid' })
-  semesterId!: string | null;
+  semesterId!: string;
 
   @ManyToOne(() => Semester, (semester) => semester.subjects, {
     onDelete: 'CASCADE',
