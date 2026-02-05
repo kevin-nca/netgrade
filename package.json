@@ -35,7 +35,6 @@
     "@ionic/core": "^8.7.17",
     "@ionic/react": "^8.7.17",
     "@ionic/react-router": "^8.7.17",
-    "@js-temporal/polyfill": "^0.5.1",
     "@tanstack/react-form": "^1.28.0",
     "@tanstack/react-query": "^5.90.20",
     "@tanstack/react-query-devtools": "^5.91.3",

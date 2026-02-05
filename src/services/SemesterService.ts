@@ -1,4 +1,3 @@
-import { Temporal } from '@js-temporal/polyfill';
 import { getRepositories } from '@/db/data-source';
 import { Semester } from '@/db/entities/Semester';
 
@@ -29,16 +28,16 @@ export class SemesterService {
    */
   static async add(newSemesterData: {
     name: string;
-    startDate: Temporal.PlainDate;
-    endDate: Temporal.PlainDate;
+    startDate: Date;
+    endDate: Date;
   }): Promise<Semester> {
     try {
       const { semester: semesterRepo } = getRepositories();
 
       const newSemester = semesterRepo.create({
         name: newSemesterData.name,
-        startDate: newSemesterData.startDate.toString(),
-        endDate: newSemesterData.endDate.toString(),
+        startDate: newSemesterData.startDate,
+        endDate: newSemesterData.endDate,
       });
       return await semesterRepo.save(newSemester);
     } catch (error) {

@@ -7,11 +7,11 @@ export class Semester extends BaseEntity {
   @Column({ type: 'varchar' })
   name!: string;
 
-  @Column({ type: 'text' })
-  startDate!: string;
+  @Column({ type: 'date' })
+  startDate!: Date;
 
-  @Column({ type: 'text' })
-  endDate!: string;
+  @Column({ type: 'date' })
+  endDate!: Date;
 
   @OneToMany(() => Subject, (subject) => subject.semester)
   subjects!: Subject[];

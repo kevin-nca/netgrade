@@ -3,7 +3,6 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
 import { getRepositories } from '@/db/data-source';
 import { Semester } from '@/db/entities/Semester';
-import { Temporal } from '@js-temporal/polyfill';
 
 export interface AppPreferences {
   userName: string | null;
@@ -202,18 +201,15 @@ export class PreferencesService {
   static async getCurrentSemester(): Promise<Semester | null> {
     try {
       const { semester: semesterRepo } = getRepositories();
-      const today = Temporal.Now.plainDateISO();
+      const today = new Date();
 
       const semesters = await semesterRepo.find();
 
       const currentSemester = semesters.find((semester) => {
-        const start = Temporal.PlainDate.from(semester.startDate);
-        const end = Temporal.PlainDate.from(semester.endDate);
+        const start = new Date(semester.startDate);
+        const end = new Date(semester.endDate);
 
-        return (
-          Temporal.PlainDate.compare(today, start) >= 0 &&
-          Temporal.PlainDate.compare(today, end) <= 0
-        );
+        return start <= today && today <= end;
       });
 
       return currentSemester || null;

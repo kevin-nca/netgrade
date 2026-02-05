@@ -60,8 +60,8 @@ export const seedTestData = async (dataSource: DataSource) => {
   // Create a semester
   const semester = repositories.semester.create({
     name: '2024/2025',
-    startDate: '2024-08-15',
-    endDate: '2025-07-31',
+    startDate: new Date('2024-08-15'),
+    endDate: new Date('2025-07-31'),
   });
   await repositories.semester.save(semester);
 
@@ -343,11 +343,15 @@ export const createMockSchoolWithDifferentSubjectAverages = (): School => {
 
 // Helper function to create mock current semester
 export const createMockCurrentSemester = (): Semester => {
+  const today = new Date();
+  const startOfYear = new Date(today.getFullYear(), 0, 1); // Jan 1 dieses Jahr
+  const endOfYear = new Date(today.getFullYear(), 11, 31); // Dec 31 dieses Jahr
+
   return {
     id: 'semester-1',
     name: 'Current Semester',
-    startDate: '2024-08-01',
-    endDate: '2024-12-31',
+    startDate: startOfYear,
+    endDate: endOfYear,
   } as Semester;
 };
 

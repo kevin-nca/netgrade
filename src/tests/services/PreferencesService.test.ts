@@ -1,9 +1,9 @@
+// PreferencesService.test.ts
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { Preferences } from '@capacitor/preferences';
 import { PreferencesService } from '@/services/PreferencesService';
 import { getRepositories } from '../../db/data-source';
 import { createMockCurrentSemester } from './setup';
-import { Temporal } from '@js-temporal/polyfill';
 import { Semester } from '../../db/entities';
 
 vi.mock('@capacitor/preferences', () => ({
@@ -156,9 +156,6 @@ describe('PreferencesService', () => {
 
     it('should return the current semester when today is within range', async () => {
       // Arrange
-      const today = Temporal.PlainDate.from('2024-10-15');
-      vi.spyOn(Temporal.Now, 'plainDateISO').mockReturnValue(today);
-
       const mockSemester = createMockCurrentSemester();
       const allSemesters = [mockSemester];
 
@@ -178,9 +175,6 @@ describe('PreferencesService', () => {
 
     it('should return null when no semester matches today', async () => {
       // Arrange
-      const today = Temporal.PlainDate.from('2024-10-15');
-      vi.spyOn(Temporal.Now, 'plainDateISO').mockReturnValue(today);
-
       const pastSemester = {
         id: 'semester-1',
         name: 'Past Semester',

@@ -1,5 +1,4 @@
 import { getRepositories } from '@/db/data-source';
-import { Temporal } from '@js-temporal/polyfill';
 import { Subject } from '@/db/entities';
 
 export class SubjectService {
@@ -40,12 +39,12 @@ export class SubjectService {
     try {
       const { subject: subjectRepo } = getRepositories();
 
-      if (!newSubjectData.semesterId) {
-        newSubjectData.semesterId = await this.getOrCreateDefaultSemester();
-      }
+      const semesterId =
+        newSubjectData.semesterId || (await this.getOrCreateDefaultSemester());
 
       const newSubject = subjectRepo.create({
         ...newSubjectData,
+        semesterId,
       });
       return await subjectRepo.save(newSubject);
     } catch (error) {
@@ -162,14 +161,14 @@ export class SubjectService {
     });
 
     if (!defaultSemester) {
-      const currentYear = Temporal.Now.plainDateISO().year;
+      const currentYear = new Date().getFullYear();
       const nextYear = currentYear + 1;
 
       defaultSemester = semesterRepo.create({
         id: defaultSemesterId,
         name: `${currentYear}/${nextYear}`,
-        startDate: `${currentYear}-08-15`,
-        endDate: `${nextYear}-07-31`,
+        startDate: new Date(`${currentYear}-08-15`),
+        endDate: new Date(`${nextYear}-07-31`),
       });
 
       await semesterRepo.save(defaultSemester);
