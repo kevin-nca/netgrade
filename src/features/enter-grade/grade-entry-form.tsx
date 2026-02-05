@@ -19,7 +19,6 @@ import {
   useUpdateExamAndGrade,
 } from '@/hooks/queries';
 import { decimalToPercentage, percentageToDecimal } from '@/utils/validation';
-import { Layout } from '@/components/Layout/Layout';
 import { useAppForm } from '@/shared/components/form';
 import {
   type EditGradeFormData,
@@ -150,65 +149,63 @@ const GradeEntryForm: React.FC<GradeEntryFormProps> = ({
           ) : undefined
         }
       />
-      <IonContent>
-        <Layout>
-          {!grades || grades.length === 0 ? (
-            <div className="ion-padding ion-text-center">
-              <p>Keine Noten gefunden.</p>
+      <IonContent slot="end">
+        {!grades || grades.length === 0 ? (
+          <div className="ion-padding ion-text-center">
+            <p>Keine Noten gefunden.</p>
+          </div>
+        ) : (
+          <IonList>
+            {grades.map((grade) => (
+              <GradeListItem
+                key={grade.id}
+                grade={grade}
+                onEdit={() => startEdit(grade)}
+                onDelete={() => handleDelete(grade.id)}
+              />
+            ))}
+          </IonList>
+        )}
+
+        <IonModal isOpen={editingId !== null}>
+          <Header title="Note bearbeiten" backButton={false} />
+          <IonContent>
+            <div className="ion-padding">
+              <form.AppField name="examName">
+                {(field) => <field.ExamNameField label="Prüfungsname" />}
+              </form.AppField>
+
+              <form.AppField name="score">
+                {(field) => <field.GradeScoreField label="Note (1-6)" />}
+              </form.AppField>
+
+              <form.AppField name="weight">
+                {(field) => <field.WeightField label="Gewichtung (0-100%)" />}
+              </form.AppField>
+
+              <form.AppField name="date">
+                {(field) => <field.DateField label="Datum" />}
+              </form.AppField>
+
+              <form.AppField name="comment">
+                {(field) => (
+                  <field.DescriptionField label="Kommentar (optional)" />
+                )}
+              </form.AppField>
+
+              <SubmitButton onClick={handleSaveEdit} text="Speichern" />
+              <CancelButton text="Abbrechen" onClick={cancelEdit} />
             </div>
-          ) : (
-            <IonList>
-              {grades.map((grade) => (
-                <GradeListItem
-                  key={grade.id}
-                  grade={grade}
-                  onEdit={() => startEdit(grade)}
-                  onDelete={() => handleDelete(grade.id)}
-                />
-              ))}
-            </IonList>
-          )}
+          </IonContent>
+        </IonModal>
 
-          <IonModal isOpen={editingId !== null}>
-            <Header title="Note bearbeiten" backButton={false} />
-            <IonContent>
-              <div className="ion-padding">
-                <form.AppField name="examName">
-                  {(field) => <field.ExamNameField label="Prüfungsname" />}
-                </form.AppField>
-
-                <form.AppField name="score">
-                  {(field) => <field.GradeScoreField label="Note (1-6)" />}
-                </form.AppField>
-
-                <form.AppField name="weight">
-                  {(field) => <field.WeightField label="Gewichtung (0-100%)" />}
-                </form.AppField>
-
-                <form.AppField name="date">
-                  {(field) => <field.DateField label="Datum" />}
-                </form.AppField>
-
-                <form.AppField name="comment">
-                  {(field) => (
-                    <field.DescriptionField label="Kommentar (optional)" />
-                  )}
-                </form.AppField>
-
-                <SubmitButton onClick={handleSaveEdit} text="Speichern" />
-                <CancelButton text="Abbrechen" onClick={cancelEdit} />
-              </div>
-            </IonContent>
-          </IonModal>
-
-          <IonToast
-            isOpen={showToast}
-            onDidDismiss={() => setShowToast(false)}
-            message={toastMessage}
-            duration={2000}
-            color="danger"
-          />
-        </Layout>
+        <IonToast
+          isOpen={showToast}
+          onDidDismiss={() => setShowToast(false)}
+          message={toastMessage}
+          duration={2000}
+          color="danger"
+        />
       </IonContent>
     </>
   );

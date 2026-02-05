@@ -1,21 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import {
-  IonButtons,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonContent,
-  IonIcon,
-  IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-  IonList,
-  IonPage,
-} from '@ionic/react';
-import { add } from 'ionicons/icons';
+import { IonButtons, IonContent, IonIcon, IonPage } from '@ionic/react';
+import { add, person, createOutline, trashOutline } from 'ionicons/icons';
 import SubjectSelectionModal from '@/features/add-subject/subject-selection-modal';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
@@ -71,16 +57,12 @@ const SchoolPage: React.FC = () => {
     });
   };
 
-  const handleRemoveSubject = (
-    subject: Subject,
-    slidingItem: HTMLIonItemSlidingElement,
-  ) => {
+  const handleRemoveSubject = (subject: Subject) => {
     deleteSubjectMutation.mutate(subject.id, {
       onError: (error) => {
         console.error('Failed to remove subject:', error);
       },
     });
-    slidingItem.close();
   };
 
   return (
@@ -99,62 +81,75 @@ const SchoolPage: React.FC = () => {
         }
       />
       <IonContent>
-        <IonList>
-          {subjects!.map((subject: Subject) => {
-            const average = SchoolService.calculateSubjectAverage(subject);
+        <div className="subjects-container">
+          {subjects!.length > 0 ? (
+            subjects!.map((subject: Subject) => {
+              const average = SchoolService.calculateSubjectAverage(subject);
 
-            return (
-              <IonItemSliding key={subject.id} className="subject-sliding-card">
-                <IonItem
-                  button
-                  color={'light'}
-                  onClick={() => goToGradesPage(subject)}
-                  className="subject-card"
-                >
-                  <IonCard color={'light'} className="grade-card">
-                    <IonCardHeader>
-                      <IonCardTitle>{subject.name}</IonCardTitle>
-                    </IonCardHeader>
-                    <IonCardContent className="subject-content-card">
-                      <p className="teacher">
-                        {subject.teacher !== null
-                          ? subject.teacher
-                          : 'Kein Name'}
-                      </p>
-                      <p className="average-grade">
-                        {average !== undefined ? `${average} Ø` : 'Keine Noten'}
-                      </p>
-                    </IonCardContent>
-                  </IonCard>
-                </IonItem>
-                <IonItemOptions side="end" className="option-slide-container">
-                  <IonItemOption
-                    className="edit-option-slide"
-                    onClick={() => {
-                      setSubjectToEdit(subject);
-                      setEditModalOpen(true);
-                    }}
+              return (
+                <div key={subject.id} className="subject-item-container">
+                  <div
+                    className="subject-item"
+                    onClick={() => goToGradesPage(subject)}
                   >
-                    Bearbeiten
-                  </IonItemOption>
-                  <IonItemOption
-                    className="remove-option-slide"
-                    onClick={(e) => {
-                      const slidingItem = (e.target as Element).closest(
-                        'ion-item-sliding',
-                      ) as HTMLIonItemSlidingElement;
-                      if (slidingItem) {
-                        handleRemoveSubject(subject, slidingItem);
-                      }
-                    }}
-                  >
-                    Löschen
-                  </IonItemOption>
-                </IonItemOptions>
-              </IonItemSliding>
-            );
-          })}
-        </IonList>
+                    <div className="subject-icon-badge">
+                      <span className="subject-initial">
+                        {subject.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+
+                    <div className="subject-info">
+                      <h3 className="subject-name">{subject.name}</h3>
+                      <div className="subject-teacher-text">
+                        <IonIcon icon={person} />
+                        <span>
+                          {subject.teacher !== null
+                            ? subject.teacher
+                            : 'Kein Name'}
+                        </span>
+                      </div>
+                      <div className="subject-average-text">
+                        Durchschnitt:{' '}
+                        {average !== undefined ? `${average}` : '—'}
+                      </div>
+                    </div>
+
+                    <div className="subject-actions">
+                      <button
+                        className="subject-action-button edit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSubjectToEdit(subject);
+                          setEditModalOpen(true);
+                        }}
+                      >
+                        <IonIcon icon={createOutline} />
+                      </button>
+                      <button
+                        className="subject-action-button delete"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveSubject(subject);
+                        }}
+                      >
+                        <IonIcon icon={trashOutline} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="subjects-empty-state">
+              <div className="subjects-empty-icon">
+                <IonIcon icon={add} />
+              </div>
+              <h3>Keine Fächer</h3>
+              <p>Füge dein erstes Fach hinzu um zu starten.</p>
+            </div>
+          )}
+        </div>
+
         <SubjectSelectionModal
           isOpen={isModalOpen}
           setIsOpen={setModalOpen}

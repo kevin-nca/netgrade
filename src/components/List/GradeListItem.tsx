@@ -1,13 +1,15 @@
 import React from 'react';
+import { IonIcon } from '@ionic/react';
 import {
-  IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-  IonLabel,
-} from '@ionic/react';
+  calendar,
+  chatbubble,
+  scale,
+  createOutline,
+  trashOutline,
+} from 'ionicons/icons';
 import { Grade } from '@/db/entities';
 import { decimalToPercentage } from '@/utils/validation';
+import './GradeListItem.css';
 
 interface GradeListItemProps {
   grade: Grade;
@@ -18,33 +20,60 @@ interface GradeListItemProps {
 
 const GradeListItem: React.FC<GradeListItemProps> = ({
   grade,
-  index,
   onEdit,
   onDelete,
 }) => {
   const weightPercentage = decimalToPercentage(grade.weight);
 
   return (
-    <IonItemSliding key={index}>
-      <IonItem>
-        <IonLabel>
-          <h2>Titel: {grade.exam.name}</h2>
-          <p>Note: {grade.score}</p>
-          <p>Gewichtung: {weightPercentage}%</p>
-          <p>Datum: {new Date(grade.date).toLocaleDateString()}</p>
-          {/*<p>Zählt: {grade.counts ? 'Ja' : 'Nein'}</p>*/}
-          <p>Kommentar: {grade.comment}</p>
-        </IonLabel>
-      </IonItem>
-      <IonItemOptions side="end">
-        <IonItemOption color="primary" onClick={onEdit}>
-          Bearbeiten
-        </IonItemOption>
-        <IonItemOption color="danger" onClick={onDelete}>
-          Löschen
-        </IonItemOption>
-      </IonItemOptions>
-    </IonItemSliding>
+    <div className="grade-item-container">
+      <div className="grade-item">
+        <div className="grade-icon-badge">
+          <span className="grade-score">{grade.score}</span>
+        </div>
+
+        <div className="grade-info">
+          <h3 className="grade-exam-name">{grade.exam.name}</h3>
+          <div className="grade-details">
+            <div className="grade-detail-item">
+              <IonIcon icon={scale} />
+              <span>{weightPercentage}%</span>
+            </div>
+            <div className="grade-detail-item">
+              <IonIcon icon={calendar} />
+              <span>{new Date(grade.date).toLocaleDateString()}</span>
+            </div>
+            {grade.comment && (
+              <div className="grade-detail-item">
+                <IonIcon icon={chatbubble} />
+                <span>{grade.comment}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="grade-actions">
+          <button
+            className="grade-action-button edit"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+          >
+            <IonIcon icon={createOutline} />
+          </button>
+          <button
+            className="grade-action-button delete"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+          >
+            <IonIcon icon={trashOutline} />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
