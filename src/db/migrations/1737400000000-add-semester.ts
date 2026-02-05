@@ -42,7 +42,18 @@ export class AddSemester1737400000000 {
       endDate: new Date(endDate.toString()),
     });
 
-    await semesterRepo.save(defaultSemester);
+    try {
+      await semesterRepo.save(defaultSemester);
+      console.log(
+        `Created default semester: ${defaultYear} with ID: ${defaultSemester.id}`,
+      );
+    } catch (error) {
+      console.error(
+        'Failed to create default semester during migration:',
+        error,
+      );
+      throw error;
+    }
 
     console.log(
       `Created default semester: ${defaultYear} with ID: ${defaultSemester.id}`,
