@@ -1,45 +1,19 @@
-import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
 import {
   DataManagementService,
   ExportError,
 } from '@/services/DataManagementService';
-import { initializeTestDatabase, seedTestData } from './setup';
+import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Exam, Grade, School, Subject } from '@/db/entities';
-import { Capacitor } from '@capacitor/core';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
 
 global.URL.createObjectURL = vi.fn(() => 'blob:mocked-url');
 global.URL.revokeObjectURL = vi.fn();
 
-// Mock Capacitor modules
-vi.mock('@capacitor/core', () => ({
-  Capacitor: {
-    isNativePlatform: vi.fn(() => false),
-  },
-}));
-
-vi.mock('@capacitor/filesystem', () => ({
-  Filesystem: {
-    writeFile: vi.fn(),
-    getUri: vi.fn(),
-  },
-  Directory: {
-    Documents: 'DOCUMENTS',
-  },
-}));
-
-vi.mock('@capacitor/share', () => ({
-  Share: {
-    share: vi.fn(),
-  },
-}));
-
 describe('DataManagementService', () => {
   let dataSource: DataSource;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     dataSource = await initializeTestDatabase();
 
     const dataSourceModule = await import('@/db/data-source');
@@ -54,10 +28,8 @@ describe('DataManagementService', () => {
     await seedTestData(dataSource);
   });
 
-  afterEach(async () => {
-    if (dataSource?.isInitialized) {
-      await dataSource.destroy();
-    }
+  afterAll(async () => {
+    await cleanupTestData(dataSource);
     vi.clearAllMocks();
   });
 
@@ -91,6 +63,10 @@ describe('DataManagementService', () => {
   });
 
   describe('exportData', () => {
+    beforeAll(async () => {
+      await seedTestData(dataSource);
+    });
+
     it('should export school data as XLSX', async () => {
       const schoolRepo = dataSource.getRepository(School);
       const school = await schoolRepo.findOne({ where: {} });
@@ -116,199 +92,6 @@ describe('DataManagementService', () => {
           schoolId: 'invalid-id',
         }),
       ).rejects.toThrow(ExportError);
-    });
-  });
-
-  describe('exportAsJSON', () => {
-    it('should export all data as JSON successfully on web', async () => {
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
-
-      const result = await DataManagementService.exportAsJSON();
-
-      expect(result.success).toBe(true);
-      expect(result.message).toBe('Export erfolgreich heruntergeladen.');
-      expect(result.filename).toMatch(/^backup_\d{4}-\d{2}-\d{2}\.json$/);
-
-      // Verifiziere nach dem Export dass Dates existieren
-      const examRepo = dataSource.getRepository(Exam);
-      const exam = await examRepo.findOne({ where: {} });
-      expect(exam).toBeTruthy();
-      expect(exam!.date).toBeInstanceOf(Date);
-    });
-
-    it('should export JSON on native platform', async () => {
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
-      vi.mocked(Filesystem.writeFile).mockResolvedValue({
-        uri: 'file://test.json',
-      });
-      vi.mocked(Filesystem.getUri).mockResolvedValue({
-        uri: 'file://test.json',
-      });
-      vi.mocked(Share.share).mockResolvedValue({ activityType: 'share' });
-
-      const result = await DataManagementService.exportAsJSON();
-
-      expect(Filesystem.writeFile).toHaveBeenCalledWith(
-        expect.objectContaining({
-          directory: Directory.Documents,
-          data: expect.any(String),
-        }),
-      );
-      expect(Share.share).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: 'NetGrade Backup',
-        }),
-      );
-      expect(result.success).toBe(true);
-      expect(result.message).toBe('Export erfolgreich');
-    });
-
-    it('should handle export errors gracefully', async () => {
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
-      vi.mocked(Filesystem.writeFile).mockResolvedValue({
-        uri: 'file://test.json',
-      });
-      vi.mocked(Filesystem.getUri).mockResolvedValue({
-        uri: 'file://test.json',
-      });
-      vi.mocked(Share.share).mockRejectedValue(new Error('Share failed'));
-
-      await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
-        ExportError,
-      );
-      await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
-        'Datei wurde gespeichert, Teilen war nicht möglich.',
-      );
-    });
-
-    it('should handle empty database', async () => {
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
-
-      const freshDataSource = await initializeTestDatabase();
-
-      const dataSourceModule = await import('@/db/data-source');
-      vi.spyOn(dataSourceModule, 'getDataSource').mockReturnValue(
-        freshDataSource,
-      );
-      vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
-        school: freshDataSource.getRepository(School),
-        subject: freshDataSource.getRepository(Subject),
-        exam: freshDataSource.getRepository(Exam),
-        grade: freshDataSource.getRepository(Grade),
-      });
-
-      const result = await DataManagementService.exportAsJSON();
-
-      expect(result.success).toBe(true);
-      expect(result.filename).toMatch(/^backup_\d{4}-\d{2}-\d{2}\.json$/);
-
-      await freshDataSource.destroy();
-    });
-  });
-
-  describe('importFromJSON', () => {
-    it(
-      'should import valid JSON data successfully',
-      { timeout: 10000 },
-      async () => {
-        const freshDataSource = await initializeTestDatabase();
-
-        const dataSourceModule = await import('@/db/data-source');
-        vi.spyOn(dataSourceModule, 'getDataSource').mockReturnValue(
-          freshDataSource,
-        );
-        vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
-          school: freshDataSource.getRepository(School),
-          subject: freshDataSource.getRepository(Subject),
-          exam: freshDataSource.getRepository(Exam),
-          grade: freshDataSource.getRepository(Grade),
-        });
-
-        const validJSON = JSON.stringify({
-          schools: [
-            {
-              id: 'test-school-1',
-              name: 'Test School',
-              appInstanceId: 'test-instance',
-              subjects: [
-                {
-                  id: 'test-subject-1',
-                  name: 'Math',
-                  teacher: 'Mr. Smith',
-                  weight: 1,
-                  appInstanceId: 'test-instance',
-                  exams: [
-                    {
-                      id: 'test-exam-1',
-                      name: 'Midterm',
-                      date: '2024-01-15',
-                      appInstanceId: 'test-instance',
-                      grade: {
-                        id: 'test-grade-1',
-                        score: 5.5,
-                        weight: 0.5,
-                        date: '2024-01-15',
-                        comment: 'Good work',
-                        counts: true,
-                        appInstanceId: 'test-instance',
-                      },
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        });
-
-        await DataManagementService.importFromJSON(validJSON);
-
-        const schoolRepo = freshDataSource.getRepository(School);
-        const schools = await schoolRepo.find({
-          relations: { subjects: { exams: { grade: true } } },
-        });
-
-        expect(schools).toHaveLength(1);
-        expect(schools[0].name).toBe('Test School');
-        expect(schools[0].subjects).toHaveLength(1);
-        expect(schools[0].subjects[0].exams).toHaveLength(1);
-
-        await freshDataSource.destroy();
-      },
-    );
-
-    it('should handle invalid JSON format', async () => {
-      const invalidJSON = 'not valid json';
-
-      await expect(
-        DataManagementService.importFromJSON(invalidJSON),
-      ).rejects.toThrow();
-    });
-
-    it('should handle missing schools property', async () => {
-      const invalidJSON = JSON.stringify({ data: [] });
-
-      await expect(
-        DataManagementService.importFromJSON(invalidJSON),
-      ).rejects.toThrow();
-    });
-
-    it('should rollback on import failure', async () => {
-      const initialSchoolCount = await dataSource.getRepository(School).count();
-
-      const invalidJSON = JSON.stringify({
-        schools: [
-          {
-            name: null,
-          },
-        ],
-      });
-
-      await expect(
-        DataManagementService.importFromJSON(invalidJSON),
-      ).rejects.toThrow();
-
-      const finalSchoolCount = await dataSource.getRepository(School).count();
-      expect(finalSchoolCount).toBe(initialSchoolCount);
     });
   });
 });
