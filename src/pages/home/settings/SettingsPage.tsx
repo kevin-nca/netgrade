@@ -47,7 +47,7 @@ import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQuerie
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import Header from '@/components/Header/Header';
 import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
-import { DataManagementService } from '@/services/DataManagementService';
+import { BackupService } from '@/services/BackupService';
 import './SettingsPage.css';
 
 const SettingsPage: React.FC = () => {
@@ -231,7 +231,7 @@ const SettingsPage: React.FC = () => {
 
   const handleExportJSON = async () => {
     try {
-      await DataManagementService.exportAsJSON();
+      await BackupService.exportAsJSON();
       showToast('JSON Export erfolgreich!', true);
     } catch {
       showToast('Export fehlgeschlagen', false);
@@ -256,7 +256,7 @@ const SettingsPage: React.FC = () => {
           handler: async () => {
             try {
               const text = await file.text();
-              await DataManagementService.importFromJSON(text);
+              await BackupService.importFromJSON(text);
               showToast('Import erfolgreich!', true);
               setTimeout(() => {
                 window.location.reload();
