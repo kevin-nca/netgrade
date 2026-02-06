@@ -55,6 +55,7 @@ export class DataManagementService {
         await transactionManager.query('DELETE FROM grade');
         await transactionManager.query('DELETE FROM exam');
         await transactionManager.query('DELETE FROM subject');
+        await transactionManager.query('DELETE FROM semester');
         await transactionManager.query('DELETE FROM school');
       });
 

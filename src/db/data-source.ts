@@ -1,7 +1,7 @@
 import { DataSource, DataSourceOptions, Repository } from 'typeorm'; // Import Repository
 import { Capacitor } from '@capacitor/core';
 import { CapacitorSQLite, SQLiteConnection } from '@capacitor-community/sqlite';
-import { Exam, Grade, School, Subject } from './entities';
+import { Exam, Grade, School, Semester, Subject } from './entities';
 import localforage from 'localforage';
 
 // @ts-expect-error SQL.js is not typed
@@ -10,6 +10,7 @@ import initSqlJs from 'sql.js';
 // Migrations
 import { Initdb1745319232244 } from './migrations/1745319232244-initdb';
 import { DropDescriptionFromSubject1761134134122 } from './migrations/1761134134122-drop_description_from_subject';
+import { AddSemester1737400000000 } from '@/db/migrations/1737400000000-add-semester';
 
 // Reference: https://github.com/sql-js/react-sqljs-demo/blob/master/src/App.js
 (window as { localforage?: typeof localforage }).localforage = localforage;
@@ -19,7 +20,7 @@ import { DropDescriptionFromSubject1761134134122 } from './migrations/1761134134
 const DATABASE_NAME = 'netgrade-db';
 const BROWSER_DB_LOCATION = 'netgrade-db-browser';
 
-export const ENTITIES = [Exam, Grade, School, Subject];
+export const ENTITIES = [Exam, Grade, School, Subject, Semester];
 
 let AppDataSource: DataSource | null = null;
 
@@ -28,6 +29,7 @@ interface AppRepositories {
   grade: Repository<Grade>;
   school: Repository<School>;
   subject: Repository<Subject>;
+  semester: Repository<Semester>;
 }
 
 let repositories: AppRepositories | null = null;
@@ -58,7 +60,11 @@ const initializeNativeDb = async (): Promise<DataSourceOptions> => {
     synchronize: false, // DEV ONLY
     logging: ['error', 'warn', 'query'],
     migrationsRun: true,
-    migrations: [Initdb1745319232244, DropDescriptionFromSubject1761134134122],
+    migrations: [
+      Initdb1745319232244,
+      DropDescriptionFromSubject1761134134122,
+      AddSemester1737400000000,
+    ],
     migrationsTableName: 'migrations',
     mode: 'no-encryption',
   };
@@ -120,6 +126,7 @@ export const initializeDatabase = async (): Promise<DataSource> => {
       grade: AppDataSource.getRepository(Grade),
       school: AppDataSource.getRepository(School),
       subject: AppDataSource.getRepository(Subject),
+      semester: AppDataSource.getRepository(Semester),
     };
     console.log('Repositories initialized.');
 
