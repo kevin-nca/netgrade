@@ -8,12 +8,15 @@ import {
   IonContent,
   IonIcon,
 } from '@ionic/react';
-import { bookOutline } from 'ionicons/icons';
+import { bookOutline, checkmarkOutline } from 'ionicons/icons';
 import { useAppForm } from '@/shared/components/form';
 import {
   editSubjectFormSchema,
   type EditSubjectFormData,
 } from './schema/edit-subject-form-schema';
+import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
+import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
+import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
 
 interface EditSubjectModalProps {
   isOpen: boolean;
@@ -86,28 +89,27 @@ const EditSubjectModal: React.FC<EditSubjectModalProps> = ({
                 </form.AppField>
               </div>
             </div>
-            <div className="modal-button-section">
-              <div className="modal-buttons">
-                <button
-                  onClick={onClose}
-                  className="modal-button cancel"
-                  disabled={loading}
-                >
-                  Abbrechen
-                </button>
-                <form.Subscribe selector={(state) => [state.values.name]}>
-                  {([name]) => (
-                    <button
-                      onClick={() => form.handleSubmit()}
-                      disabled={!name.trim() || loading}
-                      className="modal-button save"
-                    >
-                      {loading ? 'Speichert...' : 'Speichern'}
-                    </button>
-                  )}
-                </form.Subscribe>
-              </div>
-            </div>
+
+            <ModalButtonGroup>
+              <ModalCancelButton
+                onClick={onClose}
+                disabled={loading}
+                text="Abbrechen"
+              />
+              <form.Subscribe selector={(state) => [state.values.name]}>
+                {([name]) => (
+                  <ModalSubmitButton
+                    onClick={() => form.handleSubmit()}
+                    disabled={!name.trim()}
+                    isLoading={loading}
+                    loadingText="Speichert..."
+                    text="Speichern"
+                    icon={checkmarkOutline}
+                  />
+                )}
+              </form.Subscribe>
+            </ModalButtonGroup>
+
             <div className="modal-bottom-spacer" />
           </div>
         </IonContent>

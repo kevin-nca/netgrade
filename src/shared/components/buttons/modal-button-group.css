@@ -1,0 +1,10 @@
+.modal-buttons-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  margin-top: auto;
+  padding-bottom: 24px;
+}
