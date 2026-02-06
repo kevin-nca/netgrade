@@ -63,16 +63,9 @@ export const useAddExam = () => {
 
   return useMutation({
     mutationFn: (payload: AddExamPayload) => ExamService.add(payload),
-    onSuccess: (newExam) => {
-      // Invalidate and refetch exams list
-      queryClient.invalidateQueries({ queryKey: examKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
-      // Invalidate and refetch subject exams
-      if (newExam.subjectId) {
-        queryClient.invalidateQueries({
-          queryKey: examKeys.subjectExams(newExam.subjectId),
-        });
-      }
+    onSuccess: () => {
+      // Invalidate exams list
+      queryClient.invalidateQueries({ queryKey: examKeys.all });
     },
   });
 };
@@ -83,20 +76,9 @@ export const useUpdateExam = () => {
   return useMutation({
     mutationFn: (examData: Partial<Exam> & { id: string }) =>
       ExamService.update(examData),
-    onSuccess: (updatedExam) => {
-      // Update the exam in the cache
-      queryClient.invalidateQueries({
-        queryKey: examKeys.detail(updatedExam.id),
-      });
-      // Invalidate and refetch exams list
-      queryClient.invalidateQueries({ queryKey: examKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
-      // Invalidate and refetch subject exams
-      if (updatedExam.subjectId) {
-        queryClient.invalidateQueries({
-          queryKey: examKeys.subjectExams(updatedExam.subjectId),
-        });
-      }
+    onSuccess: () => {
+      // Invalidate exams list
+      queryClient.invalidateQueries({ queryKey: examKeys.all });
     },
   });
 };
@@ -106,12 +88,9 @@ export const useDeleteExam = () => {
 
   return useMutation({
     mutationFn: (examId: string) => ExamService.delete(examId),
-    onSuccess: (deletedExamId) => {
-      // Remove the exam from the cache
-      queryClient.removeQueries({ queryKey: examKeys.detail(deletedExamId) });
-      // Invalidate and refetch exams list
-      queryClient.invalidateQueries({ queryKey: examKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: examKeys.upcoming() });
+    onSuccess: () => {
+      // Invalidate exams list
+      queryClient.invalidateQueries({ queryKey: examKeys.all });
     },
   });
 };

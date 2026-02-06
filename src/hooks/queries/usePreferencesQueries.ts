@@ -6,6 +6,8 @@ import {
 } from '@tanstack/react-query';
 import { NotificationSettings, PreferencesService } from '@/services';
 import { notificationScheduler } from '@/notification-scheduler';
+import { semesterKeys } from '@/hooks/queries/useSemesterQueries';
+import { getRepositories } from '@/db/data-source';
 
 export const preferencesKeys = {
   all: ['preferences'] as const,
@@ -175,5 +177,22 @@ export const useResetNotifications = () => {
         queryKey: preferencesKeys.schedulerStatus(),
       });
     },
+  });
+};
+
+export const useCurrentSemester = () => {
+  return useQuery({
+    queryKey: semesterKeys.current(),
+    queryFn: async () => {
+      const { semester: semesterRepo } = getRepositories();
+      const today = new Date();
+
+      return await semesterRepo
+        .createQueryBuilder('semester')
+        .where('semester.startDate <= :today', { today })
+        .andWhere('semester.endDate >= :today', { today })
+        .getOne();
+    },
+    staleTime: Infinity,
   });
 };

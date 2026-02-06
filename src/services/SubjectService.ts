@@ -1,5 +1,5 @@
 import { getRepositories } from '@/db/data-source';
-import { Subject } from '@/db/entities/Subject';
+import { Subject } from '@/db/entities';
 
 export class SubjectService {
   /**
@@ -34,11 +34,17 @@ export class SubjectService {
     teacher?: string | null;
     description?: string | null;
     weight?: number;
+    semesterId?: string | null;
   }): Promise<Subject> {
     try {
       const { subject: subjectRepo } = getRepositories();
+
+      const semesterId =
+        newSubjectData.semesterId || (await this.getOrCreateDefaultSemester());
+
       const newSubject = subjectRepo.create({
         ...newSubjectData,
+        semesterId,
       });
       return await subjectRepo.save(newSubject);
     } catch (error) {
@@ -139,5 +145,36 @@ export class SubjectService {
       );
       throw error;
     }
+  }
+
+  /**
+   * Gets or creates the default semester
+   * @returns Promise<string> - The ID of the default semester
+   */
+  private static async getOrCreateDefaultSemester(): Promise<string> {
+    const { semester: semesterRepo } = getRepositories();
+
+    const defaultSemesterId = 'default-semester-id';
+
+    let defaultSemester = await semesterRepo.findOne({
+      where: { id: defaultSemesterId },
+    });
+
+    if (!defaultSemester) {
+      const currentYear = new Date().getFullYear();
+      const nextYear = currentYear + 1;
+
+      defaultSemester = semesterRepo.create({
+        id: defaultSemesterId,
+        name: `${currentYear}/${nextYear}`,
+        startDate: new Date(`${currentYear}-08-15`),
+        endDate: new Date(`${nextYear}-07-31`),
+      });
+
+      await semesterRepo.save(defaultSemester);
+      console.log(`Created default semester: ${currentYear}/${nextYear}`);
+    }
+
+    return defaultSemester.id;
   }
 }

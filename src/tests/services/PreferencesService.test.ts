@@ -1,6 +1,10 @@
+// PreferencesService.test.ts
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { Preferences } from '@capacitor/preferences';
 import { PreferencesService } from '@/services/PreferencesService';
+import { getRepositories } from '@/db/data-source';
+import { createMockCurrentSemester } from './setup';
+import { Semester } from '@/db/entities';
 
 vi.mock('@capacitor/preferences', () => ({
   Preferences: {
@@ -8,6 +12,10 @@ vi.mock('@capacitor/preferences', () => ({
     get: vi.fn(),
     clear: vi.fn(),
   },
+}));
+
+vi.mock('@/db/data-source', () => ({
+  getRepositories: vi.fn(),
 }));
 
 describe('PreferencesService', () => {
@@ -138,6 +146,74 @@ describe('PreferencesService', () => {
 
       // Assert
       expect(result).toBe(false);
+    });
+  });
+
+  describe('getCurrentSemester', () => {
+    const mockGetRepositories = getRepositories as unknown as ReturnType<
+      typeof vi.fn
+    >;
+
+    it('should return the current semester when today is within range', async () => {
+      // Arrange
+      const mockSemester = createMockCurrentSemester();
+      const allSemesters = [mockSemester];
+
+      mockGetRepositories.mockReturnValue({
+        semester: {
+          find: vi.fn().mockResolvedValue(allSemesters),
+        },
+      } as never);
+
+      // Act
+      const result = await PreferencesService.getCurrentSemester();
+
+      // Assert
+      expect(result).toEqual(mockSemester);
+      expect(mockGetRepositories).toHaveBeenCalled();
+    });
+
+    it('should return null when no semester matches today', async () => {
+      // Arrange
+      const pastSemester = {
+        id: 'semester-1',
+        name: 'Past Semester',
+        startDate: new Date('2023-08-01'),
+        endDate: new Date('2024-07-31'),
+      } as Semester;
+
+      mockGetRepositories.mockReturnValue({
+        semester: {
+          find: vi.fn().mockResolvedValue([pastSemester]),
+        },
+      } as never);
+
+      // Act
+      const result = await PreferencesService.getCurrentSemester();
+
+      // Assert
+      expect(result).toBeNull();
+    });
+
+    it('should throw error when database operation fails', async () => {
+      // Arrange
+      const testError = new Error('Database error');
+      const consoleSpy = vi.spyOn(console, 'error');
+
+      mockGetRepositories.mockReturnValue({
+        semester: {
+          find: vi.fn().mockRejectedValue(testError),
+        },
+      } as never);
+
+      // Act & Assert
+      await expect(PreferencesService.getCurrentSemester()).rejects.toThrow(
+        'Database error',
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to get current semester:',
+        testError,
+      );
     });
   });
 });
