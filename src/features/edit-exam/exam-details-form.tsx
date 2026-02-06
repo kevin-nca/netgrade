@@ -45,6 +45,9 @@ import {
   validateWeight,
 } from '@/utils/validation';
 import { Routes } from '@/routes';
+import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
+import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
+import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
 import styles from './styles/edit-exam-page.module.css';
 import { Layout } from '@/components/Layout/Layout';
 import { GradeFormData } from './types';
@@ -342,34 +345,20 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
               </div>
 
               <div className={styles.actionContainer}>
-                <div className={styles.buttonGroup}>
-                  <IonButton
-                    className={styles.confirmButton}
+                <ModalButtonGroup>
+                  <ModalCancelButton
+                    onClick={() => setShowGradeConfirmModal(false)}
+                    text="Abbrechen"
+                  />
+                  <ModalSubmitButton
                     onClick={handleAddGrade}
                     disabled={addGradeWithExamMutation.isPending}
-                  >
-                    {addGradeWithExamMutation.isPending ? (
-                      <>
-                        <div className={styles.spinner} />
-                        Wird gespeichert...
-                      </>
-                    ) : (
-                      <>
-                        <IonIcon
-                          icon={checkmarkCircleOutline}
-                          className={styles.buttonIcon}
-                        />
-                        Speichern
-                      </>
-                    )}
-                  </IonButton>
-                  <IonButton
-                    className={styles.cancelButton}
-                    onClick={() => setShowGradeConfirmModal(false)}
-                  >
-                    Abbrechen
-                  </IonButton>
-                </div>
+                    isLoading={addGradeWithExamMutation.isPending}
+                    loadingText="Wird gespeichert..."
+                    text="Speichern"
+                    icon={checkmarkCircleOutline}
+                  />
+                </ModalButtonGroup>
               </div>
             </div>
           </IonModal>
