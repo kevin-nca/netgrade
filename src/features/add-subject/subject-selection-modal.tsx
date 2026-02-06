@@ -41,7 +41,6 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
           subject.name.toLowerCase() ===
           value.newSubjectName.trim().toLowerCase(),
       );
-
       if (isDuplicate) {
         console.error(`Fach "${value.newSubjectName}" existiert bereits`);
         return;
@@ -88,7 +87,6 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
             {(field) => <field.EditSubjectField label="Fachname" />}
           </form.AppField>
         </div>
-
         <ModalButtonGroup>
           <ModalCancelButton onClick={closeModal} text="Abbrechen" />
           <form.Subscribe selector={(state) => [state.values.newSubjectName]}>
