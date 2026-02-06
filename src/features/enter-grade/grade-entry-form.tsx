@@ -24,8 +24,8 @@ import {
   type EditGradeFormData,
   editGradeSchema,
 } from './schema/grade-entry-form-schema';
-import SubmitButton from '@/shared/components/submitt-button/submit-button';
-import CancelButton from '@/shared/components/cancel-button/cancel-button';
+import SubmitButton from '@/shared/components/buttons/submitt-button/submit-button';
+import CancelButton from '@/shared/components/buttons/cancel-button/cancel-button';
 
 interface GradeEntryFormProps {
   subjectId: string;

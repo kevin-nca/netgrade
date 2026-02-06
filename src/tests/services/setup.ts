@@ -4,6 +4,7 @@ import { Exam, Grade, School, Subject } from '@/db/entities';
 // @ts-expect-error SQL.js is not typed
 import initSqlJs from 'sql.js';
 import { AppInfo } from '@/AppInfo';
+import { beforeAll } from 'vitest';
 
 beforeAll(async () => {
   await AppInfo.initialize();
@@ -60,7 +61,6 @@ export const seedTestData = async (dataSource: DataSource) => {
   const subject = repositories.subject.create({
     name: 'Test Subject',
     teacher: 'Test Teacher',
-    description: 'Test Description',
     weight: 1.0,
     schoolId: school.id,
   });
