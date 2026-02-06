@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { IonIcon } from '@ionic/react';
 import {
@@ -20,21 +20,16 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
 }) => {
   const history = useHistory();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState('home');
 
-  // Update activeTab based on current route
-  useEffect(() => {
+  const activeTab = useMemo(() => {
     const currentPath = location.pathname;
 
-    if (currentPath === Routes.HOME) {
-      setActiveTab('home');
-    } else if (currentPath === Routes.CALENDAR) {
-      setActiveTab('calendar');
-    } else if (currentPath === Routes.GRADES_ADD) {
-      setActiveTab('grades');
-    } else if (currentPath === Routes.SETTINGS) {
-      setActiveTab('settings');
-    }
+    if (currentPath === Routes.HOME) return 'home';
+    if (currentPath === Routes.CALENDAR) return 'calendar';
+    if (currentPath === Routes.GRADES_ADD) return 'grades';
+    if (currentPath === Routes.SETTINGS) return 'settings';
+
+    return 'home';
   }, [location.pathname]);
 
   return (
@@ -46,7 +41,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
           <div
             className={`tab-item ${activeTab === 'home' ? 'active' : ''}`}
             onClick={() => {
-              setActiveTab('home');
               history.push(Routes.HOME);
             }}
           >
@@ -58,7 +52,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
           <div
             className={`tab-item ${activeTab === 'calendar' ? 'active' : ''}`}
             onClick={() => {
-              setActiveTab('calendar');
               history.push(Routes.CALENDAR);
             }}
           >
@@ -79,7 +72,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
           <div
             className={`tab-item ${activeTab === 'grades' ? 'active' : ''}`}
             onClick={() => {
-              setActiveTab('grades');
               history.push(Routes.GRADES_ADD);
             }}
           >
@@ -91,7 +83,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
           <div
             className={`tab-item ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => {
-              setActiveTab('settings');
               history.push(Routes.SETTINGS);
             }}
           >

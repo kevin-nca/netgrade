@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { IonContent, IonToast } from '@ionic/react';
 import { format, parseISO } from 'date-fns';
 import {
@@ -82,18 +82,17 @@ const AddGradeForm: React.FC<AddGradeFormProps> = ({ onSuccess }) => {
     },
   });
 
-  useEffect(() => {
-    if (schoolsError) {
-      setToastMessage('Fehler beim Laden der Schulen');
-      setToastColor('danger');
-      setShowToast(true);
-    }
-    if (subjectsError) {
-      setToastMessage('Fehler beim Laden der Fächer');
-      setToastColor('danger');
-      setShowToast(true);
-    }
-  }, [schoolsError, subjectsError]);
+  if (schoolsError && !showToast) {
+    setToastMessage('Fehler beim Laden der Schulen');
+    setToastColor('danger');
+    setShowToast(true);
+  }
+
+  if (subjectsError && !showToast) {
+    setToastMessage('Fehler beim Laden der Fächer');
+    setToastColor('danger');
+    setShowToast(true);
+  }
 
   const handleAddGrade = () => {
     form.handleSubmit();
