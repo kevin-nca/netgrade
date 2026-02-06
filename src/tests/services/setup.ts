@@ -4,6 +4,7 @@ import { Exam, Grade, School, Subject, Semester } from '@/db/entities';
 // @ts-expect-error SQL.js is not typed
 import initSqlJs from 'sql.js';
 import { AppInfo } from '@/AppInfo';
+import { beforeAll } from 'vitest';
 
 beforeAll(async () => {
   await AppInfo.initialize();

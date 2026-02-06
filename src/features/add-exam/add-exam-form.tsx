@@ -6,7 +6,7 @@ import { useAppForm } from '@/shared/components/form';
 import Header from '@/components/Header/Header';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-import SubmitButton from '@/shared/components/submitt-button/submit-button';
+import SubmitButton from '@/shared/components/buttons/submitt-button/submit-button';
 import FormContainer from '@/shared/components/form-layout/form-container';
 import SuccessOverlay from '@/shared/components/form-layout/succes-overlay';
 import {

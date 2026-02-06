@@ -46,6 +46,9 @@ import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQuerie
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import Header from '@/components/Header/Header';
 import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
+import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
+import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
+import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
 import './SettingsPage.css';
 
 const SettingsPage: React.FC = () => {
@@ -537,36 +540,31 @@ const SettingsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="modal-button-section">
-                <div className="modal-buttons">
-                  <button
-                    onClick={handleCancelNameEdit}
-                    className="modal-button cancel"
-                    disabled={saveUserNameMutation.isPending}
-                  >
-                    Abbrechen
-                  </button>
-                  <nameForm.Subscribe
-                    selector={(state) => [state.values.nameInput]}
-                  >
-                    {([nameInput]) => (
-                      <button
-                        onClick={handleSaveName}
-                        disabled={
-                          saveUserNameMutation.isPending ||
-                          !nameInput.trim() ||
-                          nameInput.trim() === (userName || '')
-                        }
-                        className="modal-button save"
-                      >
-                        {saveUserNameMutation.isPending
-                          ? 'Speichert...'
-                          : 'Speichern'}
-                      </button>
-                    )}
-                  </nameForm.Subscribe>
-                </div>
-              </div>
+              <ModalButtonGroup>
+                <ModalCancelButton
+                  onClick={handleCancelNameEdit}
+                  disabled={saveUserNameMutation.isPending}
+                  text="Abbrechen"
+                />
+                <nameForm.Subscribe
+                  selector={(state) => [state.values.nameInput]}
+                >
+                  {([nameInput]) => (
+                    <ModalSubmitButton
+                      onClick={handleSaveName}
+                      disabled={
+                        saveUserNameMutation.isPending ||
+                        !nameInput.trim() ||
+                        nameInput.trim() === (userName || '')
+                      }
+                      isLoading={saveUserNameMutation.isPending}
+                      loadingText="Speichert..."
+                      text="Speichern"
+                      icon={checkmarkOutline}
+                    />
+                  )}
+                </nameForm.Subscribe>
+              </ModalButtonGroup>
 
               <div className="modal-bottom-spacer" />
             </div>
