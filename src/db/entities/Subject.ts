@@ -21,10 +21,10 @@ export class Subject extends BaseEntity {
 
   @ManyToOne(() => Semester, (semester) => semester.subjects, {
     onDelete: 'CASCADE',
-    nullable: true,
+    nullable: false,
   })
   @JoinColumn({ name: 'semesterId' })
-  semester!: Semester | null;
+  semester!: Semester;
 
   @ManyToOne(() => School, (school) => school.subjects, {
     onDelete: 'CASCADE',
