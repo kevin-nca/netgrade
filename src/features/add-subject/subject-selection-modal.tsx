@@ -1,11 +1,15 @@
 import React, { useEffect } from 'react';
-import { IonContent, IonModal, IonButton } from '@ionic/react';
+import { IonContent, IonModal } from '@ionic/react';
+import { addOutline } from 'ionicons/icons';
 import { Subject } from '@/db/entities';
 import { useAppForm } from '@/shared/components/form';
 import {
   subjectFormSchema,
   type SubjectFormData,
 } from './schema/subject-form-schema';
+import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
+import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
+import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
 import styles from './styles/subject-selection-modal.module.css';
 
 interface SubjectSelectionSlideUpProps {
@@ -84,14 +88,20 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
             {(field) => <field.EditSubjectField label="Fachname" />}
           </form.AppField>
         </div>
-        <div className={styles.buttons}>
-          <IonButton className={styles.addButton} onClick={handleAddSubject}>
-            Hinzufügen
-          </IonButton>
-          <IonButton className={styles.addButton} onClick={closeModal}>
-            Abbrechen
-          </IonButton>
-        </div>
+
+        <ModalButtonGroup>
+          <ModalCancelButton onClick={closeModal} text="Abbrechen" />
+          <form.Subscribe selector={(state) => [state.values.newSubjectName]}>
+            {([newSubjectName]) => (
+              <ModalSubmitButton
+                onClick={handleAddSubject}
+                disabled={!newSubjectName.trim()}
+                text="Hinzufügen"
+                icon={addOutline}
+              />
+            )}
+          </form.Subscribe>
+        </ModalButtonGroup>
       </IonContent>
     </IonModal>
   );

@@ -1,28 +1,29 @@
-.subjects-container {
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-top: 16px;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+ion-list {
+  background: transparent !important;
+  padding: 16px;
 }
 
-.subject-item-container {
+.grade-item-container {
   border-radius: 16px;
   overflow: hidden;
+  padding-right: 16px;
+  padding-left: 16px;
+  padding-top: 16px;
 }
 
-.subject-item {
+.grade-item-container:first-child {
+  margin-top: 0;
+}
+
+.grade-item {
   border-radius: 16px;
   padding: 20px;
   display: flex;
   align-items: center;
   gap: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  width: 100%;
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.8) 0%,
@@ -36,11 +37,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.subject-item:active {
-  transform: scale(0.98);
-}
-
-.subject-icon-badge {
+.grade-icon-badge {
   width: 52px;
   height: 52px;
   background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
@@ -52,61 +49,64 @@
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
 }
 
-.subject-initial {
-  font-size: 22px;
+.grade-score {
+  font-size: 20px;
   font-weight: 700;
   color: white;
   letter-spacing: -0.5px;
 }
 
-.subject-info {
+.grade-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   min-width: 0;
 }
 
-.subject-name {
+.grade-exam-name {
   font-size: 15px;
   font-weight: 600;
   color: #000000;
   margin: 0;
   letter-spacing: -0.2px;
   line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.subject-teacher-text {
+.grade-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.grade-detail-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   font-size: 11px;
   font-weight: 500;
   color: rgba(0, 0, 0, 0.5);
 }
 
-.subject-teacher-text ion-icon {
-  font-size: 11px;
+.grade-detail-item ion-icon {
+  font-size: 12px;
   color: rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
 }
 
-.subject-average-text {
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.7);
-  letter-spacing: -0.1px;
+.grade-detail-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.subject-actions {
+.grade-actions {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
 }
 
-.subject-action-button {
+.grade-action-button {
   width: 40px;
   height: 40px;
   border-radius: 10px;
@@ -119,80 +119,30 @@
   font-size: 20px;
 }
 
-.subject-action-button.edit {
+.grade-action-button.edit {
   background: linear-gradient(135deg, #007aff, #0051d5);
   color: white;
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
-.subject-action-button.edit:active {
+.grade-action-button.edit:active {
   transform: scale(0.95);
   box-shadow: 0 1px 4px rgba(0, 122, 255, 0.3);
 }
 
-.subject-action-button.delete {
+.grade-action-button.delete {
   background: linear-gradient(135deg, #ff3b30, #e60000);
   color: white;
   box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
 }
 
-.subject-action-button.delete:active {
+.grade-action-button.delete:active {
   transform: scale(0.95);
   box-shadow: 0 1px 4px rgba(255, 59, 48, 0.3);
 }
 
-.subjects-empty-state {
-  text-align: center;
-  padding: 24px 16px;
-  border-radius: 16px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.8) 0%,
-    rgba(255, 255, 255, 0.4) 100%
-  );
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.subjects-empty-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  background: rgba(0, 122, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 12px;
-}
-
-.subjects-empty-icon ion-icon {
-  font-size: 22px;
-  color: #007aff;
-  opacity: 0.6;
-}
-
-.subjects-empty-state h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #000000;
-  margin: 0 0 6px 0;
-  letter-spacing: -0.2px;
-}
-
-.subjects-empty-state p {
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.5);
-  margin: 0;
-  line-height: 1.3;
-}
-
 @media (prefers-color-scheme: dark) {
-  .subject-item,
-  .subjects-empty-state {
+  .grade-item {
     background: linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.12) 0%,
@@ -204,38 +154,28 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
 
-  .subject-name,
-  .subjects-empty-state h3 {
+  .grade-exam-name {
     color: #ffffff;
   }
 
-  .subject-teacher-text,
-  .subjects-empty-state p {
+  .grade-detail-item,
+  .grade-detail-item ion-icon {
     color: rgba(255, 255, 255, 0.6);
-  }
-
-  .subject-teacher-text ion-icon {
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  .subject-average-text {
-    color: rgba(255, 255, 255, 0.8);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .subject-item,
-  .subject-action-button {
+  .grade-action-button {
     transition: none !important;
   }
 }
 
 @media (pointer: coarse) {
-  .subject-item {
+  .grade-item {
     min-height: 44px;
   }
 
-  .subject-action-button {
+  .grade-action-button {
     min-width: 44px;
     min-height: 44px;
   }

@@ -1,10 +1,13 @@
 import React from 'react';
-import { IonButton } from '@ionic/react';
+import { addOutline } from 'ionicons/icons';
 import { useAppForm } from '@/shared/components/form';
 import {
   schoolFormSchema,
   type SchoolFormData,
 } from './schema/add-school-form-schema';
+import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
+import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
+import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
 
 interface AddSchoolFormProps {
   onSubmit: (schoolName: string) => void;
@@ -41,26 +44,25 @@ export const AddSchoolForm: React.FC<AddSchoolFormProps> = ({
         </form.AppField>
       </div>
 
-      <div className="modal-button-section">
-        <div className="modal-buttons">
-          <IonButton
-            onClick={onCancel}
-            fill="clear"
-            disabled={isLoading}
-            expand="block"
-          >
-            Abbrechen
-          </IonButton>
-          <IonButton
-            onClick={handleAdd}
-            disabled={isLoading}
-            expand="block"
-            color="primary"
-          >
-            {isLoading ? 'Speichert...' : 'Hinzufügen'}
-          </IonButton>
-        </div>
-      </div>
+      <ModalButtonGroup>
+        <ModalCancelButton
+          onClick={onCancel}
+          disabled={isLoading}
+          text="Abbrechen"
+        />
+        <form.Subscribe selector={(state) => [state.values.schoolName]}>
+          {([schoolName]) => (
+            <ModalSubmitButton
+              onClick={handleAdd}
+              disabled={!schoolName.trim() || isLoading}
+              isLoading={isLoading}
+              loadingText="Speichert..."
+              text="Hinzufügen"
+              icon={addOutline}
+            />
+          )}
+        </form.Subscribe>
+      </ModalButtonGroup>
     </>
   );
 };
