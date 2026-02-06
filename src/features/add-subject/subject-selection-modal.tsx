@@ -22,6 +22,10 @@ interface SubjectSelectionSlideUpProps {
   removeFromSubjectsOrModules: (subjectId: string) => void;
 }
 
+const generateTempId = () => {
+  return `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+};
+
 const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
   isOpen,
   setIsOpen,
@@ -47,7 +51,7 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
       }
 
       const newSubject: Partial<Subject> & { id: string; name: string } = {
-        id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: generateTempId(),
         name: value.newSubjectName.trim(),
         teacher: null,
         schoolId: '',
