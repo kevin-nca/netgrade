@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { IonContent, IonModal } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
 import { Subject } from '@/db/entities';
@@ -28,6 +28,10 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
   subjectsOrModules = [],
   addToSubjectsOrModules,
 }) => {
+  const generateTempId = useCallback(() => {
+    return `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }, []);
+
   const form = useAppForm({
     defaultValues: {
       newSubjectName: '',
@@ -48,7 +52,7 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
       }
 
       const newSubject: Partial<Subject> & { id: string; name: string } = {
-        id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: generateTempId(), // ✅ Aufruf in onSubmit (nicht während Render)
         name: value.newSubjectName.trim(),
         teacher: null,
         schoolId: '',
