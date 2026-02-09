@@ -47,7 +47,7 @@ import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQuerie
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import Header from '@/components/Header/Header';
 import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
-import { BackupService } from '@/services/BackupService';
+import { DataManagementService } from '@/services/DataManagementService';
 import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
 import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
 import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
@@ -234,7 +234,7 @@ const SettingsPage: React.FC = () => {
 
   const handleExportJSON = async () => {
     try {
-      await BackupService.exportAsJSON();
+      await DataManagementService.exportAsJSON();
       showToast('JSON Export erfolgreich!', true);
     } catch {
       showToast('Export fehlgeschlagen', false);
@@ -259,7 +259,7 @@ const SettingsPage: React.FC = () => {
           handler: async () => {
             try {
               const text = await file.text();
-              await BackupService.importFromJSON(text);
+              await DataManagementService.importFromJSON(text);
               showToast('Import erfolgreich!', true);
               setTimeout(() => {
                 window.location.reload();
