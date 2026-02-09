@@ -117,12 +117,11 @@
 
 /* Remove button positioning */
 .semester-item .remove-button {
-  margin-left: auto;
   flex-shrink: 0;
 }
 
 /* Responsive adjustments */
-@media (max-width: 576px) {
+@media (max-width: 480px) {
   .semester-content {
     gap: 8px;
   }
