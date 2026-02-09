@@ -1,0 +1,148 @@
+/* src/pages/onboarding/components/semesterStep/SemesterStep.css */
+
+.semester-item {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.semester-item:hover {
+  transform: translateY(-2px);
+}
+
+.semester-item.selected {
+  border: 2px solid var(--ion-color-primary);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ion-color-primary-rgb), 0.1),
+    rgba(var(--ion-color-primary-rgb), 0.05)
+  );
+}
+
+.semester-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+}
+
+.semester-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.semester-0 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.semester-1 {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.semester-2 {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.semester-3 {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.semester-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.semester-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.selected-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  background: var(--ion-color-primary);
+  color: white;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.semester-details {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.selected-icon {
+  font-size: 24px;
+  color: var(--ion-color-primary);
+  flex-shrink: 0;
+}
+
+.date-input {
+  cursor: pointer;
+}
+
+.date-input:hover {
+  opacity: 0.8;
+}
+
+.date-display {
+  padding: 12px 0;
+  font-size: 16px;
+  flex: 1;
+}
+
+.semesters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.semesters-section {
+  margin-top: 24px;
+}
+
+/* Remove button positioning */
+.semester-item .remove-button {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .semester-content {
+    gap: 8px;
+  }
+
+  .semester-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .semester-name {
+    font-size: 14px;
+  }
+
+  .semester-details {
+    font-size: 12px;
+  }
+
+  .selected-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}

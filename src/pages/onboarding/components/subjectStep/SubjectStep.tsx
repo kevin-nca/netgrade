@@ -1,3 +1,4 @@
+// src/pages/onboarding/components/subjectStep/SubjectStep.tsx
 import React, { useState, useEffect } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/react';
@@ -8,13 +9,21 @@ import {
   personOutline,
   checkmarkCircleOutline,
   arrowForward,
+  calendarOutline,
 } from 'ionicons/icons';
-import { OnboardingDataTemp, TempSchool, TempSubject } from '../../types';
+import {
+  OnboardingDataTemp,
+  TempSchool,
+  TempSubject,
+  TempSemester,
+} from '../../types';
 import './SubjectStep.css';
 
 interface SubjectStepProps {
   data: OnboardingDataTemp;
   setData: React.Dispatch<React.SetStateAction<OnboardingDataTemp>>;
+  selectedSemesterId: string;
+  setSelectedSemesterId: React.Dispatch<React.SetStateAction<string>>;
   selectedSchoolId: string;
   setSelectedSchoolId: React.Dispatch<React.SetStateAction<string>>;
   generateId: () => string;
@@ -24,6 +33,8 @@ interface SubjectStepProps {
 const SubjectStep: React.FC<SubjectStepProps> = ({
   data,
   setData,
+  selectedSemesterId,
+  setSelectedSemesterId,
   selectedSchoolId,
   setSelectedSchoolId,
   generateId,
@@ -32,6 +43,11 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
   const [selectedSchool, setSelectedSchool] = useState<TempSchool | null>(
     data.schools.find((s) => s.id === selectedSchoolId) ||
       data.schools[0] ||
+      null,
+  );
+  const [selectedSemester, setSelectedSemester] = useState<TempSemester | null>(
+    data.semesters.find((s) => s.id === selectedSemesterId) ||
+      data.semesters[0] ||
       null,
   );
   const [showAddForm, setShowAddForm] = useState(false);
@@ -44,7 +60,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
       weight: 100,
     },
     onSubmit: async ({ value }) => {
-      if (selectedSchool) {
+      if (selectedSchool && selectedSemester) {
         const subject: TempSubject = {
           id: generateId(),
           name: value.name.trim(),
@@ -52,6 +68,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
           description: value.description?.trim() || null,
           weight: 100,
           schoolId: selectedSchool.id,
+          semesterId: selectedSemester.id,
         };
 
         setData((prev) => ({
@@ -72,6 +89,12 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
     }
   }, [selectedSchool, setSelectedSchoolId]);
 
+  useEffect(() => {
+    if (selectedSemester) {
+      setSelectedSemesterId(selectedSemester.id);
+    }
+  }, [selectedSemester, setSelectedSemesterId]);
+
   const handleAddSubject = () => {
     form.handleSubmit();
   };
@@ -84,14 +107,34 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
   };
 
   const currentSchoolSubjects = data.subjects.filter(
-    (s) => s.schoolId === selectedSchool?.id,
+    (s) =>
+      s.schoolId === selectedSchool?.id &&
+      s.semesterId === selectedSemester?.id,
   );
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('de-CH', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  };
 
   if (!selectedSchool) {
     return (
       <div className="onboarding-step">
         <div className="step-header">
           <h1>Keine Schule ausgewählt</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedSemester) {
+    return (
+      <div className="onboarding-step">
+        <div className="step-header">
+          <h1>Kein Semester ausgewählt</h1>
         </div>
       </div>
     );
@@ -108,13 +151,49 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
           <div className="step-text">
             <h1 className="step-title">Fächer hinzufügen</h1>
             <p className="step-subtitle">
-              Erstelle Fächer für {selectedSchool.name}
+              Erstelle Fächer für {selectedSchool.name} -{' '}
+              {selectedSemester.name}
             </p>
           </div>
         </div>
       </div>
 
       <div className="step-body">
+        {/* Semester Selector */}
+        {data.semesters.length > 1 && (
+          <div className="semester-selector">
+            <h3 className="subsection-title">Semester auswählen</h3>
+            <div className="semesters-grid">
+              {data.semesters.map((semester, index) => (
+                <div
+                  key={semester.id}
+                  className={`glass-card semester-selector-item ${semester.id === selectedSemester.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedSemester(semester)}
+                >
+                  <div className={`semester-avatar semester-${index % 4}`}>
+                    <IonIcon icon={calendarOutline} />
+                  </div>
+                  <div className="semester-selector-info">
+                    <span className="semester-selector-name">
+                      {semester.name}
+                    </span>
+                    <span className="semester-selector-dates">
+                      {formatDate(semester.startDate)} -{' '}
+                      {formatDate(semester.endDate)}
+                    </span>
+                  </div>
+                  {semester.id === selectedSemester.id && (
+                    <IonIcon
+                      icon={checkmarkCircleOutline}
+                      className="selected-icon"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* School Selector */}
         {data.schools.length > 1 && (
           <div className="school-selector">
