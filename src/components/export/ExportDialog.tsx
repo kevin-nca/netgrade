@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   IonContent,
   IonHeader,
@@ -63,7 +63,6 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
   const [selectedSchoolId, setSelectedSchoolId] = useState<string | null>(
     school?.id || null,
   );
-  const [customFilename, setCustomFilename] = useState<string>('');
   const [toast, setToast] = useState<ToastState>({
     show: false,
     message: '',
@@ -76,20 +75,15 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 
   const isNative = Capacitor.isNativePlatform();
 
-  useEffect(() => {
+  const customFilename = useMemo(() => {
     if (selectedSchoolId === 'all') {
-      const filename = generateExportFilename(
-        'alle-schulen',
-        userName || undefined,
-      );
-      setCustomFilename(filename);
+      return generateExportFilename('alle-schulen', userName || undefined);
     } else {
       const selectedSchool = schools?.find((s) => s.id === selectedSchoolId);
-      const filename = generateExportFilename(
+      return generateExportFilename(
         selectedSchool?.name,
         userName || undefined,
       );
-      setCustomFilename(filename);
     }
   }, [selectedSchoolId, userName, schools]);
 
@@ -312,8 +306,8 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                       <IonInput
                         value={customFilename}
                         placeholder="Dateiname eingeben..."
-                        onIonInput={(e) => setCustomFilename(e.detail.value!)}
                         className="filename-input-field"
+                        disabled
                       />
                       <div slot="end" className="filename-extension">
                         .xlsx
