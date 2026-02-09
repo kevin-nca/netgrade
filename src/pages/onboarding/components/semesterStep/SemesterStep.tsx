@@ -43,7 +43,11 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
     defaultValues: {
       name: '',
       startDate: new Date().toISOString(),
-      endDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(), // +6 Monate
+      endDate: (() => {
+        const d = new Date();
+        d.setMonth(d.getMonth() + 6);
+        return d.toISOString();
+      })(),
     },
     onSubmit: async ({ value }) => {
       const semester: TempSemester = {
