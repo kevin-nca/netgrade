@@ -1,4 +1,4 @@
-import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, vi, expect, beforeAll, afterAll, Mock } from 'vitest';
 import { DataSource, EntityManager } from 'typeorm';
 import * as XLSX from 'xlsx';
 import { Capacitor } from '@capacitor/core';
@@ -366,7 +366,7 @@ describe('DataManagementService', () => {
       appendSheetSpy.mockRestore();
     });
 
-    it('should throw SAVE_FAILED error when web export fails (Lines 281-282)', async () => {
+    it('should throw SAVE_FAILED error when web export fails', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
 
       const createElementSpy = vi
@@ -402,7 +402,7 @@ describe('DataManagementService', () => {
       createElementSpy.mockRestore();
     });
 
-    it('should handle non-Error object in isShareCancelled correctly (Line 448)', async () => {
+    it('should handle non-Error object in isShareCancelled correctly', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
       vi.mocked(Filesystem.getUri).mockResolvedValue({ uri: 'file://test' });
 
@@ -435,7 +435,7 @@ describe('DataManagementService', () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     });
 
-    it('should correctly format subject averages in single school export (Line 717)', async () => {
+    it('should correctly format subject averages in single school export', async () => {
       const schoolRepo = dataSource.getRepository(School);
       const school = schoolRepo.create({ name: 'Avg Test School' });
       await schoolRepo.save(school);
@@ -607,7 +607,7 @@ describe('DataManagementService', () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     });
 
-    it('should throw SAVE_FAILED error when web export JSON fails (Lines 418-419)', async () => {
+    it('should throw SAVE_FAILED error when web export JSON fails', async () => {
       const createElementSpy = vi
         .spyOn(document, 'createElement')
         .mockImplementation(() => {
@@ -629,10 +629,35 @@ describe('DataManagementService', () => {
 
       createElementSpy.mockRestore();
     });
+
+    it('should throw UNKNOWN error when an update unexpected error occurs', async () => {
+      const schoolRepo = dataSource.getRepository(School);
+      const findSpy = vi
+        .spyOn(schoolRepo, 'find')
+        .mockRejectedValue(new Error('Unexpected DB Error'));
+
+      await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
+        ExportError,
+      );
+
+      try {
+        await DataManagementService.exportAsJSON();
+      } catch (error) {
+        expect(error).toBeInstanceOf(ExportError);
+        if (error instanceof ExportError) {
+          expect(error.code).toBe('UNKNOWN');
+          expect(error.message).toBe(
+            'Backup-Export fehlgeschlagen. Bitte versuchen Sie es erneut.',
+          );
+        }
+      }
+
+      findSpy.mockRestore();
+    });
   });
 
   describe('importFromJSON', () => {
-    it('should parse "date" fields as Date objects (Line 198)', async () => {
+    it('should parse "date" fields as Date objects', async () => {
       const validJson = JSON.stringify({
         schools: [
           {
@@ -888,7 +913,7 @@ describe('DataManagementService', () => {
         }
       ).createBlob(content, format);
 
-    it('should return text/plain blob for unknown format (Line 257)', () => {
+    it('should return text/plain blob for unknown format', () => {
       const blob = createBlob('some content', 'unknown-format');
       expect(blob.type).toBe('text/plain');
     });
@@ -924,5 +949,51 @@ describe('DataManagementService', () => {
     ])('should return correct message for %s', (error, expected) => {
       expect(getErrorMessage(error)).toBe(expected);
     });
+  });
+
+  it('should format dates as YYYY-MM-DD in JSON export', async () => {
+    await DataManagementService.resetAllData();
+    const schoolRepo = dataSource.getRepository(School);
+    const school = new School();
+    school.name = 'Date Test School';
+    await schoolRepo.save(school);
+
+    const semesterRepo = dataSource.getRepository(Semester);
+    let semester = await semesterRepo.findOne({ where: {} });
+    if (!semester) {
+      semester = new Semester();
+      semester.name = 'Test Semester';
+      semester.startDate = new Date();
+      semester.endDate = new Date();
+      await semesterRepo.save(semester);
+    }
+
+    const subject = new Subject();
+    subject.name = 'Date Subject';
+    subject.school = school;
+    subject.semester = semester;
+    await dataSource.getRepository(Subject).save(subject);
+
+    const exam = new Exam();
+    exam.name = 'Date Exam';
+    exam.date = new Date('2023-12-25T12:00:00.000Z');
+    exam.subject = subject;
+    await dataSource.getRepository(Exam).save(exam);
+
+    (global.URL.createObjectURL as Mock).mockClear();
+
+    await DataManagementService.exportAsJSON();
+
+    expect(global.URL.createObjectURL).toHaveBeenCalled();
+    const blob = (global.URL.createObjectURL as Mock).mock.calls[0][0] as Blob;
+    const text = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsText(blob);
+    });
+    const json = JSON.parse(text);
+
+    expect(json.schools[0].subjects[0].exams[0].date).toBe('2023-12-25T00:00:00.000Z');
   });
 });
