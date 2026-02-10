@@ -994,6 +994,8 @@ describe('DataManagementService', () => {
     });
     const json = JSON.parse(text);
 
-    expect(json.schools[0].subjects[0].exams[0].date).toBe('2023-12-25T00:00:00.000Z');
+    expect(json.schools[0].subjects[0].exams[0].date).toBe(
+      '2023-12-25T00:00:00.000Z',
+    );
   });
 });
