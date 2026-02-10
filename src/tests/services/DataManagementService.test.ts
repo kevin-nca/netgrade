@@ -11,7 +11,6 @@ import {
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Exam, Grade, School, Subject, Semester } from '@/db/entities';
 
-// Mock Capacitor Plugins
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
     isNativePlatform: vi.fn().mockReturnValue(false),
@@ -226,12 +225,34 @@ describe('DataManagementService', () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     });
 
-    it('should throw ExportError when share fails (not cancelled) on native platform', async () => {
+    it.each([
+      {
+        desc: 'should throw ExportError when share fails (not cancelled) on native platform',
+        mockShare: () =>
+          vi
+            .mocked(Share.share)
+            .mockRejectedValueOnce(new Error('Sharing failed')),
+        mockFs: () => {},
+        expectedCode: 'SAVE_FAILED',
+        expectedMsg: 'Datei wurde gespeichert, Teilen war nicht möglich.',
+      },
+      {
+        desc: 'should throw ExportError when file write fails on native platform',
+        mockShare: () => {},
+        mockFs: () =>
+          vi
+            .mocked(Filesystem.writeFile)
+            .mockRejectedValueOnce(new Error('permission denied')),
+        expectedCode: 'SAVE_FAILED',
+        expectedMsg: 'Keine Berechtigung zum Speichern von Dateien.',
+      },
+    ])('$desc', async ({ mockShare, mockFs, expectedCode, expectedMsg }) => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
       vi.mocked(Filesystem.getUri).mockResolvedValue({
         uri: 'file://path/to/export.xlsx',
       });
-      vi.mocked(Share.share).mockRejectedValueOnce(new Error('Sharing failed'));
+      mockShare();
+      mockFs();
 
       const schoolRepo = dataSource.getRepository(School);
       const school = await schoolRepo.findOne({ where: {} });
@@ -239,7 +260,7 @@ describe('DataManagementService', () => {
       await expect(
         DataManagementService.exportData({
           format: 'xlsx',
-          filename: 'export_native_fail.xlsx',
+          filename: 'error_test.xlsx',
           schoolId: school!.id,
         }),
       ).rejects.toThrow(ExportError);
@@ -247,50 +268,13 @@ describe('DataManagementService', () => {
       try {
         await DataManagementService.exportData({
           format: 'xlsx',
-          filename: 'export_native_fail.xlsx',
+          filename: 'error_test.xlsx',
           schoolId: school!.id,
         });
       } catch (error) {
         if (error instanceof ExportError) {
-          expect(error.code).toBe('SAVE_FAILED');
-          expect(error.message).toBe(
-            'Datei wurde gespeichert, Teilen war nicht möglich.',
-          );
-        }
-      }
-
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
-    });
-
-    it('should throw ExportError when file write fails on native platform', async () => {
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
-      vi.mocked(Filesystem.writeFile).mockRejectedValueOnce(
-        new Error('permission denied'),
-      );
-
-      const schoolRepo = dataSource.getRepository(School);
-      const school = await schoolRepo.findOne({ where: {} });
-
-      await expect(
-        DataManagementService.exportData({
-          format: 'xlsx',
-          filename: 'export_native_write_fail.xlsx',
-          schoolId: school!.id,
-        }),
-      ).rejects.toThrow(ExportError);
-
-      try {
-        await DataManagementService.exportData({
-          format: 'xlsx',
-          filename: 'export_native_write_fail.xlsx',
-          schoolId: school!.id,
-        });
-      } catch (error) {
-        if (error instanceof ExportError) {
-          expect(error.code).toBe('SAVE_FAILED');
-          expect(error.message).toBe(
-            'Keine Berechtigung zum Speichern von Dateien.',
-          );
+          expect(error.code).toBe(expectedCode);
+          expect(error.message).toBe(expectedMsg);
         }
       }
 
@@ -381,6 +365,135 @@ describe('DataManagementService', () => {
 
       appendSheetSpy.mockRestore();
     });
+
+    it('should throw SAVE_FAILED error when web export fails (Lines 281-282)', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation(() => {
+          throw new Error('DOM Error');
+        });
+
+      const schoolRepo = dataSource.getRepository(School);
+      const school = await schoolRepo.findOne({ where: {} });
+
+      await expect(
+        DataManagementService.exportData({
+          format: 'xlsx',
+          filename: 'fail.xlsx',
+          schoolId: school!.id,
+        }),
+      ).rejects.toThrow(ExportError);
+
+      try {
+        await DataManagementService.exportData({
+          format: 'xlsx',
+          filename: 'fail.xlsx',
+          schoolId: school!.id,
+        });
+      } catch (error) {
+        if (error instanceof ExportError) {
+          expect(error.code).toBe('SAVE_FAILED');
+          expect(error.message).toBe('Download fehlgeschlagen.');
+        }
+      }
+
+      createElementSpy.mockRestore();
+    });
+
+    it('should handle non-Error object in isShareCancelled correctly (Line 448)', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+      vi.mocked(Filesystem.getUri).mockResolvedValue({ uri: 'file://test' });
+
+      vi.mocked(Share.share).mockRejectedValueOnce('Just a string error');
+
+      const schoolRepo = dataSource.getRepository(School);
+      const school = await schoolRepo.findOne({ where: {} });
+
+      await expect(
+        DataManagementService.exportData({
+          format: 'xlsx',
+          filename: 'test.xlsx',
+          schoolId: school!.id,
+        }),
+      ).rejects.toThrow(ExportError);
+
+      try {
+        await DataManagementService.exportData({
+          format: 'xlsx',
+          filename: 'test.xlsx',
+          schoolId: school!.id,
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(ExportError);
+        if (error instanceof ExportError) {
+          expect(error.message).toBe('Unbekannter Fehler beim Export.');
+        }
+      }
+
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+    });
+
+    it('should correctly format subject averages in single school export (Line 717)', async () => {
+      const schoolRepo = dataSource.getRepository(School);
+      const school = schoolRepo.create({ name: 'Avg Test School' });
+      await schoolRepo.save(school);
+
+      const semesterRepo = dataSource.getRepository(Semester);
+      const semester = await semesterRepo.findOne({ where: {} });
+
+      const subjectRepo = dataSource.getRepository(Subject);
+      const subject = subjectRepo.create({
+        name: 'Avg Test Subject',
+        school,
+        semester: semester!,
+      });
+      await subjectRepo.save(subject);
+
+      const examRepo = dataSource.getRepository(Exam);
+      const exam = examRepo.create({
+        name: 'Exam 1',
+        subject,
+        isCompleted: true,
+        weight: 1,
+        date: new Date(),
+      });
+      await examRepo.save(exam);
+
+      const gradeRepo = dataSource.getRepository(Grade);
+      const grade = gradeRepo.create({
+        exam,
+        score: 2.5,
+        weight: 1,
+        date: new Date(),
+      });
+      await gradeRepo.save(grade);
+
+      const aoaSpy = vi.spyOn(XLSX.utils, 'aoa_to_sheet');
+
+      await DataManagementService.exportData({
+        format: 'xlsx',
+        filename: 'single_school.xlsx',
+        schoolId: school.id,
+      });
+
+      const summariesCall = aoaSpy.mock.calls.find((call) => {
+        const data = call[0] as unknown[][];
+        return data && data[0] && data[0][0] === 'Summaries';
+      });
+
+      expect(summariesCall).toBeDefined();
+      const summariesData = summariesCall![0] as unknown[][];
+
+      const subjectRow = summariesData.find(
+        (row) => row[0] === 'Avg Test Subject',
+      );
+      expect(subjectRow).toBeDefined();
+      expect(subjectRow![1]).toBe('2.50');
+
+      aoaSpy.mockRestore();
+    });
   });
 
   describe('exportAsJSON', () => {
@@ -449,12 +562,34 @@ describe('DataManagementService', () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     });
 
-    it('should throw ExportError when share fails (not cancelled) on native platform (JSON)', async () => {
+    it.each([
+      {
+        desc: 'should throw ExportError when share fails (not cancelled) on native platform (JSON)',
+        mockShare: () =>
+          vi
+            .mocked(Share.share)
+            .mockRejectedValueOnce(new Error('Sharing failed')),
+        mockFs: () => {},
+        expectedCode: 'SAVE_FAILED',
+        expectedMsg: 'Datei wurde gespeichert, Teilen war nicht möglich.',
+      },
+      {
+        desc: 'should throw ExportError when file write fails on native platform (JSON)',
+        mockShare: () => {},
+        mockFs: () =>
+          vi
+            .mocked(Filesystem.writeFile)
+            .mockRejectedValueOnce(new Error('permission denied')),
+        expectedCode: 'SAVE_FAILED',
+        expectedMsg: 'Keine Berechtigung zum Speichern von Dateien.',
+      },
+    ])('$desc', async ({ mockShare, mockFs, expectedCode, expectedMsg }) => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
       vi.mocked(Filesystem.getUri).mockResolvedValue({
         uri: 'file://path/to/backup.json',
       });
-      vi.mocked(Share.share).mockRejectedValueOnce(new Error('Sharing failed'));
+      mockShare();
+      mockFs();
 
       await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
         ExportError,
@@ -464,21 +599,20 @@ describe('DataManagementService', () => {
         await DataManagementService.exportAsJSON();
       } catch (error) {
         if (error instanceof ExportError) {
-          expect(error.code).toBe('SAVE_FAILED');
-          expect(error.message).toBe(
-            'Datei wurde gespeichert, Teilen war nicht möglich.',
-          );
+          expect(error.code).toBe(expectedCode);
+          expect(error.message).toBe(expectedMsg);
         }
       }
 
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     });
 
-    it('should throw ExportError when file write fails on native platform (JSON)', async () => {
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
-      vi.mocked(Filesystem.writeFile).mockRejectedValueOnce(
-        new Error('permission denied'),
-      );
+    it('should throw SAVE_FAILED error when web export JSON fails (Lines 418-419)', async () => {
+      const createElementSpy = vi
+        .spyOn(document, 'createElement')
+        .mockImplementation(() => {
+          throw new Error('DOM Error JSON');
+        });
 
       await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
         ExportError,
@@ -489,17 +623,70 @@ describe('DataManagementService', () => {
       } catch (error) {
         if (error instanceof ExportError) {
           expect(error.code).toBe('SAVE_FAILED');
-          expect(error.message).toBe(
-            'Keine Berechtigung zum Speichern von Dateien.',
-          );
+          expect(error.message).toBe('Backup-Download fehlgeschlagen.');
         }
       }
 
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+      createElementSpy.mockRestore();
     });
   });
 
   describe('importFromJSON', () => {
+    it('should parse "date" fields as Date objects (Line 198)', async () => {
+      const validJson = JSON.stringify({
+        schools: [
+          {
+            name: 'Test School',
+            subjects: [
+              {
+                name: 'Test Subject',
+                exams: [
+                  {
+                    name: 'Test Exam',
+                    date: '2023-12-24',
+                    isCompleted: true,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      const saveSpy = vi.fn();
+      const querySpy = vi.fn();
+
+      vi.spyOn(dataSource, 'transaction').mockImplementation(
+        async (
+          runInTransactionOrIsolationLevel:
+            | ((entityManager: EntityManager) => Promise<unknown>)
+            | string,
+          maybeRunInTransaction?: (
+            entityManager: EntityManager,
+          ) => Promise<unknown>,
+        ) => {
+          const cb =
+            typeof runInTransactionOrIsolationLevel === 'function'
+              ? runInTransactionOrIsolationLevel
+              : maybeRunInTransaction!;
+
+          const mockManager = {
+            query: querySpy,
+            getRepository: () => ({ save: saveSpy }),
+          } as unknown as EntityManager;
+          return cb(mockManager);
+        },
+      );
+
+      await DataManagementService.importFromJSON(validJson);
+
+      const savedSchools = saveSpy.mock.calls[0][0];
+      const examDate = savedSchools[0].subjects[0].exams[0].date;
+
+      expect(examDate).toBeInstanceOf(Date);
+      expect(examDate.toISOString().startsWith('2023-12-24')).toBe(true);
+    });
+
     it('should successfully import valid backup data', async () => {
       const semesterRepo = dataSource.getRepository(Semester);
       let semester = await semesterRepo.findOne({ where: {} });
@@ -625,38 +812,29 @@ describe('DataManagementService', () => {
       );
     });
 
-    it('should throw PARSE_FAILED error for invalid JSON syntax', async () => {
-      const invalidJson = '{ invalid: json ';
-
+    it.each([
+      {
+        desc: 'should throw PARSE_FAILED error for invalid JSON syntax',
+        jsonInput: '{ invalid: json ',
+        expectedCode: 'PARSE_FAILED',
+        errorClass: SyntaxError,
+      },
+      {
+        desc: 'should throw INVALID_DATA error if schools array is missing',
+        jsonInput: JSON.stringify({ wrongKey: [] }),
+        expectedCode: 'INVALID_DATA',
+        errorClass: ExportError,
+      },
+    ])('$desc', async ({ jsonInput, expectedCode }) => {
       await expect(
-        DataManagementService.importFromJSON(invalidJson),
+        DataManagementService.importFromJSON(jsonInput),
       ).rejects.toThrow(ExportError);
 
       try {
-        await DataManagementService.importFromJSON(invalidJson);
+        await DataManagementService.importFromJSON(jsonInput);
       } catch (error) {
         if (error instanceof ExportError) {
-          expect(error.code).toBe('PARSE_FAILED');
-        } else {
-          throw error;
-        }
-      }
-    });
-
-    it('should throw INVALID_DATA error if schools array is missing', async () => {
-      const invalidData = JSON.stringify({
-        wrongKey: [],
-      });
-
-      await expect(
-        DataManagementService.importFromJSON(invalidData),
-      ).rejects.toThrow(ExportError);
-
-      try {
-        await DataManagementService.importFromJSON(invalidData);
-      } catch (error) {
-        if (error instanceof ExportError) {
-          expect(error.code).toBe('INVALID_DATA');
+          expect(error.code).toBe(expectedCode);
         } else {
           throw error;
         }
@@ -702,6 +880,20 @@ describe('DataManagementService', () => {
     });
   });
 
+  describe('createBlob', () => {
+    const createBlob = (content: string, format: unknown) =>
+      (
+        DataManagementService as unknown as {
+          createBlob: (content: string, format: unknown) => Blob;
+        }
+      ).createBlob(content, format);
+
+    it('should return text/plain blob for unknown format (Line 257)', () => {
+      const blob = createBlob('some content', 'unknown-format');
+      expect(blob.type).toBe('text/plain');
+    });
+  });
+
   describe('getErrorMessage', () => {
     const getErrorMessage = (error: unknown) =>
       (
@@ -710,37 +902,27 @@ describe('DataManagementService', () => {
         }
       ).getErrorMessage(error);
 
-    it('should return file error message if error message contains "file"', () => {
-      expect(getErrorMessage(new Error('Some file error occurred'))).toBe(
+    it.each([
+      [
+        new Error('Some file error occurred'),
         'Datei konnte nicht geöffnet werden. Versuchen Sie es erneut.',
-      );
-    });
-
-    it('should return file error message if error message contains "File"', () => {
-      expect(getErrorMessage(new Error('File access denied'))).toBe(
+      ],
+      [
+        new Error('File access denied'),
         'Datei konnte nicht geöffnet werden. Versuchen Sie es erneut.',
-      );
-    });
-
-    it('should return permission error message if error message contains "permission"', () => {
-      expect(getErrorMessage(new Error('Write permission denied'))).toBe(
+      ],
+      [
+        new Error('Write permission denied'),
         'Keine Berechtigung zum Speichern von Dateien.',
-      );
-    });
-
-    it('should return default error message for other errors', () => {
-      expect(getErrorMessage(new Error('Share failed'))).toBe(
+      ],
+      [
+        new Error('Share failed'),
         'Datei wurde gespeichert, Teilen war nicht möglich.',
-      );
-    });
-
-    it('should return unknown error message if error is not an Error instance', () => {
-      expect(getErrorMessage('Unknown string error')).toBe(
-        'Unbekannter Fehler beim Export.',
-      );
-      expect(getErrorMessage({ code: 500 })).toBe(
-        'Unbekannter Fehler beim Export.',
-      );
+      ],
+      ['Unknown string error', 'Unbekannter Fehler beim Export.'],
+      [{ code: 500 }, 'Unbekannter Fehler beim Export.'],
+    ])('should return correct message for %s', (error, expected) => {
+      expect(getErrorMessage(error)).toBe(expected);
     });
   });
 });
