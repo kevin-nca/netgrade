@@ -13,7 +13,6 @@ import {
   addOutline,
   trashOutline,
   arrowForward,
-  checkmarkCircleOutline,
 } from 'ionicons/icons';
 import { OnboardingDataTemp, TempSemester } from '../../types';
 import './SemesterStep.css';
@@ -53,8 +52,8 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
       const semester: TempSemester = {
         id: generateId(),
         name: value.name.trim(),
-        startDate: new Date(value.startDate), // ← String → Date
-        endDate: new Date(value.endDate), // ← String → Date
+        startDate: new Date(value.startDate),
+        endDate: new Date(value.endDate),
       };
 
       setData((prev) => ({
@@ -91,10 +90,6 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
       );
       setSelectedSemesterId(remainingSemesters[0]?.id || '');
     }
-  };
-
-  const handleSelectSemester = (semesterId: string) => {
-    setSelectedSemesterId(semesterId);
   };
 
   const formatDate = (date: Date) => {
@@ -298,35 +293,18 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
             <h3 className="subsection-title">Deine Semester</h3>
             <div className="semesters-list">
               {data.semesters.map((semester, index) => (
-                <div
-                  key={semester.id}
-                  className={`glass-card semester-item ${
-                    semester.id === selectedSemesterId ? 'selected' : ''
-                  }`}
-                  onClick={() => handleSelectSemester(semester.id)}
-                >
+                <div key={semester.id} className="glass-card semester-item">
                   <div className="semester-content">
                     <div className={`semester-avatar semester-${index % 4}`}>
                       {semester.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="semester-info">
-                      <h4 className="semester-name">
-                        {semester.name}
-                        {semester.id === selectedSemesterId && (
-                          <span className="selected-badge">Ausgewählt</span>
-                        )}
-                      </h4>
+                      <h4 className="semester-name">{semester.name}</h4>
                       <p className="semester-details">
                         {formatDate(semester.startDate)} -{' '}
                         {formatDate(semester.endDate)}
                       </p>
                     </div>
-                    {semester.id === selectedSemesterId && (
-                      <IonIcon
-                        icon={checkmarkCircleOutline}
-                        className="selected-icon"
-                      />
-                    )}
                     <IonButton
                       fill="clear"
                       color="danger"
