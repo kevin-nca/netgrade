@@ -37,6 +37,7 @@ export class Exam extends BaseEntity {
   @OneToOne(() => Grade, (grade) => grade.exam, {
     nullable: true,
     onDelete: 'SET NULL',
+    cascade: true,
   })
   @JoinColumn({ name: 'gradeId' })
   grade!: Grade | null;
