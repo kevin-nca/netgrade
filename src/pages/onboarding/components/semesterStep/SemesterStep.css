@@ -71,18 +71,7 @@
   margin: 0;
 }
 
-.date-input {
-  cursor: pointer;
-}
-
-.date-display {
-  padding: 12px 0;
-  font-size: 16px;
-  flex: 1;
-  color: #000000;
-}
-
-/* Remove button (inherited from shared styles) */
+/* Remove button */
 .semester-item .remove-button {
   --color: #ff3b30;
   margin: 0;
@@ -99,9 +88,5 @@
 
   .semester-details {
     color: rgba(255, 255, 255, 0.6);
-  }
-
-  .date-display {
-    color: #ffffff;
   }
 }
