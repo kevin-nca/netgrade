@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   IonAlert,
   IonButton,
@@ -23,6 +23,7 @@ import {
   closeOutline,
   createOutline,
   downloadOutline,
+  cloudUploadOutline,
   informationCircleOutline,
   pencilOutline,
   personOutline,
@@ -46,6 +47,7 @@ import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQuerie
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import Header from '@/components/Header/Header';
 import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
+import { DataManagementService } from '@/services/DataManagementService';
 import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
 import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
 import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
@@ -62,6 +64,7 @@ const SettingsPage: React.FC = () => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [schoolIdToDelete, setSchoolIdToDelete] = useState<string | null>(null);
   const history = useHistory();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: schools } = useSchools();
   const { data: userName } = useUserName();
@@ -227,6 +230,49 @@ const SettingsPage: React.FC = () => {
         setSchoolIdToDelete(null);
       },
     });
+  };
+
+  const handleExportJSON = async () => {
+    try {
+      await DataManagementService.exportAsJSON();
+      showToast('JSON Export erfolgreich!', true);
+    } catch {
+      showToast('Export fehlgeschlagen', false);
+    }
+  };
+
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    presentAlert({
+      header: 'JSON Import',
+      message:
+        'Möchten Sie die Daten aus dieser JSON-Datei importieren? Dies überschreibt alle bestehenden Daten!',
+      buttons: [
+        { text: 'Abbrechen', role: 'cancel' },
+        {
+          text: 'Importieren',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              const text = await file.text();
+              await DataManagementService.importFromJSON(text);
+              showToast('Import erfolgreich!', true);
+              setTimeout(() => {
+                window.location.reload();
+              }, 1500);
+            } catch {
+              showToast('Import fehlgeschlagen', false);
+            }
+          },
+        },
+      ],
+    });
+
+    event.target.value = '';
   };
 
   return (
@@ -415,6 +461,40 @@ const SettingsPage: React.FC = () => {
             <div className="settings-list">
               <div
                 className="settings-item glass-card"
+                onClick={handleExportJSON}
+              >
+                <div className="item-content">
+                  <div className="item-icon export">
+                    <IonIcon icon={downloadOutline} />
+                  </div>
+                  <div className="item-text">
+                    <h3 className="item-title">JSON Export</h3>
+                    <p className="item-subtitle">
+                      App-Daten als JSON exportieren
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="settings-item glass-card"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <div className="item-content">
+                  <div className="item-icon import">
+                    <IonIcon icon={cloudUploadOutline} />
+                  </div>
+                  <div className="item-text">
+                    <h3 className="item-title">JSON Import</h3>
+                    <p className="item-subtitle">
+                      App-Daten aus JSON wiederherstellen
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="settings-item glass-card"
                 onClick={() => setIsExportDialogOpen(true)}
               >
                 <div className="item-content">
@@ -422,7 +502,7 @@ const SettingsPage: React.FC = () => {
                     <IonIcon icon={downloadOutline} />
                   </div>
                   <div className="item-text">
-                    <h3 className="item-title">Daten exportieren</h3>
+                    <h3 className="item-title">Excel Export</h3>
                     <p className="item-subtitle">
                       Als Excel-Datei herunterladen
                     </p>
@@ -471,6 +551,14 @@ const SettingsPage: React.FC = () => {
           setIsOpen={setShowNavigationModal}
         />
       </IonContent>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        style={{ display: 'none' }}
+        onChange={handleFileSelect}
+      />
 
       <AddSchoolModal
         isOpen={showAddSchoolModal}
