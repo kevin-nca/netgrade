@@ -42,6 +42,7 @@ const SchoolPage: React.FC = () => {
     const payload = {
       name: subjectData.name,
       schoolId: schoolId,
+      semesterId: subjectData.semesterId,
       teacher: null,
       description: null,
       weight: 1.0,
