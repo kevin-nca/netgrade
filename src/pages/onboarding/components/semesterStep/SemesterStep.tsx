@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import {
-  IonButton,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonDatetime,
-  IonModal,
-} from '@ionic/react';
+import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/react';
 import {
   calendarOutline,
   addOutline,
@@ -35,17 +28,15 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
   onNext,
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [showStartDateModal, setShowStartDateModal] = useState(false);
-  const [showEndDateModal, setShowEndDateModal] = useState(false);
 
   const form = useForm({
     defaultValues: {
       name: '',
-      startDate: new Date().toISOString(),
+      startDate: new Date().toISOString().split('T')[0],
       endDate: (() => {
         const d = new Date();
         d.setMonth(d.getMonth() + 6);
-        return d.toISOString();
+        return d.toISOString().split('T')[0];
       })(),
     },
     onSubmit: async ({ value }) => {
@@ -79,11 +70,9 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
     setData((prev) => ({
       ...prev,
       semesters: prev.semesters.filter((s) => s.id !== semesterId),
-      // Entferne auch alle Subjects die zu diesem Semester gehören
       subjects: prev.subjects.filter((s) => s.semesterId !== semesterId),
     }));
 
-    // Wenn das gelöschte Semester ausgewählt war, wähle ein anderes
     if (selectedSemesterId === semesterId) {
       const remainingSemesters = data.semesters.filter(
         (s) => s.id !== semesterId,
@@ -102,7 +91,6 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
 
   const handleNext = () => {
     if (data.semesters.length > 0) {
-      // Stelle sicher, dass ein Semester ausgewählt ist
       if (!selectedSemesterId && data.semesters.length > 0) {
         setSelectedSemesterId(data.semesters[0].id);
       }
@@ -178,11 +166,8 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
                   <form.Field name="startDate">
                     {(field) => (
                       <div className="field-group">
-                        <label className="field-label">Startdatum</label>
-                        <div
-                          className="input-wrapper glass-input date-input"
-                          onClick={() => setShowStartDateModal(true)}
-                        >
+                        <label className="field-label">Startdatum *</label>
+                        <div className="input-wrapper glass-input">
                           <IonItem lines="none" className="input-item">
                             <div slot="start" className="input-icon-wrapper">
                               <IonIcon
@@ -190,28 +175,17 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
                                 className="input-icon"
                               />
                             </div>
-                            <div className="date-display">
-                              {formatDate(new Date(field.state.value))}
-                            </div>
+                            <IonInput
+                              type="date"
+                              value={field.state.value}
+                              onIonChange={(e) =>
+                                field.handleChange(e.detail.value || '')
+                              }
+                              className="input-field"
+                              required
+                            />
                           </IonItem>
                         </div>
-                        <IonModal
-                          isOpen={showStartDateModal}
-                          onDidDismiss={() => setShowStartDateModal(false)}
-                        >
-                          <IonDatetime
-                            value={field.state.value}
-                            onIonChange={(e) => {
-                              if (e.detail.value) {
-                                field.handleChange(e.detail.value as string);
-                                setShowStartDateModal(false);
-                              }
-                            }}
-                            presentation="date"
-                            locale="de-CH"
-                            firstDayOfWeek={1}
-                          />
-                        </IonModal>
                       </div>
                     )}
                   </form.Field>
@@ -219,11 +193,8 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
                   <form.Field name="endDate">
                     {(field) => (
                       <div className="field-group">
-                        <label className="field-label">Enddatum</label>
-                        <div
-                          className="input-wrapper glass-input date-input"
-                          onClick={() => setShowEndDateModal(true)}
-                        >
+                        <label className="field-label">Enddatum *</label>
+                        <div className="input-wrapper glass-input">
                           <IonItem lines="none" className="input-item">
                             <div slot="start" className="input-icon-wrapper">
                               <IonIcon
@@ -231,28 +202,17 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
                                 className="input-icon"
                               />
                             </div>
-                            <div className="date-display">
-                              {formatDate(new Date(field.state.value))}
-                            </div>
+                            <IonInput
+                              type="date"
+                              value={field.state.value}
+                              onIonChange={(e) =>
+                                field.handleChange(e.detail.value || '')
+                              }
+                              className="input-field"
+                              required
+                            />
                           </IonItem>
                         </div>
-                        <IonModal
-                          isOpen={showEndDateModal}
-                          onDidDismiss={() => setShowEndDateModal(false)}
-                        >
-                          <IonDatetime
-                            value={field.state.value}
-                            onIonChange={(e) => {
-                              if (e.detail.value) {
-                                field.handleChange(e.detail.value as string);
-                                setShowEndDateModal(false);
-                              }
-                            }}
-                            presentation="date"
-                            locale="de-CH"
-                            firstDayOfWeek={1}
-                          />
-                        </IonModal>
                       </div>
                     )}
                   </form.Field>
