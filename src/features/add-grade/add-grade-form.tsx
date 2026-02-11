@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IonContent, IonToast } from '@ionic/react';
+import { IonContent, IonToast, useIonViewWillEnter } from '@ionic/react';
 import { format, parseISO } from 'date-fns';
 import {
   useAddGradeWithExam,
@@ -36,6 +36,11 @@ const AddGradeForm: React.FC<AddGradeFormProps> = ({ onSuccess }) => {
     useSchoolSubjects(selectedSchoolId);
 
   const addGradeWithExamMutation = useAddGradeWithExam();
+
+  useIonViewWillEnter(() => {
+    setShowSuccess(false);
+    setShowToast(false);
+  });
 
   const form = useAppForm({
     defaultValues: {

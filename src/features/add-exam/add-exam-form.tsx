@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IonContent, IonToast } from '@ionic/react';
+import { IonContent, IonToast, useIonViewWillEnter } from '@ionic/react';
 import { format } from 'date-fns';
 import { useAddExam, useSchools, useSchoolSubjects } from '@/hooks';
 import { useAppForm } from '@/shared/components/form';
@@ -31,6 +31,11 @@ const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
     useSchoolSubjects(selectedSchoolId);
 
   const addExamMutation = useAddExam();
+
+  useIonViewWillEnter(() => {
+    setShowSuccess(false);
+    setShowToast(false);
+  });
 
   const form = useAppForm({
     defaultValues: {
