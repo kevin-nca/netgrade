@@ -16,6 +16,7 @@ import {
   IonModal,
   IonSegment,
   IonSegmentButton,
+  IonSpinner,
   IonTitle,
   IonToast,
   IonToolbar,
@@ -265,7 +266,13 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
             </IonSegment>
 
             {segmentValue === 'details' ? (
-              <EditExamForm examId={examId} onSuccess={onEditSuccess} />
+              exam ? (
+                <EditExamForm exam={exam} onSuccess={onEditSuccess} />
+              ) : (
+                <div className="ion-padding ion-text-center">
+                  <IonSpinner />
+                </div>
+              )
             ) : (
               <GradeForm
                 formValues={gradeForm.state.values as GradeFormData}

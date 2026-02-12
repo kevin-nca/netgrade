@@ -8,24 +8,24 @@ import {
 } from '@ionic/react';
 import { saveOutline } from 'ionicons/icons';
 import { useAppForm } from '@/shared/components/form';
-import { useExam, useSubjects, useUpdateExam } from '@/hooks';
+import { useSubjects, useUpdateExam } from '@/hooks';
 import styles from './styles/form-common.module.css';
 import {
   editExamSchema,
   type EditExamFormData,
 } from './schema/edit-exam-schema';
+import { Exam } from '@/db/entities/Exam';
 
 interface EditExamFormProps {
-  examId: string;
+  exam: Exam;
   onSuccess?: () => void;
 }
 
-export function EditExamForm({ examId, onSuccess }: EditExamFormProps) {
+export function EditExamForm({ exam, onSuccess }: EditExamFormProps) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
 
-  const { data: exam } = useExam(examId);
   const { data: subjects = [] } = useSubjects();
   const updateExamMutation = useUpdateExam();
 
@@ -41,7 +41,7 @@ export function EditExamForm({ examId, onSuccess }: EditExamFormProps) {
     },
     onSubmit: async ({ value }) => {
       const updatedExam = {
-        id: examId,
+        id: exam.id,
         name: value.title.trim(),
         date: new Date(value.date),
         subjectId: value.subject,
