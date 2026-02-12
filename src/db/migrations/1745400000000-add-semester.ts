@@ -1,8 +1,8 @@
-import { getRepositories } from '@/db/data-source';
 import { QueryRunner } from 'typeorm';
+import { uuidv4 } from 'zod';
 
-export class AddSemester1737400000000 {
-  name = 'AddSemester1737400000000';
+export class AddSemester1745400000000 {
+  name = 'AddSemester1745400000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     console.log('Running migration: ' + this.name);
@@ -26,33 +26,26 @@ export class AddSemester1737400000000 {
       ALTER TABLE "subject" ADD COLUMN "semesterId" varchar
     `);
 
-    // 3. Create default semester using repository
-    const { semester: semesterRepo } = getRepositories();
-
+    // 3. Insert default semester direkt via SQL
+    const id = uuidv4();
     const currentYear = new Date().getFullYear();
     const nextYear = currentYear + 1;
-    const defaultYear = `${currentYear}/${nextYear}`;
-    const startDate = new Date(`${currentYear}-08-15`);
-    const endDate = new Date(`${nextYear}-07-31`);
 
-    const defaultSemester = semesterRepo.create({
-      name: defaultYear,
-      startDate: startDate,
-      endDate: endDate,
-    });
+    await queryRunner.query(`
+      INSERT INTO "semester" ("id", "version", "name", "startDate", "endDate")
+      VALUES (
+        '${id}',
+        1,
+        '${currentYear}/${nextYear}',
+        '${currentYear}-08-15',
+        '${nextYear}-07-31'
+      )
+    `);
 
-    try {
-      await semesterRepo.save(defaultSemester);
-      console.log(
-        `Created default semester: ${defaultYear} with ID: ${defaultSemester.id}`,
-      );
-    } catch (error) {
-      console.error(
-        'Failed to create default semester during migration:',
-        error,
-      );
-      throw error;
-    }
+    // 4. Alle bestehenden Subjects dem Default-Semester zuweisen
+    await queryRunner.query(`
+      UPDATE "subject" SET "semesterId" = '${id}' WHERE "semesterId" IS NULL
+    `);
 
     console.log('Migration completed successfully');
   }

@@ -10,7 +10,7 @@ import initSqlJs from 'sql.js';
 // Migrations
 import { Initdb1745319232244 } from './migrations/1745319232244-initdb';
 import { DropDescriptionFromSubject1761134134122 } from './migrations/1761134134122-drop_description_from_subject';
-import { AddSemester1737400000000 } from '@/db/migrations/1737400000000-add-semester';
+import { AddSemester1745400000000 } from '@/db/migrations/1745400000000-add-semester';
 
 // Reference: https://github.com/sql-js/react-sqljs-demo/blob/master/src/App.js
 (window as { localforage?: typeof localforage }).localforage = localforage;
@@ -63,7 +63,7 @@ const initializeNativeDb = async (): Promise<DataSourceOptions> => {
     migrations: [
       Initdb1745319232244,
       DropDescriptionFromSubject1761134134122,
-      AddSemester1737400000000,
+      AddSemester1745400000000,
     ],
     migrationsTableName: 'migrations',
     mode: 'no-encryption',
