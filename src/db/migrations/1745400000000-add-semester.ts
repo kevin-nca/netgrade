@@ -1,8 +1,8 @@
 import { getRepositories } from '@/db/data-source';
 import { QueryRunner } from 'typeorm';
 
-export class AddSemester1737400000000 {
-  name = 'AddSemester1737400000000';
+export class AddSemester1745400000000 {
+  name = 'AddSemester1745400000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     console.log('Running migration: ' + this.name);
