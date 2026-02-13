@@ -28,12 +28,12 @@ PODS:
   - CordovaPlugins (8.0.2):
     - CapacitorCordova
   - IONFilesystemLib (1.1.0)
-  - SQLCipher (4.7.0):
-    - SQLCipher/standard (= 4.7.0)
-  - SQLCipher/common (4.7.0)
-  - SQLCipher/standard (4.7.0):
+  - SQLCipher (4.10.0):
+    - SQLCipher/standard (= 4.10.0)
+  - SQLCipher/common (4.10.0)
+  - SQLCipher/standard (4.10.0):
     - SQLCipher/common
-  - ZIPFoundation (0.9.19)
+  - ZIPFoundation (0.9.20)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
@@ -97,11 +97,11 @@ SPEC CHECKSUMS:
   CapacitorPreferences: 443fabe9670226200e595658a87ef0b1566716d4
   CapacitorShare: 12f1d192170cbcf9f108fd675ac8e343761a4638
   CapacitorStatusBar: 312e2e67928dfe9514c4a8916a1fd610552f5f35
-  CordovaPlugins: 4ebe9926167412b97d046d9d7f2fc6eab0310ad8
+  CordovaPlugins: 4d45f605ba0ea5defdf8673ab1cc3ae66a856903
   IONFilesystemLib: 50b9a0f3052a9b40b9bedb43f328a8fe222f9f87
-  SQLCipher: ba9d0076041ed767c5bd3d3f77098318d04a403c
-  ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
+  SQLCipher: 2e8a68aae3a479f3d86defede2c1f09a8594cf2d
+  ZIPFoundation: dfd3d681c4053ff7e2f7350bc4e53b5dba3f5351
 
-PODFILE CHECKSUM: f9fcc71f3a842903639b70fbb9ff049930b621df
+PODFILE CHECKSUM: 3e1dcc59d492cfdb950b35972e8e4b3ed6ce6dde
 
 COCOAPODS: 1.16.2
