@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import {
   IonContent,
   IonIcon,
   IonPage,
   IonRefresher,
   IonRefresherContent,
+  useIonRouter,
 } from '@ionic/react';
 import { add, personCircleOutline } from 'ionicons/icons';
 import { useAddSchool, useUserName } from '@/hooks/queries';
@@ -21,7 +21,7 @@ import './MainPage.css';
 function MainPage() {
   const [showNavigationModal, setShowNavigationModal] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
-  const history = useHistory();
+  const router = useIonRouter();
 
   const { data: userName } = useUserName();
 
@@ -70,7 +70,7 @@ function MainPage() {
                 </div>
                 <div
                   className="profile-settings-button"
-                  onClick={() => history.push(Routes.SETTINGS)}
+                  onClick={() => router.push(Routes.SETTINGS, 'forward')}
                 >
                   <IonIcon
                     icon={personCircleOutline}
@@ -100,7 +100,7 @@ function MainPage() {
               <h2 className="section-title">Prüfungen</h2>
               <div
                 className="header-action-button"
-                onClick={() => history.push(Routes.EXAMS_ADD)}
+                onClick={() => router.push(Routes.EXAMS_ADD, 'forward')}
               >
                 <IonIcon icon={add} className="action-icon" />
               </div>
