@@ -1,13 +1,19 @@
-import { getRepositories } from '@/db/data-source';
 import { QueryRunner } from 'typeorm';
 
-export class AddSemester1737400000000 {
-  name = 'AddSemester1737400000000';
+function generateUuid(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+export class AddSemester1745400000000 {
+  name = 'AddSemester1745400000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     console.log('Running migration: ' + this.name);
 
-    // 1. Create semester table
     await queryRunner.query(`
       CREATE TABLE "semester" (
                                 "id"            varchar PRIMARY KEY NOT NULL,
@@ -21,39 +27,34 @@ export class AddSemester1737400000000 {
       )
     `);
 
-    // 2. Add semesterId column to subject
     await queryRunner.query(`
       ALTER TABLE "subject" ADD COLUMN "semesterId" varchar
     `);
 
-    // 3. Create default semester using repository
-    const { semester: semesterRepo } = getRepositories();
-
+    const id = generateUuid();
     const currentYear = new Date().getFullYear();
     const nextYear = currentYear + 1;
-    const defaultYear = `${currentYear}/${nextYear}`;
-    const startDate = new Date(`${currentYear}-08-15`);
-    const endDate = new Date(`${nextYear}-07-31`);
 
-    const defaultSemester = semesterRepo.create({
-      name: defaultYear,
-      startDate: startDate,
-      endDate: endDate,
-    });
+    await queryRunner.query(`
+      INSERT INTO "semester" ("id", "version", "name", "startDate", "endDate")
+      VALUES (
+        '${id}',
+        1,
+        '${currentYear}/${nextYear}',
+        '${currentYear}-08-15',
+        '${nextYear}-07-31'
+      )
+    `);
 
-    try {
-      await semesterRepo.save(defaultSemester);
-      console.log(
-        `Created default semester: ${defaultYear} with ID: ${defaultSemester.id}`,
-      );
-    } catch (error) {
-      console.error(
-        'Failed to create default semester during migration:',
-        error,
-      );
-      throw error;
-    }
+    await queryRunner.query(`
+      UPDATE "subject" SET "semesterId" = '${id}' WHERE "semesterId" IS NULL
+    `);
 
     console.log('Migration completed successfully');
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`ALTER TABLE "subject" DROP COLUMN "semesterId"`);
+    await queryRunner.query(`DROP TABLE "semester"`);
   }
 }
