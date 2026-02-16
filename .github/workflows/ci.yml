@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: cypress/included:13.15.0
+      options: --user root
 
     steps:
       - name: Check out repository
@@ -33,6 +34,13 @@ jobs:
 
       - name: Unit Tests with Coverage
         run: npm run test:coverage
+
+      - name: Install curl and gpg
+        run: |
+          apt-get update
+          apt-get install -y curl gnupg
+        env:
+          DEBIAN_FRONTEND: noninteractive
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
