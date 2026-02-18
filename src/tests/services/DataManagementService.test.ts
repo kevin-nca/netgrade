@@ -509,13 +509,18 @@ describe('DataManagementService', () => {
 
     it('should throw error if no data to export', async () => {
       const schoolRepo = dataSource.getRepository(School);
-      const findSpy = vi.spyOn(schoolRepo, 'find').mockResolvedValue([]);
+      const semesterRepo = dataSource.getRepository(Semester);
+      const findSchoolSpy = vi.spyOn(schoolRepo, 'find').mockResolvedValue([]);
+      const findSemesterSpy = vi
+        .spyOn(semesterRepo, 'find')
+        .mockResolvedValue([]);
 
       await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
         ExportError,
       );
 
-      findSpy.mockRestore();
+      findSchoolSpy.mockRestore();
+      findSemesterSpy.mockRestore();
     });
 
     it('should use native export functionality for JSON on native platform', async () => {
@@ -661,12 +666,15 @@ describe('DataManagementService', () => {
       const validJson = JSON.stringify({
         schools: [
           {
+            id: 'test-school-id',
             name: 'Test School',
             subjects: [
               {
+                id: 'test-subject-id',
                 name: 'Test Subject',
                 exams: [
                   {
+                    id: 'test-exam-id',
                     name: 'Test Exam',
                     date: '2023-12-24',
                     isCompleted: true,
@@ -678,8 +686,9 @@ describe('DataManagementService', () => {
         ],
       });
 
-      const saveSpy = vi.fn();
+      const saveSpy = vi.fn().mockResolvedValue([]);
       const querySpy = vi.fn();
+      const updateSpy = vi.fn();
 
       vi.spyOn(dataSource, 'transaction').mockImplementation(
         async (
@@ -697,7 +706,7 @@ describe('DataManagementService', () => {
 
           const mockManager = {
             query: querySpy,
-            getRepository: () => ({ save: saveSpy }),
+            getRepository: () => ({ save: saveSpy, update: updateSpy }),
           } as unknown as EntityManager;
           return cb(mockManager);
         },
@@ -705,8 +714,17 @@ describe('DataManagementService', () => {
 
       await DataManagementService.importFromJSON(validJson);
 
-      const savedSchools = saveSpy.mock.calls[0][0];
-      const examDate = savedSchools[0].subjects[0].exams[0].date;
+      // The service saves exams in the third save call (after schools and subjects)
+      // Find the save call that includes the exam with the date
+      const examSaveCall = saveSpy.mock.calls.find(
+        (call) =>
+          Array.isArray(call[0]) &&
+          call[0].length > 0 &&
+          call[0][0].date instanceof Date,
+      );
+
+      expect(examSaveCall).toBeDefined();
+      const examDate = examSaveCall![0][0].date;
 
       expect(examDate).toBeInstanceOf(Date);
       expect(examDate.toISOString().startsWith('2023-12-24')).toBe(true);
