@@ -406,6 +406,10 @@
   background: linear-gradient(135deg, #ff3b30 0%, #ff6b6b 100%);
 }
 
+.item-icon.import {
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+}
+
 .item-icon.empty {
   background: rgba(0, 0, 0, 0.1);
   color: rgba(0, 0, 0, 0.3);
@@ -625,7 +629,7 @@
 }
 
 .settings-item .item-extra {
-  max-height: 30;
+  max-height: 30px;
   overflow: hidden;
   transition: max-height 0.3s ease;
 }
