@@ -34,10 +34,12 @@ jobs:
       - name: Unit Tests with Coverage
         run: npm run test:coverage
 
-      - name: Install dependencies for Codecov uploader (curl, gpg)
+      - name: Install curl and gpg
         run: |
           apt-get update
           apt-get install -y curl gnupg
+        env:
+          DEBIAN_FRONTEND: noninteractive
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

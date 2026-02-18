@@ -62,8 +62,8 @@ const initializeNativeDb = async (): Promise<DataSourceOptions> => {
     migrationsRun: true,
     migrations: [
       Initdb1745319232244,
-      AddSemester1745400000000,
       DropDescriptionFromSubject1761134134122,
+      AddSemester1745400000000,
     ],
     migrationsTableName: 'migrations',
     mode: 'no-encryption',
