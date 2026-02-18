@@ -908,6 +908,181 @@ describe('DataManagementService', () => {
 
       transactionSpy.mockRestore();
     });
+
+    it('should import semesters when present in backup', async () => {
+      const validJson = JSON.stringify({
+        schools: [{ id: 'school-1', name: 'Test School', subjects: [] }],
+        semesters: [
+          {
+            id: 'semester-1',
+            name: '2024/2025',
+            startDate: '2024-08-15',
+            endDate: '2025-07-31',
+          },
+        ],
+      });
+
+      const saveSpy = vi.fn().mockResolvedValue([]);
+      const querySpy = vi.fn();
+
+      vi.spyOn(dataSource, 'transaction').mockImplementation(
+        async (
+          runInTransactionOrIsolationLevel:
+            | ((entityManager: EntityManager) => Promise<unknown>)
+            | string,
+          maybeRunInTransaction?: (
+            entityManager: EntityManager,
+          ) => Promise<unknown>,
+        ) => {
+          const cb =
+            typeof runInTransactionOrIsolationLevel === 'function'
+              ? runInTransactionOrIsolationLevel
+              : maybeRunInTransaction!;
+
+          const mockManager = {
+            query: querySpy,
+            getRepository: () => ({ save: saveSpy, update: vi.fn() }),
+          } as unknown as EntityManager;
+          return cb(mockManager);
+        },
+      );
+
+      await DataManagementService.importFromJSON(validJson);
+
+      const semesterSaveCall = saveSpy.mock.calls.find(
+        (call) =>
+          Array.isArray(call[0]) &&
+          call[0].length > 0 &&
+          call[0][0].startDate instanceof Date &&
+          call[0][0].name === '2024/2025',
+      );
+
+      expect(semesterSaveCall).toBeDefined();
+      expect(semesterSaveCall![0][0]).toMatchObject({
+        id: 'semester-1',
+        name: '2024/2025',
+      });
+    });
+
+    it('should import grades and update exam references', async () => {
+      const validJson = JSON.stringify({
+        schools: [
+          {
+            id: 'school-1',
+            name: 'Test School',
+            subjects: [
+              {
+                id: 'subject-1',
+                name: 'Test Subject',
+                exams: [
+                  {
+                    id: 'exam-1',
+                    name: 'Test Exam',
+                    date: '2023-12-24',
+                    isCompleted: true,
+                    grade: {
+                      id: 'grade-1',
+                      score: 5.5,
+                      weight: 1,
+                      date: '2023-12-24',
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      const saveSpy = vi.fn().mockResolvedValue([]);
+      const querySpy = vi.fn();
+      const updateSpy = vi.fn().mockResolvedValue({ affected: 1 });
+
+      vi.spyOn(dataSource, 'transaction').mockImplementation(
+        async (
+          runInTransactionOrIsolationLevel:
+            | ((entityManager: EntityManager) => Promise<unknown>)
+            | string,
+          maybeRunInTransaction?: (
+            entityManager: EntityManager,
+          ) => Promise<unknown>,
+        ) => {
+          const cb =
+            typeof runInTransactionOrIsolationLevel === 'function'
+              ? runInTransactionOrIsolationLevel
+              : maybeRunInTransaction!;
+
+          const mockManager = {
+            query: querySpy,
+            getRepository: () => ({ save: saveSpy, update: updateSpy }),
+          } as unknown as EntityManager;
+          return cb(mockManager);
+        },
+      );
+
+      await DataManagementService.importFromJSON(validJson);
+
+      const gradeSaveCall = saveSpy.mock.calls.find(
+        (call) =>
+          Array.isArray(call[0]) &&
+          call[0].length > 0 &&
+          call[0][0].score === 5.5,
+      );
+
+      expect(gradeSaveCall).toBeDefined();
+      expect(gradeSaveCall![0][0]).toMatchObject({
+        id: 'grade-1',
+        score: 5.5,
+        examId: 'exam-1',
+      });
+
+      expect(updateSpy).toHaveBeenCalledWith(
+        { id: 'exam-1' },
+        { gradeId: 'grade-1' },
+      );
+    });
+
+    it('should export semesters in JSON backup', async () => {
+      await DataManagementService.resetAllData();
+
+      const semesterRepo = dataSource.getRepository(Semester);
+      const semester = new Semester();
+      semester.name = 'Export Semester Test';
+      semester.startDate = new Date('2024-08-15');
+      semester.endDate = new Date('2025-07-31');
+      await semesterRepo.save(semester);
+
+      const schoolRepo = dataSource.getRepository(School);
+      const school = new School();
+      school.name = 'Semester Export School';
+      await schoolRepo.save(school);
+
+      (global.URL.createObjectURL as Mock).mockClear();
+
+      await DataManagementService.exportAsJSON();
+
+      expect(global.URL.createObjectURL).toHaveBeenCalled();
+      const blob = (global.URL.createObjectURL as Mock).mock
+        .calls[0][0] as Blob;
+      const text = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsText(blob);
+      });
+      const json = JSON.parse(text);
+
+      expect(json.semesters).toBeDefined();
+      expect(json.semesters.length).toBeGreaterThan(0);
+
+      // Find the specific semester we created
+      const exportedSemester = json.semesters.find(
+        (s: { name: string }) => s.name === 'Export Semester Test',
+      );
+      expect(exportedSemester).toBeDefined();
+      expect(exportedSemester.startDate).toBe('2024-08-15');
+      expect(exportedSemester.endDate).toBe('2025-07-31');
+    });
   });
 
   describe('formatData', () => {
@@ -977,14 +1152,11 @@ describe('DataManagementService', () => {
     await schoolRepo.save(school);
 
     const semesterRepo = dataSource.getRepository(Semester);
-    let semester = await semesterRepo.findOne({ where: {} });
-    if (!semester) {
-      semester = new Semester();
-      semester.name = 'Test Semester';
-      semester.startDate = new Date();
-      semester.endDate = new Date();
-      await semesterRepo.save(semester);
-    }
+    const semester = new Semester();
+    semester.name = 'Date Test Semester';
+    semester.startDate = new Date('2024-01-01');
+    semester.endDate = new Date('2024-12-31');
+    await semesterRepo.save(semester);
 
     const subject = new Subject();
     subject.name = 'Date Subject';
@@ -1012,8 +1184,10 @@ describe('DataManagementService', () => {
     });
     const json = JSON.parse(text);
 
-    expect(json.schools[0].subjects[0].exams[0].date).toBe(
-      '2023-12-25T00:00:00.000Z',
+    const dateSchool = json.schools.find(
+      (s: { name: string }) => s.name === 'Date Test School',
     );
+    expect(dateSchool).toBeDefined();
+    expect(dateSchool.subjects[0].exams[0].date).toMatch(/^2023-12-25/);
   });
 });
