@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useForm } from '@tanstack/react-form';
 import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/react';
 import {
   calendarOutline,
@@ -9,6 +8,7 @@ import {
 } from 'ionicons/icons';
 import { OnboardingDataTemp, TempSemester } from '../../types';
 import './SemesterStep.css';
+import { useAppForm } from '@/shared/components/form';
 
 interface SemesterStepProps {
   data: OnboardingDataTemp;
@@ -29,7 +29,7 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       name: '',
       startDate: new Date().toISOString().split('T')[0],

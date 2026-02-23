@@ -120,26 +120,6 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
     });
   };
 
-  if (!selectedSchool) {
-    return (
-      <div className="onboarding-step">
-        <div className="step-header">
-          <h1>Keine Schule ausgewählt</h1>
-        </div>
-      </div>
-    );
-  }
-
-  if (!selectedSemester) {
-    return (
-      <div className="onboarding-step">
-        <div className="step-header">
-          <h1>Kein Semester ausgewählt</h1>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="onboarding-step">
       <div className="step-header">
@@ -151,8 +131,8 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
           <div className="step-text">
             <h1 className="step-title">Fächer hinzufügen</h1>
             <p className="step-subtitle">
-              Erstelle Fächer für {selectedSchool.name} -{' '}
-              {selectedSemester.name}
+              Erstelle Fächer für {selectedSchool!.name} -{' '}
+              {selectedSemester!.name}
             </p>
           </div>
         </div>
@@ -167,7 +147,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
               {data.semesters.map((semester, index) => (
                 <div
                   key={semester.id}
-                  className={`glass-card semester-selector-item ${semester.id === selectedSemester.id ? 'selected' : ''}`}
+                  className={`glass-card semester-selector-item ${semester.id === selectedSemester!.id ? 'selected' : ''}`}
                   onClick={() => setSelectedSemester(semester)}
                 >
                   <div className={`semester-avatar semester-${index % 4}`}>
@@ -182,7 +162,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                       {formatDate(semester.endDate)}
                     </span>
                   </div>
-                  {semester.id === selectedSemester.id && (
+                  {semester.id === selectedSemester!.id && (
                     <IonIcon
                       icon={checkmarkCircleOutline}
                       className="selected-icon"
@@ -202,14 +182,14 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
               {data.schools.map((school, index) => (
                 <div
                   key={school.id}
-                  className={`glass-card school-selector-item ${school.id === selectedSchool.id ? 'selected' : ''}`}
+                  className={`glass-card school-selector-item ${school.id === selectedSchool!.id ? 'selected' : ''}`}
                   onClick={() => setSelectedSchool(school)}
                 >
                   <div className={`school-avatar school-${index % 4}`}>
                     {school.name.charAt(0).toUpperCase()}
                   </div>
                   <span className="school-selector-name">{school.name}</span>
-                  {school.id === selectedSchool.id && (
+                  {school.id === selectedSchool!.id && (
                     <IonIcon
                       icon={checkmarkCircleOutline}
                       className="selected-icon"
