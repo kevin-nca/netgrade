@@ -254,7 +254,8 @@
   .subsection-title,
   .form-title,
   .school-name,
-  .subject-name {
+  .subject-name,
+  .cancel-button {
     color: #ffffff;
   }
 
