@@ -53,11 +53,6 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
         semesters: [...prev.semesters, semester],
       }));
 
-      // Setze das neue Semester als ausgewählt, wenn es das erste ist
-      if (data.semesters.length === 0) {
-        setSelectedSemesterId(semester.id);
-      }
-
       form.reset();
       setShowAddForm(false);
     },
