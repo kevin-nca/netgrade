@@ -9,6 +9,7 @@ import {
 import { OnboardingDataTemp, TempSemester } from '../../types';
 import './SemesterStep.css';
 import { useAppForm } from '@/shared/components/form';
+import '../SharedStepStyles.css';
 
 interface SemesterStepProps {
   data: OnboardingDataTemp;

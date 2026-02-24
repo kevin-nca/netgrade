@@ -2,20 +2,6 @@
   margin-top: 24px;
 }
 
-.semester-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  flex-shrink: 0;
-}
-
 .semester-0 {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
