@@ -22,53 +22,11 @@
   font-style: italic;
 }
 
-.input-wrapper {
-  border-radius: 16px;
-  padding: 4px;
-}
-
-.input-item {
-  --background: transparent;
-  --padding-start: 16px;
-  --padding-end: 16px;
-  --padding-top: 12px;
-  --padding-bottom: 12px;
-  --min-height: 52px;
-}
-
-.input-icon-wrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #ff9500 0%, #ff8500 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 12px;
-}
-
-.input-icon {
-  font-size: 20px;
-  color: #ffffff;
-}
-
-.input-field {
-  --color: #000000;
-  --placeholder-color: rgba(0, 0, 0, 0.4);
-  font-size: 16px;
-  font-weight: 500;
-}
-
 /* =========================
    DARK MODE
 ========================= */
 @media (prefers-color-scheme: dark) {
   .input-hint p {
     color: rgba(255, 255, 255, 0.5);
-  }
-
-  .input-field {
-    --color: #ffffff;
-    --placeholder-color: rgba(255, 255, 255, 0.4);
   }
 }
