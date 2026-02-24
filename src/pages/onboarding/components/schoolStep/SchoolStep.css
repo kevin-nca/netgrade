@@ -7,16 +7,3 @@ body {
   background-color: #ffffff; /* Light Mode fix */
   color: #000000; /* base color */
 }
-
-.add-text h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #000000;
-  margin: 0 0 4px 0;
-}
-
-.add-text p {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.5);
-  margin: 0;
-}
