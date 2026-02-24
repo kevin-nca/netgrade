@@ -17,12 +17,14 @@ import {
   useAddSchool,
   useAddSubject,
   useSetOnboardingCompleted,
+  useAddSemester,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
-import { School } from '@/db/entities';
+import { School, Semester } from '@/db/entities';
 
 import WelcomeScreen from './components/welcomeScreen/WelcomeScreen';
 import NameStep from './components/nameStep/NameStep';
+import SemesterStep from './components/semesterStep/SemesterStep';
 import SchoolStep from './components/schoolStep/SchoolStep';
 import SubjectStep from './components/subjectStep/SubjectStep';
 import CompletionStep from './components/completionStep/CompletionStep';
@@ -38,10 +40,12 @@ const OnboardingPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [data, setData] = useState<OnboardingDataTemp>({
     userName: '',
+    semesters: [],
     schools: [],
     subjects: [],
   });
   const [selectedSchoolId, setSelectedSchoolId] = useState<string>('');
+  const [selectedSemesterId, setSelectedSemesterId] = useState<string>('');
   const [isCompleting, setIsCompleting] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -54,8 +58,9 @@ const OnboardingPage: React.FC = () => {
   const addSchoolMutation = useAddSchool();
   const addSubjectMutation = useAddSubject();
   const setOnboardingCompletedMutation = useSetOnboardingCompleted();
+  const addSemesterMutation = useAddSemester();
 
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   const showToastMessage = (
     message: string,
@@ -73,10 +78,12 @@ const OnboardingPage: React.FC = () => {
       case 1:
         return 'Dein Name';
       case 2:
-        return 'Schulen';
+        return 'Semester';
       case 3:
-        return 'Fächer';
+        return 'Schulen';
       case 4:
+        return 'Fächer';
+      case 5:
         return 'Fertig';
       default:
         return 'Einrichtung';
@@ -107,6 +114,27 @@ const OnboardingPage: React.FC = () => {
         });
       });
 
+      // Save semesters and map temp IDs to real IDs
+      const semesterIdMapping: { [tempId: string]: string } = {};
+
+      for (const semester of data.semesters) {
+        const savedSemester = await new Promise<Semester>((resolve, reject) => {
+          addSemesterMutation.mutate(
+            {
+              name: semester.name,
+              startDate: semester.startDate,
+              endDate: semester.endDate,
+            },
+            {
+              onSuccess: (result) => resolve(result),
+              onError: reject,
+            },
+          );
+        });
+
+        semesterIdMapping[semester.id] = savedSemester.id;
+      }
+
       // Save schools and map temp IDs to real IDs
       const schoolIdMapping: { [tempId: string]: string } = {};
 
@@ -128,13 +156,20 @@ const OnboardingPage: React.FC = () => {
         schoolIdMapping[school.id] = savedSchool.id;
       }
 
-      // Save subjects with correct schoolId references
+      // Save subjects with correct schoolId and semesterId references
       for (const subject of data.subjects) {
         const realSchoolId = schoolIdMapping[subject.schoolId];
+        const realSemesterId = semesterIdMapping[subject.semesterId];
 
         if (!realSchoolId) {
           throw new Error(
             `Could not find real school ID for subject: ${subject.name}`,
+          );
+        }
+
+        if (!realSemesterId) {
+          throw new Error(
+            `Could not find real semester ID for subject: ${subject.name}`,
           );
         }
 
@@ -143,6 +178,7 @@ const OnboardingPage: React.FC = () => {
             {
               name: subject.name,
               schoolId: realSchoolId,
+              semesterId: realSemesterId, // ← NEU
               teacher: subject.teacher || null,
               description: subject.description || null,
             },
@@ -205,13 +241,23 @@ const OnboardingPage: React.FC = () => {
         </IonHeader>
       )}
 
-      <IonContent className="onboarding-content" scrollY={currentStep === 3}>
+      <IonContent className="onboarding-content" scrollY={currentStep === 4}>
         <div className="onboarding-container">
           {currentStep === 0 && <WelcomeScreen onNext={handleNextStep} />}
           {currentStep === 1 && (
             <NameStep data={data} setData={setData} onNext={handleNextStep} />
           )}
           {currentStep === 2 && (
+            <SemesterStep
+              data={data}
+              setData={setData}
+              selectedSemesterId={selectedSemesterId}
+              setSelectedSemesterId={setSelectedSemesterId}
+              generateId={generateId}
+              onNext={handleNextStep}
+            />
+          )}
+          {currentStep === 3 && (
             <SchoolStep
               data={data}
               setData={setData}
@@ -221,17 +267,19 @@ const OnboardingPage: React.FC = () => {
               onNext={handleNextStep}
             />
           )}
-          {currentStep === 3 && (
+          {currentStep === 4 && (
             <SubjectStep
               data={data}
               setData={setData}
+              selectedSemesterId={selectedSemesterId}
+              setSelectedSemesterId={setSelectedSemesterId}
               selectedSchoolId={selectedSchoolId}
               setSelectedSchoolId={setSelectedSchoolId}
               generateId={generateId}
               onNext={handleNextStep}
             />
           )}
-          {currentStep === 4 && (
+          {currentStep === 5 && (
             <CompletionStep
               data={data}
               isCompleting={isCompleting}

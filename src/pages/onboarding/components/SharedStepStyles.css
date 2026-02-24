@@ -8,28 +8,32 @@
 
 /* Item Lists */
 .schools-list,
-.subjects-list {
+.subjects-list,
+.semesters-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
 .school-item,
-.subject-item {
+.subject-item,
+.semester-item {
   border-radius: 16px;
   padding: 16px;
   transition: all 0.3s ease;
 }
 
 .school-content,
-.subject-content {
+.subject-content,
+.semester-content {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .school-avatar,
-.subject-avatar {
+.subject-avatar,
+.semester-avatar {
   width: 44px;
   height: 44px;
   border-radius: 12px;
@@ -46,24 +50,29 @@
 .school-0 {
   background: linear-gradient(135deg, #ff3b30 0%, #ff6b6b 100%);
 }
+
 .school-1 {
   background: linear-gradient(135deg, #ff9500 0%, #ffb84d 100%);
 }
+
 .school-2 {
   background: linear-gradient(135deg, #34c759 0%, #4cd964 100%);
 }
+
 .school-3 {
   background: linear-gradient(135deg, #5856d6 0%, #7c7aff 100%);
 }
 
 .school-info,
-.subject-info {
+.subject-info,
+.semester-info {
   flex: 1;
   min-width: 0;
 }
 
 .school-name,
-.subject-name {
+.subject-name,
+.semester-name {
   font-size: 16px;
   font-weight: 600;
   color: #000000;
@@ -72,7 +81,8 @@
 }
 
 .school-details,
-.subject-details {
+.subject-details,
+.semester-details {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.5);
   margin: 0;
@@ -84,7 +94,8 @@
 }
 
 /* Add Prompts */
-.add-section {
+.add-section,
+.semesters-section {
   margin-top: 20px;
 }
 
@@ -250,12 +261,14 @@
   .subsection-title,
   .form-title,
   .school-name,
-  .subject-name {
+  .subject-name,
+  .semester-name {
     color: #ffffff;
   }
 
   .school-details,
-  .subject-details {
+  .subject-details,
+  .semester-details {
     color: rgba(255, 255, 255, 0.6);
   }
 
