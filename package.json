@@ -68,7 +68,7 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.2",
-    "@types/uuid": "^10.0.0",
+    "@types/uuid": "^11.0.0",
     "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-react": "^5.1.4",
     "@vitest/coverage-v8": "^4.0.18",
