@@ -46,12 +46,15 @@
 .school-0 {
   background: linear-gradient(135deg, #ff3b30 0%, #ff6b6b 100%);
 }
+
 .school-1 {
   background: linear-gradient(135deg, #ff9500 0%, #ffb84d 100%);
 }
+
 .school-2 {
   background: linear-gradient(135deg, #34c759 0%, #4cd964 100%);
 }
+
 .school-3 {
   background: linear-gradient(135deg, #5856d6 0%, #7c7aff 100%);
 }
@@ -84,7 +87,8 @@
 }
 
 /* Add Prompts */
-.add-section {
+.add-section,
+.subjects-section {
   margin-top: 20px;
 }
 
