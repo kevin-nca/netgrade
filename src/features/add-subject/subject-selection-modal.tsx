@@ -54,7 +54,6 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
         id: generateTempId(),
         name: value.newSubjectName.trim(),
         teacher: null,
-        schoolId: '',
       };
 
       addToSubjectsOrModules(newSubject as Subject);
