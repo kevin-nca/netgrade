@@ -86,9 +86,11 @@ export class DataManagementService {
       if (options.schoolId === 'all') {
         schools = await schoolRepo.find({
           relations: {
-            subjects: {
-              exams: {
-                grade: true,
+            semesters: {
+              subjects: {
+                exams: {
+                  grade: true,
+                },
               },
             },
           },
@@ -102,9 +104,11 @@ export class DataManagementService {
         const school = await schoolRepo.findOne({
           where: { id: options.schoolId },
           relations: {
-            subjects: {
-              exams: {
-                grade: true,
+            semesters: {
+              subjects: {
+                exams: {
+                  grade: true,
+                },
               },
             },
           },
@@ -145,7 +149,7 @@ export class DataManagementService {
   static async exportAsJSON(): Promise<ExportResult> {
     try {
       const schools = await getRepositories().school.find({
-        relations: { subjects: { exams: { grade: true } } },
+        relations: { semesters: { subjects: { exams: { grade: true } } } },
       });
 
       if (schools.length === 0) {
@@ -214,6 +218,7 @@ export class DataManagementService {
         await transactionManager.query('DELETE FROM grade');
         await transactionManager.query('DELETE FROM exam');
         await transactionManager.query('DELETE FROM subject');
+        await transactionManager.query('DELETE FROM semester');
         await transactionManager.query('DELETE FROM school');
         await transactionManager.getRepository(School).save(schools);
       });
@@ -505,18 +510,19 @@ export class DataManagementService {
         'Durchschnittsnote',
       ],
       ...schools.map((school) => {
-        const totalSubjects = school.subjects.length;
-        const totalExams = school.subjects.reduce(
+        const allSubjects = school.semesters.flatMap((s) => s.subjects);
+        const totalSubjects = allSubjects.length;
+        const totalExams = allSubjects.reduce(
           (sum, subject) => sum + subject.exams.length,
           0,
         );
-        const completedExams = school.subjects.reduce(
+        const completedExams = allSubjects.reduce(
           (sum, subject) =>
             sum + subject.exams.filter((exam) => exam.isCompleted).length,
           0,
         );
 
-        const completedGrades = school.subjects.flatMap((subject) =>
+        const completedGrades = allSubjects.flatMap((subject) =>
           subject.exams
             .filter((exam) => exam.isCompleted && exam.grade)
             .map((exam) => exam.grade!),
@@ -560,15 +566,18 @@ export class DataManagementService {
     XLSX.utils.book_append_sheet(workbook, allSchoolsSheet, 'Alle Schulen');
 
     const allSubjectsData = [
-      ['Schule', 'Fach', 'Lehrer', 'Beschreibung', 'Gewichtung', 'Erstellt am'],
+      ['Schule', 'Semester', 'Fach', 'Lehrer', 'Gewichtung', 'Erstellt am'],
       ...schools.flatMap((school) =>
-        school.subjects.map((subject) => [
-          school.name,
-          subject.name,
-          subject.teacher || '',
-          subject.weight || 1,
-          subject.createdAt.toLocaleDateString('de-DE'),
-        ]),
+        school.semesters.flatMap((semester) =>
+          semester.subjects.map((subject) => [
+            school.name,
+            semester.name,
+            subject.name,
+            subject.teacher || '',
+            subject.weight || 1,
+            subject.createdAt.toLocaleDateString('de-DE'),
+          ]),
+        ),
       ),
     ];
     const allSubjectsSheet = XLSX.utils.aoa_to_sheet(allSubjectsData);
@@ -577,10 +586,10 @@ export class DataManagementService {
     const allExamsData = [
       [
         'Schule',
+        'Semester',
         'Fach',
         'Prüfung',
         'Datum',
-        'Beschreibung',
         'Gewichtung',
         'Abgeschlossen',
         'Note',
@@ -588,19 +597,21 @@ export class DataManagementService {
         'Kommentar',
       ],
       ...schools.flatMap((school) =>
-        school.subjects.flatMap((subject) =>
-          subject.exams.map((exam) => [
-            school.name,
-            subject.name,
-            exam.name,
-            exam.date.toISOString().split('T')[0],
-            exam.description || '',
-            exam.weight || 1,
-            exam.isCompleted ? 'Ja' : 'Nein',
-            exam.grade?.score || '',
-            exam.grade?.weight || '',
-            exam.grade?.comment || '',
-          ]),
+        school.semesters.flatMap((semester) =>
+          semester.subjects.flatMap((subject) =>
+            subject.exams.map((exam) => [
+              school.name,
+              semester.name,
+              subject.name,
+              exam.name,
+              exam.date.toISOString().split('T')[0],
+              exam.weight || 1,
+              exam.isCompleted ? 'Ja' : 'Nein',
+              exam.grade?.score || '',
+              exam.grade?.weight || '',
+              exam.grade?.comment || '',
+            ]),
+          ),
         ),
       ),
     ];
@@ -655,7 +666,7 @@ export class DataManagementService {
   }
 
   /**
-   * Format single school as XLSX (behält die alte Struktur bei)
+   * Format single school as XLSX
    */
   private static formatSingleSchoolAsXlsx(school: School): string {
     const workbook = XLSX.utils.book_new();
@@ -670,39 +681,44 @@ export class DataManagementService {
     XLSX.utils.book_append_sheet(workbook, schoolSheet, 'School');
 
     const subjectsData = [
-      ['Name', 'Teacher', 'Description', 'Weight', 'Created at'],
-      ...school.subjects.map((subject) => [
-        subject.name,
-        subject.teacher || '',
-        subject.weight || 1,
-        subject.createdAt.toLocaleDateString('de-DE'),
-      ]),
+      ['Semester', 'Name', 'Teacher', 'Weight', 'Created at'],
+      ...school.semesters.flatMap((semester) =>
+        semester.subjects.map((subject) => [
+          semester.name,
+          subject.name,
+          subject.teacher || '',
+          subject.weight || 1,
+          subject.createdAt.toLocaleDateString('de-DE'),
+        ]),
+      ),
     ];
     const subjectsSheet = XLSX.utils.aoa_to_sheet(subjectsData);
     XLSX.utils.book_append_sheet(workbook, subjectsSheet, 'Subjects');
 
     const examsData = [
       [
+        'Semester',
         'Subject',
         'Name',
         'Date',
-        'Description',
         'Weight',
         'Completed',
         'Score',
         'Comment',
       ],
-      ...school.subjects.flatMap((subject) =>
-        subject.exams.map((exam) => [
-          subject.name,
-          exam.name,
-          exam.date.toISOString().split('T')[0],
-          exam.description || '',
-          exam.weight || 1,
-          exam.isCompleted ? 'Yes' : 'No',
-          exam.grade?.score || '',
-          exam.grade?.comment || '',
-        ]),
+      ...school.semesters.flatMap((semester) =>
+        semester.subjects.flatMap((subject) =>
+          subject.exams.map((exam) => [
+            semester.name,
+            subject.name,
+            exam.name,
+            exam.date.toISOString().split('T')[0],
+            exam.weight || 1,
+            exam.isCompleted ? 'Yes' : 'No',
+            exam.grade?.score || '',
+            exam.grade?.comment || '',
+          ]),
+        ),
       ),
     ];
     const examsSheet = XLSX.utils.aoa_to_sheet(examsData);
@@ -738,29 +754,31 @@ export class DataManagementService {
     let examsTotal = 0;
 
     schools.forEach((school) => {
-      school.subjects.forEach((subject) => {
-        const completedExams = subject.exams.filter(
-          (exam) => exam.isCompleted && exam.grade,
-        );
-        examsTotal += subject.exams.length;
-        examsCompleted += completedExams.length;
+      school.semesters.forEach((semester) => {
+        semester.subjects.forEach((subject) => {
+          const completedExams = subject.exams.filter(
+            (exam) => exam.isCompleted && exam.grade,
+          );
+          examsTotal += subject.exams.length;
+          examsCompleted += completedExams.length;
 
-        if (completedExams.length > 0) {
-          const subjectScore =
-            completedExams.reduce(
-              (sum, exam) => sum + exam.grade!.score * (exam.weight || 1),
-              0,
-            ) /
-            completedExams.reduce((sum, exam) => sum + (exam.weight || 1), 0);
+          if (completedExams.length > 0) {
+            const subjectScore =
+              completedExams.reduce(
+                (sum, exam) => sum + exam.grade!.score * (exam.weight || 1),
+                0,
+              ) /
+              completedExams.reduce((sum, exam) => sum + (exam.weight || 1), 0);
 
-          const subjectKey =
-            schools.length > 1
-              ? `${school.name} - ${subject.name}`
-              : subject.name;
-          perSubjectAverages[subjectKey] = subjectScore;
-          totalWeightedScore += subjectScore * (subject.weight || 1);
-          totalWeight += subject.weight || 1;
-        }
+            const subjectKey =
+              schools.length > 1
+                ? `${school.name} - ${subject.name}`
+                : subject.name;
+            perSubjectAverages[subjectKey] = subjectScore;
+            totalWeightedScore += subjectScore * (subject.weight || 1);
+            totalWeight += subject.weight || 1;
+          }
+        });
       });
     });
 

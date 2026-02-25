@@ -4,19 +4,17 @@ import { Grade } from '@/db/entities';
 import { Subject } from '@/db/entities/Subject';
 
 export class SchoolService {
-  /**
-   * Fetches all schools from the database
-   * @returns Promise<School[]> - A promise that resolves to an array of schools
-   */
   static async fetchAll(): Promise<School[]> {
     try {
       const { school: schoolRepo } = getRepositories();
       return await schoolRepo.find({
         order: { name: 'ASC' },
         relations: {
-          subjects: {
-            exams: {
-              grade: true,
+          semesters: {
+            subjects: {
+              exams: {
+                grade: true,
+              },
             },
           },
         },
@@ -27,38 +25,45 @@ export class SchoolService {
     }
   }
 
-  /**
-   * Adds a new school to the database
-   * @param newSchoolData - The data for the new school
-   * @returns Promise<School> - A promise that resolves to the newly created school
-   */
   static async add(newSchoolData: {
     name: string;
     type?: string;
     address?: string;
   }): Promise<School> {
     try {
-      const { school: schoolRepo } = getRepositories();
+      const { school: schoolRepo, semester: semesterRepo } = getRepositories();
+
       const newSchool = schoolRepo.create(newSchoolData);
-      return await schoolRepo.save(newSchool);
+      const savedSchool = await schoolRepo.save(newSchool);
+
+      const currentYear = new Date().getFullYear();
+      const nextYear = currentYear + 1;
+
+      const defaultSemester = semesterRepo.create({
+        name: `${currentYear}/${nextYear}`,
+        startDate: new Date(`${currentYear}-08-15`),
+        endDate: new Date(`${nextYear}-07-31`),
+        schoolId: savedSchool.id,
+      });
+      await semesterRepo.save(defaultSemester);
+
+      // Return school with semesters so callers can access semesterId directly
+      return (await schoolRepo.findOne({
+        where: { id: savedSchool.id },
+        relations: { semesters: true },
+      })) as School;
     } catch (error) {
       console.error('Failed to add school:', error);
       throw error;
     }
   }
 
-  /**
-   * Updates an existing school in the database
-   * @param updatedSchoolData - The updated school data
-   * @returns Promise<School> - A promise that resolves to the updated school
-   */
   static async update(
     updatedSchoolData: Partial<School> & { id: string },
   ): Promise<School> {
     try {
       const { school: schoolRepo } = getRepositories();
 
-      // First, find the existing school
       const existingSchool = await schoolRepo.findOne({
         where: { id: updatedSchoolData.id },
       });
@@ -68,7 +73,6 @@ export class SchoolService {
         );
       }
 
-      // Merge the updated data with the existing school
       const mergedSchool = schoolRepo.create({
         ...existingSchool,
         ...updatedSchoolData,
@@ -81,11 +85,6 @@ export class SchoolService {
     }
   }
 
-  /**
-   * Deletes a school from the database
-   * @param schoolId - The ID of the school to delete
-   * @returns Promise<string> - A promise that resolves to the ID of the deleted school
-   */
   static async delete(schoolId: string): Promise<string> {
     try {
       const { school: schoolRepo } = getRepositories();
@@ -100,11 +99,6 @@ export class SchoolService {
     }
   }
 
-  /**
-   * Finds a school by its ID
-   * @param id - The ID of the school to find
-   * @returns Promise<School | null> - A promise that resolves to the school or null if not found
-   */
   static async findById(id: string): Promise<School | null> {
     try {
       const { school: schoolRepo } = getRepositories();
@@ -115,33 +109,24 @@ export class SchoolService {
     }
   }
 
-  /**
-   * Calculates the average grade for a specific school
-   * @param school - The school entity with loaded subjects and their exams/grades relations
-   * @returns number | undefined - The calculated average or undefined if no grades exist
-   */
   static calculateSchoolAverage(school: School): number | undefined {
-    // Calculate average for each subject
-    const subjectAverages = school.subjects
+    const allSubjects = school.semesters.flatMap(
+      (semester) => semester.subjects,
+    );
+
+    const subjectAverages = allSubjects
       .map((subject) => this.calculateSubjectAverage(subject))
-      .filter((avg) => avg !== undefined);
+      .filter((avg): avg is number => avg !== undefined);
 
     if (subjectAverages.length === 0) return undefined;
 
     const totalScore = subjectAverages.reduce((acc, avg) => acc + avg, 0);
-    const totalCount = subjectAverages.length;
-    const average = totalScore / totalCount;
+    const average = totalScore / subjectAverages.length;
 
     return Number(average.toFixed(1));
   }
 
-  /**
-   * Calculates the average grade for a specific subject
-   * @param subject - The subject entity with loaded exams and grades relations
-   * @returns number | undefined - The calculated average or undefined if no grades exist
-   */
   static calculateSubjectAverage(subject: Subject): number | undefined {
-    // Extract grades from the subject's exams
     const grades = subject.exams
       .map((exam) => exam.grade)
       .filter((grade): grade is Grade => grade !== null);
@@ -156,7 +141,6 @@ export class SchoolService {
 
     if (totalWeight === 0) return undefined;
 
-    const average = totalScore / totalWeight;
-    return Number(average.toFixed(2));
+    return Number((totalScore / totalWeight).toFixed(2));
   }
 }
