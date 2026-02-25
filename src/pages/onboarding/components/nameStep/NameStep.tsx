@@ -8,6 +8,7 @@ import {
 } from 'ionicons/icons';
 import { OnboardingDataTemp } from '../../types';
 import './NameStep.css';
+import '../SharedStepStyles.css';
 
 interface NameStepProps {
   data: OnboardingDataTemp;

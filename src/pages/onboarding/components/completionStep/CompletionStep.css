@@ -1,59 +1,9 @@
-.completion-content {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.completion-icon-wrapper {
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
-  position: relative;
-}
-
-.completion-icon {
-  font-size: 28px;
-  color: #ffffff;
-}
-
-.completion-text {
-  flex: 1;
-}
-
-.completion-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #000000;
-  margin: 0;
-  letter-spacing: -1px;
-  line-height: 1.1;
-}
-
-.completion-subtitle {
-  font-size: 17px;
-  color: rgba(0, 0, 0, 0.5);
-  margin: 4px 0 0 0;
-  font-weight: 400;
-}
-
-/* Summary & Completion */
 .summary-card,
 .features-card {
   border-radius: 20px;
   padding: 24px;
   overflow: hidden;
   margin-bottom: 16px;
-}
-
-.summary-content,
-.features-content {
-  position: relative;
 }
 
 .summary-title,
@@ -88,30 +38,6 @@
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.2);
 }
 
-.summary-icon {
-  font-size: 20px;
-  color: white;
-}
-
-.summary-info h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #000000;
-  margin: 0 0 4px 0;
-}
-
-.summary-info p {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.5);
-  margin: 0;
-}
-
-.features-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .feature-item {
   display: flex;
   align-items: center;
@@ -129,40 +55,10 @@
   color: rgba(0, 0, 0, 0.7);
 }
 
-@media (max-width: 480px) {
-  .completion-content {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
-  }
-
-  .completion-title {
-    font-size: 24px;
-  }
-}
-
 /* =========================
    DARK MODE
 ========================= */
 @media (prefers-color-scheme: dark) {
-  .completion-title,
-  .summary-title,
-  .features-title {
-    color: #ffffff;
-  }
-
-  .completion-subtitle {
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  .summary-info h4 {
-    color: #ffffff;
-  }
-
-  .summary-info p {
-    color: rgba(255, 255, 255, 0.6);
-  }
-
   .feature-item span {
     color: rgba(255, 255, 255, 0.7);
   }

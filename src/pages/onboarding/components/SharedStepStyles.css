@@ -46,12 +46,15 @@
 .school-0 {
   background: linear-gradient(135deg, #ff3b30 0%, #ff6b6b 100%);
 }
+
 .school-1 {
   background: linear-gradient(135deg, #ff9500 0%, #ffb84d 100%);
 }
+
 .school-2 {
   background: linear-gradient(135deg, #34c759 0%, #4cd964 100%);
 }
+
 .school-3 {
   background: linear-gradient(135deg, #5856d6 0%, #7c7aff 100%);
 }
@@ -84,7 +87,8 @@
 }
 
 /* Add Prompts */
-.add-section {
+.add-section,
+.subjects-section {
   margin-top: 20px;
 }
 
@@ -127,19 +131,23 @@
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
 }
 
-.add-icon {
+.add-icon,
+.step-icon,
+.feature-icon {
   font-size: 24px;
   color: white;
 }
 
-.add-text h4 {
+.add-text h4,
+.summary-info h4 {
   font-size: 16px;
   font-weight: 600;
   color: #000000;
   margin: 0 0 4px 0;
 }
 
-.add-text p {
+.add-text p,
+.summary-info p {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.5);
   margin: 0;
@@ -152,7 +160,9 @@
   overflow: hidden;
 }
 
-.form-content {
+.form-content,
+.summary-content,
+.features-content {
   position: relative;
 }
 
@@ -171,7 +181,8 @@
   margin-bottom: 20px;
 }
 
-.field-group {
+.field-group,
+.features-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -209,9 +220,11 @@
   margin-right: 12px;
 }
 
-.input-icon {
+.input-icon,
+.back-icon,
+.summary-icon {
   font-size: 20px;
-  color: #ffffff;
+  color: white;
 }
 
 .input-field {
@@ -250,12 +263,25 @@
   .subsection-title,
   .form-title,
   .school-name,
-  .subject-name {
+  .subject-name,
+  .cancel-button,
+  .completion-title,
+  .summary-title,
+  .features-title,
+  .summary-info h4,
+  .hero-title,
+  .hero-subtitle,
+  .feature-card span {
     color: #ffffff;
   }
 
   .school-details,
-  .subject-details {
+  .subject-details,
+  .step-subtitle,
+  .completion-subtitle,
+  .summary-info p,
+  .hero-description,
+  .welcome-promise {
     color: rgba(255, 255, 255, 0.6);
   }
 

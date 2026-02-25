@@ -48,10 +48,6 @@
   transform: scale(0.95);
 }
 
-.back-icon {
-  font-size: 20px;
-}
-
 .onboarding-title {
   font-size: 17px;
   font-weight: 600;
@@ -151,11 +147,6 @@
   justify-content: center;
   box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
   position: relative;
-}
-
-.step-icon {
-  font-size: 28px;
-  color: #ffffff;
 }
 
 .step-text {
