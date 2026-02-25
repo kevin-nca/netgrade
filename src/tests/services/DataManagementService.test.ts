@@ -291,14 +291,20 @@ describe('DataManagementService', () => {
       await schoolRepo.save(uniqueSchool);
 
       const semesterRepo = dataSource.getRepository(Semester);
-      const semester = await semesterRepo.findOne({ where: {} });
+      const semester = await semesterRepo.save(
+        semesterRepo.create({
+          name: 'Unique Semester',
+          startDate: new Date(),
+          endDate: new Date(),
+          school: uniqueSchool,
+        }),
+      );
 
       const subjectRepo = dataSource.getRepository(Subject);
       const subject = subjectRepo.create({
         name: 'Unique Subject',
-        school: uniqueSchool,
         weight: 1,
-        semester: semester!,
+        semester: semester,
       });
       await subjectRepo.save(subject);
 
@@ -441,13 +447,21 @@ describe('DataManagementService', () => {
       await schoolRepo.save(school);
 
       const semesterRepo = dataSource.getRepository(Semester);
-      const semester = await semesterRepo.findOne({ where: {} });
+      const semester =
+        (await semesterRepo.findOne({ where: { schoolId: school.id } })) ??
+        (await semesterRepo.save(
+          semesterRepo.create({
+            name: '2025/2026',
+            startDate: new Date('2025-08-15'),
+            endDate: new Date('2026-07-31'),
+            schoolId: school.id,
+          }),
+        ));
 
       const subjectRepo = dataSource.getRepository(Subject);
       const subject = subjectRepo.create({
         name: 'Avg Test Subject',
-        school,
-        semester: semester!,
+        semesterId: semester.id,
       });
       await subjectRepo.save(subject);
 
@@ -732,21 +746,19 @@ describe('DataManagementService', () => {
       });
       await schoolRepo.save(originalSchool);
 
-      const subjectRepo = dataSource.getRepository(Subject);
-      const originalSubject = subjectRepo.create({
-        name: 'Export Import Subject',
-        weight: 1,
-        school: originalSchool,
-        semester: semester,
-      });
-      await subjectRepo.save(originalSubject);
-
       const schoolsForExport = await schoolRepo.find({
-        relations: { subjects: { exams: { grade: true } } },
+        relations: { semesters: { subjects: { exams: { grade: true } } } },
         where: { id: originalSchool.id },
       });
 
-      schoolsForExport[0].subjects[0].semester = semester;
+      if (
+        schoolsForExport[0].semesters &&
+        schoolsForExport[0].semesters.length > 0 &&
+        schoolsForExport[0].semesters[0].subjects &&
+        schoolsForExport[0].semesters[0].subjects.length > 0
+      ) {
+        schoolsForExport[0].semesters[0].subjects[0].semester = semester;
+      }
 
       const validJson = JSON.stringify(
         { schools: schoolsForExport },
@@ -759,35 +771,53 @@ describe('DataManagementService', () => {
 
       const cleanJson = JSON.parse(validJson);
       delete cleanJson.schools[0].id;
+
       if (
-        cleanJson.schools[0].subjects &&
-        cleanJson.schools[0].subjects.length > 0
+        cleanJson.schools[0].semesters &&
+        cleanJson.schools[0].semesters.length > 0
       ) {
-        delete cleanJson.schools[0].subjects[0].id;
-        delete cleanJson.schools[0].subjects[0].schoolId;
+        delete cleanJson.schools[0].semesters[0].id;
+        delete cleanJson.schools[0].semesters[0].schoolId;
 
         if (
-          cleanJson.schools[0].subjects[0].exams &&
-          cleanJson.schools[0].subjects[0].exams.length > 0
+          cleanJson.schools[0].semesters[0].subjects &&
+          cleanJson.schools[0].semesters[0].subjects.length > 0
         ) {
-          delete cleanJson.schools[0].subjects[0].exams[0].id;
-          delete cleanJson.schools[0].subjects[0].exams[0].subjectId;
+          delete cleanJson.schools[0].semesters[0].subjects[0].id;
+          delete cleanJson.schools[0].semesters[0].subjects[0].semesterId;
 
-          if (cleanJson.schools[0].subjects[0].exams[0].grade) {
-            delete cleanJson.schools[0].subjects[0].exams[0].grade.id;
-            delete cleanJson.schools[0].subjects[0].exams[0].grade.examId;
+          if (
+            cleanJson.schools[0].semesters[0].subjects[0].exams &&
+            cleanJson.schools[0].semesters[0].subjects[0].exams.length > 0
+          ) {
+            delete cleanJson.schools[0].semesters[0].subjects[0].exams[0].id;
+            delete cleanJson.schools[0].semesters[0].subjects[0].exams[0]
+              .subjectId;
+
+            if (cleanJson.schools[0].semesters[0].subjects[0].exams[0].grade) {
+              delete cleanJson.schools[0].semesters[0].subjects[0].exams[0]
+                .grade.id;
+              delete cleanJson.schools[0].semesters[0].subjects[0].exams[0]
+                .grade.examId;
+            }
           }
         }
       }
+
       const schoolRef = cleanJson.schools[0];
-      if (schoolRef.subjects) {
-        schoolRef.subjects.forEach((subj: Subject) => {
-          subj.school = schoolRef as unknown as School;
-          if (subj.exams) {
-            subj.exams.forEach((ex: Exam) => {
-              ex.subject = subj;
-              if (ex.grade) {
-                ex.grade.exam = ex;
+      if (schoolRef.semesters) {
+        schoolRef.semesters.forEach((sem: Semester) => {
+          sem.school = schoolRef as unknown as School;
+          if (sem.subjects) {
+            sem.subjects.forEach((subj: Subject) => {
+              subj.semester = sem;
+              if (subj.exams) {
+                subj.exams.forEach((ex: Exam) => {
+                  ex.subject = subj;
+                  if (ex.grade) {
+                    ex.grade.exam = ex;
+                  }
+                });
               }
             });
           }
@@ -965,12 +995,13 @@ describe('DataManagementService', () => {
       semester.name = 'Test Semester';
       semester.startDate = new Date();
       semester.endDate = new Date();
+      semester.school = school;
       await semesterRepo.save(semester);
     }
 
     const subject = new Subject();
     subject.name = 'Date Subject';
-    subject.school = school;
+    semester.school = school;
     subject.semester = semester;
     await dataSource.getRepository(Subject).save(subject);
 
@@ -994,7 +1025,7 @@ describe('DataManagementService', () => {
     });
     const json = JSON.parse(text);
 
-    expect(json.schools[0].subjects[0].exams[0].date).toBe(
+    expect(json.schools[0].semesters[0].subjects[0].exams[0].date).toBe(
       '2023-12-25T00:00:00.000Z',
     );
   });

@@ -1,4 +1,3 @@
-// SemesterService.test.ts
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { DataSource } from 'typeorm';
 import { SemesterService } from '@/services/SemesterService';
@@ -16,12 +15,9 @@ describe('SemesterService', () => {
     grade: Grade;
   };
 
-  // Set up the database before all tests
   beforeAll(async () => {
-    // Initialize the test database
     dataSource = await initializeTestDatabase();
 
-    // Mock the getRepositories function to use our test repositories
     const dataSourceModule = await import('@/db/data-source');
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
       school: dataSource.getRepository(School),
@@ -34,13 +30,11 @@ describe('SemesterService', () => {
     testData = await seedTestData(dataSource);
   });
 
-  // Clean up after all tests
   afterAll(async () => {
     await cleanupTestData(dataSource);
     vi.clearAllMocks();
   });
 
-  // Test fetchAll method
   it('should fetch all semesters', async () => {
     const semesters = await SemesterService.fetchAll();
     expect(semesters).toBeInstanceOf(Array);
@@ -49,9 +43,7 @@ describe('SemesterService', () => {
     expect(semesters[0].name).toBe('2024/2025');
   });
 
-  // Test fetchAll error handling
   it('should throw error and log when fetchAll fails', async () => {
-    // Arrange
     const testError = new Error('Database fetch error');
     const consoleSpy = vi.spyOn(console, 'error');
     const dataSourceModule = await import('@/db/data-source');
@@ -62,7 +54,6 @@ describe('SemesterService', () => {
       },
     } as never);
 
-    // Act & Assert
     await expect(SemesterService.fetchAll()).rejects.toThrow(
       'Database fetch error',
     );
@@ -72,31 +63,27 @@ describe('SemesterService', () => {
     );
   });
 
-  // Test add method
   it('should add a new semester', async () => {
     const newSemesterData = {
       name: '2025/2026',
       startDate: new Date('2025-08-15'),
       endDate: new Date('2026-07-31'),
+      schoolId: testData.school.id,
     };
 
     const newSemester = await SemesterService.add(newSemesterData);
     expect(newSemester).toBeInstanceOf(Semester);
     expect(newSemester.id).toBeDefined();
     expect(newSemester.name).toBe(newSemesterData.name);
+    expect(newSemester.schoolId).toBe(testData.school.id);
 
-    // Verify the semester was actually added to the database
     const semesters = await SemesterService.fetchAll();
-    const foundSemester = semesters.find(
-      (semester) => semester.id === newSemester.id,
-    );
+    const foundSemester = semesters.find((s) => s.id === newSemester.id);
     expect(foundSemester).toBeDefined();
     expect(foundSemester?.name).toBe(newSemesterData.name);
   });
 
-  // Test add error handling
   it('should throw error and log when add fails', async () => {
-    // Arrange
     const testError = new Error('Database add error');
     const consoleSpy = vi.spyOn(console, 'error');
     const dataSourceModule = await import('@/db/data-source');
@@ -112,9 +99,9 @@ describe('SemesterService', () => {
       name: '2025/2026',
       startDate: new Date('2025-08-15'),
       endDate: new Date('2026-07-31'),
+      schoolId: testData.school.id,
     };
 
-    // Act & Assert
     await expect(SemesterService.add(newSemesterData)).rejects.toThrow(
       'Database add error',
     );
@@ -124,7 +111,6 @@ describe('SemesterService', () => {
     );
   });
 
-  // Test findById method
   it('should find a semester by id', async () => {
     const semester = await SemesterService.findById(testData.semester.id);
     expect(semester).toBeInstanceOf(Semester);
@@ -132,9 +118,7 @@ describe('SemesterService', () => {
     expect(semester?.name).toBe(testData.semester.name);
   });
 
-  // Test findById error handling
   it('should throw error and log when findById fails', async () => {
-    // Arrange
     const testError = new Error('Database findById error');
     const consoleSpy = vi.spyOn(console, 'error');
     const dataSourceModule = await import('@/db/data-source');
@@ -147,7 +131,6 @@ describe('SemesterService', () => {
 
     const testId = 'test-id';
 
-    // Act & Assert
     await expect(SemesterService.findById(testId)).rejects.toThrow(
       'Database findById error',
     );
@@ -157,7 +140,6 @@ describe('SemesterService', () => {
     );
   });
 
-  // Test update method
   it('should update a semester', async () => {
     const updatedSemesterData = {
       ...testData.semester,
@@ -170,42 +152,33 @@ describe('SemesterService', () => {
     expect(updatedSemester.id).toBe(testData.semester.id);
     expect(updatedSemester.name).toBe(updatedSemesterData.name);
 
-    // Verify the semester was actually updated in the database
     const semester = await SemesterService.findById(testData.semester.id);
     expect(semester?.name).toBe(updatedSemesterData.name);
   });
 
-  // Test delete method
   it('should delete a semester', async () => {
-    // First, add a new semester to delete
     const newSemesterData = {
       name: 'Semester to Delete',
       startDate: new Date('2025-08-15'),
       endDate: new Date('2026-07-31'),
+      schoolId: testData.school.id,
     };
     const newSemester = await SemesterService.add(newSemesterData);
 
-    // Delete the semester
     const deletedSemesterId = await SemesterService.delete(newSemester.id);
     expect(deletedSemesterId).toBe(newSemester.id);
 
-    // Verify the semester was actually deleted from the database
     const semester = await SemesterService.findById(newSemester.id);
     expect(semester).toBeNull();
   });
 
-  // Test error handling for delete method
   it('should throw an error when deleting a non-existent semester', async () => {
     await expect(SemesterService.delete('non-existent-id')).rejects.toThrow();
   });
 
-  // Test error handling for update method
   it('should throw an error when updating a non-existent semester', async () => {
     await expect(
-      SemesterService.update({
-        id: 'non-existent-id',
-        name: 'Updated Name',
-      }),
+      SemesterService.update({ id: 'non-existent-id', name: 'Updated Name' }),
     ).rejects.toThrow();
   });
 });

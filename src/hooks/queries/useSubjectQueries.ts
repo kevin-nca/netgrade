@@ -9,6 +9,8 @@ export const subjectKeys = {
   lists: () => [...subjectKeys.all, 'list'] as const,
   list: (filters: Record<string, unknown>) =>
     [...subjectKeys.lists(), { filters }] as const,
+  semesterSubjects: (semesterId: string) =>
+    [...subjectKeys.all, 'semester', semesterId] as const,
   schoolSubjects: (schoolId: string) =>
     [...subjectKeys.all, 'school', schoolId] as const,
 };
@@ -16,9 +18,8 @@ export const subjectKeys = {
 // Types
 export interface AddSubjectPayload {
   name: string;
-  schoolId: string;
+  semesterId: string;
   teacher?: string | null;
-  description?: string | null;
   weight?: number;
 }
 
@@ -57,7 +58,7 @@ export const useSchoolSubjects = (schoolId: string) => {
     placeholderData: () => {
       return queryClient
         .getQueryData<Subject[]>(subjectKeys.lists())
-        ?.filter((s) => s.schoolId === schoolId);
+        ?.filter((s) => s.semester?.schoolId === schoolId);
     },
     staleTime: Infinity,
     enabled: !!schoolId,
@@ -87,10 +88,9 @@ export const useUpdateSubject = () => {
     onSuccess: (updatedSubject) => {
       // Invalidate and refetch subjects list
       queryClient.invalidateQueries({ queryKey: subjectKeys.lists() });
-      // Invalidate and refetch school subjects
-      if (updatedSubject.schoolId) {
+      if (updatedSubject.semesterId) {
         queryClient.invalidateQueries({
-          queryKey: subjectKeys.schoolSubjects(updatedSubject.schoolId),
+          queryKey: subjectKeys.semesterSubjects(updatedSubject.semesterId),
         });
       }
     },
