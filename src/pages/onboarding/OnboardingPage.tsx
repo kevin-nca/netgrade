@@ -30,6 +30,7 @@ import ProgressBar from './components/progressbar/ProgressBar';
 
 import { OnboardingDataTemp } from './types';
 import './OnboardingPage.css';
+import './components/SharedStepStyles.css';
 
 // Generate unique ID
 const generateId = () => Math.random().toString(36).substr(2, 9);

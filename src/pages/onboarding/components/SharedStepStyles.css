@@ -131,7 +131,8 @@
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
 }
 
-.add-icon {
+.add-icon,
+.step-icon {
   font-size: 24px;
   color: white;
 }
@@ -213,7 +214,8 @@
   margin-right: 12px;
 }
 
-.input-icon {
+.input-icon,
+.back-icon {
   font-size: 20px;
   color: #ffffff;
 }
@@ -260,7 +262,8 @@
   }
 
   .school-details,
-  .subject-details {
+  .subject-details,
+  .step-subtitle {
     color: rgba(255, 255, 255, 0.6);
   }
 
