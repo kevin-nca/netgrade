@@ -63,6 +63,7 @@ export const seedTestData = async (dataSource: DataSource) => {
     name: '2024/2025',
     startDate: new Date('2024-08-15'),
     endDate: new Date('2025-07-31'),
+    schoolId: school.id,
   });
   await repositories.semester.save(semester);
 
@@ -71,7 +72,6 @@ export const seedTestData = async (dataSource: DataSource) => {
     name: 'Test Subject',
     teacher: 'Test Teacher',
     weight: 1.0,
-    schoolId: school.id,
     semesterId: semester.id,
   });
   await repositories.subject.save(subject);
@@ -216,6 +216,7 @@ export const createMockSubjectWithMissingGrade = (): Subject => {
         id: 'exam2',
         grade: null,
       } as Exam,
+      { id: 'exam2', grade: null } as Exam,
     ],
   } as Subject;
 };
@@ -227,41 +228,46 @@ export const createMockSchoolWithSubjects = (): School => {
   return {
     id: 'test-school-id',
     name: 'Test School',
-    subjects: [
+    semesters: [
       {
-        id: 'subject1',
-        name: 'Math',
-        exams: [
+        id: 'semester1',
+        subjects: [
           {
-            id: 'exam1',
-            grade: { id: 'grade1', score: 5.0, weight: 1.0 } as Grade,
-          } as Exam,
+            id: 'subject1',
+            name: 'Math',
+            exams: [
+              {
+                id: 'exam1',
+                grade: { id: 'grade1', score: 5.0, weight: 1.0 } as Grade,
+              } as Exam,
+            ],
+          } as Subject,
+          {
+            id: 'subject2',
+            name: 'English',
+            exams: [
+              {
+                id: 'exam2',
+                grade: { id: 'grade2', score: 4.0, weight: 1.0 } as Grade,
+              } as Exam,
+              {
+                id: 'exam3',
+                grade: { id: 'grade3', score: 5.0, weight: 1.0 } as Grade,
+              } as Exam,
+            ],
+          } as Subject,
+          {
+            id: 'subject3',
+            name: 'Science',
+            exams: [
+              {
+                id: 'exam4',
+                grade: { id: 'grade4', score: 5.0, weight: 1.0 } as Grade,
+              } as Exam,
+            ],
+          } as Subject,
         ],
-      } as Subject,
-      {
-        id: 'subject2',
-        name: 'English',
-        exams: [
-          {
-            id: 'exam2',
-            grade: { id: 'grade2', score: 4.0, weight: 1.0 } as Grade,
-          } as Exam,
-          {
-            id: 'exam3',
-            grade: { id: 'grade3', score: 5.0, weight: 1.0 } as Grade,
-          } as Exam,
-        ],
-      } as Subject,
-      {
-        id: 'subject3',
-        name: 'Science',
-        exams: [
-          {
-            id: 'exam4',
-            grade: { id: 'grade4', score: 5.0, weight: 1.0 } as Grade,
-          } as Exam,
-        ],
-      } as Subject,
+      } as Semester,
     ],
   } as School;
 };
@@ -271,37 +277,42 @@ export const createMockSchoolWithMixedSubjects = (): School => {
   return {
     id: 'test-school-id',
     name: 'Test School',
-    subjects: [
+    semesters: [
       {
-        id: 'subject1',
-        name: 'Math',
-        exams: [
+        id: 'semester1',
+        subjects: [
           {
-            id: 'exam1',
-            grade: { id: 'grade1', score: 5.0, weight: 1.0 } as Grade,
-          } as Exam,
-        ],
-      } as Subject,
-      {
-        id: 'subject2',
-        name: 'English',
-        exams: [
+            id: 'subject1',
+            name: 'Math',
+            exams: [
+              {
+                id: 'exam1',
+                grade: { id: 'grade1', score: 5.0, weight: 1.0 } as Grade,
+              } as Exam,
+            ],
+          } as Subject,
           {
-            id: 'exam2',
-            grade: null, // No grade
-          } as Exam,
-        ],
-      } as Subject,
-      {
-        id: 'subject3',
-        name: 'Science',
-        exams: [
+            id: 'subject2',
+            name: 'English',
+            exams: [
+              {
+                id: 'exam2',
+                grade: null, // No grade
+              } as Exam,
+            ],
+          } as Subject,
           {
-            id: 'exam3',
-            grade: { id: 'grade3', score: 6.0, weight: 1.0 } as Grade,
-          } as Exam,
+            id: 'subject3',
+            name: 'Science',
+            exams: [
+              {
+                id: 'exam3',
+                grade: { id: 'grade3', score: 6.0, weight: 1.0 } as Grade,
+              } as Exam,
+            ],
+          } as Subject,
         ],
-      } as Subject,
+      } as Semester,
     ],
   } as School;
 };
@@ -311,31 +322,36 @@ export const createMockSchoolWithDifferentSubjectAverages = (): School => {
   return {
     id: 'test-school-id',
     name: 'Test School',
-    subjects: [
+    semesters: [
       {
-        id: 'subject1',
-        name: 'Math',
-        exams: [
+        id: 'semester1',
+        subjects: [
           {
-            id: 'exam1',
-            grade: { id: 'grade1', score: 6.0, weight: 3.0 } as Grade,
-          } as Exam,
+            id: 'subject1',
+            name: 'Math',
+            exams: [
+              {
+                id: 'exam1',
+                grade: { id: 'grade1', score: 6.0, weight: 3.0 } as Grade,
+              } as Exam,
+              {
+                id: 'exam2',
+                grade: { id: 'grade2', score: 4.0, weight: 1.0 } as Grade,
+              } as Exam,
+            ],
+          } as Subject,
           {
-            id: 'exam2',
-            grade: { id: 'grade2', score: 4.0, weight: 1.0 } as Grade,
-          } as Exam,
+            id: 'subject2',
+            name: 'English',
+            exams: [
+              {
+                id: 'exam3',
+                grade: { id: 'grade3', score: 5.0, weight: 1.0 } as Grade,
+              } as Exam,
+            ],
+          } as Subject,
         ],
-      } as Subject,
-      {
-        id: 'subject2',
-        name: 'English',
-        exams: [
-          {
-            id: 'exam3',
-            grade: { id: 'grade3', score: 5.0, weight: 1.0 } as Grade,
-          } as Exam,
-        ],
-      } as Subject,
+      } as Semester,
     ],
   } as School;
 };
