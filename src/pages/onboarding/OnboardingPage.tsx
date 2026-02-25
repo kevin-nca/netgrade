@@ -100,12 +100,8 @@ const OnboardingPage: React.FC = () => {
 
     try {
       // Save user name
-      await new Promise<void>((resolve, reject) => {
-        saveUserNameMutation.mutate(data.userName, {
-          onSuccess: () => resolve(),
-          onError: reject,
-        });
-      });
+
+      saveUserNameMutation.mutate(data.userName);
 
       // Save schools and map temp IDs to real IDs
       const schoolIdMapping: { [tempId: string]: string } = {};
