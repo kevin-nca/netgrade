@@ -137,7 +137,8 @@
   color: white;
 }
 
-.add-text h4 {
+.add-text h4,
+.summary-info h4 {
   font-size: 16px;
   font-weight: 600;
   color: #000000;
@@ -215,9 +216,10 @@
 }
 
 .input-icon,
-.back-icon {
+.back-icon,
+.summary-icon {
   font-size: 20px;
-  color: #ffffff;
+  color: white;
 }
 
 .input-field {
