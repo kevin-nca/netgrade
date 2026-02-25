@@ -54,7 +54,7 @@ export const useSchoolSubjects = (schoolId: string) => {
   return useQuery({
     queryKey: subjectKeys.schoolSubjects(schoolId),
     queryFn: () => SubjectService.findBySchoolId(schoolId),
-    initialData: () => {
+    placeholderData: () => {
       return queryClient
         .getQueryData<Subject[]>(subjectKeys.lists())
         ?.filter((s) => s.schoolId === schoolId);
