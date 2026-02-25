@@ -1,6 +1,6 @@
 import { PreferencesService } from './PreferencesService';
 import { getDataSource, getRepositories } from '@/db/data-source';
-import { School } from '@/db/entities';
+import { School, Semester, Subject, Exam, Grade } from '@/db/entities';
 import * as XLSX from 'xlsx';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
@@ -144,11 +144,17 @@ export class DataManagementService {
    */
   static async exportAsJSON(): Promise<ExportResult> {
     try {
-      const schools = await getRepositories().school.find({
+      const { school: schoolRepo, semester: semesterRepo } = getRepositories();
+
+      const schools = await schoolRepo.find({
         relations: { subjects: { exams: { grade: true } } },
       });
 
-      if (schools.length === 0) {
+      const semesters = await semesterRepo.find({
+        relations: { subjects: true },
+      });
+
+      if (schools.length === 0 && semesters.length === 0) {
         throw new ExportError(
           'Keine Daten zum Exportieren vorhanden.',
           'INVALID_DATA',
@@ -156,7 +162,7 @@ export class DataManagementService {
       }
 
       const json = JSON.stringify(
-        { schools },
+        { schools, semesters },
         (key, value) => {
           if (value instanceof Date) {
             return value.toISOString().split('T')[0];
@@ -189,12 +195,15 @@ export class DataManagementService {
   }
 
   /**
-   * Import data from JSON backup
+   * Import data from JSON backup (including semesters)
    */
   static async importFromJSON(jsonString: string): Promise<void> {
     try {
       const parsed = JSON.parse(jsonString, (key, value) => {
-        if (key === 'date' && typeof value === 'string') {
+        if (
+          (key === 'date' || key === 'startDate' || key === 'endDate') &&
+          typeof value === 'string'
+        ) {
           return new Date(value);
         }
         return value;
@@ -207,15 +216,78 @@ export class DataManagementService {
         );
       }
 
-      const { schools } = parsed;
+      const { schools, semesters = [] } = parsed;
+
+      const subjectsToInsert = schools.flatMap((school: School) =>
+        (school.subjects ?? []).map((subject: Subject) => ({
+          ...subject,
+          schoolId: school.id,
+          exams: [],
+        })),
+      );
+
+      const examsToInsert = schools.flatMap((school: School) =>
+        (school.subjects ?? []).flatMap((subject: Subject) =>
+          (subject.exams ?? []).map((exam: Exam) => ({
+            ...exam,
+            subjectId: subject.id,
+            grade: null,
+            gradeId: null,
+          })),
+        ),
+      );
+
+      const gradesToInsert = schools.flatMap((school: School) =>
+        (school.subjects ?? []).flatMap((subject: Subject) =>
+          (subject.exams ?? [])
+            .filter((exam: Exam) => exam.grade)
+            .map((exam: Exam) => ({
+              ...exam.grade!,
+              examId: exam.id,
+            })),
+        ),
+      );
+
+      const schoolsWithoutSubjects = schools.map((school: School) => ({
+        ...school,
+        subjects: [],
+      }));
 
       const dataSource = getDataSource();
       await dataSource.transaction(async (transactionManager) => {
         await transactionManager.query('DELETE FROM grade');
         await transactionManager.query('DELETE FROM exam');
         await transactionManager.query('DELETE FROM subject');
+        await transactionManager.query('DELETE FROM semester');
         await transactionManager.query('DELETE FROM school');
-        await transactionManager.getRepository(School).save(schools);
+
+        await transactionManager
+          .getRepository(School)
+          .save(schoolsWithoutSubjects);
+
+        if (semesters.length > 0) {
+          await transactionManager.getRepository(Semester).save(semesters);
+        }
+
+        if (subjectsToInsert.length > 0) {
+          await transactionManager
+            .getRepository(Subject)
+            .save(subjectsToInsert);
+        }
+
+        if (examsToInsert.length > 0) {
+          await transactionManager.getRepository(Exam).save(examsToInsert);
+        }
+
+        if (gradesToInsert.length > 0) {
+          await transactionManager.getRepository(Grade).save(gradesToInsert);
+
+          for (const grade of gradesToInsert) {
+            await transactionManager
+              .getRepository(Exam)
+              .update({ id: grade.examId as string }, { gradeId: grade.id });
+          }
+        }
       });
     } catch (error) {
       console.error('JSON import failed:', error);

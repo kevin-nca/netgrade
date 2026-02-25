@@ -30,6 +30,7 @@ import {
   schoolOutline,
   settingsOutline,
   trashOutline,
+  cloudDownloadOutline,
 } from 'ionicons/icons';
 import { Routes } from '@/routes';
 import { ExportDialog } from '@/components/export/ExportDialog';
@@ -465,7 +466,7 @@ const SettingsPage: React.FC = () => {
               >
                 <div className="item-content">
                   <div className="item-icon export">
-                    <IonIcon icon={downloadOutline} />
+                    <IonIcon icon={cloudDownloadOutline} />
                   </div>
                   <div className="item-text">
                     <h3 className="item-title">JSON Export</h3>
