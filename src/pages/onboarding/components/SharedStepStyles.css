@@ -132,7 +132,8 @@
 }
 
 .add-icon,
-.step-icon {
+.step-icon,
+.feature-icon {
   font-size: 24px;
   color: white;
 }
@@ -267,7 +268,10 @@
   .completion-title,
   .summary-title,
   .features-title,
-  .summary-info h4 {
+  .summary-info h4,
+  .hero-title,
+  .hero-subtitle,
+  .feature-card span {
     color: #ffffff;
   }
 
@@ -275,7 +279,9 @@
   .subject-details,
   .step-subtitle,
   .completion-subtitle,
-  .summary-info p {
+  .summary-info p,
+  .hero-description,
+  .welcome-promise {
     color: rgba(255, 255, 255, 0.6);
   }
 
