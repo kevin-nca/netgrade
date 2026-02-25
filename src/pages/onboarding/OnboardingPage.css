@@ -48,7 +48,6 @@
   transform: scale(0.95);
 }
 
-
 .onboarding-title {
   font-size: 17px;
   font-weight: 600;
@@ -88,8 +87,9 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
-  inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
   position: relative;
   overflow: hidden;
 }
@@ -99,8 +99,9 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06),
-  inset 0 1px 0 rgba(255, 255, 255, 1);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 .onboarding-step {
@@ -147,7 +148,6 @@
   box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
   position: relative;
 }
-
 
 .step-text {
   flex: 1;
@@ -265,8 +265,9 @@
       rgba(255, 255, 255, 0.06) 100%
     );
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
 
   .glass-input {
