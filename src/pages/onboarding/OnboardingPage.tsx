@@ -31,7 +31,6 @@ import ProgressBar from './components/progressbar/ProgressBar';
 import { OnboardingDataTemp } from './types';
 import './OnboardingPage.css';
 
-// Generate unique ID
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 const OnboardingPage: React.FC = () => {
@@ -99,7 +98,6 @@ const OnboardingPage: React.FC = () => {
     setIsCompleting(true);
 
     try {
-      // Save user name
       await new Promise<void>((resolve, reject) => {
         saveUserNameMutation.mutate(data.userName, {
           onSuccess: () => resolve(),
@@ -107,8 +105,8 @@ const OnboardingPage: React.FC = () => {
         });
       });
 
-      // Save schools and map temp IDs to real IDs
-      const schoolIdMapping: { [tempId: string]: string } = {};
+      const schoolIdToSemesterIdMapping: { [tempSchoolId: string]: string } =
+        {};
 
       for (const school of data.schools) {
         const savedSchool = await new Promise<School>((resolve, reject) => {
@@ -125,26 +123,16 @@ const OnboardingPage: React.FC = () => {
           );
         });
 
-        schoolIdMapping[school.id] = savedSchool.id;
+        schoolIdToSemesterIdMapping[school.id] = savedSchool.semesters[0].id;
       }
 
-      // Save subjects with correct schoolId references
       for (const subject of data.subjects) {
-        const realSchoolId = schoolIdMapping[subject.schoolId];
-
-        if (!realSchoolId) {
-          throw new Error(
-            `Could not find real school ID for subject: ${subject.name}`,
-          );
-        }
-
         await new Promise<void>((resolve, reject) => {
           addSubjectMutation.mutate(
             {
               name: subject.name,
-              schoolId: realSchoolId,
+              semesterId: schoolIdToSemesterIdMapping[subject.schoolId],
               teacher: subject.teacher || null,
-              description: subject.description || null,
             },
             {
               onSuccess: () => resolve(),
@@ -154,7 +142,6 @@ const OnboardingPage: React.FC = () => {
         });
       }
 
-      // Mark onboarding as complete
       await new Promise<void>((resolve, reject) => {
         setOnboardingCompletedMutation.mutate(true, {
           onSuccess: () => resolve(),
@@ -177,7 +164,6 @@ const OnboardingPage: React.FC = () => {
 
   return (
     <IonPage className="onboarding-page">
-      {/* Header - only show for steps 1+ */}
       {currentStep > 0 && (
         <IonHeader className="onboarding-header">
           <IonToolbar className="onboarding-toolbar">
