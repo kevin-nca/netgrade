@@ -30,6 +30,7 @@ export class SemesterService {
     name: string;
     startDate: Date;
     endDate: Date;
+    schoolId: string;
   }): Promise<Semester> {
     try {
       const { semester: semesterRepo } = getRepositories();
@@ -38,6 +39,7 @@ export class SemesterService {
         name: newSemesterData.name,
         startDate: newSemesterData.startDate,
         endDate: newSemesterData.endDate,
+        schoolId: newSemesterData.schoolId,
       });
       return await semesterRepo.save(newSemester);
     } catch (error) {

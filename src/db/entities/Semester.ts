@@ -24,6 +24,6 @@ export class Semester extends BaseEntity {
   @JoinColumn({ name: 'schoolId' })
   school!: School;
 
-  @OneToMany(() => Subject, (subject) => subject.semester)
+  @OneToMany(() => Subject, (subject) => subject.semester, { cascade: true })
   subjects!: Subject[];
 }

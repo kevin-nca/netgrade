@@ -198,7 +198,10 @@ export class DataManagementService {
   static async importFromJSON(jsonString: string): Promise<void> {
     try {
       const parsed = JSON.parse(jsonString, (key, value) => {
-        if (key === 'date' && typeof value === 'string') {
+        if (
+          (key === 'date' || key === 'startDate' || key === 'endDate') &&
+          typeof value === 'string'
+        ) {
           return new Date(value);
         }
         return value;

@@ -98,12 +98,7 @@ const OnboardingPage: React.FC = () => {
     setIsCompleting(true);
 
     try {
-      await new Promise<void>((resolve, reject) => {
-        saveUserNameMutation.mutate(data.userName, {
-          onSuccess: () => resolve(),
-          onError: reject,
-        });
-      });
+      saveUserNameMutation.mutate(data.userName);
 
       const schoolIdToSemesterIdMapping: { [tempSchoolId: string]: string } =
         {};
