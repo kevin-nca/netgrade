@@ -145,7 +145,8 @@
   margin: 0 0 4px 0;
 }
 
-.add-text p {
+.add-text p,
+.summary-info p {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.5);
   margin: 0;
@@ -158,7 +159,9 @@
   overflow: hidden;
 }
 
-.form-content {
+.form-content,
+.summary-content,
+.features-content {
   position: relative;
 }
 
@@ -177,7 +180,8 @@
   margin-bottom: 20px;
 }
 
-.field-group {
+.field-group,
+.features-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -259,13 +263,19 @@
   .form-title,
   .school-name,
   .subject-name,
-  .cancel-button {
+  .cancel-button,
+  .completion-title,
+  .summary-title,
+  .features-title,
+  .summary-info h4 {
     color: #ffffff;
   }
 
   .school-details,
   .subject-details,
-  .step-subtitle {
+  .step-subtitle,
+  .completion-subtitle,
+  .summary-info p {
     color: rgba(255, 255, 255, 0.6);
   }
 
