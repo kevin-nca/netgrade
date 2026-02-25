@@ -138,29 +138,16 @@ const OnboardingPage: React.FC = () => {
           );
         }
 
-        await new Promise<void>((resolve, reject) => {
-          addSubjectMutation.mutate(
-            {
-              name: subject.name,
-              schoolId: realSchoolId,
-              teacher: subject.teacher || null,
-              description: subject.description || null,
-            },
-            {
-              onSuccess: () => resolve(),
-              onError: reject,
-            },
-          );
+        addSubjectMutation.mutate({
+          name: subject.name,
+          schoolId: realSchoolId,
+          teacher: subject.teacher || null,
+          description: subject.description || null,
         });
       }
 
       // Mark onboarding as complete
-      await new Promise<void>((resolve, reject) => {
-        setOnboardingCompletedMutation.mutate(true, {
-          onSuccess: () => resolve(),
-          onError: reject,
-        });
-      });
+      setOnboardingCompletedMutation.mutate(true);
 
       setTimeout(() => {
         history.replace(Routes.HOME);

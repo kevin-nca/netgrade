@@ -7,13 +7,12 @@ import {
   statsChartOutline,
 } from 'ionicons/icons';
 import { Routes } from '@/routes';
-import { useSchools, useSubjects } from '@/hooks/queries';
+import { useSchools } from '@/hooks/queries';
 import { SchoolService } from '@/services/SchoolService';
 
 const SchoolsList: React.FC = () => {
   const history = useHistory();
   const { data: schools } = useSchools();
-  useSubjects();
 
   const getSchoolIcon = (schoolName: string) => {
     return schoolName.charAt(0).toUpperCase();
