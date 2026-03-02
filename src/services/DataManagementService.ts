@@ -467,7 +467,10 @@ export class DataManagementService {
       if (error.message.includes('permission')) {
         return 'Keine Berechtigung zum Speichern von Dateien.';
       }
-      return 'Datei wurde gespeichert, Teilen war nicht möglich.';
+      if (error.message.includes('share') || error.message.includes('Share')) {
+        return 'Datei wurde gespeichert, Teilen war nicht möglich.';
+      }
+      return 'Unbekannter Fehler beim Export.';
     }
     return 'Unbekannter Fehler beim Export.';
   }

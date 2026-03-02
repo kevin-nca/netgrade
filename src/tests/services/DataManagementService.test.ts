@@ -1318,8 +1318,89 @@ describe('DataManagementService', () => {
       ],
       ['Unknown string error', 'Unbekannter Fehler beim Export.'],
       [{ code: 500 }, 'Unbekannter Fehler beim Export.'],
+      [new Error('Some other error'), 'Unbekannter Fehler beim Export.'],
     ])('should return correct message for %s', (error, expected) => {
       expect(getErrorMessage(error)).toBe(expected);
+    });
+  });
+
+  describe('properFilename', () => {
+    it('should append .xlsx to filename on native platform when missing', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://path/to/export.xlsx',
+      });
+
+      const schoolRepo = dataSource.getRepository(School);
+      const school = await schoolRepo.findOne({ where: {} });
+
+      await DataManagementService.exportData({
+        format: 'xlsx',
+        filename: 'export_native',
+        schoolId: school!.id,
+      });
+
+      expect(Filesystem.writeFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: 'export_native.xlsx',
+          directory: 'DOCUMENTS',
+        }),
+      );
+
+      expect(Filesystem.stat).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: 'export_native.xlsx',
+          directory: 'DOCUMENTS',
+        }),
+      );
+
+      expect(Filesystem.getUri).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: 'export_native.xlsx',
+          directory: 'DOCUMENTS',
+        }),
+      );
+
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+    });
+
+    it('should not append .xlsx to filename on native platform when already present', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://path/to/export.xlsx',
+      });
+
+      const schoolRepo = dataSource.getRepository(School);
+      const school = await schoolRepo.findOne({ where: {} });
+
+      await DataManagementService.exportData({
+        format: 'xlsx',
+        filename: 'export_native.xlsx',
+        schoolId: school!.id,
+      });
+
+      expect(Filesystem.writeFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: 'export_native.xlsx',
+          directory: 'DOCUMENTS',
+        }),
+      );
+
+      expect(Filesystem.stat).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: 'export_native.xlsx',
+          directory: 'DOCUMENTS',
+        }),
+      );
+
+      expect(Filesystem.getUri).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: 'export_native.xlsx',
+          directory: 'DOCUMENTS',
+        }),
+      );
+
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     });
   });
 });
