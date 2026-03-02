@@ -114,18 +114,10 @@ const OnboardingPage: React.FC = () => {
       const semesterIdMapping: { [tempId: string]: string } = {};
 
       for (const semester of data.semesters) {
-        const savedSemester = await new Promise<Semester>((resolve, reject) => {
-          addSemesterMutation.mutate(
-            {
-              name: semester.name,
-              startDate: semester.startDate,
-              endDate: semester.endDate,
-            },
-            {
-              onSuccess: (result) => resolve(result),
-              onError: reject,
-            },
-          );
+        const savedSemester = await addSemesterMutation.mutateAsync({
+          name: semester.name,
+          startDate: semester.startDate,
+          endDate: semester.endDate,
         });
 
         semesterIdMapping[semester.id] = savedSemester.id;
@@ -135,18 +127,10 @@ const OnboardingPage: React.FC = () => {
       const schoolIdMapping: { [tempId: string]: string } = {};
 
       for (const school of data.schools) {
-        const savedSchool = await new Promise<School>((resolve, reject) => {
-          addSchoolMutation.mutate(
-            {
-              name: school.name,
-              address: school.address || undefined,
-              type: school.type || undefined,
-            },
-            {
-              onSuccess: (result) => resolve(result),
-              onError: reject,
-            },
-          );
+        const savedSchool = await addSchoolMutation.mutateAsync({
+          name: school.name,
+          address: school.address || undefined,
+          type: school.type || undefined,
         });
 
         schoolIdMapping[school.id] = savedSchool.id;
