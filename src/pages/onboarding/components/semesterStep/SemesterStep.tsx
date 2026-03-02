@@ -113,133 +113,134 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
 
       {/* Add Semester Form */}
       <div className="add-section">
-        {data.semesters.length < 3 &&
-          (!showAddForm ? (
-            <div className="glass-card add-prompt">
-              <div className="add-content" onClick={() => setShowAddForm(true)}>
-                <div className="add-icon-wrapper">
-                  <IonIcon icon={addOutline} className="add-icon" />
-                </div>
-                <div className="add-text">
-                  <h4>Semester hinzufügen</h4>
-                  <p>Tippe hier, um ein neues Semester zu erstellen</p>
-                </div>
+        {data.semesters.length < 3 && !showAddForm && (
+          <div className="glass-card add-prompt">
+            <div className="add-content" onClick={() => setShowAddForm(true)}>
+              <div className="add-icon-wrapper">
+                <IonIcon icon={addOutline} className="add-icon" />
+              </div>
+              <div className="add-text">
+                <h4>Semester hinzufügen</h4>
+                <p>Tippe hier, um ein neues Semester zu erstellen</p>
               </div>
             </div>
-          ) : (
-            <div className="glass-card add-form">
-              <div className="form-content">
-                <h3 className="form-title">Neues Semester erstellen</h3>
+          </div>
+        )}
 
-                <div className="form-fields">
-                  <form.Field name="name">
-                    {(field) => (
-                      <div className="field-group">
-                        <label className="field-label">Semester Name *</label>
-                        <div className="input-wrapper glass-input">
-                          <IonItem lines="none" className="input-item">
-                            <div slot="start" className="input-icon-wrapper">
-                              <IonIcon
-                                icon={calendarOutline}
-                                className="input-icon"
-                              />
-                            </div>
-                            <IonInput
-                              value={field.state.value}
-                              placeholder="z.B. HS 2024 oder 1. Semester"
-                              onIonChange={(e) =>
-                                field.handleChange(e.detail.value || '')
-                              }
-                              className="input-field"
-                              clearInput
+        {data.semesters.length < 3 && showAddForm && (
+          <div className="glass-card add-form">
+            <div className="form-content">
+              <h3 className="form-title">Neues Semester erstellen</h3>
+
+              <div className="form-fields">
+                <form.Field name="name">
+                  {(field) => (
+                    <div className="field-group">
+                      <label className="field-label">Semester Name *</label>
+                      <div className="input-wrapper glass-input">
+                        <IonItem lines="none" className="input-item">
+                          <div slot="start" className="input-icon-wrapper">
+                            <IonIcon
+                              icon={calendarOutline}
+                              className="input-icon"
                             />
-                          </IonItem>
-                        </div>
+                          </div>
+                          <IonInput
+                            value={field.state.value}
+                            placeholder="z.B. HS 2024 oder 1. Semester"
+                            onIonChange={(e) =>
+                              field.handleChange(e.detail.value || '')
+                            }
+                            className="input-field"
+                            clearInput
+                          />
+                        </IonItem>
                       </div>
-                    )}
-                  </form.Field>
+                    </div>
+                  )}
+                </form.Field>
 
-                  <form.Field name="startDate">
-                    {(field) => (
-                      <div className="field-group">
-                        <label className="field-label">Startdatum *</label>
-                        <div className="input-wrapper glass-input">
-                          <IonItem lines="none" className="input-item">
-                            <div slot="start" className="input-icon-wrapper">
-                              <IonIcon
-                                icon={calendarOutline}
-                                className="input-icon"
-                              />
-                            </div>
-                            <IonInput
-                              type="date"
-                              value={field.state.value}
-                              onIonChange={(e) =>
-                                field.handleChange(e.detail.value || '')
-                              }
-                              className="input-field"
-                              required
+                <form.Field name="startDate">
+                  {(field) => (
+                    <div className="field-group">
+                      <label className="field-label">Startdatum *</label>
+                      <div className="input-wrapper glass-input">
+                        <IonItem lines="none" className="input-item">
+                          <div slot="start" className="input-icon-wrapper">
+                            <IonIcon
+                              icon={calendarOutline}
+                              className="input-icon"
                             />
-                          </IonItem>
-                        </div>
+                          </div>
+                          <IonInput
+                            type="date"
+                            value={field.state.value}
+                            onIonChange={(e) =>
+                              field.handleChange(e.detail.value || '')
+                            }
+                            className="input-field"
+                            required
+                          />
+                        </IonItem>
                       </div>
-                    )}
-                  </form.Field>
+                    </div>
+                  )}
+                </form.Field>
 
-                  <form.Field name="endDate">
-                    {(field) => (
-                      <div className="field-group">
-                        <label className="field-label">Enddatum *</label>
-                        <div className="input-wrapper glass-input">
-                          <IonItem lines="none" className="input-item">
-                            <div slot="start" className="input-icon-wrapper">
-                              <IonIcon
-                                icon={calendarOutline}
-                                className="input-icon"
-                              />
-                            </div>
-                            <IonInput
-                              type="date"
-                              value={field.state.value}
-                              onIonChange={(e) =>
-                                field.handleChange(e.detail.value || '')
-                              }
-                              className="input-field"
-                              required
+                <form.Field name="endDate">
+                  {(field) => (
+                    <div className="field-group">
+                      <label className="field-label">Enddatum *</label>
+                      <div className="input-wrapper glass-input">
+                        <IonItem lines="none" className="input-item">
+                          <div slot="start" className="input-icon-wrapper">
+                            <IonIcon
+                              icon={calendarOutline}
+                              className="input-icon"
                             />
-                          </IonItem>
-                        </div>
+                          </div>
+                          <IonInput
+                            type="date"
+                            value={field.state.value}
+                            onIonChange={(e) =>
+                              field.handleChange(e.detail.value || '')
+                            }
+                            className="input-field"
+                            required
+                          />
+                        </IonItem>
                       </div>
-                    )}
-                  </form.Field>
-                </div>
+                    </div>
+                  )}
+                </form.Field>
+              </div>
 
-                <div className="form-actions">
-                  <IonButton
-                    fill="clear"
-                    onClick={() => {
-                      setShowAddForm(false);
-                      form.reset();
-                    }}
-                    className="cancel-button"
-                  >
-                    Abbrechen
-                  </IonButton>
-                  <form.Subscribe selector={(state) => [state.values.name]}>
-                    {([name]) => (
-                      <IonButton
-                        onClick={handleAddSemester}
-                        disabled={!name?.trim()}
-                        className="save-button"
-                      >
-                        Hinzufügen
-                      </IonButton>
-                    )}
-                  </form.Subscribe>
-                </div>
+              <div className="form-actions">
+                <IonButton
+                  fill="clear"
+                  onClick={() => {
+                    setShowAddForm(false);
+                    form.reset();
+                  }}
+                  className="cancel-button"
+                >
+                  Abbrechen
+                </IonButton>
+                <form.Subscribe selector={(state) => [state.values.name]}>
+                  {([name]) => (
+                    <IonButton
+                      onClick={handleAddSemester}
+                      disabled={!name?.trim()}
+                      className="save-button"
+                    >
+                      Hinzufügen
+                    </IonButton>
+                  )}
+                </form.Subscribe>
               </div>
             </div>
-          ))}
+          </div>
+        )}
       </div>
 
       <div className="step-body">
