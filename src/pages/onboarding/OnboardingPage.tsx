@@ -15,7 +15,6 @@ import { useHistory } from 'react-router-dom';
 import {
   useSaveUserName,
   useAddSchool,
-  useAddSubject,
   useSetOnboardingCompleted,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
@@ -51,7 +50,6 @@ const OnboardingPage: React.FC = () => {
   const history = useHistory();
   const saveUserNameMutation = useSaveUserName();
   const addSchoolMutation = useAddSchool();
-  const addSubjectMutation = useAddSubject();
   const setOnboardingCompletedMutation = useSetOnboardingCompleted();
 
   const totalSteps = 5;
@@ -119,22 +117,6 @@ const OnboardingPage: React.FC = () => {
         });
 
         schoolIdToSemesterIdMapping[school.id] = savedSchool.semesters[0].id;
-      }
-
-      for (const subject of data.subjects) {
-        await new Promise<void>((resolve, reject) => {
-          addSubjectMutation.mutate(
-            {
-              name: subject.name,
-              semesterId: schoolIdToSemesterIdMapping[subject.schoolId],
-              teacher: subject.teacher || null,
-            },
-            {
-              onSuccess: () => resolve(),
-              onError: reject,
-            },
-          );
-        });
       }
 
       await new Promise<void>((resolve, reject) => {
