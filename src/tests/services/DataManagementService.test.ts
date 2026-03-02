@@ -942,12 +942,22 @@ describe('DataManagementService', () => {
         .spyOn(schoolRepo, 'find')
         .mockResolvedValue([mockSchool]);
 
+      const createElementSpy = vi.spyOn(document, 'createElement');
+      const anchorClickSpy = vi.fn();
+
+      createElementSpy.mockImplementationOnce((tag: string) => {
+        const element = document.createElement(tag);
+        vi.spyOn(element, 'click').mockImplementation(anchorClickSpy);
+        return element;
+      });
+
       (global.URL.createObjectURL as Mock).mockClear();
 
       await DataManagementService.exportAsJSON();
 
       Date.prototype.toJSON = originalToJSON;
 
+      expect(anchorClickSpy).toHaveBeenCalled();
       expect(global.URL.createObjectURL).toHaveBeenCalled();
       const blob = (global.URL.createObjectURL as Mock).mock
         .calls[0][0] as Blob;
@@ -963,6 +973,7 @@ describe('DataManagementService', () => {
       expect(parsed.schools[0].semesters[0].endDate).toBe('2025-06-15');
 
       findSpy.mockRestore();
+      createElementSpy.mockRestore();
     });
 
     it('should use native export functionality for JSON on native platform', async () => {
