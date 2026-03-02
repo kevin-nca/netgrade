@@ -20,7 +20,6 @@ import {
   useAddSemester,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
-import { School, Semester } from '@/db/entities';
 
 import WelcomeScreen from './components/welcomeScreen/WelcomeScreen';
 import NameStep from './components/nameStep/NameStep';
