@@ -107,12 +107,8 @@ const OnboardingPage: React.FC = () => {
 
     try {
       // Save user name
-      await new Promise<void>((resolve, reject) => {
-        saveUserNameMutation.mutate(data.userName, {
-          onSuccess: () => resolve(),
-          onError: reject,
-        });
-      });
+
+      saveUserNameMutation.mutate(data.userName);
 
       // Save semesters and map temp IDs to real IDs
       const semesterIdMapping: { [tempId: string]: string } = {};
@@ -167,36 +163,16 @@ const OnboardingPage: React.FC = () => {
           );
         }
 
-        if (!realSemesterId) {
-          throw new Error(
-            `Could not find real semester ID for subject: ${subject.name}`,
-          );
-        }
-
-        await new Promise<void>((resolve, reject) => {
-          addSubjectMutation.mutate(
-            {
-              name: subject.name,
-              schoolId: realSchoolId,
-              semesterId: realSemesterId, // ← NEU
-              teacher: subject.teacher || null,
-              description: subject.description || null,
-            },
-            {
-              onSuccess: () => resolve(),
-              onError: reject,
-            },
-          );
+        addSubjectMutation.mutate({
+          name: subject.name,
+          schoolId: realSchoolId,
+          teacher: subject.teacher || null,
+          description: subject.description || null,
         });
       }
 
       // Mark onboarding as complete
-      await new Promise<void>((resolve, reject) => {
-        setOnboardingCompletedMutation.mutate(true, {
-          onSuccess: () => resolve(),
-          onError: reject,
-        });
-      });
+      setOnboardingCompletedMutation.mutate(true);
 
       setTimeout(() => {
         history.replace(Routes.HOME);

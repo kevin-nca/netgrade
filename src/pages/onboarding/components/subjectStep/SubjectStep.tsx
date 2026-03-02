@@ -77,7 +77,6 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
         }));
 
         form.reset();
-        form.setFieldValue('weight', 100);
         setShowAddForm(false);
       }
     },
