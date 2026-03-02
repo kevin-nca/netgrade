@@ -4,6 +4,10 @@ import { Grade } from '@/db/entities';
 import { Subject } from '@/db/entities/Subject';
 
 export class SchoolService {
+  /**
+   * Fetches all schools from the database
+   * @returns Promise<School[]> - A promise that resolves to an array of schools
+   */
   static async fetchAll(): Promise<School[]> {
     try {
       const { school: schoolRepo } = getRepositories();
@@ -25,6 +29,11 @@ export class SchoolService {
     }
   }
 
+  /**
+   * * Adds a new school to the database
+   *    * @param newSchoolData - The data for the new school
+   *    * @returns Promise<School> - A promise that resolves to the newly created school
+   *    */
   static async add(newSchoolData: {
     name: string;
     type?: string;
@@ -58,6 +67,11 @@ export class SchoolService {
     }
   }
 
+  /**
+   * Updates an existing school in the database
+   * @param updatedSchoolData - The updated school data
+   * @returns Promise<School> - A promise that resolves to the updated school
+   */
   static async update(
     updatedSchoolData: Partial<School> & { id: string },
   ): Promise<School> {
@@ -84,7 +98,11 @@ export class SchoolService {
       throw error;
     }
   }
-
+  /**
+   * Deletes a school from the database
+   * @param schoolId - The ID of the school to delete
+   * @returns Promise<string> - A promise that resolves to the ID of the deleted school
+   */
   static async delete(schoolId: string): Promise<string> {
     try {
       const { school: schoolRepo } = getRepositories();
@@ -99,6 +117,11 @@ export class SchoolService {
     }
   }
 
+  /**
+   * * Finds a school by its ID
+   *    * @param id - The ID of the school to find
+   *    * @returns Promise<School | null> - A promise that resolves to the school or null if not found
+   *    */
   static async findById(id: string): Promise<School | null> {
     try {
       const { school: schoolRepo } = getRepositories();
@@ -109,6 +132,11 @@ export class SchoolService {
     }
   }
 
+  /**
+   * Calculates the average grade for a specific school
+   * @param school - The school entity with loaded subjects and their exams/grades relations
+   * @returns number | undefined - The calculated average or undefined if no grades exist
+   */
   static calculateSchoolAverage(school: School): number | undefined {
     const allSubjects = school.semesters.flatMap(
       (semester) => semester.subjects,
@@ -125,7 +153,11 @@ export class SchoolService {
 
     return Number(average.toFixed(1));
   }
-
+  /**
+   * Calculates the average grade for a specific subject
+   * @param subject - The subject entity with loaded exams and grades relations
+   * @returns number | undefined - The calculated average or undefined if no grades exist
+   */
   static calculateSubjectAverage(subject: Subject): number | undefined {
     const grades = subject.exams
       .map((exam) => exam.grade)

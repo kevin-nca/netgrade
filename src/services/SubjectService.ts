@@ -2,6 +2,10 @@ import { getRepositories } from '@/db/data-source';
 import { Subject } from '@/db/entities';
 
 export class SubjectService {
+  /**
+   * Fetches all subjects from the database
+   * @returns Promise<Subject[]> - A promise that resolves to an array of subjects
+   */
   static async fetchAll(): Promise<Subject[]> {
     try {
       const { subject: subjectRepo } = getRepositories();
@@ -21,7 +25,11 @@ export class SubjectService {
       throw error;
     }
   }
-
+  /**
+   * Adds a new subject to the database
+   * @param newSubjectData - The data for the new subject
+   * @returns Promise<Subject> - A promise that resolves to the newly created subject
+   */
   static async add(newSubjectData: {
     name: string;
     semesterId: string;
