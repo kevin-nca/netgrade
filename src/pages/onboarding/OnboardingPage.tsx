@@ -163,9 +163,16 @@ const OnboardingPage: React.FC = () => {
           );
         }
 
+        if (!realSemesterId) {
+          throw new Error(
+            `Could not find real semester ID for subject: ${subject.name}`,
+          );
+        }
+
         addSubjectMutation.mutate({
           name: subject.name,
           schoolId: realSchoolId,
+          semesterId: realSemesterId,
           teacher: subject.teacher || null,
           description: subject.description || null,
         });
