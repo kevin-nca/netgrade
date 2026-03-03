@@ -1403,4 +1403,222 @@ describe('DataManagementService', () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     });
   });
+
+  describe('calculateSummaries (via XLSX export)', () => {
+    const callCalculateSummaries = (schools: School[]) => {
+      const svc = DataManagementService as unknown as {
+        calculateSummaries: (s: School[]) => {
+          perSubjectAverages: Record<string, number>;
+          overallAverage: number;
+          examsCompleted: number;
+          examsTotal: number;
+        };
+      };
+      return svc.calculateSummaries(schools);
+    };
+
+    it('should calculate weighted subject average using exam grade score and exam weight (lines 774-777)', async () => {
+      const dataSourceModule = await import('@/db/data-source');
+      const {
+        school: schoolRepo,
+        semester: semesterRepo,
+        subject: subjectRepo,
+        exam: examRepo,
+        grade: gradeRepo,
+      } = dataSourceModule.getRepositories();
+
+      const school = await schoolRepo.save(
+        schoolRepo.create({ name: 'School A', address: null, type: null }),
+      );
+      const semester = await semesterRepo.save(
+        semesterRepo.create({
+          name: 'Sem 1',
+          startDate: new Date('2026-01-01'),
+          endDate: new Date('2026-12-31'),
+          schoolId: school.id,
+        }),
+      );
+      const subject = await subjectRepo.save(
+        subjectRepo.create({
+          name: 'Math',
+          semesterId: semester.id,
+          teacher: null,
+          weight: 1,
+        }),
+      );
+
+      const grade1 = await gradeRepo.save(
+        gradeRepo.create({
+          score: 4,
+          weight: 1,
+          comment: null,
+          date: new Date('2026-02-01'),
+        }),
+      );
+      const grade2 = await gradeRepo.save(
+        gradeRepo.create({
+          score: 6,
+          weight: 1,
+          comment: null,
+          date: new Date('2026-02-02'),
+        }),
+      );
+
+      await examRepo.save(
+        examRepo.create({
+          name: 'Exam 1',
+          date: new Date('2026-02-01'),
+          weight: 2,
+          isCompleted: true,
+          subjectId: subject.id,
+          gradeId: grade1.id,
+        }),
+      );
+
+      await examRepo.save(
+        examRepo.create({
+          name: 'Exam 2',
+          date: new Date('2026-02-02'),
+          weight: null,
+          isCompleted: true,
+          subjectId: subject.id,
+          gradeId: grade2.id,
+        }),
+      );
+
+      const aoaSpy = vi
+        .spyOn(XLSX.utils, 'aoa_to_sheet')
+        .mockImplementation(() => ({}) as unknown as XLSX.WorkSheet);
+      const appendSpy = vi
+        .spyOn(XLSX.utils, 'book_append_sheet')
+        .mockImplementation(() => {});
+
+      const fullSchool = await schoolRepo.findOne({
+        where: { id: school.id },
+        relations: {
+          semesters: {
+            subjects: {
+              exams: {
+                grade: true,
+              },
+            },
+          },
+        },
+      });
+
+      expect(fullSchool).toBeTruthy();
+
+      const summaries = callCalculateSummaries([fullSchool!]);
+
+      expect(summaries.perSubjectAverages['Math']).toBeCloseTo(4.6666667, 5);
+      expect(summaries.examsTotal).toBe(2);
+      expect(summaries.examsCompleted).toBe(2);
+
+      aoaSpy.mockRestore();
+      appendSpy.mockRestore();
+    });
+
+    it('should calculate overallAverage weighted by subject.weight (lines 784-785)', async () => {
+      const dataSourceModule = await import('@/db/data-source');
+      const {
+        school: schoolRepo,
+        semester: semesterRepo,
+        subject: subjectRepo,
+        exam: examRepo,
+        grade: gradeRepo,
+      } = dataSourceModule.getRepositories();
+
+      const school = await schoolRepo.save(
+        schoolRepo.create({ name: 'School B', address: null, type: null }),
+      );
+      const semester = await semesterRepo.save(
+        semesterRepo.create({
+          name: 'Sem 1',
+          startDate: new Date('2026-01-01'),
+          endDate: new Date('2026-12-31'),
+          schoolId: school.id,
+        }),
+      );
+
+      const subject1 = await subjectRepo.save(
+        subjectRepo.create({
+          name: 'Sub1',
+          semesterId: semester.id,
+          weight: 1,
+          teacher: null,
+        }),
+      );
+      const subject2 = await subjectRepo.save(
+        subjectRepo.create({
+          name: 'Sub2',
+          semesterId: semester.id,
+          weight: 2,
+          teacher: null,
+        }),
+      );
+
+      const g1 = await gradeRepo.save(
+        gradeRepo.create({
+          score: 4,
+          weight: 1,
+          comment: null,
+          date: new Date('2026-03-01'),
+        }),
+      );
+      const g2 = await gradeRepo.save(
+        gradeRepo.create({
+          score: 6,
+          weight: 1,
+          comment: null,
+          date: new Date('2026-03-02'),
+        }),
+      );
+
+      await examRepo.save(
+        examRepo.create({
+          name: 'E1',
+          date: new Date('2026-03-01'),
+          weight: 1,
+          isCompleted: true,
+          subjectId: subject1.id,
+          gradeId: g1.id,
+        }),
+      );
+      await examRepo.save(
+        examRepo.create({
+          name: 'E2',
+          date: new Date('2026-03-02'),
+          weight: 1,
+          isCompleted: true,
+          subjectId: subject2.id,
+          gradeId: g2.id,
+        }),
+      );
+
+      const aoaSpy = vi.spyOn(XLSX.utils, 'aoa_to_sheet');
+
+      const fullSchool = await schoolRepo.findOne({
+        where: { id: school.id },
+        relations: {
+          semesters: {
+            subjects: {
+              exams: {
+                grade: true,
+              },
+            },
+          },
+        },
+      });
+      expect(fullSchool).toBeTruthy();
+
+      const summaries = callCalculateSummaries([fullSchool!]);
+      expect(summaries.perSubjectAverages['Sub1']).toBeCloseTo(4, 5);
+      expect(summaries.perSubjectAverages['Sub2']).toBeCloseTo(6, 5);
+      expect(summaries.overallAverage).toBeCloseTo(5.3333333, 5);
+      expect(summaries.examsTotal).toBe(2);
+      expect(summaries.examsCompleted).toBe(2);
+
+      aoaSpy.mockRestore();
+    });
+  });
 });
