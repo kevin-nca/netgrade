@@ -21,6 +21,7 @@ export interface AddSubjectPayload {
   semesterId: string;
   teacher?: string | null;
   weight?: number;
+  semesterId: string;
 }
 
 // Hooks
