@@ -18,7 +18,6 @@ export const subjectKeys = {
 // Types
 export interface AddSubjectPayload {
   name: string;
-  semesterId: string;
   teacher?: string | null;
   weight?: number;
   semesterId: string;

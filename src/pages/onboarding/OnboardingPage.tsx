@@ -15,6 +15,7 @@ import { useHistory } from 'react-router-dom';
 import {
   useSaveUserName,
   useAddSchool,
+  useAddSubject,
   useSetOnboardingCompleted,
   useAddSemester,
 } from '@/hooks/queries';
@@ -30,6 +31,7 @@ import ProgressBar from './components/progressbar/ProgressBar';
 
 import { OnboardingDataTemp } from './types';
 import './OnboardingPage.css';
+import './components/SharedStepStyles.css';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -53,6 +55,7 @@ const OnboardingPage: React.FC = () => {
   const history = useHistory();
   const saveUserNameMutation = useSaveUserName();
   const addSchoolMutation = useAddSchool();
+  const addSubjectMutation = useAddSubject();
   const setOnboardingCompletedMutation = useSetOnboardingCompleted();
   const addSemesterMutation = useAddSemester();
 
@@ -104,20 +107,7 @@ const OnboardingPage: React.FC = () => {
     try {
       saveUserNameMutation.mutate(data.userName);
 
-      // Save semesters and map temp IDs to real IDs
-      const semesterIdMapping: { [tempId: string]: string } = {};
-
-      for (const semester of data.semesters) {
-        const savedSemester = await addSemesterMutation.mutateAsync({
-          name: semester.name,
-          startDate: semester.startDate,
-          endDate: semester.endDate,
-        });
-
-        semesterIdMapping[semester.id] = savedSemester.id;
-      }
-
-      // Save schools and map temp IDs to real IDs
+      // Save schools first and map temp IDs to real IDs
       const schoolIdMapping: { [tempId: string]: string } = {};
 
       for (const school of data.schools) {
@@ -127,34 +117,56 @@ const OnboardingPage: React.FC = () => {
           type: school.type || undefined,
         });
 
-        schoolIdToSemesterIdMapping[school.id] = savedSchool.semesters[0].id;
+        schoolIdMapping[school.id] = savedSchool.id;
       }
 
-      // Save subjects with correct schoolId and semesterId references
-      for (const subject of data.subjects) {
-        const realSchoolId = schoolIdMapping[subject.schoolId];
-        const realSemesterId = semesterIdMapping[subject.semesterId];
+      // Save semesters and map temp IDs to real IDs (requires schoolId)
+      const semesterIdMapping: { [tempId: string]: string } = {};
+
+      for (const semester of data.semesters) {
+        const realSchoolId = schoolIdMapping[selectedSchoolId];
 
         if (!realSchoolId) {
-          throw new Error(
-            `Could not find real school ID for subject: ${subject.name}`,
+          showToastMessage(
+            'Fehler beim Speichern: Schule für Semester konnte nicht zugeordnet werden.',
+            'danger',
           );
+          setIsCompleting(false);
+          return;
         }
+
+        const savedSemester = await addSemesterMutation.mutateAsync({
+          name: semester.name,
+          startDate: semester.startDate,
+          endDate: semester.endDate,
+          schoolId: realSchoolId,
+        });
+
+        semesterIdMapping[semester.id] = savedSemester.id;
+      }
+
+      // Save subjects with correct semesterId reference (schoolId is derived from semester)
+      for (const subject of data.subjects) {
+        const realSemesterId = semesterIdMapping[subject.semesterId];
 
         if (!realSemesterId) {
-          throw new Error(
-            `Could not find real semester ID for subject: ${subject.name}`,
+          showToastMessage(
+            `Fehler beim Speichern: Semester für Fach "${subject.name}" konnte nicht zugeordnet werden.`,
+            'danger',
           );
+          setIsCompleting(false);
+          return;
         }
 
-        addSubjectMutation.mutate({
+        await addSubjectMutation.mutateAsync({
           name: subject.name,
-          schoolId: realSchoolId,
           semesterId: realSemesterId,
           teacher: subject.teacher || null,
-          description: subject.description || null,
+          weight: subject.weight ?? undefined,
         });
-      });
+      }
+
+      setOnboardingCompletedMutation.mutate(true);
 
       setTimeout(() => {
         history.replace(Routes.HOME);
