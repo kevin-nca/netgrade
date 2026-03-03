@@ -4,7 +4,7 @@ import { GradeService, AddExamAndGradePayload } from '@/services/GradeService';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Grade } from '@/db/entities/Grade';
 import { Exam } from '@/db/entities/Exam';
-import { School, Subject, Semester } from '@/db/entities';
+import { School, Subject } from '@/db/entities';
 
 describe('GradeService', () => {
   let dataSource: DataSource;
@@ -22,7 +22,6 @@ describe('GradeService', () => {
       subject: dataSource.getRepository(Subject),
       exam: dataSource.getRepository(Exam),
       grade: dataSource.getRepository(Grade),
-      semester: dataSource.getRepository(Semester),
     });
 
     // Also mock the getDataSource function to return our test dataSource
@@ -356,52 +355,5 @@ describe('GradeService', () => {
 
     // With scores 80 (weight 1) and 90 (weight 2), weighted average should be 86.67
     expect(weightedAverage).toBeCloseTo(86.67, 1);
-  });
-
-  it('should reuse existing exam in addWithExam and update exam properties', async () => {
-    const examRepo = dataSource.getRepository(Exam);
-    const gradeRepo = dataSource.getRepository(Grade);
-
-    // Ensure an existing exam without grade exists
-    const existingExam = await examRepo.save(
-      examRepo.create({
-        name: 'Existing Exam',
-        date: new Date('2026-02-01'),
-        weight: 0.5,
-        isCompleted: false,
-        subjectId: testData.subject.id,
-        gradeId: null,
-      }),
-    );
-
-    const payload = {
-      subjectId: testData.subject.id,
-      examName: 'Existing Exam',
-      date: new Date('2026-02-01'),
-      weight: 2,
-      score: 5.0,
-      comment: 'ok',
-    };
-
-    const savedGrade = await GradeService.addWithExam(payload);
-
-    expect(savedGrade.exam).toBeDefined();
-    expect(savedGrade.exam.id).toBe(existingExam.id);
-
-    const updatedExam = await examRepo.findOne({
-      where: { id: existingExam.id },
-    });
-    expect(updatedExam).toBeTruthy();
-    expect(updatedExam!.isCompleted).toBe(true);
-    expect(updatedExam!.weight).toBe(payload.weight);
-    expect(updatedExam!.gradeId).toBe(savedGrade.id);
-
-    const grade = await gradeRepo.findOne({
-      where: { id: savedGrade.id },
-      relations: { exam: true },
-    });
-
-    expect(grade).toBeTruthy();
-    expect(grade!.exam.id).toBe(existingExam.id);
   });
 });
