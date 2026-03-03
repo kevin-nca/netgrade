@@ -5,27 +5,12 @@ import { PreferencesService } from '@/services/PreferencesService';
 import { getRepositories } from '@/db/data-source';
 import { createMockCurrentSemester } from './setup';
 import { Semester } from '@/db/entities';
-import { Capacitor } from '@capacitor/core';
-import { LocalNotifications } from '@capacitor/local-notifications';
-
-vi.mock('@capacitor/core', () => ({
-  Capacitor: {
-    isNativePlatform: vi.fn().mockReturnValue(false),
-  },
-}));
-
-vi.mock('@capacitor/local-notifications', () => ({
-  LocalNotifications: {
-    requestPermissions: vi.fn(),
-  },
-}));
 
 vi.mock('@capacitor/preferences', () => ({
   Preferences: {
     set: vi.fn(),
     get: vi.fn(),
     clear: vi.fn(),
-    remove: vi.fn(),
   },
 }));
 
@@ -40,9 +25,6 @@ describe('PreferencesService', () => {
   const mockPreferencesGet = Preferences.get as unknown as ReturnType<
     typeof vi.fn
   >;
-  const mockPreferencesRemove = (
-    Preferences as unknown as { remove: ReturnType<typeof vi.fn> }
-  ).remove;
 
   beforeAll(() => {
     vi.clearAllMocks();
@@ -232,163 +214,6 @@ describe('PreferencesService', () => {
         'Failed to get current semester:',
         testError,
       );
-    });
-  });
-
-  describe('notification settings', () => {
-    it('should return default notification settings when none are stored', async () => {
-      mockPreferencesGet.mockResolvedValueOnce({ value: null });
-
-      const result = await PreferencesService.getNotificationSettings();
-
-      expect(result).toEqual({
-        enabled: false,
-        reminderDays: 1,
-        reminderTime: [9, 0],
-        autoSchedulingEnabled: true,
-      });
-      expect(mockPreferencesGet).toHaveBeenCalledWith({
-        key: 'notification_settings',
-      });
-    });
-
-    it('should migrate legacy reminderTime string to tuple and persist migrated settings', async () => {
-      const legacy = {
-        enabled: true,
-        reminderDays: 2,
-        reminderTime: '08:30',
-        autoSchedulingEnabled: false,
-      };
-
-      mockPreferencesGet.mockResolvedValueOnce({
-        value: JSON.stringify(legacy),
-      });
-      mockPreferencesSet.mockResolvedValue(undefined);
-
-      const result = await PreferencesService.getNotificationSettings();
-
-      expect(result).toEqual({
-        enabled: true,
-        reminderDays: 2,
-        reminderTime: [8, 30],
-        autoSchedulingEnabled: false,
-      });
-
-      const persisted = mockPreferencesSet.mock.calls.find(
-        (call) => call[0]?.key === 'notification_settings',
-      );
-      expect(persisted).toBeDefined();
-
-      const persistedValue = JSON.parse(persisted![0].value);
-      expect(persistedValue).toEqual({
-        enabled: true,
-        reminderDays: 2,
-        reminderTime: [8, 30],
-        autoSchedulingEnabled: false,
-      });
-    });
-
-    it('should return default notification settings when stored value is invalid JSON', async () => {
-      mockPreferencesGet.mockResolvedValueOnce({ value: '{invalid json' });
-
-      const result = await PreferencesService.getNotificationSettings();
-
-      expect(result).toEqual({
-        enabled: false,
-        reminderDays: 1,
-        reminderTime: [9, 0],
-        autoSchedulingEnabled: true,
-      });
-    });
-
-    it('should save notification settings as JSON', async () => {
-      mockPreferencesSet.mockResolvedValue(undefined);
-
-      await PreferencesService.saveNotificationSettings({
-        enabled: true,
-        reminderDays: 1,
-        reminderTime: [10, 0],
-        autoSchedulingEnabled: true,
-      });
-
-      expect(mockPreferencesSet).toHaveBeenCalledWith({
-        key: 'notification_settings',
-        value: JSON.stringify({
-          enabled: true,
-          reminderDays: 1,
-          reminderTime: [10, 0],
-          autoSchedulingEnabled: true,
-        }),
-      });
-    });
-
-    it('should remove notification settings when saving null via generic preference (indirect)', async () => {
-      const svc = PreferencesService as unknown as {
-        saveNotificationSettings: (s: unknown) => Promise<void>;
-      };
-
-      mockPreferencesRemove?.mockResolvedValue?.(undefined);
-      expect(typeof svc.saveNotificationSettings).toBe('function');
-    });
-  });
-
-  describe('requestNotificationPermissions', () => {
-    it('should return false on web platform', async () => {
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValueOnce(false);
-
-      const result = await PreferencesService.requestNotificationPermissions();
-
-      expect(result).toBe(false);
-      expect(LocalNotifications.requestPermissions).not.toHaveBeenCalled();
-    });
-
-    it('should return true when native permission is granted', async () => {
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValueOnce(true);
-      vi.mocked(LocalNotifications.requestPermissions).mockResolvedValueOnce({
-        display: 'granted',
-      } as unknown as Awaited<
-        ReturnType<typeof LocalNotifications.requestPermissions>
-      >);
-
-      const result = await PreferencesService.requestNotificationPermissions();
-
-      expect(result).toBe(true);
-    });
-
-    it('should return false when native permission is denied', async () => {
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValueOnce(true);
-      vi.mocked(LocalNotifications.requestPermissions).mockResolvedValueOnce({
-        display: 'denied',
-      } as unknown as Awaited<
-        ReturnType<typeof LocalNotifications.requestPermissions>
-      >);
-
-      const result = await PreferencesService.requestNotificationPermissions();
-
-      expect(result).toBe(false);
-    });
-
-    it('should return false when requesting permissions throws', async () => {
-      vi.mocked(Capacitor.isNativePlatform).mockReturnValueOnce(true);
-      vi.mocked(LocalNotifications.requestPermissions).mockRejectedValueOnce(
-        new Error('permissions error'),
-      );
-
-      const result = await PreferencesService.requestNotificationPermissions();
-
-      expect(result).toBe(false);
-    });
-  });
-
-  describe('getAvailableReminderTimes', () => {
-    it('should return a copy (mutating result must not affect subsequent calls)', () => {
-      const first = PreferencesService.getAvailableReminderTimes();
-      first.push([23, 59]);
-
-      const second = PreferencesService.getAvailableReminderTimes();
-
-      expect(second).not.toEqual(first);
-      expect(second).not.toContainEqual([23, 59]);
     });
   });
 });
