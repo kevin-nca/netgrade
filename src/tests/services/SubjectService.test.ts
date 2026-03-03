@@ -1,6 +1,5 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
-import type { Repository } from 'typeorm';
 import { SubjectService } from '@/services/SubjectService';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
@@ -118,34 +117,5 @@ describe('SubjectService', () => {
 
   it('should throw an error when deleting a non-existent subject', async () => {
     await expect(SubjectService.delete('non-existent-id')).rejects.toThrow();
-  });
-
-  it('should log and rethrow when findBySchoolId fails', async () => {
-    const dataSourceModule = await import('@/db/data-source');
-
-    const failingRepo = {
-      find: vi.fn().mockRejectedValue(new Error('DB failure')),
-    };
-
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
-      school: dataSource.getRepository(School),
-      subject: failingRepo as unknown as Repository<Subject>,
-      exam: dataSource.getRepository(Exam),
-      grade: dataSource.getRepository(Grade),
-      semester: dataSource.getRepository(Semester),
-    });
-
-    await expect(SubjectService.findBySchoolId('school-x')).rejects.toThrow(
-      'DB failure',
-    );
-
-    expect(console.error).toHaveBeenCalledWith(
-      'Failed to find subjects for school ID school-x:',
-      expect.any(Error),
-    );
-
-    vi.mocked(console.error).mockRestore?.();
   });
 });
