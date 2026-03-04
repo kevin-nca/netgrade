@@ -93,6 +93,7 @@ export const useUpdateSubject = () => {
           queryKey: subjectKeys.semesterSubjects(updatedSubject.semesterId),
         });
       }
+      queryClient.invalidateQueries({ queryKey: subjectKeys.all });
     },
   });
 };

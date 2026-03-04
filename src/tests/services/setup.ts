@@ -216,7 +216,6 @@ export const createMockSubjectWithMissingGrade = (): Subject => {
         id: 'exam2',
         grade: null,
       } as Exam,
-      { id: 'exam2', grade: null } as Exam,
     ],
   } as Subject;
 };
