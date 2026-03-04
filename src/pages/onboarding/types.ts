@@ -1,9 +1,18 @@
-import { School, Subject } from '@/db/entities';
+import { School, Semester, Subject } from '@/db/entities';
 
 export interface OnboardingData {
   userName: string;
+  semesters: Semester[];
   schools: School[];
   subjects: Subject[];
+}
+
+export interface TempSemester {
+  id: string;
+  name: string;
+  startDate: Date;
+  endDate: Date;
+  schoolId: string;
 }
 
 export interface TempSchool {
@@ -20,10 +29,12 @@ export interface TempSubject {
   description?: string | null;
   weight?: number | null;
   schoolId: string;
+  semesterId: string;
 }
 
 export interface OnboardingDataTemp {
   userName: string;
+  semesters: TempSemester[];
   schools: TempSchool[];
   subjects: TempSubject[];
 }

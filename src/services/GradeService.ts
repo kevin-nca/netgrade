@@ -23,7 +23,9 @@ export class GradeService {
         relations: {
           exam: {
             subject: {
-              school: true,
+              semester: {
+                school: true,
+              },
             },
           },
         },
@@ -71,12 +73,12 @@ export class GradeService {
           const newExam = transactionManager.create(Exam, newExamData);
           savedExam = await transactionManager.save(newExam);
         }
+
         const newGradeData: Partial<Grade> = {
           score: payload.score,
           weight: payload.weight,
           comment: payload.comment ?? null,
           date: payload.date,
-          examId: savedExam.id,
         };
         const newGrade = transactionManager.create(Grade, newGradeData);
         const savedGrade = await transactionManager.save(newGrade);
@@ -86,7 +88,9 @@ export class GradeService {
           where: { id: savedGrade.id },
           relations: {
             exam: {
-              subject: true,
+              subject: {
+                semester: true,
+              },
             },
           },
         });
@@ -217,7 +221,11 @@ export class GradeService {
           exam: { subjectId },
         },
         relations: {
-          exam: { subject: true },
+          exam: {
+            subject: {
+              semester: true,
+            },
+          },
         },
       });
     } catch (error) {

@@ -12,6 +12,9 @@ export class SubjectService {
       return await subjectRepo.find({
         order: { name: 'ASC' },
         relations: {
+          semester: {
+            school: true,
+          },
           exams: {
             grade: true,
           },
@@ -22,7 +25,6 @@ export class SubjectService {
       throw error;
     }
   }
-
   /**
    * Adds a new subject to the database
    * @param newSubjectData - The data for the new subject
@@ -30,23 +32,19 @@ export class SubjectService {
    */
   static async add(newSubjectData: {
     name: string;
-    schoolId: string;
+    semesterId: string;
     teacher?: string | null;
-    description?: string | null;
     weight?: number;
-    semesterId?: string | null;
   }): Promise<Subject> {
     try {
       const { subject: subjectRepo } = getRepositories();
+      const newSubject = subjectRepo.create(newSubjectData);
+      await subjectRepo.save(newSubject);
 
-      const semesterId =
-        newSubjectData.semesterId || (await this.getOrCreateDefaultSemester());
-
-      const newSubject = subjectRepo.create({
-        ...newSubjectData,
-        semesterId,
-      });
-      return await subjectRepo.save(newSubject);
+      return (await subjectRepo.findOne({
+        where: { id: newSubject.id },
+        relations: { semester: true },
+      })) as Subject;
     } catch (error) {
       console.error('Failed to add subject:', error);
       throw error;
@@ -130,9 +128,10 @@ export class SubjectService {
     try {
       const { subject: subjectRepo } = getRepositories();
       return await subjectRepo.find({
-        where: { schoolId },
+        where: { semester: { schoolId } },
         order: { name: 'ASC' },
         relations: {
+          semester: true,
           exams: {
             grade: true,
           },
@@ -145,36 +144,5 @@ export class SubjectService {
       );
       throw error;
     }
-  }
-
-  /**
-   * Gets or creates the default semester
-   * @returns Promise<string> - The ID of the default semester
-   */
-  private static async getOrCreateDefaultSemester(): Promise<string> {
-    const { semester: semesterRepo } = getRepositories();
-
-    const defaultSemesterId = 'default-semester-id';
-
-    let defaultSemester = await semesterRepo.findOne({
-      where: { id: defaultSemesterId },
-    });
-
-    if (!defaultSemester) {
-      const currentYear = new Date().getFullYear();
-      const nextYear = currentYear + 1;
-
-      defaultSemester = semesterRepo.create({
-        id: defaultSemesterId,
-        name: `${currentYear}/${nextYear}`,
-        startDate: new Date(`${currentYear}-08-15`),
-        endDate: new Date(`${nextYear}-07-31`),
-      });
-
-      await semesterRepo.save(defaultSemester);
-      console.log(`Created default semester: ${currentYear}/${nextYear}`);
-    }
-
-    return defaultSemester.id;
   }
 }

@@ -17,6 +17,7 @@ export interface AddSemesterPayload {
   name: string;
   startDate: Date;
   endDate: Date;
+  schoolId: string;
 }
 
 // Hooks

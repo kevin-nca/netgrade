@@ -15,8 +15,25 @@ import {
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/features/edit-subject/edit-subject-modal';
-import { SchoolService } from '@/services/SchoolService';
 import './SchoolPage.css';
+
+const calculateSubjectAverage = (subject: Subject): number | undefined => {
+  const grades = subject.exams
+    .map((exam) => exam.grade)
+    .filter((grade) => grade !== null);
+
+  if (grades.length === 0) return undefined;
+
+  const totalScore = grades.reduce(
+    (acc, grade) => acc + grade!.score * grade!.weight,
+    0,
+  );
+  const totalWeight = grades.reduce((acc, grade) => acc + grade!.weight, 0);
+
+  if (totalWeight === 0) return undefined;
+
+  return Number((totalScore / totalWeight).toFixed(2));
+};
 
 const SchoolPage: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -39,29 +56,25 @@ const SchoolPage: React.FC = () => {
   };
 
   const addSubjectToStore = (subjectData: Subject) => {
-    const payload = {
-      name: subjectData.name,
-      schoolId: schoolId,
-      teacher: null,
-      description: null,
-      weight: 1.0,
-    };
+    const defaultSemesterId = school!.semesters[0].id;
 
-    addSubjectMutation.mutate(payload, {
-      onSuccess: () => {
-        setModalOpen(false);
+    addSubjectMutation.mutate(
+      {
+        name: subjectData.name,
+        semesterId: defaultSemesterId,
+        teacher: null,
+        weight: 1.0,
       },
-      onError: (error) => {
-        console.error('Failed to add subject:', error);
+      {
+        onSuccess: () => setModalOpen(false),
+        onError: (error) => console.error('Failed to add subject:', error),
       },
-    });
+    );
   };
 
   const handleRemoveSubject = (subject: Subject) => {
     deleteSubjectMutation.mutate(subject.id, {
-      onError: (error) => {
-        console.error('Failed to remove subject:', error);
-      },
+      onError: (error) => console.error('Failed to remove subject:', error),
     });
   };
 
@@ -84,7 +97,7 @@ const SchoolPage: React.FC = () => {
         <div className="subjects-container">
           {subjects!.length > 0 ? (
             subjects!.map((subject: Subject) => {
-              const average = SchoolService.calculateSubjectAverage(subject);
+              const average = calculateSubjectAverage(subject);
 
               return (
                 <div key={subject.id} className="subject-item-container">
@@ -158,9 +171,8 @@ const SchoolPage: React.FC = () => {
           addToSubjectsOrModules={addSubjectToStore}
           removeFromSubjectsOrModules={(id: string) =>
             deleteSubjectMutation.mutate(id, {
-              onError: (error) => {
-                console.error('Failed to remove subject:', error);
-              },
+              onError: (error) =>
+                console.error('Failed to remove subject:', error),
             })
           }
           availableSubjects={[]}
