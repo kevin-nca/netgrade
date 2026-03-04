@@ -31,8 +31,8 @@ import ProgressBar from './components/progressbar/ProgressBar';
 
 import { OnboardingDataTemp } from './types';
 import './OnboardingPage.css';
+import './components/SharedStepStyles.css';
 
-// Generate unique ID
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 const OnboardingPage: React.FC = () => {
@@ -77,9 +77,9 @@ const OnboardingPage: React.FC = () => {
       case 1:
         return 'Dein Name';
       case 2:
-        return 'Semester';
-      case 3:
         return 'Schulen';
+      case 3:
+        return 'Semester';
       case 4:
         return 'Fächer';
       case 5:
@@ -105,24 +105,9 @@ const OnboardingPage: React.FC = () => {
     setIsCompleting(true);
 
     try {
-      // Save user name
-
       saveUserNameMutation.mutate(data.userName);
 
-      // Save semesters and map temp IDs to real IDs
-      const semesterIdMapping: { [tempId: string]: string } = {};
-
-      for (const semester of data.semesters) {
-        const savedSemester = await addSemesterMutation.mutateAsync({
-          name: semester.name,
-          startDate: semester.startDate,
-          endDate: semester.endDate,
-        });
-
-        semesterIdMapping[semester.id] = savedSemester.id;
-      }
-
-      // Save schools and map temp IDs to real IDs
+      // Save schools first and map temp IDs to real IDs
       const schoolIdMapping: { [tempId: string]: string } = {};
 
       for (const school of data.schools) {
@@ -135,33 +120,52 @@ const OnboardingPage: React.FC = () => {
         schoolIdMapping[school.id] = savedSchool.id;
       }
 
-      // Save subjects with correct schoolId and semesterId references
-      for (const subject of data.subjects) {
-        const realSchoolId = schoolIdMapping[subject.schoolId];
-        const realSemesterId = semesterIdMapping[subject.semesterId];
+      // Save semesters and map temp IDs to real IDs (requires schoolId)
+      const semesterIdMapping: { [tempId: string]: string } = {};
+
+      for (const semester of data.semesters) {
+        const realSchoolId = schoolIdMapping[semester.schoolId];
 
         if (!realSchoolId) {
-          throw new Error(
-            `Could not find real school ID for subject: ${subject.name}`,
+          showToastMessage(
+            'Fehler beim Speichern: Schule für Semester konnte nicht zugeordnet werden.',
+            'danger',
           );
+          setIsCompleting(false);
+          return;
         }
+
+        const savedSemester = await addSemesterMutation.mutateAsync({
+          name: semester.name,
+          startDate: semester.startDate,
+          endDate: semester.endDate,
+          schoolId: realSchoolId,
+        });
+
+        semesterIdMapping[semester.id] = savedSemester.id;
+      }
+
+      // Save subjects with correct semesterId reference (schoolId is derived from semester)
+      for (const subject of data.subjects) {
+        const realSemesterId = semesterIdMapping[subject.semesterId];
 
         if (!realSemesterId) {
-          throw new Error(
-            `Could not find real semester ID for subject: ${subject.name}`,
+          showToastMessage(
+            `Fehler beim Speichern: Semester für Fach "${subject.name}" konnte nicht zugeordnet werden.`,
+            'danger',
           );
+          setIsCompleting(false);
+          return;
         }
 
-        addSubjectMutation.mutate({
+        await addSubjectMutation.mutateAsync({
           name: subject.name,
-          schoolId: realSchoolId,
           semesterId: realSemesterId,
           teacher: subject.teacher || null,
-          description: subject.description || null,
+          weight: subject.weight ?? undefined,
         });
       }
 
-      // Mark onboarding as complete
       setOnboardingCompletedMutation.mutate(true);
 
       setTimeout(() => {
@@ -179,7 +183,6 @@ const OnboardingPage: React.FC = () => {
 
   return (
     <IonPage className="onboarding-page">
-      {/* Header - only show for steps 1+ */}
       {currentStep > 0 && (
         <IonHeader className="onboarding-header">
           <IonToolbar className="onboarding-toolbar">
@@ -214,21 +217,23 @@ const OnboardingPage: React.FC = () => {
             <NameStep data={data} setData={setData} onNext={handleNextStep} />
           )}
           {currentStep === 2 && (
-            <SemesterStep
-              data={data}
-              setData={setData}
-              selectedSemesterId={selectedSemesterId}
-              setSelectedSemesterId={setSelectedSemesterId}
-              generateId={generateId}
-              onNext={handleNextStep}
-            />
-          )}
-          {currentStep === 3 && (
             <SchoolStep
               data={data}
               setData={setData}
               selectedSchoolId={selectedSchoolId}
               setSelectedSchoolId={setSelectedSchoolId}
+              generateId={generateId}
+              onNext={handleNextStep}
+            />
+          )}
+          {currentStep === 3 && (
+            <SemesterStep
+              data={data}
+              setData={setData}
+              selectedSchoolId={selectedSchoolId}
+              setSelectedSchoolId={setSelectedSchoolId}
+              selectedSemesterId={selectedSemesterId}
+              setSelectedSemesterId={setSelectedSemesterId}
               generateId={generateId}
               onNext={handleNextStep}
             />

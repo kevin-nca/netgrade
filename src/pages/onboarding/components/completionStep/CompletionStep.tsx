@@ -9,6 +9,7 @@ import {
 } from 'ionicons/icons';
 import { OnboardingDataTemp } from '../../types';
 import './CompletionStep.css';
+import '../SharedStepStyles.css';
 
 interface CompletionStepProps {
   data: OnboardingDataTemp;

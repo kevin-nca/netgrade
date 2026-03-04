@@ -20,9 +20,6 @@ export class Grade extends BaseEntity {
   })
   date!: Date;
 
-  @Column({ type: 'uuid', nullable: true })
-  examId!: string | null;
-
   @OneToOne(() => Exam, (exam) => exam.grade, {
     nullable: false,
   })

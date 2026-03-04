@@ -5,6 +5,7 @@ import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Grade } from '@/db/entities/Grade';
 import { Exam } from '@/db/entities/Exam';
 import { School, Subject } from '@/db/entities';
+import { Semester } from '../../db/entities';
 
 describe('GradeService', () => {
   let dataSource: DataSource;
@@ -22,6 +23,7 @@ describe('GradeService', () => {
       subject: dataSource.getRepository(Subject),
       exam: dataSource.getRepository(Exam),
       grade: dataSource.getRepository(Grade),
+      semester: dataSource.getRepository(Semester),
     });
 
     // Also mock the getDataSource function to return our test dataSource
