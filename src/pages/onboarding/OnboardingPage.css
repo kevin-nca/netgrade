@@ -12,6 +12,11 @@
   min-height: 100vh;
 }
 
+.back-icon {
+  font-size: 20px;
+  color: #000000;
+}
+
 .onboarding-header {
   background: linear-gradient(
     135deg,
@@ -34,9 +39,6 @@
 }
 
 .back-button {
-  --color: #000000;
-  --background-hover: rgba(0, 0, 0, 0.05);
-  --border-radius: 12px;
   margin-left: 8px;
   width: 40px;
   height: 40px;
@@ -46,10 +48,6 @@
 
 .back-button:active {
   transform: scale(0.95);
-}
-
-.back-icon {
-  font-size: 20px;
 }
 
 .onboarding-title {
@@ -153,11 +151,6 @@
   position: relative;
 }
 
-.step-icon {
-  font-size: 28px;
-  color: #ffffff;
-}
-
 .step-text {
   flex: 1;
 }
@@ -252,9 +245,9 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .back-button {
-    --color: #ffffff;
-    --background-hover: rgba(255, 255, 255, 0.1);
+  .back-icon {
+    color: #ffffff;
+    font-size: 20px;
   }
 
   .onboarding-title {

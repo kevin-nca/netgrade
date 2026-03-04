@@ -18,6 +18,7 @@ import {
   TempSemester,
 } from '../../types';
 import './SubjectStep.css';
+import '../SharedStepStyles.css';
 
 interface SubjectStepProps {
   data: OnboardingDataTemp;

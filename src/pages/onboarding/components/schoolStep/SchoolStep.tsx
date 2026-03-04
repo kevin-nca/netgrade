@@ -17,6 +17,7 @@ import {
 } from 'ionicons/icons';
 import { OnboardingDataTemp, TempSchool, SCHOOL_TYPES } from '../../types';
 import './SchoolStep.css';
+import '../SharedStepStyles.css';
 
 interface SchoolStepProps {
   data: OnboardingDataTemp;

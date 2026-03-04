@@ -8,6 +8,7 @@ import {
   heartOutline,
 } from 'ionicons/icons';
 import './WelcomeScreen.css';
+import '../SharedStepStyles.css';
 
 interface WelcomeScreenProps {
   onNext: () => void;

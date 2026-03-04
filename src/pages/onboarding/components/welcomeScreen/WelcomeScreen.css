@@ -96,21 +96,25 @@
   left: 15%;
   animation-delay: 0s;
 }
+
 .dot-2 {
   top: 15%;
   right: 25%;
   animation-delay: 1s;
 }
+
 .dot-3 {
   top: 70%;
   left: 20%;
   animation-delay: 2s;
 }
+
 .dot-4 {
   top: 40%;
   right: 30%;
   animation-delay: 3s;
 }
+
 .dot-5 {
   top: 80%;
   right: 15%;
@@ -271,9 +275,11 @@
 .card-1 {
   animation-delay: 0s;
 }
+
 .card-2 {
   animation-delay: 1s;
 }
+
 .card-3 {
   animation-delay: 2s;
 }
@@ -300,16 +306,13 @@
 .card-1 .feature-icon-wrapper {
   background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
 }
+
 .card-2 .feature-icon-wrapper {
   background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
 }
+
 .card-3 .feature-icon-wrapper {
   background: linear-gradient(135deg, #45b7d1 0%, #96c93d 100%);
-}
-
-.feature-icon {
-  font-size: 20px;
-  color: #ffffff;
 }
 
 .feature-card span {
@@ -398,19 +401,6 @@
    DARK MODE
 ========================= */
 @media (prefers-color-scheme: dark) {
-  .hero-title,
-  .hero-subtitle {
-    color: #ffffff;
-  }
-
-  .hero-description {
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  .welcome-promise {
-    color: rgba(255, 255, 255, 0.6);
-  }
-
   /* Feature Cards Dark Mode */
   .feature-card {
     background: linear-gradient(
@@ -420,10 +410,6 @@
     );
     border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  }
-
-  .feature-card span {
-    color: #ffffff;
   }
 }
 
