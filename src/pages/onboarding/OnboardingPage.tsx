@@ -77,9 +77,9 @@ const OnboardingPage: React.FC = () => {
       case 1:
         return 'Dein Name';
       case 2:
-        return 'Semester';
-      case 3:
         return 'Schulen';
+      case 3:
+        return 'Semester';
       case 4:
         return 'Fächer';
       case 5:
@@ -124,7 +124,7 @@ const OnboardingPage: React.FC = () => {
       const semesterIdMapping: { [tempId: string]: string } = {};
 
       for (const semester of data.semesters) {
-        const realSchoolId = schoolIdMapping[selectedSchoolId];
+        const realSchoolId = schoolIdMapping[semester.schoolId];
 
         if (!realSchoolId) {
           showToastMessage(
@@ -217,21 +217,23 @@ const OnboardingPage: React.FC = () => {
             <NameStep data={data} setData={setData} onNext={handleNextStep} />
           )}
           {currentStep === 2 && (
-            <SemesterStep
-              data={data}
-              setData={setData}
-              selectedSemesterId={selectedSemesterId}
-              setSelectedSemesterId={setSelectedSemesterId}
-              generateId={generateId}
-              onNext={handleNextStep}
-            />
-          )}
-          {currentStep === 3 && (
             <SchoolStep
               data={data}
               setData={setData}
               selectedSchoolId={selectedSchoolId}
               setSelectedSchoolId={setSelectedSchoolId}
+              generateId={generateId}
+              onNext={handleNextStep}
+            />
+          )}
+          {currentStep === 3 && (
+            <SemesterStep
+              data={data}
+              setData={setData}
+              selectedSchoolId={selectedSchoolId}
+              setSelectedSchoolId={setSelectedSchoolId}
+              selectedSemesterId={selectedSemesterId}
+              setSelectedSemesterId={setSelectedSemesterId}
               generateId={generateId}
               onNext={handleNextStep}
             />

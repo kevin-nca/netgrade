@@ -69,6 +69,7 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
     setData((prev) => ({
       ...prev,
       schools: prev.schools.filter((s) => s.id !== schoolId),
+      semesters: prev.semesters.filter((s) => s.schoolId !== schoolId),
       subjects: prev.subjects.filter((s) => s.schoolId !== schoolId),
     }));
     if (selectedSchoolId === schoolId) {

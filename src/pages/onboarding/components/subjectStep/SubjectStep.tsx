@@ -45,10 +45,21 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
       data.schools[0] ||
       null,
   );
+
+  const initialSchool =
+    data.schools.find((s) => s.id === selectedSchoolId) ||
+    data.schools[0] ||
+    null;
+  const initialSemester =
+    data.semesters.find(
+      (s) =>
+        s.id === selectedSemesterId && s.schoolId === (initialSchool?.id ?? ''),
+    ) ||
+    data.semesters.find((s) => s.schoolId === (initialSchool?.id ?? '')) ||
+    null;
+
   const [selectedSemester, setSelectedSemester] = useState<TempSemester | null>(
-    data.semesters.find((s) => s.id === selectedSemesterId) ||
-      data.semesters[0] ||
-      null,
+    initialSemester,
   );
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -85,7 +96,17 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
   useEffect(() => {
     if (selectedSchool) {
       setSelectedSchoolId(selectedSchool.id);
+      const firstSemesterOfSchool = data.semesters.find(
+        (s) => s.schoolId === selectedSchool.id,
+      );
+      if (
+        firstSemesterOfSchool &&
+        selectedSemester?.schoolId !== selectedSchool.id
+      ) {
+        setSelectedSemester(firstSemesterOfSchool);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSchool, setSelectedSchoolId]);
 
   useEffect(() => {
@@ -139,36 +160,39 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
 
       <div className="step-body">
         {/* Semester Selector */}
-        {data.semesters.length > 1 && (
+        {data.semesters.filter((s) => s.schoolId === selectedSchool?.id)
+          .length > 1 && (
           <div className="semester-selector">
             <h3 className="subsection-title">Semester auswählen</h3>
             <div className="semesters-grid">
-              {data.semesters.map((semester, index) => (
-                <div
-                  key={semester.id}
-                  className={`glass-card semester-selector-item ${semester.id === selectedSemester!.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedSemester(semester)}
-                >
-                  <div className={`semester-avatar semester-${index % 4}`}>
-                    <IonIcon icon={calendarOutline} />
+              {data.semesters
+                .filter((s) => s.schoolId === selectedSchool?.id)
+                .map((semester, index) => (
+                  <div
+                    key={semester.id}
+                    className={`glass-card semester-selector-item ${semester.id === selectedSemester!.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedSemester(semester)}
+                  >
+                    <div className={`semester-avatar semester-${index % 4}`}>
+                      <IonIcon icon={calendarOutline} />
+                    </div>
+                    <div className="semester-selector-info">
+                      <span className="semester-selector-name">
+                        {semester.name}
+                      </span>
+                      <span className="semester-selector-dates">
+                        {formatDate(semester.startDate)} -{' '}
+                        {formatDate(semester.endDate)}
+                      </span>
+                    </div>
+                    {semester.id === selectedSemester!.id && (
+                      <IonIcon
+                        icon={checkmarkCircleOutline}
+                        className="selected-icon"
+                      />
+                    )}
                   </div>
-                  <div className="semester-selector-info">
-                    <span className="semester-selector-name">
-                      {semester.name}
-                    </span>
-                    <span className="semester-selector-dates">
-                      {formatDate(semester.startDate)} -{' '}
-                      {formatDate(semester.endDate)}
-                    </span>
-                  </div>
-                  {semester.id === selectedSemester!.id && (
-                    <IonIcon
-                      icon={checkmarkCircleOutline}
-                      className="selected-icon"
-                    />
-                  )}
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         )}
