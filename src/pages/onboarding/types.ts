@@ -12,6 +12,7 @@ export interface TempSemester {
   name: string;
   startDate: Date;
   endDate: Date;
+  schoolId: string;
 }
 
 export interface TempSchool {

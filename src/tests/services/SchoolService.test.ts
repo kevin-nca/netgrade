@@ -15,7 +15,7 @@ import {
   createMockSubjectWithMissingGrade,
 } from './setup';
 import { School } from '@/db/entities/School';
-import { Exam, Grade, Subject } from '@/db/entities';
+import { Exam, Grade, Semester, Subject } from '@/db/entities';
 
 describe('SchoolService', () => {
   let dataSource: DataSource;
@@ -33,6 +33,7 @@ describe('SchoolService', () => {
       subject: dataSource.getRepository(Subject),
       exam: dataSource.getRepository(Exam),
       grade: dataSource.getRepository(Grade),
+      semester: dataSource.getRepository(Semester),
     });
 
     testData = await seedTestData(dataSource);
@@ -67,6 +68,9 @@ describe('SchoolService', () => {
     expect(newSchool.name).toBe(newSchoolData.name);
     expect(newSchool.type).toBe(newSchoolData.type);
     expect(newSchool.address).toBe(newSchoolData.address);
+    // Verify default semester was created
+    expect(newSchool.semesters).toBeDefined();
+    expect(newSchool.semesters.length).toBe(1);
 
     // Verify the school was actually added to the database
     const schools = await SchoolService.fetchAll();

@@ -5,6 +5,7 @@ import {
   addOutline,
   trashOutline,
   arrowForward,
+  checkmarkCircleOutline,
 } from 'ionicons/icons';
 import { OnboardingDataTemp, TempSemester } from '../../types';
 import './SemesterStep.css';
@@ -14,6 +15,8 @@ import '../SharedStepStyles.css';
 interface SemesterStepProps {
   data: OnboardingDataTemp;
   setData: React.Dispatch<React.SetStateAction<OnboardingDataTemp>>;
+  selectedSchoolId: string;
+  setSelectedSchoolId: React.Dispatch<React.SetStateAction<string>>;
   selectedSemesterId: string;
   setSelectedSemesterId: React.Dispatch<React.SetStateAction<string>>;
   generateId: () => string;
@@ -23,6 +26,8 @@ interface SemesterStepProps {
 const SemesterStep: React.FC<SemesterStepProps> = ({
   data,
   setData,
+  selectedSchoolId,
+  setSelectedSchoolId,
   selectedSemesterId,
   setSelectedSemesterId,
   generateId,
@@ -41,11 +46,13 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
       })(),
     },
     onSubmit: async ({ value }) => {
+      const schoolId = selectedSchoolId || data.schools[0]?.id || '';
       const semester: TempSemester = {
         id: generateId(),
         name: value.name.trim(),
         startDate: new Date(value.startDate),
         endDate: new Date(value.endDate),
+        schoolId,
       };
 
       setData((prev) => ({
@@ -133,6 +140,35 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
               <h3 className="form-title">Neues Semester erstellen</h3>
 
               <div className="form-fields">
+                {data.schools.length > 1 && (
+                  <div className="field-group">
+                    <label className="field-label">Schule *</label>
+                    <div className="schools-grid">
+                      {data.schools.map((school, index) => (
+                        <div
+                          key={school.id}
+                          className={`glass-card school-selector-item ${school.id === (selectedSchoolId || data.schools[0]?.id) ? 'selected' : ''}`}
+                          onClick={() => setSelectedSchoolId(school.id)}
+                        >
+                          <div className={`school-avatar school-${index % 4}`}>
+                            {school.name.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="school-selector-name">
+                            {school.name}
+                          </span>
+                          {school.id ===
+                            (selectedSchoolId || data.schools[0]?.id) && (
+                            <IonIcon
+                              icon={checkmarkCircleOutline}
+                              className="selected-icon"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <form.Field name="name">
                   {(field) => (
                     <div className="field-group">
@@ -258,8 +294,17 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
                     <div className="semester-info">
                       <h4 className="semester-name">{semester.name}</h4>
                       <p className="semester-details">
-                        {formatDate(semester.startDate)} -{' '}
+                        {formatDate(semester.startDate)} –{' '}
                         {formatDate(semester.endDate)}
+                        {data.schools.length > 1 && (
+                          <>
+                            {' '}
+                            •{' '}
+                            {data.schools.find(
+                              (s) => s.id === semester.schoolId,
+                            )?.name ?? ''}
+                          </>
+                        )}
                       </p>
                     </div>
                     <IonButton

@@ -1,6 +1,6 @@
 import { Entity, Column, OneToMany } from 'typeorm';
 import { BaseEntity } from './BaseEntity';
-import { Subject } from './Subject';
+import { Semester } from './Semester';
 
 @Entity('school')
 export class School extends BaseEntity {
@@ -13,6 +13,6 @@ export class School extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   type!: string | null;
 
-  @OneToMany(() => Subject, (subject) => subject.school, { cascade: true })
-  subjects!: Subject[];
+  @OneToMany(() => Semester, (semester) => semester.school, { cascade: true })
+  semesters!: Semester[];
 }
