@@ -63,7 +63,7 @@ export const AddSemesterForm: React.FC<AddSemesterFormProps> = ({
 
         <form.AppField name="schoolId">
           {(field) => (
-            <field.SemesterSchoolSelectField label="Schule" schools={schools} />
+            <field.SchoolSelectField label="Schule" schools={schools} />
           )}
         </form.AppField>
 

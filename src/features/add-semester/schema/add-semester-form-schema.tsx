@@ -5,7 +5,9 @@ export const semesterFormSchema = z
     semesterName: z.string().min(1, 'Bitte gib einen Semesternamen ein'),
     startDate: z.string().min(1, 'Bitte wähle ein Startdatum'),
     endDate: z.string().min(1, 'Bitte wähle ein Enddatum'),
-    schoolId: z.string().min(1, 'Bitte wähle eine Schule aus'),
+    schoolId: z.any().refine((val) => val !== null && val !== undefined, {
+      message: 'Bitte wähle eine Schule aus',
+    }),
   })
   .refine((data) => data.endDate >= data.startDate, {
     message: 'Das Enddatum muss nach dem Startdatum liegen',
