@@ -12,7 +12,6 @@ import { EditExamSubjectSelectField } from '@/features/edit-exam/fields/edit-exa
 import { AddSchoolField } from '@/features/add-school/fields/add-school-field';
 import { EditSubjectField } from '@/features/edit-subject/fields/edit-subject-field';
 import { AddSemesterNameField } from '@/features/add-semester/fields/add-semester-name-field';
-import { SemesterSchoolSelectField } from '@/features/add-semester/fields/semester-school-select-field';
 export const { fieldContext, formContext, useFieldContext } =
   createFormHookContexts();
 
@@ -32,7 +31,6 @@ const { useAppForm, withForm } = createFormHook({
     AddSchoolField,
     EditSubjectField,
     AddSemesterNameField,
-    SemesterSchoolSelectField,
   },
   formComponents: {},
 });
