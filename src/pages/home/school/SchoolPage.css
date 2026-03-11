@@ -1,6 +1,7 @@
 .subjects-container {
   padding-left: 16px;
   padding-right: 16px;
+  padding-top: 8px;
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -189,8 +190,7 @@
   line-height: 1.3;
 }
 
-/* Semester Selector */
-.semester-selector {
+.school-semester-selector {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,7 +198,7 @@
   padding: 20px 24px 8px;
 }
 
-.semester-name {
+.school-semester-name {
   font-size: 15px;
   font-weight: 600;
   min-width: 130px;
@@ -207,7 +207,7 @@
   letter-spacing: -0.3px;
 }
 
-.semester-arrow {
+.school-semester-arrow {
   background: rgba(0, 122, 255, 0.1);
   border: none;
   cursor: pointer;
@@ -223,12 +223,12 @@
   flex-shrink: 0;
 }
 
-.semester-arrow:active {
+.school-semester-arrow:active {
   transform: scale(0.88);
   background: rgba(0, 122, 255, 0.2);
 }
 
-.semester-arrow:disabled {
+.school-semester-arrow:disabled {
   background: rgba(0, 0, 0, 0.06);
   color: rgba(0, 0, 0, 0.2);
   cursor: default;
@@ -267,20 +267,20 @@
     color: rgba(255, 255, 255, 0.8);
   }
 
-  .semester-name {
+  .school-semester-name {
     color: #ffffff;
   }
 
-  .semester-arrow {
+  .school-semester-arrow {
     background: rgba(0, 122, 255, 0.15);
     color: #007aff;
   }
 
-  .semester-arrow:active {
+  .school-semester-arrow:active {
     background: rgba(0, 122, 255, 0.28);
   }
 
-  .semester-arrow:disabled {
+  .school-semester-arrow:disabled {
     background: rgba(255, 255, 255, 0.08);
     color: rgba(255, 255, 255, 0.2);
   }
@@ -289,7 +289,7 @@
 @media (prefers-reduced-motion: reduce) {
   .subject-item,
   .subject-action-button,
-  .semester-arrow {
+  .school-semester-arrow {
     transition: none !important;
   }
 }

@@ -107,17 +107,17 @@ const SchoolPage: React.FC = () => {
         }
       />
       <IonContent>
-        <div className="semester-selector">
+        <div className="school-semester-selector">
           <button
-            className="semester-arrow"
+            className="school-semester-arrow"
             onClick={() => setActiveSemesterIndex((i) => i - 1)}
             disabled={activeSemesterIndex === 0}
           >
             <IonIcon icon={chevronBack} />
           </button>
-          <span className="semester-name">{activeSemester?.name ?? '—'}</span>
+          <span className="school-semester-name">{activeSemester?.name ?? '—'}</span>
           <button
-            className="semester-arrow"
+            className="school-semester-arrow"
             onClick={() => setActiveSemesterIndex((i) => i + 1)}
             disabled={activeSemesterIndex === semesters.length - 1}
           >
