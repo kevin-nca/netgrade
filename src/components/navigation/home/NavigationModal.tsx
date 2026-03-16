@@ -40,10 +40,9 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
       onDidDismiss={handleDismiss}
       breakpoints={[0, 0.5, 1]}
       initialBreakpoint={0.8}
-      className="nav-modal"
     >
       <Header title={'Eintragen'} backButton={false}></Header>
-      <IonContent className="nav-modal-content">
+      <IonContent>
         <div className="nav-modal-list">
           <IonItem
             button
