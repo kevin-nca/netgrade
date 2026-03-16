@@ -101,6 +101,9 @@ const SchoolPage: React.FC = () => {
 
     if (!confirmed) return;
     deleteSemesterMutation.mutate(semester.id, {
+      onSuccess: () => {
+        setActiveSemesterIndex((i) => Math.max(0, i - 1));
+      },
       onError: (error) => console.error('Failed to remove semester:', error),
     });
   };
@@ -142,6 +145,8 @@ const SchoolPage: React.FC = () => {
           <button
             className="school-semester-delete"
             disabled={semesters.length <= 1}
+            aria-label="Semester löschen"
+            title="Semester löschen"
             onClick={(e) => {
               e.stopPropagation();
               handleRemoveSemester(semesters[activeSemesterIndex]);
