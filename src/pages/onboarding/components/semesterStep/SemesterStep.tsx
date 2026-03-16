@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/react';
+import { IonButton, IonIcon } from '@ionic/react';
 import {
   calendarOutline,
   addOutline,
@@ -171,84 +171,17 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
                   </div>
                 )}
 
-                <form.Field name="name">
-                  {(field) => (
-                    <div className="field-group">
-                      <label className="field-label">Semester Name *</label>
-                      <div className="input-wrapper glass-input">
-                        <IonItem lines="none" className="input-item">
-                          <div slot="start" className="input-icon-wrapper">
-                            <IonIcon
-                              icon={calendarOutline}
-                              className="input-icon"
-                            />
-                          </div>
-                          <IonInput
-                            value={field.state.value}
-                            placeholder="z.B. HS 2024 oder 1. Semester"
-                            onIonChange={(e) =>
-                              field.handleChange(e.detail.value || '')
-                            }
-                            className="input-field"
-                            clearInput
-                          />
-                        </IonItem>
-                      </div>
-                    </div>
-                  )}
-                </form.Field>
+                <form.AppField name="name">
+                  {(field) => <field.NameField label="Semester Name" />}
+                </form.AppField>
 
-                <form.Field name="startDate">
-                  {(field) => (
-                    <div className="field-group">
-                      <label className="field-label">Startdatum *</label>
-                      <div className="input-wrapper glass-input">
-                        <IonItem lines="none" className="input-item">
-                          <div slot="start" className="input-icon-wrapper">
-                            <IonIcon
-                              icon={calendarOutline}
-                              className="input-icon"
-                            />
-                          </div>
-                          <IonInput
-                            type="date"
-                            value={field.state.value}
-                            onIonChange={(e) =>
-                              field.handleChange(e.detail.value || '')
-                            }
-                            className="input-field"
-                          />
-                        </IonItem>
-                      </div>
-                    </div>
-                  )}
-                </form.Field>
+                <form.AppField name="startDate">
+                  {(field) => <field.DateField label="Startdatum" />}
+                </form.AppField>
 
-                <form.Field name="endDate">
-                  {(field) => (
-                    <div className="field-group">
-                      <label className="field-label">Enddatum *</label>
-                      <div className="input-wrapper glass-input">
-                        <IonItem lines="none" className="input-item">
-                          <div slot="start" className="input-icon-wrapper">
-                            <IonIcon
-                              icon={calendarOutline}
-                              className="input-icon"
-                            />
-                          </div>
-                          <IonInput
-                            type="date"
-                            value={field.state.value}
-                            onIonChange={(e) =>
-                              field.handleChange(e.detail.value || '')
-                            }
-                            className="input-field"
-                          />
-                        </IonItem>
-                      </div>
-                    </div>
-                  )}
-                </form.Field>
+                <form.AppField name="endDate">
+                  {(field) => <field.DateField label="Enddatum" />}
+                </form.AppField>
               </div>
 
               <div className="form-actions">

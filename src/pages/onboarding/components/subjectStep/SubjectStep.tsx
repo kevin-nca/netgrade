@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/react';
+import { IonButton, IonIcon } from '@ionic/react';
 import {
   bookOutline,
   addOutline,
@@ -15,7 +15,6 @@ import {
   TempSemester,
 } from '../../types';
 import { useAppForm } from '@/shared/components/form';
-import { personOutline } from 'ionicons/icons';
 import './SubjectStep.css';
 import '../SharedStepStyles.css';
 
@@ -238,59 +237,13 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                   <h3 className="form-title">Neues Fach erstellen</h3>
 
                   <div className="form-fields">
-                    <form.Field name="name">
-                      {(field) => (
-                        <div className="field-group">
-                          <label className="field-label">Fachname *</label>
-                          <div className="input-wrapper glass-input">
-                            <IonItem lines="none" className="input-item">
-                              <div slot="start" className="input-icon-wrapper">
-                                <IonIcon
-                                  icon={bookOutline}
-                                  className="input-icon"
-                                />
-                              </div>
-                              <IonInput
-                                value={field.state.value}
-                                placeholder="z.B. Mathematik"
-                                onIonInput={(e) =>
-                                  field.handleChange(e.detail.value || '')
-                                }
-                                className="input-field"
-                                clearInput
-                              />
-                            </IonItem>
-                          </div>
-                        </div>
-                      )}
-                    </form.Field>
+                    <form.AppField name="name">
+                      {(field) => <field.SubjectNameField label="Fachname" />}
+                    </form.AppField>
 
-                    <form.Field name="teacher">
-                      {(field) => (
-                        <div className="field-group">
-                          <label className="field-label">Lehrer/in</label>
-                          <div className="input-wrapper glass-input">
-                            <IonItem lines="none" className="input-item">
-                              <div slot="start" className="input-icon-wrapper">
-                                <IonIcon
-                                  icon={personOutline}
-                                  className="input-icon"
-                                />
-                              </div>
-                              <IonInput
-                                value={field.state.value}
-                                placeholder="z.B. Frau Schmidt"
-                                onIonInput={(e) =>
-                                  field.handleChange(e.detail.value || '')
-                                }
-                                className="input-field"
-                                clearInput
-                              />
-                            </IonItem>
-                          </div>
-                        </div>
-                      )}
-                    </form.Field>
+                    <form.AppField name="teacher">
+                      {(field) => <field.TeacherField label="Lehrer/in" />}
+                    </form.AppField>
                   </div>
 
                   <div className="form-actions">

@@ -1,11 +1,7 @@
 import React from 'react';
 import { useAppForm } from '@/shared/components/form';
-import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/react';
-import {
-  personCircleOutline,
-  createOutline,
-  arrowForward,
-} from 'ionicons/icons';
+import { IonButton, IonIcon } from '@ionic/react';
+import { personCircleOutline, arrowForward } from 'ionicons/icons';
 import { OnboardingDataTemp } from '../../types';
 import './NameStep.css';
 import '../SharedStepStyles.css';
@@ -45,28 +41,9 @@ const NameStep: React.FC<NameStepProps> = ({ data, setData, onNext }) => {
       <div className="step-body">
         <div className="glass-card input-card">
           <div className="input-section">
-            <form.Field name="userName">
-              {(field) => (
-                <div className="input-wrapper glass-input">
-                  <IonItem lines="none" className="input-item">
-                    <div slot="start" className="input-icon-wrapper">
-                      <IonIcon icon={createOutline} className="input-icon" />
-                    </div>
-                    <IonInput
-                      value={field.state.value}
-                      placeholder="Dein Vorname..."
-                      onIonInput={(e) =>
-                        field.handleChange(e.detail.value || '')
-                      }
-                      className="input-field"
-                      clearInput
-                      autoFocus
-                      maxlength={32}
-                    />
-                  </IonItem>
-                </div>
-              )}
-            </form.Field>
+            <form.AppField name="userName">
+              {(field) => <field.NameField label="Dein Name" />}
+            </form.AppField>
 
             <div className="input-hint">
               <p>Keine Sorge, nur du siehst diese Information.</p>

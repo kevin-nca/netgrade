@@ -1,21 +1,13 @@
 import React, { useState } from 'react';
 import { useAppForm } from '@/shared/components/form';
-import {
-  IonButton,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonSelect,
-  IonSelectOption,
-} from '@ionic/react';
+import { IonButton, IonIcon } from '@ionic/react';
 import {
   schoolOutline,
   addOutline,
   trashOutline,
-  businessOutline,
   arrowForward,
 } from 'ionicons/icons';
-import { OnboardingDataTemp, TempSchool, SCHOOL_TYPES } from '../../types';
+import { OnboardingDataTemp, TempSchool } from '../../types';
 import './SchoolStep.css';
 import '../SharedStepStyles.css';
 
@@ -115,65 +107,13 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
                 <h3 className="form-title">Neue Schule erstellen</h3>
 
                 <div className="form-fields">
-                  <form.Field name="name">
-                    {(field) => (
-                      <div className="field-group">
-                        <label className="field-label">Schulname *</label>
-                        <div className="input-wrapper glass-input">
-                          <IonItem lines="none" className="input-item">
-                            <div slot="start" className="input-icon-wrapper">
-                              <IonIcon
-                                icon={schoolOutline}
-                                className="input-icon"
-                              />
-                            </div>
-                            <IonInput
-                              value={field.state.value}
-                              placeholder="z.B. BBW"
-                              onIonChange={(e) =>
-                                field.handleChange(e.detail.value || '')
-                              }
-                              className="input-field"
-                              clearInput
-                            />
-                          </IonItem>
-                        </div>
-                      </div>
-                    )}
-                  </form.Field>
+                  <form.AppField name="name">
+                    {(field) => <field.AddSchoolField label="Schulname" />}
+                  </form.AppField>
 
-                  <form.Field name="type">
-                    {(field) => (
-                      <div className="field-group">
-                        <label className="field-label">Schultyp</label>
-                        <div className="input-wrapper glass-input">
-                          <IonItem lines="none" className="input-item">
-                            <div slot="start" className="input-icon-wrapper">
-                              <IonIcon
-                                icon={businessOutline}
-                                className="input-icon"
-                              />
-                            </div>
-                            <IonSelect
-                              value={field.state.value}
-                              placeholder="Wähle den Schultyp"
-                              onIonChange={(e) =>
-                                field.handleChange(e.detail.value)
-                              }
-                              className="input-field"
-                              interface="popover"
-                            >
-                              {SCHOOL_TYPES.map((type) => (
-                                <IonSelectOption key={type} value={type}>
-                                  {type}
-                                </IonSelectOption>
-                              ))}
-                            </IonSelect>
-                          </IonItem>
-                        </div>
-                      </div>
-                    )}
-                  </form.Field>
+                  <form.AppField name="type">
+                    {(field) => <field.SchoolTypeField label="Schultyp" />}
+                  </form.AppField>
                 </div>
 
                 <div className="form-actions">
