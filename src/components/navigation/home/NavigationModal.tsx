@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useRef } from 'react';
 import { IonContent, IonItem, IonLabel, IonModal } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import Header from '@/components/Header/Header';
+import './NavigationModal.css';
 
 interface SlideUpProps {
   isOpen: boolean;
@@ -39,15 +40,28 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
       onDidDismiss={handleDismiss}
       breakpoints={[0, 0.5, 1]}
       initialBreakpoint={0.8}
+      className="nav-modal"
     >
       <Header title={'Eintragen'} backButton={false}></Header>
-      <IonContent>
-        <IonItem button onClick={goToTab2}>
-          <IonLabel>Note</IonLabel>
-        </IonItem>
-        <IonItem button onClick={goToTab3}>
-          <IonLabel>Anstehende Prüfung</IonLabel>
-        </IonItem>
+      <IonContent className="nav-modal-content">
+        <div className="nav-modal-list">
+          <IonItem
+            button
+            onClick={goToTab2}
+            className="nav-modal-item"
+            lines="none"
+          >
+            <IonLabel>Note</IonLabel>
+          </IonItem>
+          <IonItem
+            button
+            onClick={goToTab3}
+            className="nav-modal-item"
+            lines="none"
+          >
+            <IonLabel>Anstehende Prüfung</IonLabel>
+          </IonItem>
+        </div>
       </IonContent>
     </IonModal>
   );
