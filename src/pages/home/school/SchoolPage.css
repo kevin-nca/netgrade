@@ -193,9 +193,9 @@
 .school-semester-selector {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 16px;
   padding: 20px 24px 8px;
+  justify-content: center;
 }
 
 .school-semester-name {
@@ -233,6 +233,18 @@
   color: rgba(0, 0, 0, 0.2);
   cursor: default;
   transform: none;
+}
+
+.school-semester-delete {
+  position: absolute;
+  right: 24px;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  color: #ff3b30;
+  font-size: 20px;
 }
 
 @media (prefers-color-scheme: dark) {
