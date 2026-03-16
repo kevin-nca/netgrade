@@ -15,6 +15,8 @@ import { SchoolTypeField } from '@/features/add-school/fields/school-type-field'
 import { TeacherField } from '@/features/form-fields/teacher-field';
 import { SubjectNameField } from '@/features/add-subject/fields/subject-name-field';
 
+import { AddSemesterNameField } from '@/features/add-semester/fields/add-semester-name-field';
+import { SubjectNameField } from '@/features/add-subject/fields/subject-name-field';
 export const { fieldContext, formContext, useFieldContext } =
   createFormHookContexts();
 
@@ -36,6 +38,7 @@ const { useAppForm, withForm } = createFormHook({
     NameField,
     SchoolTypeField,
     TeacherField,
+    AddSemesterNameField,
     SubjectNameField,
   },
   formComponents: {},

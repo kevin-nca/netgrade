@@ -43,8 +43,10 @@ import {
   useUpdateSchool,
   useUserName,
 } from '@/hooks/queries';
+import { useAddSemester } from '@/hooks/queries/useSemesterQueries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
+import AddSemesterModal from '@/components/modals/AddSemesterModal';
 import Header from '@/components/Header/Header';
 import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
 import { DataManagementService } from '@/services/DataManagementService';
@@ -55,6 +57,7 @@ import './SettingsPage.css';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
+  const [showAddSemesterModal, setShowAddSemesterModal] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [showNameEditModal, setShowNameEditModal] = useState(false);
   const [appVersion] = useState('');
@@ -69,6 +72,7 @@ const SettingsPage: React.FC = () => {
   const { data: schools } = useSchools();
   const { data: userName } = useUserName();
   const addSchoolMutation = useAddSchool();
+  const addSemesterMutation = useAddSemester();
   const saveUserNameMutation = useSaveUserName();
   const resetAllDataMutation = useResetAllDataMutation();
   const deleteSchoolMutation = useDeleteSchool();
@@ -182,6 +186,26 @@ const SettingsPage: React.FC = () => {
         },
       );
     }
+  };
+
+  const handleAddSemester = (payload: {
+    name: string;
+    startDate: Date;
+    endDate: Date;
+    schoolId: string;
+  }) => {
+    addSemesterMutation.mutate(payload, {
+      onSuccess: () => {
+        setShowAddSemesterModal(false);
+        showToast('Semester erfolgreich hinzugefügt');
+      },
+      onError: (error) => {
+        showToast(
+          `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+          false,
+        );
+      },
+    });
   };
 
   const handleResetData = () => {
@@ -452,6 +476,17 @@ const SettingsPage: React.FC = () => {
               )}
             </div>
           </div>
+          <div className="settings-section">
+            <div className="section-header">
+              <h2 className="section-title">Semester hinzufügen</h2>
+              <div
+                className="section-add-button"
+                onClick={() => setShowAddSemesterModal(true)}
+              >
+                <IonIcon icon={addOutline} className="section-add-icon" />
+              </div>
+            </div>
+          </div>
           <NotificationSettings />
           <div className="settings-section">
             <div className="section-header">
@@ -565,6 +600,14 @@ const SettingsPage: React.FC = () => {
         onClose={() => setShowAddSchoolModal(false)}
         onAdd={handleAddSchool}
         isLoading={addSchoolMutation.isPending}
+      />
+
+      <AddSemesterModal
+        isOpen={showAddSemesterModal}
+        onClose={() => setShowAddSemesterModal(false)}
+        onAdd={handleAddSemester}
+        isLoading={addSemesterMutation.isPending}
+        schools={schools ?? []}
       />
 
       <IonModal
