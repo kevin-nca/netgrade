@@ -8,8 +8,9 @@ import {
   checkmarkCircleOutline,
 } from 'ionicons/icons';
 import { OnboardingDataTemp, TempSemester } from '../../types';
-import './SemesterStep.css';
 import { useAppForm } from '@/shared/components/form';
+import { semesterStepSchema, SemesterStepFormData } from './semester-step-schema';
+import './SemesterStep.css';
 import '../SharedStepStyles.css';
 
 interface SemesterStepProps {
@@ -44,6 +45,9 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
         d.setMonth(d.getMonth() + 6);
         return d.toISOString().split('T')[0];
       })(),
+    } as SemesterStepFormData,
+    validators: {
+      onSubmit: semesterStepSchema,
     },
     onSubmit: async ({ value }) => {
       const schoolId = selectedSchoolId || data.schools[0]?.id || '';
@@ -64,10 +68,6 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
       setShowAddForm(false);
     },
   });
-
-  const handleAddSemester = () => {
-    form.handleSubmit();
-  };
 
   const handleRemoveSemester = (semesterId: string) => {
     setData((prev) => ({
@@ -118,7 +118,6 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
         </div>
       </div>
 
-      {/* Add Semester Form */}
       <div className="add-section">
         {data.semesters.length < 3 && !showAddForm && (
           <div className="glass-card add-prompt">
@@ -215,7 +214,6 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
                               field.handleChange(e.detail.value || '')
                             }
                             className="input-field"
-                            required
                           />
                         </IonItem>
                       </div>
@@ -242,7 +240,6 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
                               field.handleChange(e.detail.value || '')
                             }
                             className="input-field"
-                            required
                           />
                         </IonItem>
                       </div>
@@ -265,7 +262,7 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
                 <form.Subscribe selector={(state) => [state.values.name]}>
                   {([name]) => (
                     <IonButton
-                      onClick={handleAddSemester}
+                      onClick={() => form.handleSubmit()}
                       disabled={!name?.trim()}
                       className="save-button"
                     >
@@ -280,7 +277,6 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
       </div>
 
       <div className="step-body">
-        {/* Existing Semesters */}
         {data.semesters.length > 0 && (
           <div className="semesters-section">
             <h3 className="subsection-title">Deine Semester</h3>

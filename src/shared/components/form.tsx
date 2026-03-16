@@ -13,7 +13,6 @@ import { EditSubjectField } from '@/features/edit-subject/fields/edit-subject-fi
 import { NameField } from '@/features/form-fields/name-field';
 import { SchoolTypeField } from '@/features/add-school/fields/school-type-field';
 import { TeacherField } from '@/features/form-fields/teacher-field';
-import { SubjectNameField } from '@/features/add-subject/fields/subject-name-field';
 
 import { AddSemesterNameField } from '@/features/add-semester/fields/add-semester-name-field';
 import { SubjectNameField } from '@/features/add-subject/fields/subject-name-field';

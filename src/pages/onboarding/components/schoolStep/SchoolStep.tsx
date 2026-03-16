@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useForm } from '@tanstack/react-form';
+import { useAppForm } from '@/shared/components/form';
 import {
   IonButton,
   IonIcon,
@@ -38,17 +38,15 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       name: '',
-      address: '',
       type: '',
     },
     onSubmit: async ({ value }) => {
       const school: TempSchool = {
         id: generateId(),
         name: value.name.trim(),
-        address: value.address?.trim() || null,
         type: value.type || null,
       };
 
@@ -61,10 +59,6 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
       setShowAddForm(false);
     },
   });
-
-  const handleAddSchool = () => {
-    form.handleSubmit();
-  };
 
   const handleRemoveSchool = (schoolId: string) => {
     setData((prev) => ({
@@ -101,7 +95,6 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
         </div>
       </div>
 
-      {/* Add School Form */}
       <div className="add-section">
         {data.schools.length < 2 &&
           (!showAddForm ? (
@@ -197,7 +190,7 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
                   <form.Subscribe selector={(state) => [state.values.name]}>
                     {([name]) => (
                       <IonButton
-                        onClick={handleAddSchool}
+                        onClick={() => form.handleSubmit()}
                         disabled={!name?.trim()}
                         className="save-button"
                       >
@@ -212,7 +205,6 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
       </div>
 
       <div className="step-body">
-        {/* Existing Schools */}
         {data.schools.length > 0 && (
           <div className="schools-section">
             <h3 className="subsection-title">Deine Schulen</h3>

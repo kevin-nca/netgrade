@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm } from '@tanstack/react-form';
+import { useAppForm } from '@/shared/components/form';
 import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/react';
 import {
   personCircleOutline,
@@ -17,7 +17,7 @@ interface NameStepProps {
 }
 
 const NameStep: React.FC<NameStepProps> = ({ data, setData, onNext }) => {
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       userName: data.userName,
     },
@@ -26,10 +26,6 @@ const NameStep: React.FC<NameStepProps> = ({ data, setData, onNext }) => {
       onNext();
     },
   });
-
-  const handleNext = () => {
-    form.handleSubmit();
-  };
 
   return (
     <div className="onboarding-step">
@@ -84,7 +80,7 @@ const NameStep: React.FC<NameStepProps> = ({ data, setData, onNext }) => {
           {([userName]) => (
             <IonButton
               expand="block"
-              onClick={handleNext}
+              onClick={() => form.handleSubmit()}
               disabled={!userName.trim()}
               className="primary-button"
             >
