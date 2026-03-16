@@ -9,7 +9,10 @@ import {
 } from 'ionicons/icons';
 import { OnboardingDataTemp, TempSemester } from '../../types';
 import { useAppForm } from '@/shared/components/form';
-import { semesterStepSchema, SemesterStepFormData } from './semester-step-schema';
+import {
+  semesterStepSchema,
+  SemesterStepFormData,
+} from './semester-step-schema';
 import './SemesterStep.css';
 import '../SharedStepStyles.css';
 
