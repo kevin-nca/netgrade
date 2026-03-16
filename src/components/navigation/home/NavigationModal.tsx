@@ -1,7 +1,13 @@
 import React, { Dispatch, SetStateAction, useRef } from 'react';
-import { IonContent, IonItem, IonLabel, IonModal } from '@ionic/react';
+import { IonContent, IonIcon, IonItem, IonModal } from '@ionic/react';
+import {
+  ribbonOutline,
+  documentTextOutline,
+  calendarOutline,
+} from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import Header from '@/components/Header/Header';
+import './NavigationModal.css';
 
 interface SlideUpProps {
   isOpen: boolean;
@@ -33,6 +39,10 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
     navigateTo('/main/home/exams/add');
   };
 
+  const goToTab4 = () => {
+    navigateTo('/main/home/settings');
+  };
+
   return (
     <IonModal
       isOpen={isOpen}
@@ -42,12 +52,41 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
     >
       <Header title={'Eintragen'} backButton={false}></Header>
       <IonContent>
-        <IonItem button onClick={goToTab2}>
-          <IonLabel>Note</IonLabel>
-        </IonItem>
-        <IonItem button onClick={goToTab3}>
-          <IonLabel>Anstehende Prüfung</IonLabel>
-        </IonItem>
+        <div className="nav-modal-list">
+          <IonItem
+            button
+            onClick={goToTab2}
+            className="nav-modal-item"
+            lines="none"
+          >
+            <div className="nav-modal-icon-box" slot="start">
+              <IonIcon icon={ribbonOutline} className="nav-modal-icon" />
+            </div>
+            <span className="text">Note</span>
+          </IonItem>
+          <IonItem
+            button
+            onClick={goToTab3}
+            className="nav-modal-item"
+            lines="none"
+          >
+            <div className="nav-modal-icon-box" slot="start">
+              <IonIcon icon={documentTextOutline} className="nav-modal-icon" />
+            </div>
+            <span className="text">Anstehende Prüfung</span>
+          </IonItem>
+          <IonItem
+            button
+            onClick={goToTab4}
+            className="nav-modal-item"
+            lines="none"
+          >
+            <div className="nav-modal-icon-box" slot="start">
+              <IonIcon icon={calendarOutline} className="nav-modal-icon" />
+            </div>
+            <span className="text">Semester</span>
+          </IonItem>
+        </div>
       </IonContent>
     </IonModal>
   );
