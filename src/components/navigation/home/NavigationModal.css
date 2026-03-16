@@ -24,6 +24,29 @@
   border-radius: 20px;
 }
 
+.nav-modal-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.text {
+  font-size: 15pt;
+}
+
+.nav-modal-icon {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
 @media (prefers-color-scheme: dark) {
   .nav-modal-item {
     --background: linear-gradient(

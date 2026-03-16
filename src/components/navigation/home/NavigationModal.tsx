@@ -1,6 +1,10 @@
 import React, { Dispatch, SetStateAction, useRef } from 'react';
-import { IonContent, IonIcon, IonItem, IonLabel, IonModal } from '@ionic/react';
-import { ribbonOutline, documentTextOutline } from 'ionicons/icons';
+import { IonContent, IonIcon, IonItem, IonModal } from '@ionic/react';
+import {
+  ribbonOutline,
+  documentTextOutline,
+  calendarOutline,
+} from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import Header from '@/components/Header/Header';
 import './NavigationModal.css';
@@ -35,6 +39,10 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
     navigateTo('/main/home/exams/add');
   };
 
+  const goToTab4 = () => {
+    navigateTo('/main/home/settings');
+  };
+
   return (
     <IonModal
       isOpen={isOpen}
@@ -51,8 +59,10 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
             className="nav-modal-item"
             lines="none"
           >
-            <IonIcon icon={ribbonOutline} slot="start" />
-            <IonLabel>Note</IonLabel>
+            <div className="nav-modal-icon-box" slot="start">
+              <IonIcon icon={ribbonOutline} className="nav-modal-icon" />
+            </div>
+            <span className="text">Note</span>
           </IonItem>
           <IonItem
             button
@@ -60,8 +70,21 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
             className="nav-modal-item"
             lines="none"
           >
-            <IonIcon icon={documentTextOutline} slot="start" />
-            <IonLabel>Anstehende Prüfung</IonLabel>
+            <div className="nav-modal-icon-box" slot="start">
+              <IonIcon icon={documentTextOutline} className="nav-modal-icon" />
+            </div>
+            <span className="text">Anstehende Prüfung</span>
+          </IonItem>
+          <IonItem
+            button
+            onClick={goToTab4}
+            className="nav-modal-item"
+            lines="none"
+          >
+            <div className="nav-modal-icon-box" slot="start">
+              <IonIcon icon={calendarOutline} className="nav-modal-icon" />
+            </div>
+            <span className="text">Semester</span>
           </IonItem>
         </div>
       </IonContent>
