@@ -9,10 +9,6 @@ import {
 } from 'ionicons/icons';
 import { OnboardingDataTemp, TempSemester } from '../../types';
 import { useAppForm } from '@/shared/components/form';
-import {
-  semesterStepSchema,
-  SemesterStepFormData,
-} from './semester-step-schema';
 import './SemesterStep.css';
 import '../SharedStepStyles.css';
 
@@ -48,9 +44,6 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
         d.setMonth(d.getMonth() + 6);
         return d.toISOString().split('T')[0];
       })(),
-    } as SemesterStepFormData,
-    validators: {
-      onSubmit: semesterStepSchema,
     },
     onSubmit: async ({ value }) => {
       const schoolId = selectedSchoolId || data.schools[0]?.id || '';
