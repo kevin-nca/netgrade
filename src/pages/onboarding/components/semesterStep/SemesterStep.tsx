@@ -172,17 +172,15 @@ const SemesterStep: React.FC<SemesterStepProps> = ({
                 )}
 
                 <form.AppField name="name">
-                  {(field) => (
-                    <field.OnboardingNameField label="Semester Name" />
-                  )}
+                  {(field) => <field.NameField label="Semester Name" />}
                 </form.AppField>
 
                 <form.AppField name="startDate">
-                  {(field) => <field.OnboardingDateField label="Startdatum" />}
+                  {(field) => <field.DateField label="Startdatum" />}
                 </form.AppField>
 
                 <form.AppField name="endDate">
-                  {(field) => <field.OnboardingDateField label="Enddatum" />}
+                  {(field) => <field.DateField label="Enddatum" />}
                 </form.AppField>
               </div>
 

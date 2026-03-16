@@ -42,7 +42,7 @@ const NameStep: React.FC<NameStepProps> = ({ data, setData, onNext }) => {
         <div className="glass-card input-card">
           <div className="input-section">
             <form.AppField name="userName">
-              {(field) => <field.OnboardingNameField label="Dein Name" />}
+              {(field) => <field.NameField label="Dein Name" />}
             </form.AppField>
 
             <div className="input-hint">

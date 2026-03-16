@@ -238,15 +238,11 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
 
                   <div className="form-fields">
                     <form.AppField name="name">
-                      {(field) => (
-                        <field.OnboardingSubjectNameField label="Fachname" />
-                      )}
+                      {(field) => <field.SubjectNameField label="Fachname" />}
                     </form.AppField>
 
                     <form.AppField name="teacher">
-                      {(field) => (
-                        <field.OnboardingTeacherField label="Lehrer/in" />
-                      )}
+                      {(field) => <field.TeacherField label="Lehrer/in" />}
                     </form.AppField>
                   </div>
 

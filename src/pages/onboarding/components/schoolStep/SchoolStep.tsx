@@ -108,15 +108,11 @@ const SchoolStep: React.FC<SchoolStepProps> = ({
 
                 <div className="form-fields">
                   <form.AppField name="name">
-                    {(field) => (
-                      <field.OnboardingSchoolNameField label="Schulname" />
-                    )}
+                    {(field) => <field.NameField label="Schulname" />}
                   </form.AppField>
 
                   <form.AppField name="type">
-                    {(field) => (
-                      <field.OnboardingSchoolTypeField label="Schultyp" />
-                    )}
+                    {(field) => <field.SchoolTypeField label="Schultyp" />}
                   </form.AppField>
                 </div>
 
