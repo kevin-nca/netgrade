@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction, useRef } from 'react';
-import { IonContent, IonItem, IonLabel, IonModal } from '@ionic/react';
+import { IonContent, IonIcon, IonItem, IonLabel, IonModal } from '@ionic/react';
+import { ribbonOutline, documentTextOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import Header from '@/components/Header/Header';
 import './NavigationModal.css';
@@ -50,6 +51,7 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
             className="nav-modal-item"
             lines="none"
           >
+            <IonIcon icon={ribbonOutline} slot="start" />
             <IonLabel>Note</IonLabel>
           </IonItem>
           <IonItem
@@ -58,6 +60,7 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
             className="nav-modal-item"
             lines="none"
           >
+            <IonIcon icon={documentTextOutline} slot="start" />
             <IonLabel>Anstehende Prüfung</IonLabel>
           </IonItem>
         </div>
