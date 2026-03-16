@@ -16,6 +16,12 @@ import { TeacherField } from '@/features/form-fields/teacher-field';
 
 import { AddSemesterNameField } from '@/features/add-semester/fields/add-semester-name-field';
 import { SubjectNameField } from '@/features/add-subject/fields/subject-name-field';
+import { OnboardingNameField } from '@/pages/onboarding/fields/onboarding-name-field';
+import { OnboardingSchoolNameField } from '@/pages/onboarding/fields/onboarding-school-name-field';
+import { OnboardingSchoolTypeField } from '@/pages/onboarding/fields/onboarding-school-type-field';
+import { OnboardingTeacherField } from '@/pages/onboarding/fields/onboarding-teacher-field';
+import { OnboardingSubjectNameField } from '@/pages/onboarding/fields/onboarding-subject-name-field';
+import { OnboardingDateField } from '@/pages/onboarding/fields/onboarding-date-field';
 export const { fieldContext, formContext, useFieldContext } =
   createFormHookContexts();
 
@@ -39,6 +45,12 @@ const { useAppForm, withForm } = createFormHook({
     TeacherField,
     AddSemesterNameField,
     SubjectNameField,
+    OnboardingNameField,
+    OnboardingSchoolNameField,
+    OnboardingSchoolTypeField,
+    OnboardingTeacherField,
+    OnboardingSubjectNameField,
+    OnboardingDateField,
   },
   formComponents: {},
 });
