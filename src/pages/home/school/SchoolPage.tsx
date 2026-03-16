@@ -8,11 +8,12 @@ import {
   trashOutline,
   chevronBack,
   chevronForward,
+  trash,
 } from 'ionicons/icons';
 import SubjectSelectionModal from '@/features/add-subject/subject-selection-modal';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
-import { Subject } from '@/db/entities';
+import { Semester, Subject } from '@/db/entities';
 import {
   useAddSubject,
   useDeleteSubject,
@@ -20,6 +21,7 @@ import {
   useSchoolSubjects,
   useUpdateSubject,
   useSemesters,
+  useDeleteSemester,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/features/edit-subject/edit-subject-modal';
@@ -58,6 +60,7 @@ const SchoolPage: React.FC = () => {
   const addSubjectMutation = useAddSubject();
   const updateSubjectMutation = useUpdateSubject();
   const deleteSubjectMutation = useDeleteSubject();
+  const deleteSemesterMutation = useDeleteSemester();
 
   const semesters = allSemesters?.filter((s) => s.schoolId === schoolId) ?? [];
   const activeSemester = semesters[activeSemesterIndex];
@@ -88,6 +91,20 @@ const SchoolPage: React.FC = () => {
   const handleRemoveSubject = (subject: Subject) => {
     deleteSubjectMutation.mutate(subject.id, {
       onError: (error) => console.error('Failed to remove subject:', error),
+    });
+  };
+
+  const handleRemoveSemester = (semester: Semester) => {
+    const confirmed = window.confirm(
+      `Semester "${semester.name}" wirklich löschen? Alle Fächer und Noten gehen verloren.`,
+    );
+
+    if (!confirmed) return;
+    deleteSemesterMutation.mutate(semester.id, {
+      onSuccess: () => {
+        setActiveSemesterIndex((i) => Math.max(0, i - 1));
+      },
+      onError: (error) => console.error('Failed to remove semester:', error),
     });
   };
 
@@ -124,6 +141,18 @@ const SchoolPage: React.FC = () => {
             disabled={activeSemesterIndex === semesters.length - 1}
           >
             <IonIcon icon={chevronForward} />
+          </button>
+          <button
+            className="school-semester-delete"
+            disabled={semesters.length <= 1}
+            aria-label="Semester löschen"
+            title="Semester löschen"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRemoveSemester(semesters[activeSemesterIndex]);
+            }}
+          >
+            <IonIcon icon={trash} />
           </button>
         </div>
 
