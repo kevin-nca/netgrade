@@ -37,7 +37,7 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
       newSubjectName: '',
     } as SubjectFormData,
     validators: {
-      onSubmit: subjectFormSchema,
+      onSubmit: subjectFormSchema(subjectsOrModules.map((s) => s.name)),
     },
     onSubmit: async ({ value }) => {
       const isDuplicate = subjectsOrModules.some(
@@ -87,7 +87,7 @@ const SubjectSelectionModal: React.FC<SubjectSelectionSlideUpProps> = ({
       <IonContent scrollY={false}>
         <div className={styles.addSubject}>
           <form.AppField name="newSubjectName">
-            {(field) => <field.EditSubjectField label="Fachname" />}
+            {(field) => <field.SubjectNameField label="Fachname" />}
           </form.AppField>
         </div>
         <ModalButtonGroup>
