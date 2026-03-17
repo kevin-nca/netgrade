@@ -1,5 +1,5 @@
 import React from 'react';
-import { format } from 'date-fns';
+import { format, addMonths } from 'date-fns';
 import { addOutline } from 'ionicons/icons';
 import { useAppForm } from '@/shared/components/form';
 import {
@@ -35,7 +35,7 @@ export const AddSemesterForm: React.FC<AddSemesterFormProps> = ({
     defaultValues: {
       semesterName: '',
       startDate: format(new Date(), 'yyyy-MM-dd'),
-      endDate: format(new Date(), 'yyyy-MM-dd'),
+      endDate: format(addMonths(new Date(), 6), 'yyyy-MM-dd'),
       schoolId: '',
     } as SemesterFormData,
     validators: {
