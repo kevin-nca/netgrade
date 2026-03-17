@@ -71,6 +71,7 @@ export const useUpdateSchool = () => {
         updatedSchool,
       );
       queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: semesterKeys.all });
     },
   });
 };
