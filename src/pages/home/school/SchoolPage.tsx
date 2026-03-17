@@ -26,6 +26,7 @@ import {
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/features/edit-subject/edit-subject-modal';
 import './SchoolPage.css';
+import '../main/MainPage.css';
 
 const calculateSubjectAverage = (subject: Subject): number | undefined => {
   const grades = subject.exams
@@ -109,7 +110,7 @@ const SchoolPage: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <IonPage className="home-page">
       <Header
         title={school!.name}
         backButton={true}
@@ -123,7 +124,7 @@ const SchoolPage: React.FC = () => {
           </IonButtons>
         }
       />
-      <IonContent>
+      <IonContent className="home-content">
         <div className="school-semester-selector">
           <button
             className="school-semester-arrow"
