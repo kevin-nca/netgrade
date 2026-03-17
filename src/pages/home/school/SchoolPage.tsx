@@ -26,7 +26,7 @@ import {
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/features/edit-subject/edit-subject-modal';
 import './SchoolPage.css';
-import '../main/MainPage.css'
+import '../main/MainPage.css';
 
 const calculateSubjectAverage = (subject: Subject): number | undefined => {
   const grades = subject.exams
