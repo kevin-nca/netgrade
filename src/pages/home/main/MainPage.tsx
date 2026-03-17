@@ -70,7 +70,9 @@ function MainPage() {
                 </div>
                 <div
                   className="profile-settings-button"
-                  onClick={() => router.push(Routes.SETTINGS, 'forward')}
+                  onClick={() =>
+                    router.push(Routes.SETTINGS, 'forward', 'replace')
+                  }
                 >
                   <IonIcon
                     icon={personCircleOutline}
