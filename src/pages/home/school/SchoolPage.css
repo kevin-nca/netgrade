@@ -120,8 +120,8 @@
 }
 
 .subject-action-button.edit {
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  color: white;
+  background: none;
+  color: black;
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
@@ -131,9 +131,10 @@
 }
 
 .subject-action-button.delete {
-  background: linear-gradient(135deg, #ff3b30, #e60000);
-  color: white;
-  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+  background: none;
+  color: black;
+  border-radius: 64px;
+  box-shadow: 0 2px 8px rgba(246, 57, 46, 0.3);
 }
 
 .subject-action-button.delete:active {
@@ -295,6 +296,19 @@
   .school-semester-arrow:disabled {
     background: rgba(255, 255, 255, 0.08);
     color: rgba(255, 255, 255, 0.2);
+  }
+
+  .subject-action-button.delete {
+    background: none;
+    color: white;
+    border-radius: 64px;
+    box-shadow: 0 2px 8px rgba(246, 57, 46, 0.3);
+  }
+
+  .subject-action-button.edit {
+    background: none;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
   }
 }
 

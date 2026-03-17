@@ -109,7 +109,7 @@ const SchoolPage: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <IonPage className="home-page">
       <Header
         title={school!.name}
         backButton={true}
@@ -123,7 +123,7 @@ const SchoolPage: React.FC = () => {
           </IonButtons>
         }
       />
-      <IonContent>
+      <IonContent className="home-content">
         <div className="school-semester-selector">
           <button
             className="school-semester-arrow"
