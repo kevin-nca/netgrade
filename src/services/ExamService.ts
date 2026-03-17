@@ -139,6 +139,7 @@ export class ExamService {
     try {
       const { exam: examRepo } = getRepositories();
       const now = new Date();
+      now.setHours(0, 0, 0, 0);
       const upcomingExams = await examRepo
         .createQueryBuilder('exam')
         .leftJoin('exam.grade', 'grade')
