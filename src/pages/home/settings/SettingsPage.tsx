@@ -305,6 +305,7 @@ const SettingsPage: React.FC = () => {
         title="Einstellungen"
         backButton={true}
         defaultHref={Routes.HOME}
+        onBack={() => history.replace(Routes.HOME)}
       />
 
       <IonContent className="settings-content" scrollY={true}>
