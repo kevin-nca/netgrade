@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { IonContent, IonToast, useIonViewWillEnter } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import {
   useAddGradeWithExam,
@@ -14,6 +15,7 @@ import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import SubmitButton from '@/shared/components/buttons/submitt-button/submit-button';
 import FormContainer from '@/shared/components/form-layout/form-container';
 import SuccessOverlay from '@/shared/components/form-layout/succes-overlay';
+import { Routes } from '@/routes';
 import {
   gradeFormSchema,
   type GradeFormData,
@@ -24,6 +26,7 @@ interface AddGradeFormProps {
 }
 
 const AddGradeForm: React.FC<AddGradeFormProps> = ({ onSuccess }) => {
+  const history = useHistory();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
@@ -108,7 +111,7 @@ const AddGradeForm: React.FC<AddGradeFormProps> = ({ onSuccess }) => {
       <Header
         title="Note hinzufügen"
         backButton
-        onBack={() => window.history.back()}
+        onBack={() => history.replace(Routes.HOME)}
       />
 
       <IonContent className="add-exam-content" scrollY>
