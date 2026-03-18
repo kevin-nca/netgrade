@@ -27,7 +27,6 @@ import CalendarGrid from './components/CalendarGrid';
 import SelectedDateView from './components/SelectedDateView';
 import ExamListView from './components/ExamListView';
 import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
-
 import { useCalendar } from '@/pages/home/calendar/hook/useCalendar';
 
 const CalendarPage: React.FC = () => {
@@ -64,7 +63,7 @@ const CalendarPage: React.FC = () => {
         backButton={true}
         defaultHref={Routes.HOME}
       />
-      <IonContent fullscreen className="calendar-container">
+      <IonContent className="calendar-container" scrollY={true}>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
         </IonRefresher>
@@ -164,6 +163,8 @@ const CalendarPage: React.FC = () => {
           isOpen={showNavigationModal}
           setIsOpen={setShowNavigationModal}
         />
+
+        <div style={{ height: '80px' }} />
       </IonContent>
 
       <BottomNavigation

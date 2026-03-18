@@ -4,33 +4,28 @@ import {
   IonButton,
   IonButtons,
   IonContent,
-  IonHeader,
   IonIcon,
   IonInput,
-  IonItem,
   IonModal,
   IonPage,
-  IonTitle,
-  IonToolbar,
   useIonAlert,
   useIonToast,
 } from '@ionic/react';
-import { useForm } from '@tanstack/react-form';
+import { useAppForm } from '@/shared/components/form';
 import { useHistory } from 'react-router-dom';
 import {
   addOutline,
   checkmarkOutline,
   closeOutline,
-  createOutline,
   downloadOutline,
   cloudUploadOutline,
   informationCircleOutline,
   pencilOutline,
-  personOutline,
   schoolOutline,
   settingsOutline,
   trashOutline,
 } from 'ionicons/icons';
+import popupStyles from '@/components/modals/popup-modal.module.css';
 import { Routes } from '@/routes';
 import { ExportDialog } from '@/components/export/ExportDialog';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
@@ -43,8 +38,10 @@ import {
   useUpdateSchool,
   useUserName,
 } from '@/hooks/queries';
+import { useAddSemester } from '@/hooks/queries/useSemesterQueries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
+import AddSemesterModal from '@/components/modals/AddSemesterModal';
 import Header from '@/components/Header/Header';
 import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
 import { DataManagementService } from '@/services/DataManagementService';
@@ -55,6 +52,7 @@ import './SettingsPage.css';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
+  const [showAddSemesterModal, setShowAddSemesterModal] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [showNameEditModal, setShowNameEditModal] = useState(false);
   const [appVersion] = useState('');
@@ -69,6 +67,7 @@ const SettingsPage: React.FC = () => {
   const { data: schools } = useSchools();
   const { data: userName } = useUserName();
   const addSchoolMutation = useAddSchool();
+  const addSemesterMutation = useAddSemester();
   const saveUserNameMutation = useSaveUserName();
   const resetAllDataMutation = useResetAllDataMutation();
   const deleteSchoolMutation = useDeleteSchool();
@@ -120,7 +119,7 @@ const SettingsPage: React.FC = () => {
     setEditSchoolName('');
   };
 
-  const nameForm = useForm({
+  const nameForm = useAppForm({
     defaultValues: {
       nameInput: userName || '',
     },
@@ -182,6 +181,26 @@ const SettingsPage: React.FC = () => {
         },
       );
     }
+  };
+
+  const handleAddSemester = (payload: {
+    name: string;
+    startDate: Date;
+    endDate: Date;
+    schoolId: string;
+  }) => {
+    addSemesterMutation.mutate(payload, {
+      onSuccess: () => {
+        setShowAddSemesterModal(false);
+        showToast('Semester erfolgreich hinzugefügt');
+      },
+      onError: (error) => {
+        showToast(
+          `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+          false,
+        );
+      },
+    });
   };
 
   const handleResetData = () => {
@@ -281,6 +300,7 @@ const SettingsPage: React.FC = () => {
         title="Einstellungen"
         backButton={true}
         defaultHref={Routes.HOME}
+        onBack={() => history.replace(Routes.HOME)}
       />
 
       <IonContent className="settings-content" scrollY={true}>
@@ -452,6 +472,17 @@ const SettingsPage: React.FC = () => {
               )}
             </div>
           </div>
+          <div className="settings-section">
+            <div className="section-header">
+              <h2 className="section-title">Semester hinzufügen</h2>
+              <div
+                className="section-add-button"
+                onClick={() => setShowAddSemesterModal(true)}
+              >
+                <IonIcon icon={addOutline} className="section-add-icon" />
+              </div>
+            </div>
+          </div>
           <NotificationSettings />
           <div className="settings-section">
             <div className="section-header">
@@ -567,97 +598,52 @@ const SettingsPage: React.FC = () => {
         isLoading={addSchoolMutation.isPending}
       />
 
+      <AddSemesterModal
+        isOpen={showAddSemesterModal}
+        onClose={() => setShowAddSemesterModal(false)}
+        onAdd={handleAddSemester}
+        isLoading={addSemesterMutation.isPending}
+        schools={schools ?? []}
+      />
+
       <IonModal
         isOpen={showNameEditModal}
         onDidDismiss={handleCancelNameEdit}
-        breakpoints={[0, 0.25, 0.5, 0.75, 1]}
-        initialBreakpoint={0.75}
-        backdropBreakpoint={0.5}
-        className="settings-modal"
+        className={popupStyles.modal}
       >
-        <IonPage className="modal-page">
-          <IonHeader className="modal-header">
-            <IonToolbar className="modal-toolbar">
-              <IonTitle className="modal-title">Namen bearbeiten</IonTitle>
-            </IonToolbar>
-          </IonHeader>
-
-          <IonContent className="modal-content" scrollY={true}>
-            <div className="modal-content-wrapper">
-              <div className="modal-header-section">
-                <div className="modal-gradient-orb" />
-                <div className="modal-header-content">
-                  <div className="modal-header-flex">
-                    <div className="modal-icon-wrapper">
-                      <IonIcon icon={personOutline} className="modal-icon" />
-                    </div>
-                    <div className="modal-text">
-                      <h1>Dein Name</h1>
-                      <p>Wie möchtest du genannt werden?</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-input-section">
-                <h2 className="modal-section-title">Name eingeben</h2>
-
-                <div className="modal-input-wrapper glass-input">
-                  <IonItem lines="none" className="modal-input-item">
-                    <div slot="start" className="modal-input-icon-wrapper">
-                      <IonIcon
-                        icon={createOutline}
-                        className="modal-input-icon"
-                      />
-                    </div>
-                    <nameForm.Field name="nameInput">
-                      {(field) => (
-                        <IonInput
-                          value={field.state.value}
-                          placeholder="Dein Name..."
-                          onIonChange={(e) =>
-                            field.handleChange(e.detail.value || '')
-                          }
-                          className="modal-input-field"
-                          clearInput
-                          autoFocus
-                        />
-                      )}
-                    </nameForm.Field>
-                  </IonItem>
-                </div>
-              </div>
-
-              <ModalButtonGroup>
-                <ModalCancelButton
-                  onClick={handleCancelNameEdit}
-                  disabled={saveUserNameMutation.isPending}
-                  text="Abbrechen"
+        <div className={popupStyles.modalContent}>
+          <h1>Namen bearbeiten</h1>
+        </div>
+        <IonContent scrollY={false}>
+          <div className={popupStyles.formFields}>
+            <nameForm.AppField name="nameInput">
+              {(field) => <field.NameField label="Dein Name" />}
+            </nameForm.AppField>
+          </div>
+          <ModalButtonGroup>
+            <ModalCancelButton
+              onClick={handleCancelNameEdit}
+              disabled={saveUserNameMutation.isPending}
+              text="Abbrechen"
+            />
+            <nameForm.Subscribe selector={(state) => [state.values.nameInput]}>
+              {([nameInput]) => (
+                <ModalSubmitButton
+                  onClick={handleSaveName}
+                  disabled={
+                    saveUserNameMutation.isPending ||
+                    !nameInput.trim() ||
+                    nameInput.trim() === (userName || '')
+                  }
+                  isLoading={saveUserNameMutation.isPending}
+                  loadingText="Speichert..."
+                  text="Speichern"
+                  icon={checkmarkOutline}
                 />
-                <nameForm.Subscribe
-                  selector={(state) => [state.values.nameInput]}
-                >
-                  {([nameInput]) => (
-                    <ModalSubmitButton
-                      onClick={handleSaveName}
-                      disabled={
-                        saveUserNameMutation.isPending ||
-                        !nameInput.trim() ||
-                        nameInput.trim() === (userName || '')
-                      }
-                      isLoading={saveUserNameMutation.isPending}
-                      loadingText="Speichert..."
-                      text="Speichern"
-                      icon={checkmarkOutline}
-                    />
-                  )}
-                </nameForm.Subscribe>
-              </ModalButtonGroup>
-
-              <div className="modal-bottom-spacer" />
-            </div>
-          </IonContent>
-        </IonPage>
+              )}
+            </nameForm.Subscribe>
+          </ModalButtonGroup>
+        </IonContent>
       </IonModal>
       <IonAlert
         isOpen={showDeleteAlert}
