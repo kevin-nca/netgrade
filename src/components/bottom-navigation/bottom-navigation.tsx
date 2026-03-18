@@ -41,7 +41,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
           <div
             className={`tab-item ${activeTab === 'home' ? 'active' : ''}`}
             onClick={() => {
-              history.push(Routes.HOME);
+              history.replace(Routes.HOME);
             }}
           >
             <div className="tab-icon-wrapper">
@@ -52,7 +52,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
           <div
             className={`tab-item ${activeTab === 'calendar' ? 'active' : ''}`}
             onClick={() => {
-              history.push(Routes.CALENDAR);
+              history.replace(Routes.CALENDAR);
             }}
           >
             <div className="tab-icon-wrapper">
@@ -72,7 +72,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
           <div
             className={`tab-item ${activeTab === 'grades' ? 'active' : ''}`}
             onClick={() => {
-              history.push(Routes.GRADES_ADD);
+              history.replace(Routes.GRADES_ADD);
             }}
           >
             <div className="tab-icon-wrapper">
@@ -83,7 +83,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
           <div
             className={`tab-item ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => {
-              history.push(Routes.SETTINGS);
+              history.replace(Routes.SETTINGS);
             }}
           >
             <div className="tab-icon-wrapper">
