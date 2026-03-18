@@ -427,7 +427,7 @@ const SettingsPage: React.FC = () => {
             </div>
 
             <div className="settings-list">
-              {schools!.length > 0 ? (
+              {schools!.length > 0 &&
                 schools!.map((school, index) => {
                   const isExpanded = expandedSchoolId === school.id;
                   const isEditing = editingSchoolId === school.id;
@@ -443,7 +443,7 @@ const SettingsPage: React.FC = () => {
                           {school.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="item-text">
-                          {isEditing ? (
+                          {isEditing && (
                             <div className="edit-school-input">
                               <IonInput
                                 value={editSchoolName}
@@ -457,7 +457,8 @@ const SettingsPage: React.FC = () => {
                                 autoFocus
                               />
                             </div>
-                          ) : (
+                          )}
+                          {!isEditing && (
                             <h3 className="item-title">{school.name}</h3>
                           )}
                         </div>
@@ -469,7 +470,7 @@ const SettingsPage: React.FC = () => {
                           onClick={(e) => e.stopPropagation()}
                         >
                           <IonButtons slot="end">
-                            {isEditing ? (
+                            {isEditing && (
                               <div className="edit-buttons">
                                 <IonButton
                                   className="save-button"
@@ -502,7 +503,8 @@ const SettingsPage: React.FC = () => {
                                   <p className="cancel-text">Abbrechen</p>
                                 </IonButton>
                               </div>
-                            ) : (
+                            )}
+                            {!isEditing && (
                               <>
                                 <IonButton
                                   className="edit-button"
@@ -538,8 +540,8 @@ const SettingsPage: React.FC = () => {
                       )}
                     </div>
                   );
-                })
-              ) : (
+                })}
+              {schools!.length === 0 && (
                 <div className="settings-item glass-card empty-item">
                   <div className="item-content">
                     <div className="item-icon empty">
@@ -568,7 +570,8 @@ const SettingsPage: React.FC = () => {
             </div>
 
             <div className="settings-list">
-              {semesters && semesters.length > 0 ? (
+              {semesters &&
+                semesters.length > 0 &&
                 semesters.map((semester, index) => {
                   const isExpanded = expandedSemesterId === semester.id;
                   const isEditing = editingSemesterId === semester.id;
@@ -584,7 +587,7 @@ const SettingsPage: React.FC = () => {
                           {semester.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="item-text">
-                          {isEditing ? (
+                          {isEditing && (
                             <div className="edit-school-input">
                               <IonInput
                                 value={editSemesterName}
@@ -598,7 +601,8 @@ const SettingsPage: React.FC = () => {
                                 autoFocus
                               />
                             </div>
-                          ) : (
+                          )}
+                          {!isEditing && (
                             <>
                               <h3 className="item-title">{semester.name}</h3>
                               {semester.school && (
@@ -617,7 +621,7 @@ const SettingsPage: React.FC = () => {
                           onClick={(e) => e.stopPropagation()}
                         >
                           <IonButtons slot="end">
-                            {isEditing ? (
+                            {isEditing && (
                               <div className="edit-buttons">
                                 <IonButton
                                   className="save-button"
@@ -650,7 +654,8 @@ const SettingsPage: React.FC = () => {
                                   <p className="cancel-text">Abbrechen</p>
                                 </IonButton>
                               </div>
-                            ) : (
+                            )}
+                            {!isEditing && (
                               <>
                                 <IonButton
                                   className="edit-button"
@@ -690,8 +695,8 @@ const SettingsPage: React.FC = () => {
                       )}
                     </div>
                   );
-                })
-              ) : (
+                })}
+              {(!semesters || semesters.length === 0) && (
                 <div className="settings-item glass-card empty-item">
                   <div className="item-content">
                     <div className="item-icon empty">
