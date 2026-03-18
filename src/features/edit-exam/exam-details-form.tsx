@@ -164,7 +164,7 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
-              <IonBackButton defaultHref={Routes.HOME} />
+              <IonBackButton defaultHref={Routes.HOME} text="Back" />
             </IonButtons>
             <IonTitle>Fehler</IonTitle>
           </IonToolbar>
@@ -204,7 +204,7 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref={Routes.HOME} text="Zurück" />
+            <IonBackButton defaultHref={Routes.HOME} text="Back" />
           </IonButtons>
           <IonTitle>Prüfung bearbeiten</IonTitle>
           <IonButtons slot="end">

@@ -8,7 +8,7 @@ const AddExamPage: React.FC = () => {
   const history = useHistory();
 
   const handleSuccess = () => {
-    history.push(Routes.HOME);
+    history.replace(Routes.HOME);
   };
 
   return (
