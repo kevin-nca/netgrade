@@ -571,6 +571,9 @@ const SettingsPage: React.FC = () => {
                 semesters.map((semester, index) => {
                   const isExpanded = expandedSemesterId === semester.id;
                   const isEditing = editingSemesterId === semester.id;
+                  const SemesterCount = semesters!.filter(
+                    (s) => s.school?.id === semester.school?.id,
+                  ).length;
 
                   return (
                     <div
@@ -677,6 +680,7 @@ const SettingsPage: React.FC = () => {
                                     setSemesterIdToDelete(semester.id);
                                     setShowDeleteSemesterAlert(true);
                                   }}
+                                  disabled={SemesterCount <= 1}
                                 >
                                   <IonIcon
                                     slot="icon-only"
