@@ -7,6 +7,7 @@ import {
   IonModal,
   IonToast,
 } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 import { add } from 'ionicons/icons';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
@@ -36,6 +37,7 @@ const GradeEntryForm: React.FC<GradeEntryFormProps> = ({
   subjectId,
   onAddGrade,
 }) => {
+  const history = useHistory();
   const { data: grades } = useSubjectGrades(subjectId);
   const { data: subject } = useSubject(subjectId);
 
@@ -140,7 +142,7 @@ const GradeEntryForm: React.FC<GradeEntryFormProps> = ({
       <Header
         title={subject?.name ?? ''}
         backButton
-        onBack={() => window.history.back()}
+        onBack={() => history.goBack()}
         endSlot={
           onAddGrade ? (
             <IonButtons slot="end">
