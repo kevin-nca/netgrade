@@ -71,6 +71,7 @@ export const useUpdateSchool = () => {
         updatedSchool,
       );
       queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: semesterKeys.all });
     },
   });
 };
@@ -82,6 +83,7 @@ export const useDeleteSchool = () => {
     mutationFn: (schoolId: string) => SchoolService.delete(schoolId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: semesterKeys.all });
     },
   });
 };
