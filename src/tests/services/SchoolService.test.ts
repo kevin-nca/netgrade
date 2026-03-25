@@ -131,6 +131,64 @@ describe('SchoolService', () => {
     await expect(SchoolService.delete('non-existent-id')).rejects.toThrow();
   });
 
+  // Regression test: deleting a school must cascade-delete all related records.
+  // This test FAILS in the browser (SQL.js) without "PRAGMA foreign_keys = ON"
+  // because SQLite does not enforce FK constraints by default.
+  it('should cascade delete semesters, subjects, exams, and grades when a school is deleted', async () => {
+    const repos = {
+      school: dataSource.getRepository(School),
+      semester: dataSource.getRepository(Semester),
+      subject: dataSource.getRepository(Subject),
+      exam: dataSource.getRepository(Exam),
+      grade: dataSource.getRepository(Grade),
+    };
+
+    // Create a full hierarchy to delete
+    const school = repos.school.create({ name: 'Cascade Test School' });
+    await repos.school.save(school);
+
+    const semester = repos.semester.create({
+      name: 'Cascade Semester',
+      startDate: new Date('2024-01-01'),
+      endDate: new Date('2024-12-31'),
+      schoolId: school.id,
+    });
+    await repos.semester.save(semester);
+
+    const subject = repos.subject.create({
+      name: 'Cascade Subject',
+      weight: 1.0,
+      semesterId: semester.id,
+    });
+    await repos.subject.save(subject);
+
+    const exam = repos.exam.create({
+      name: 'Cascade Exam',
+      date: new Date(),
+      weight: 1.0,
+      isCompleted: false,
+      subjectId: subject.id,
+    });
+    await repos.exam.save(exam);
+
+    const grade = repos.grade.create({
+      score: 5.0,
+      weight: 1.0,
+      date: new Date(),
+      exam: exam,
+    });
+    await repos.grade.save(grade);
+
+    // Delete the school — cascade should remove all child records
+    await SchoolService.delete(school.id);
+
+    // All related records must be gone
+    expect(await repos.semester.findOneBy({ id: semester.id })).toBeNull();
+    expect(await repos.subject.findOneBy({ id: subject.id })).toBeNull();
+    expect(await repos.exam.findOneBy({ id: exam.id })).toBeNull();
+    expect(await repos.grade.findOneBy({ id: grade.id })).toBeNull();
+  });
+
   // Test calculateSchoolAverage method
   describe('calculateSchoolAverage', () => {
     it('should calculate the weighted average for a school with grades', () => {
