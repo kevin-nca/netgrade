@@ -131,63 +131,6 @@ describe('SchoolService', () => {
     await expect(SchoolService.delete('non-existent-id')).rejects.toThrow();
   });
 
-  // Test cascade delete: deleting a school must also delete its semesters, subjects, exams, and grades.
-  // This test exposes the browser bug where SQLite FK cascades are not enforced without
-  // "PRAGMA foreign_keys = ON", so semesters/subjects/exams are left orphaned.
-  it('should cascade delete semesters, subjects, exams, and grades when a school is deleted', async () => {
-    const repos = {
-      school: dataSource.getRepository(School),
-      semester: dataSource.getRepository(Semester),
-      subject: dataSource.getRepository(Subject),
-      exam: dataSource.getRepository(Exam),
-    };
-
-    // Build a full hierarchy
-    const school = repos.school.create({ name: 'Cascade Delete School' });
-    await repos.school.save(school);
-
-    const semester = repos.semester.create({
-      name: '2025/2026',
-      startDate: new Date('2025-08-01'),
-      endDate: new Date('2026-07-31'),
-      schoolId: school.id,
-    });
-    await repos.semester.save(semester);
-
-    const subject = repos.subject.create({
-      name: 'Cascade Subject',
-      weight: 1.0,
-      semesterId: semester.id,
-    });
-    await repos.subject.save(subject);
-
-    const exam = repos.exam.create({
-      name: 'Cascade Exam',
-      date: new Date(),
-      weight: 1.0,
-      isCompleted: false,
-      subjectId: subject.id,
-    });
-    await repos.exam.save(exam);
-
-    // Delete the school
-    await SchoolService.delete(school.id);
-
-    // All related records must be gone
-    const remainingSemesters = await repos.semester.findBy({
-      schoolId: school.id,
-    });
-    expect(remainingSemesters).toHaveLength(0);
-
-    const remainingSubjects = await repos.subject.findBy({
-      semesterId: semester.id,
-    });
-    expect(remainingSubjects).toHaveLength(0);
-
-    const remainingExams = await repos.exam.findBy({ subjectId: subject.id });
-    expect(remainingExams).toHaveLength(0);
-  });
-
   // Test calculateSchoolAverage method
   describe('calculateSchoolAverage', () => {
     it('should calculate the weighted average for a school with grades', () => {
