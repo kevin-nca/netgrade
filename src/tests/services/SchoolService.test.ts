@@ -131,62 +131,107 @@ describe('SchoolService', () => {
     await expect(SchoolService.delete('non-existent-id')).rejects.toThrow();
   });
 
-  // Regression test: deleting a school must cascade-delete all related records.
-  // This test FAILS in the browser (SQL.js) without "PRAGMA foreign_keys = ON"
-  // because SQLite does not enforce FK constraints by default.
-  it('should cascade delete semesters, subjects, exams, and grades when a school is deleted', async () => {
-    const repos = {
-      school: dataSource.getRepository(School),
-      semester: dataSource.getRepository(Semester),
-      subject: dataSource.getRepository(Subject),
-      exam: dataSource.getRepository(Exam),
-      grade: dataSource.getRepository(Grade),
+  // Cascade delete regression tests.
+  describe('cascade delete', () => {
+    let repos: {
+      school: ReturnType<typeof dataSource.getRepository<School>>;
+      semester: ReturnType<typeof dataSource.getRepository<Semester>>;
+      subject: ReturnType<typeof dataSource.getRepository<Subject>>;
+      exam: ReturnType<typeof dataSource.getRepository<Exam>>;
+      grade: ReturnType<typeof dataSource.getRepository<Grade>>;
     };
 
-    // Create a full hierarchy to delete
-    const school = repos.school.create({ name: 'Cascade Test School' });
-    await repos.school.save(school);
-
-    const semester = repos.semester.create({
-      name: 'Cascade Semester',
-      startDate: new Date('2024-01-01'),
-      endDate: new Date('2024-12-31'),
-      schoolId: school.id,
+    beforeAll(() => {
+      repos = {
+        school: dataSource.getRepository(School),
+        semester: dataSource.getRepository(Semester),
+        subject: dataSource.getRepository(Subject),
+        exam: dataSource.getRepository(Exam),
+        grade: dataSource.getRepository(Grade),
+      };
     });
-    await repos.semester.save(semester);
 
-    const subject = repos.subject.create({
-      name: 'Cascade Subject',
-      weight: 1.0,
-      semesterId: semester.id,
+    const createFullHierarchy = async () => {
+      const school = repos.school.create({ name: 'Cascade Test School' });
+      await repos.school.save(school);
+
+      const semester = repos.semester.create({
+        name: 'Cascade Semester',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-12-31'),
+        schoolId: school.id,
+      });
+      await repos.semester.save(semester);
+
+      const subject = repos.subject.create({
+        name: 'Cascade Subject',
+        weight: 1.0,
+        semesterId: semester.id,
+      });
+      await repos.subject.save(subject);
+
+      const exam = repos.exam.create({
+        name: 'Cascade Exam',
+        date: new Date(),
+        weight: 1.0,
+        isCompleted: false,
+        subjectId: subject.id,
+      });
+      await repos.exam.save(exam);
+
+      const grade = repos.grade.create({
+        score: 5.0,
+        weight: 1.0,
+        date: new Date(),
+        exam: exam,
+      });
+      await repos.grade.save(grade);
+
+      return { school, semester, subject, exam, grade };
+    };
+
+    // all cascade failures below.
+    it('should have PRAGMA foreign_keys = ON (required for cascade to work)', async () => {
+      const result = await dataSource.query('PRAGMA foreign_keys');
+
+      expect(result[0].foreign_keys).toBe(1);
     });
-    await repos.subject.save(subject);
 
-    const exam = repos.exam.create({
-      name: 'Cascade Exam',
-      date: new Date(),
-      weight: 1.0,
-      isCompleted: false,
-      subjectId: subject.id,
+    // Step 1: school → semester  (FK: semester.schoolId → school.id ON DELETE CASCADE)
+    it('should delete semesters when their school is deleted', async () => {
+      await dataSource.query('PRAGMA foreign_keys = OFF');
+      const { school, semester } = await createFullHierarchy();
+      await SchoolService.delete(school.id);
+      await dataSource.query('PRAGMA foreign_keys = ON');
+      expect(await repos.semester.findOneBy({ id: semester.id })).toBeNull();
     });
-    await repos.exam.save(exam);
 
-    const grade = repos.grade.create({
-      score: 5.0,
-      weight: 1.0,
-      date: new Date(),
-      exam: exam,
+    // Step 2: semester → subject  (FK: subject.semesterId → semester.id ON DELETE CASCADE)
+    it('should delete subjects when their school is deleted', async () => {
+      await dataSource.query('PRAGMA foreign_keys = OFF');
+      const { school, subject } = await createFullHierarchy();
+      await SchoolService.delete(school.id);
+      await dataSource.query('PRAGMA foreign_keys = ON');
+      expect(await repos.subject.findOneBy({ id: subject.id })).toBeNull();
     });
-    await repos.grade.save(grade);
 
-    // Delete the school — cascade should remove all child records
-    await SchoolService.delete(school.id);
+    // Step 3: subject → exam  (FK: exam.subjectId → subject.id ON DELETE CASCADE)
+    it('should delete exams when their school is deleted', async () => {
+      await dataSource.query('PRAGMA foreign_keys = OFF');
+      const { school, exam } = await createFullHierarchy();
+      await SchoolService.delete(school.id);
+      await dataSource.query('PRAGMA foreign_keys = ON');
+      expect(await repos.exam.findOneBy({ id: exam.id })).toBeNull();
+    });
 
-    // All related records must be gone
-    expect(await repos.semester.findOneBy({ id: semester.id })).toBeNull();
-    expect(await repos.subject.findOneBy({ id: subject.id })).toBeNull();
-    expect(await repos.exam.findOneBy({ id: exam.id })).toBeNull();
-    expect(await repos.grade.findOneBy({ id: grade.id })).toBeNull();
+    // Step 4: exam → grade
+    it('should delete grades when their school is deleted', async () => {
+      await dataSource.query('PRAGMA foreign_keys = OFF');
+      const { school, grade } = await createFullHierarchy();
+      await SchoolService.delete(school.id);
+      await dataSource.query('PRAGMA foreign_keys = ON');
+      expect(await repos.grade.findOneBy({ id: grade.id })).toBeNull();
+    });
   });
 
   // Test calculateSchoolAverage method
