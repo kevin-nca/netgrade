@@ -17,7 +17,7 @@
     "android": "cap open android"
   },
   "dependencies": {
-    "@awesome-cordova-plugins/social-sharing": "^8.0.0",
+    "@awesome-cordova-plugins/social-sharing": "^9.1.2",
     "@capacitor-community/sqlite": "^8.0.1",
     "@capacitor/android": "^8.2.0",
     "@capacitor/app": "^8.0.0",
