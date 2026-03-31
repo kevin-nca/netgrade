@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
-  IonAlert,
   IonButton,
   IonButtons,
   IonContent,
@@ -49,6 +48,7 @@ import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-
 import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
 import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
 import './SettingsPage.css';
+import AlertButton from '@/pages/home/settings/components/AlertButton';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -645,29 +645,13 @@ const SettingsPage: React.FC = () => {
           </ModalButtonGroup>
         </IonContent>
       </IonModal>
-      <IonAlert
+      <AlertButton
         isOpen={showDeleteAlert}
-        onDidDismiss={() => {
+        onDismiss={() => {
           setShowDeleteAlert(false);
           setSchoolIdToDelete(null);
         }}
-        header="Schule löschen?"
-        message={`Möchtest du die Schule wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
-        buttons={[
-          {
-            text: 'Abbrechen',
-            role: 'cancel',
-            handler: () => {
-              setShowDeleteAlert(false);
-              setSchoolIdToDelete(null);
-            },
-          },
-          {
-            text: 'Löschen',
-            role: 'destructive',
-            handler: handleDeleteSchool,
-          },
-        ]}
+        onDelete={handleDeleteSchool}
       />
 
       <ExportDialog
