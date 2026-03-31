@@ -34,16 +34,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.glass-input {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
-}
-
 /* Page Background */
 .settings-page {
   background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
@@ -54,27 +44,6 @@
 }
 
 /* Header Styling */
-.settings-header {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.settings-toolbar {
-  --background: transparent;
-  --border-width: 0;
-  padding: 8px 4px;
-  display: flex;
-  align-items: center;
-  position: relative;
-}
 
 .back-button {
   --color: #000000;
@@ -256,10 +225,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-.notification-list {
-  gap: 6px;
 }
 
 .settings-item {
@@ -486,14 +451,6 @@
   transform: translateX(2px);
 }
 
-.item-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
 .settings-item:hover .item-indicator {
   background: rgba(0, 122, 255, 0.3);
   transform: scale(1.2);
@@ -685,31 +642,12 @@
   padding: 8px 4px;
 }
 
-.modal-close-button {
-  --color: #000000;
-  font-size: 16px;
-  font-weight: 500;
-  margin-left: 8px;
-  --background-hover: rgba(0, 0, 0, 0.05);
-  --border-radius: 50%;
-}
-
-.modal-close-icon {
-  font-size: 24px;
-}
-
 .modal-title {
   font-size: 17px;
   font-weight: 600;
   color: #000000;
   text-align: center;
   letter-spacing: -0.4px;
-}
-
-.modal-dummy-button {
-  --color: transparent;
-  margin-right: 8px;
-  visibility: hidden;
 }
 
 .modal-content {
@@ -833,14 +771,6 @@
     height: 44px;
     font-size: 20px;
   }
-
-  .modal-body {
-    padding: 0 20px 28px;
-  }
-
-  .modal-buttons {
-    gap: 8px;
-  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -864,7 +794,6 @@
   .profile-name,
   .section-title,
   .item-title,
-  .settings-title,
   .info-title {
     color: #ffffff;
   }
@@ -874,18 +803,8 @@
     color: rgba(255, 255, 255, 0.6);
   }
 
-  .modal-wrapper {
-    background: #2a2a2a;
-  }
-
   .modal-title {
     color: #ffffff;
-  }
-
-  .modal-input {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    --placeholder-color: rgba(255, 255, 255, 0.5);
   }
 
   .notification-section::before {
@@ -963,22 +882,5 @@
 
   .modal-section-title {
     color: #ffffff;
-  }
-
-  .modal-input-field {
-    --placeholder-color: rgba(255, 255, 255, 0.6);
-    color: #ffffff;
-  }
-
-  .modal-button.cancel {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .modal-button.save {
-    background: rgba(255, 255, 255, 0.353);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.706);
   }
 }
