@@ -41,7 +41,6 @@ import { useAddSemester } from '@/hooks/queries/useSemesterQueries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import AddSemesterModal from '@/components/modals/AddSemesterModal';
-import Header from '@/components/Header/Header';
 import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
 import { DataManagementService } from '@/services/DataManagementService';
 import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
@@ -49,6 +48,7 @@ import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-c
 import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
 import './SettingsPage.css';
 import AlertButton from '@/pages/home/settings/components/AlertButton';
+import SettingsHeader from '@/pages/home/settings/components/SettingsHeader';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -296,12 +296,7 @@ const SettingsPage: React.FC = () => {
 
   return (
     <IonPage className="settings-page">
-      <Header
-        title="Einstellungen"
-        backButton={true}
-        defaultHref={Routes.HOME}
-        onBack={() => history.replace(Routes.HOME)}
-      />
+      <SettingsHeader />
 
       <IonContent className="settings-content" scrollY={true}>
         <div className="content-wrapper">
