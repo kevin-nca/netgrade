@@ -21,7 +21,6 @@ import {
   informationCircleOutline,
   pencilOutline,
   schoolOutline,
-  settingsOutline,
   trashOutline,
 } from 'ionicons/icons';
 import popupStyles from '@/components/modals/popup-modal.module.css';
@@ -49,6 +48,7 @@ import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
 import './SettingsPage.css';
 import AlertButton from '@/pages/home/settings/components/AlertButton';
 import SettingsHeader from '@/pages/home/settings/components/SettingsHeader';
+import ProfileCard from '@/pages/home/settings/components/ProfileCard';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -300,31 +300,10 @@ const SettingsPage: React.FC = () => {
 
       <IonContent className="settings-content" scrollY={true}>
         <div className="content-wrapper">
-          <div className="profile-section">
-            <div className="gradient-orb" />
-            <div className="profile-card glass-card">
-              <div className="profile-content">
-                <div className="profile-avatar">
-                  {userName ? userName.charAt(0).toUpperCase() : 'U'}
-                </div>
-                <div className="profile-info">
-                  <h1 className="profile-name">{userName || 'Benutzer'}</h1>
-                  <p className="profile-subtitle">
-                    Verwalte deine App-Einstellungen
-                  </p>
-                </div>
-                <div
-                  className="profile-edit-button"
-                  onClick={() => setShowNameEditModal(true)}
-                >
-                  <IonIcon
-                    icon={settingsOutline}
-                    className="profile-edit-icon"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <ProfileCard
+            userName={userName}
+            onEditClick={() => setShowNameEditModal(true)}
+          />
 
           <div className="settings-section">
             <div className="section-header">
