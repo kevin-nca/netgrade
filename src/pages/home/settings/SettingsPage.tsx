@@ -34,17 +34,17 @@ import { useAddSemester } from '@/hooks/queries/useSemesterQueries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import AddSemesterModal from '@/components/modals/AddSemesterModal';
-import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
+import NotificationSettings from '@/pages/home/settings/components/notification/NotificationSettings';
 import { DataManagementService } from '@/services/DataManagementService';
 import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
 import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
 import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
 import './SettingsPage.css';
-import AlertButton from '@/pages/home/settings/components/AlertButton';
-import SettingsHeader from '@/pages/home/settings/components/SettingsHeader';
-import ProfileCard from '@/pages/home/settings/components/ProfileCard';
-import SchoolCard from '@/pages/home/settings/components/SchoolCard';
-import EmptySchoolCard from '@/pages/home/settings/components/EmptySchoolCard';
+import AlertButton from '@/pages/home/settings/components/alertButton/AlertButton';
+import SettingsHeader from '@/pages/home/settings/components/settingsHeader/SettingsHeader';
+import ProfileCard from '@/pages/home/settings/components/profileCard/ProfileCard';
+import SchoolCard from '@/pages/home/settings/components/schoolCard/SchoolCard';
+import EmptySchoolCard from '@/pages/home/settings/components/emptySchoolCard/EmptySchoolCard';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
