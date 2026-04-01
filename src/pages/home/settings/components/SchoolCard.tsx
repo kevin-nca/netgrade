@@ -1,4 +1,5 @@
 import { IonButton, IonButtons, IonIcon, IonInput } from '@ionic/react';
+import './SchoolCard.css';
 import {
   checkmarkOutline,
   closeOutline,

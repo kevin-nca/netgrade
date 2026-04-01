@@ -1,5 +1,6 @@
 import { IonIcon } from '@ionic/react';
 import { settingsOutline } from 'ionicons/icons';
+import './ProfileCard.css';
 
 interface ProfileCardProps {
   userName: string | null | undefined;

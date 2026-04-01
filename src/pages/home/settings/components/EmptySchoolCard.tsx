@@ -1,5 +1,6 @@
 import { IonIcon } from '@ionic/react';
 import { schoolOutline } from 'ionicons/icons';
+import './EmptySchoolCard.css';
 
 const EmptySchoolCard = () => {
   return (
