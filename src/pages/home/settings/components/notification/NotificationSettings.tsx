@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './NotificationSettings.css';
 import {
   IonBadge,
   IonContent,

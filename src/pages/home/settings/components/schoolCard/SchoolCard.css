@@ -1,0 +1,52 @@
+.item-icon.school-0 {
+  background: linear-gradient(135deg, #ff3b30 0%, #ff6b6b 100%);
+}
+
+.item-icon.school-1 {
+  background: linear-gradient(135deg, #ff9500 0%, #ffb84d 100%);
+}
+
+.item-icon.school-2 {
+  background: linear-gradient(135deg, #34c759 0%, #4cd964 100%);
+}
+
+.item-icon.school-3 {
+  background: linear-gradient(135deg, #5856d6 0%, #7c7aff 100%);
+}
+
+.settings-item .item-extra {
+  max-height: 30px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.settings-item.expanded .item-extra {
+  max-height: 200px;
+}
+
+.edit-buttons {
+  padding-top: 19px;
+}
+
+.save-button {
+  --box-shadow: none !important;
+}
+
+.edit-button {
+  padding-top: 19px;
+}
+
+.edit-text {
+  font-size: 16px;
+}
+
+.delete-button {
+  padding-top: 16px;
+}
+
+.delete-text {
+  color: rgba(255, 255, 255, 0.3);
+  padding-left: 8px;
+  padding-top: 4px;
+  font-size: 16px;
+}
