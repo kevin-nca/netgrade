@@ -15,6 +15,7 @@ import { useAppForm } from '@/shared/components/form';
 import { useHistory } from 'react-router-dom';
 import {
   addOutline,
+  calendarOutline,
   checkmarkOutline,
   closeOutline,
   downloadOutline,
@@ -37,8 +38,11 @@ import {
   useSchools,
   useUpdateSchool,
   useUserName,
+  useAddSemester,
+  useSemesters,
+  useUpdateSemester,
+  useDeleteSemester,
 } from '@/hooks/queries';
-import { useAddSemester } from '@/hooks/queries/useSemesterQueries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import AddSemesterModal from '@/components/modals/AddSemesterModal';
@@ -65,6 +69,7 @@ const SettingsPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: schools } = useSchools();
+  const { data: semesters } = useSemesters();
   const { data: userName } = useUserName();
   const addSchoolMutation = useAddSchool();
   const addSemesterMutation = useAddSemester();
@@ -72,13 +77,88 @@ const SettingsPage: React.FC = () => {
   const resetAllDataMutation = useResetAllDataMutation();
   const deleteSchoolMutation = useDeleteSchool();
   const updateSchoolMutation = useUpdateSchool();
+  const updateSemesterMutation = useUpdateSemester();
+  const deleteSemesterMutation = useDeleteSemester();
 
   const [expandedSchoolId, setExpandedSchoolId] = useState<string | null>(null);
   const [editingSchoolId, setEditingSchoolId] = useState<string | null>(null);
   const [editSchoolName, setEditSchoolName] = useState('');
 
+  const [expandedSemesterId, setExpandedSemesterId] = useState<string | null>(
+    null,
+  );
+  const [editingSemesterId, setEditingSemesterId] = useState<string | null>(
+    null,
+  );
+  const [editSemesterName, setEditSemesterName] = useState('');
+  const [showDeleteSemesterAlert, setShowDeleteSemesterAlert] = useState(false);
+  const [semesterIdToDelete, setSemesterIdToDelete] = useState<string | null>(
+    null,
+  );
+
   const toggleSchool = (id: string) => {
     setExpandedSchoolId((prev) => (prev === id ? null : id));
+  };
+
+  const toggleSemester = (id: string) => {
+    setExpandedSemesterId((prev) => (prev === id ? null : id));
+  };
+
+  const handleEditSemester = (
+    semesterId: string,
+    currentName: string,
+    e: React.MouseEvent,
+  ) => {
+    e.stopPropagation();
+    setEditingSemesterId(semesterId);
+    setEditSemesterName(currentName);
+  };
+
+  const handleSaveSemesterEdit = (semesterId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (editSemesterName.trim()) {
+      updateSemesterMutation.mutate(
+        { id: semesterId, name: editSemesterName.trim() },
+        {
+          onSuccess: () => {
+            setEditingSemesterId(null);
+            setEditSemesterName('');
+            showToast('Semestername erfolgreich geändert');
+          },
+          onError: (error) => {
+            showToast(
+              `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+              false,
+            );
+          },
+        },
+      );
+    }
+  };
+
+  const handleCancelSemesterEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingSemesterId(null);
+    setEditSemesterName('');
+  };
+
+  const handleDeleteSemester = () => {
+    if (!semesterIdToDelete) return;
+    deleteSemesterMutation.mutate(semesterIdToDelete, {
+      onSuccess: () => {
+        showToast('Semester wurde gelöscht', true);
+        setShowDeleteSemesterAlert(false);
+        setSemesterIdToDelete(null);
+      },
+      onError: (error) => {
+        showToast(
+          `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+          false,
+        );
+        setShowDeleteSemesterAlert(false);
+        setSemesterIdToDelete(null);
+      },
+    });
   };
 
   const handleEditSchool = (
@@ -343,7 +423,7 @@ const SettingsPage: React.FC = () => {
             </div>
 
             <div className="settings-list">
-              {schools!.length > 0 ? (
+              {schools!.length > 0 &&
                 schools!.map((school, index) => {
                   const isExpanded = expandedSchoolId === school.id;
                   const isEditing = editingSchoolId === school.id;
@@ -359,7 +439,7 @@ const SettingsPage: React.FC = () => {
                           {school.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="item-text">
-                          {isEditing ? (
+                          {isEditing && (
                             <div className="edit-school-input">
                               <IonInput
                                 value={editSchoolName}
@@ -373,7 +453,8 @@ const SettingsPage: React.FC = () => {
                                 autoFocus
                               />
                             </div>
-                          ) : (
+                          )}
+                          {!isEditing && (
                             <h3 className="item-title">{school.name}</h3>
                           )}
                         </div>
@@ -385,7 +466,7 @@ const SettingsPage: React.FC = () => {
                           onClick={(e) => e.stopPropagation()}
                         >
                           <IonButtons slot="end">
-                            {isEditing ? (
+                            {isEditing && (
                               <div className="edit-buttons">
                                 <IonButton
                                   className="save-button"
@@ -418,7 +499,8 @@ const SettingsPage: React.FC = () => {
                                   <p className="cancel-text">Abbrechen</p>
                                 </IonButton>
                               </div>
-                            ) : (
+                            )}
+                            {!isEditing && (
                               <>
                                 <IonButton
                                   className="edit-button"
@@ -454,8 +536,8 @@ const SettingsPage: React.FC = () => {
                       )}
                     </div>
                   );
-                })
-              ) : (
+                })}
+              {schools!.length === 0 && (
                 <div className="settings-item glass-card empty-item">
                   <div className="item-content">
                     <div className="item-icon empty">
@@ -474,13 +556,161 @@ const SettingsPage: React.FC = () => {
           </div>
           <div className="settings-section">
             <div className="section-header">
-              <h2 className="section-title">Semester hinzufügen</h2>
+              <h2 className="section-title">Deine Semester</h2>
               <div
                 className="section-add-button"
                 onClick={() => setShowAddSemesterModal(true)}
               >
                 <IonIcon icon={addOutline} className="section-add-icon" />
               </div>
+            </div>
+
+            <div className="settings-list">
+              {semesters &&
+                semesters.length > 0 &&
+                semesters.map((semester, index) => {
+                  const isExpanded = expandedSemesterId === semester.id;
+                  const isEditing = editingSemesterId === semester.id;
+                  const SemesterCount = semesters!.filter(
+                    (s) => s.school?.id === semester.school?.id,
+                  ).length;
+
+                  return (
+                    <div
+                      key={semester.id}
+                      className={`settings-item glass-card ${isExpanded ? 'expanded' : ''}`}
+                      onClick={() => toggleSemester(semester.id)}
+                    >
+                      <div className="item-content">
+                        <div className={`item-icon school-${index % 4}`}>
+                          {semester.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="item-text">
+                          {isEditing && (
+                            <div className="edit-school-input">
+                              <IonInput
+                                value={editSemesterName}
+                                placeholder="Semestername..."
+                                onIonChange={(e) =>
+                                  setEditSemesterName(e.detail.value || '')
+                                }
+                                onClick={(e) => e.stopPropagation()}
+                                className="school-edit-field"
+                                clearInput
+                                autoFocus
+                              />
+                            </div>
+                          )}
+                          {!isEditing && (
+                            <>
+                              <h3 className="item-title">{semester.name}</h3>
+                              {semester.school && (
+                                <p className="item-subtitle">
+                                  {semester.school.name}
+                                </p>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {isExpanded && (
+                        <div
+                          className="item-extra"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <IonButtons slot="end">
+                            {isEditing && (
+                              <div className="edit-buttons">
+                                <IonButton
+                                  className="save-button"
+                                  color="success"
+                                  onClick={(e) =>
+                                    handleSaveSemesterEdit(semester.id, e)
+                                  }
+                                  disabled={
+                                    updateSemesterMutation.isPending ||
+                                    !editSemesterName.trim() ||
+                                    editSemesterName.trim() === semester.name
+                                  }
+                                >
+                                  <IonIcon
+                                    slot="icon-only"
+                                    icon={checkmarkOutline}
+                                  />
+                                  <p className="save-text">Speichern</p>
+                                </IonButton>
+                                <IonButton
+                                  className="cancel-button"
+                                  color="medium"
+                                  onClick={handleCancelSemesterEdit}
+                                  disabled={updateSemesterMutation.isPending}
+                                >
+                                  <IonIcon
+                                    slot="icon-only"
+                                    icon={closeOutline}
+                                  />
+                                  <p className="cancel-text">Abbrechen</p>
+                                </IonButton>
+                              </div>
+                            )}
+                            {!isEditing && (
+                              <>
+                                <IonButton
+                                  className="edit-button"
+                                  color="primary"
+                                  onClick={(e) =>
+                                    handleEditSemester(
+                                      semester.id,
+                                      semester.name,
+                                      e,
+                                    )
+                                  }
+                                >
+                                  <IonIcon
+                                    slot="icon-only"
+                                    icon={pencilOutline}
+                                  />
+                                  <p className="edit-text">Bearbeiten</p>
+                                </IonButton>
+                                <IonButton
+                                  className="delete-button"
+                                  color="danger"
+                                  onClick={() => {
+                                    setSemesterIdToDelete(semester.id);
+                                    setShowDeleteSemesterAlert(true);
+                                  }}
+                                  disabled={SemesterCount <= 1}
+                                >
+                                  <IonIcon
+                                    slot="icon-only"
+                                    icon={trashOutline}
+                                  />
+                                  <p className="delete-text">Löschen</p>
+                                </IonButton>
+                              </>
+                            )}
+                          </IonButtons>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              {(!semesters || semesters.length === 0) && (
+                <div className="settings-item glass-card empty-item">
+                  <div className="item-content">
+                    <div className="item-icon empty">
+                      <IonIcon icon={calendarOutline} />
+                    </div>
+                    <div className="item-text">
+                      <h3 className="item-title">Keine Semester</h3>
+                      <p className="item-subtitle">
+                        Tippe auf + um ein Semester hinzuzufügen
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <NotificationSettings />
@@ -666,6 +896,31 @@ const SettingsPage: React.FC = () => {
             text: 'Löschen',
             role: 'destructive',
             handler: handleDeleteSchool,
+          },
+        ]}
+      />
+
+      <IonAlert
+        isOpen={showDeleteSemesterAlert}
+        onDidDismiss={() => {
+          setShowDeleteSemesterAlert(false);
+          setSemesterIdToDelete(null);
+        }}
+        header="Semester löschen?"
+        message="Möchtest du das Semester wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+        buttons={[
+          {
+            text: 'Abbrechen',
+            role: 'cancel',
+            handler: () => {
+              setShowDeleteSemesterAlert(false);
+              setSemesterIdToDelete(null);
+            },
+          },
+          {
+            text: 'Löschen',
+            role: 'destructive',
+            handler: handleDeleteSemester,
           },
         ]}
       />
