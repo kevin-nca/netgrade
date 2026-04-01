@@ -24,6 +24,7 @@ import {
   schoolOutline,
   settingsOutline,
   trashOutline,
+  documentTextOutline,
 } from 'ionicons/icons';
 import popupStyles from '@/components/modals/popup-modal.module.css';
 import { Routes } from '@/routes';
@@ -45,6 +46,7 @@ import AddSemesterModal from '@/components/modals/AddSemesterModal';
 import Header from '@/components/Header/Header';
 import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
 import { DataManagementService } from '@/services/DataManagementService';
+import { PDFService } from '@/services/PDFService';
 import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
 import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
 import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
@@ -255,6 +257,18 @@ const SettingsPage: React.FC = () => {
     try {
       await DataManagementService.exportAsJSON();
       showToast('JSON Export erfolgreich!', true);
+    } catch {
+      showToast('Export fehlgeschlagen', false);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    try {
+      const result = await PDFService.exportSchoolReport(
+        'all',
+        'netgrade-export',
+      );
+      showToast(result.message, result.success);
     } catch {
       showToast('Export fehlgeschlagen', false);
     }
@@ -495,7 +509,7 @@ const SettingsPage: React.FC = () => {
                 onClick={handleExportJSON}
               >
                 <div className="item-content">
-                  <div className="item-icon export">
+                  <div className="item-icon json">
                     <IonIcon icon={downloadOutline} />
                   </div>
                   <div className="item-text">
@@ -509,10 +523,27 @@ const SettingsPage: React.FC = () => {
 
               <div
                 className="settings-item glass-card"
+                onClick={handleExportPDF}
+              >
+                <div className="item-content">
+                  <div className="item-icon pdf">
+                    <IonIcon icon={documentTextOutline} />
+                  </div>
+                  <div className="item-text">
+                    <h3 className="item-title">PDF Export</h3>
+                    <p className="item-subtitle">
+                      App-Daten als PDF exportieren
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="settings-item glass-card"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <div className="item-content">
-                  <div className="item-icon import">
+                  <div className="item-icon json">
                     <IonIcon icon={cloudUploadOutline} />
                   </div>
                   <div className="item-text">

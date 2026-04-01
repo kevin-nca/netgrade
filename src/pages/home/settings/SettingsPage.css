@@ -402,8 +402,16 @@
   background: linear-gradient(135deg, #34c759 0%, #4cd964 100%);
 }
 
+.item-icon.pdf {
+  background: linear-gradient(135deg, #5856d6 0%, #7c7aff 100%);
+}
+
 .item-icon.danger {
   background: linear-gradient(135deg, #ff3b30 0%, #ff6b6b 100%);
+}
+
+.item-icon.json {
+  background: linear-gradient(135deg, #ff9500 0%, #ffb84d 100%);
 }
 
 .item-icon.empty {
@@ -625,7 +633,7 @@
 }
 
 .settings-item .item-extra {
-  max-height: 30;
+  max-height: 30px;
   overflow: hidden;
   transition: max-height 0.3s ease;
 }
