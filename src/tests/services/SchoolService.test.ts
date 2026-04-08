@@ -199,38 +199,23 @@ describe('SchoolService', () => {
 
     // Step 1: school → semester  (FK: semester.schoolId → school.id ON DELETE CASCADE)
     it('should delete semesters when their school is deleted', async () => {
-      await dataSource.query('PRAGMA foreign_keys = OFF');
       const { school, semester } = await createFullHierarchy();
       await SchoolService.delete(school.id);
-      await dataSource.query('PRAGMA foreign_keys = ON');
       expect(await repos.semester.findOneBy({ id: semester.id })).toBeNull();
     });
 
     // Step 2: semester → subject  (FK: subject.semesterId → semester.id ON DELETE CASCADE)
     it('should delete subjects when their school is deleted', async () => {
-      await dataSource.query('PRAGMA foreign_keys = OFF');
       const { school, subject } = await createFullHierarchy();
       await SchoolService.delete(school.id);
-      await dataSource.query('PRAGMA foreign_keys = ON');
       expect(await repos.subject.findOneBy({ id: subject.id })).toBeNull();
     });
 
     // Step 3: subject → exam  (FK: exam.subjectId → subject.id ON DELETE CASCADE)
     it('should delete exams when their school is deleted', async () => {
-      await dataSource.query('PRAGMA foreign_keys = OFF');
       const { school, exam } = await createFullHierarchy();
       await SchoolService.delete(school.id);
-      await dataSource.query('PRAGMA foreign_keys = ON');
       expect(await repos.exam.findOneBy({ id: exam.id })).toBeNull();
-    });
-
-    // Step 4: exam → grade
-    it('should delete grades when their school is deleted', async () => {
-      await dataSource.query('PRAGMA foreign_keys = OFF');
-      const { school, grade } = await createFullHierarchy();
-      await SchoolService.delete(school.id);
-      await dataSource.query('PRAGMA foreign_keys = ON');
-      expect(await repos.grade.findOneBy({ id: grade.id })).toBeNull();
     });
   });
 

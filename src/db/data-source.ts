@@ -123,6 +123,7 @@ export const initializeDatabase = async (): Promise<DataSource> => {
 
     AppDataSource = new DataSource(options);
     await AppDataSource.initialize();
+    await AppDataSource.query('PRAGMA foreign_keys = ON');
     console.log('Data Source has been initialized successfully.');
 
     repositories = {
