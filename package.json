@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@awesome-cordova-plugins/social-sharing": "^9.1.2",
-    "@capacitor-community/sqlite": "^8.0.1",
+    "@capacitor-community/sqlite": "^8.1.0",
     "@capacitor/android": "^8.3.0",
     "@capacitor/app": "^8.1.0",
     "@capacitor/core": "^8.0.2",
@@ -46,7 +46,7 @@
     "ionicons": "^8.0.13",
     "localforage": "^1.10.0",
     "react": "^19.2.4",
-    "react-calendar": "^6.0.0",
+    "react-calendar": "^6.0.1",
     "react-dom": "^19.2.4",
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
