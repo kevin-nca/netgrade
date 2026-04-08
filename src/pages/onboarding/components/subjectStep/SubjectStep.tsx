@@ -1,12 +1,9 @@
-// src/pages/onboarding/components/subjectStep/SubjectStep.tsx
 import React, { useState, useEffect } from 'react';
-import { useForm } from '@tanstack/react-form';
-import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/react';
+import { IonButton, IonIcon } from '@ionic/react';
 import {
   bookOutline,
   addOutline,
   trashOutline,
-  personOutline,
   checkmarkCircleOutline,
   arrowForward,
   calendarOutline,
@@ -17,6 +14,7 @@ import {
   TempSubject,
   TempSemester,
 } from '../../types';
+import { useAppForm } from '@/shared/components/form';
 import './SubjectStep.css';
 import '../SharedStepStyles.css';
 
@@ -64,12 +62,10 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
   );
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       name: '',
       teacher: '',
-      description: '',
-      weight: 100,
     },
     onSubmit: async ({ value }) => {
       if (selectedSchool && selectedSemester) {
@@ -77,7 +73,6 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
           id: generateId(),
           name: value.name.trim(),
           teacher: value.teacher?.trim() || null,
-          description: value.description?.trim() || null,
           weight: 100,
           schoolId: selectedSchool.id,
           semesterId: selectedSemester.id,
@@ -115,10 +110,6 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
       setSelectedSemesterId(selectedSemester.id);
     }
   }, [selectedSemester, setSelectedSemesterId]);
-
-  const handleAddSubject = () => {
-    form.handleSubmit();
-  };
 
   const handleRemoveSubject = (subjectId: string) => {
     setData((prev) => ({
@@ -160,7 +151,6 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
       </div>
 
       <div className="step-body">
-        {/* Semester Selector */}
         {data.semesters.filter((s) => s.schoolId === selectedSchool?.id)
           .length > 1 && (
           <div className="semester-selector">
@@ -198,7 +188,6 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
           </div>
         )}
 
-        {/* School Selector */}
         {data.schools.length > 1 && (
           <div className="school-selector">
             <h3 className="subsection-title">Schule auswählen</h3>
@@ -225,7 +214,6 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
           </div>
         )}
 
-        {/* Add Subject Form */}
         <div className="add-section">
           {currentSchoolSubjects.length < 2 &&
             (!showAddForm ? (
@@ -249,59 +237,13 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                   <h3 className="form-title">Neues Fach erstellen</h3>
 
                   <div className="form-fields">
-                    <form.Field name="name">
-                      {(field) => (
-                        <div className="field-group">
-                          <label className="field-label">Fachname *</label>
-                          <div className="input-wrapper glass-input">
-                            <IonItem lines="none" className="input-item">
-                              <div slot="start" className="input-icon-wrapper">
-                                <IonIcon
-                                  icon={bookOutline}
-                                  className="input-icon"
-                                />
-                              </div>
-                              <IonInput
-                                value={field.state.value}
-                                placeholder="z.B. Mathematik"
-                                onIonInput={(e) =>
-                                  field.handleChange(e.detail.value || '')
-                                }
-                                className="input-field"
-                                clearInput
-                              />
-                            </IonItem>
-                          </div>
-                        </div>
-                      )}
-                    </form.Field>
+                    <form.AppField name="name">
+                      {(field) => <field.SubjectNameField label="Fachname" />}
+                    </form.AppField>
 
-                    <form.Field name="teacher">
-                      {(field) => (
-                        <div className="field-group">
-                          <label className="field-label">Lehrer/in</label>
-                          <div className="input-wrapper glass-input">
-                            <IonItem lines="none" className="input-item">
-                              <div slot="start" className="input-icon-wrapper">
-                                <IonIcon
-                                  icon={personOutline}
-                                  className="input-icon"
-                                />
-                              </div>
-                              <IonInput
-                                value={field.state.value}
-                                placeholder="z.B. Frau Schmidt"
-                                onIonInput={(e) =>
-                                  field.handleChange(e.detail.value || '')
-                                }
-                                className="input-field"
-                                clearInput
-                              />
-                            </IonItem>
-                          </div>
-                        </div>
-                      )}
-                    </form.Field>
+                    <form.AppField name="teacher">
+                      {(field) => <field.TeacherField label="Lehrer/in" />}
+                    </form.AppField>
                   </div>
 
                   <div className="form-actions">
@@ -310,7 +252,6 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                       onClick={() => {
                         setShowAddForm(false);
                         form.reset();
-                        form.setFieldValue('weight', 100);
                       }}
                       className="cancel-button"
                     >
@@ -319,7 +260,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                     <form.Subscribe selector={(state) => [state.values.name]}>
                       {([name]) => (
                         <IonButton
-                          onClick={handleAddSubject}
+                          onClick={() => form.handleSubmit()}
                           disabled={!name?.trim()}
                           className="save-button"
                         >
@@ -332,6 +273,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
               </div>
             ))}
         </div>
+
         {currentSchoolSubjects.length > 0 && (
           <div className="subjects-section">
             <h3 className="subsection-title">Deine Fächer</h3>
@@ -364,8 +306,6 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
             </div>
           </div>
         )}
-
-        {/* Add Subject Form */}
       </div>
 
       <div className="step-footer">

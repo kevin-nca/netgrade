@@ -1,7 +1,7 @@
 .subjects-container {
   padding-left: 16px;
   padding-right: 16px;
-  padding-top: 16px;
+  padding-top: 8px;
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -120,8 +120,8 @@
 }
 
 .subject-action-button.edit {
-  background: linear-gradient(135deg, #007aff, #0051d5);
-  color: white;
+  background: none;
+  color: black;
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
@@ -131,9 +131,10 @@
 }
 
 .subject-action-button.delete {
-  background: linear-gradient(135deg, #ff3b30, #e60000);
-  color: white;
-  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
+  background: none;
+  color: black;
+  border-radius: 64px;
+  box-shadow: 0 2px 8px rgba(246, 57, 46, 0.3);
 }
 
 .subject-action-button.delete:active {
@@ -190,6 +191,63 @@
   line-height: 1.3;
 }
 
+.school-semester-selector {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px 8px;
+  justify-content: center;
+}
+
+.school-semester-name {
+  font-size: 15px;
+  font-weight: 600;
+  min-width: 130px;
+  text-align: center;
+  color: #000000;
+  letter-spacing: -0.3px;
+}
+
+.school-semester-arrow {
+  background: rgba(0, 122, 255, 0.1);
+  border: none;
+  cursor: pointer;
+  color: #007aff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.school-semester-arrow:active {
+  transform: scale(0.88);
+  background: rgba(0, 122, 255, 0.2);
+}
+
+.school-semester-arrow:disabled {
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.2);
+  cursor: default;
+  transform: none;
+}
+
+.school-semester-delete {
+  position: absolute;
+  right: 24px;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  color: #ff3b30;
+  font-size: 20px;
+}
+
 @media (prefers-color-scheme: dark) {
   .subject-item,
   .subjects-empty-state {
@@ -221,11 +279,43 @@
   .subject-average-text {
     color: rgba(255, 255, 255, 0.8);
   }
+
+  .school-semester-name {
+    color: #ffffff;
+  }
+
+  .school-semester-arrow {
+    background: rgba(0, 122, 255, 0.15);
+    color: #007aff;
+  }
+
+  .school-semester-arrow:active {
+    background: rgba(0, 122, 255, 0.28);
+  }
+
+  .school-semester-arrow:disabled {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  .subject-action-button.delete {
+    background: none;
+    color: white;
+    border-radius: 64px;
+    box-shadow: 0 2px 8px rgba(246, 57, 46, 0.3);
+  }
+
+  .subject-action-button.edit {
+    background: none;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .subject-item,
-  .subject-action-button {
+  .subject-action-button,
+  .school-semester-arrow {
     transition: none !important;
   }
 }

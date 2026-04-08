@@ -1,19 +1,11 @@
 import React from 'react';
-import {
-  IonModal,
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonIcon,
-} from '@ionic/react';
-import { timeOutline } from 'ionicons/icons';
+import { IonContent, IonModal } from '@ionic/react';
 import {
   AddSemesterForm,
   AddSemesterPayload,
 } from '@/features/add-semester/add-semester-form';
 import { School } from '@/db/entities';
+import styles from './popup-modal.module.css';
 
 interface AddSemesterModalProps {
   isOpen: boolean;
@@ -34,46 +26,22 @@ const AddSemesterModal: React.FC<AddSemesterModalProps> = ({
     <IonModal
       isOpen={isOpen}
       onDidDismiss={onClose}
-      breakpoints={[0, 0.25, 0.5, 0.75, 1]}
-      initialBreakpoint={0.75}
-      backdropBreakpoint={0.5}
-      className="settings-modal"
+      className={styles.modal}
+      style={{ '--height': '75%' }}
     >
-      <IonPage className="modal-page">
-        <IonHeader className="modal-header">
-          <IonToolbar className="modal-toolbar">
-            <IonTitle className="modal-title">Neues Semester</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-
-        <IonContent className="modal-content" scrollY={true}>
-          <div className="modal-content-wrapper">
-            <div className="modal-header-section">
-              <div className="modal-gradient-orb" />
-              <div className="modal-header-content">
-                <div className="modal-header-flex">
-                  <div className="modal-icon-wrapper">
-                    <IonIcon icon={timeOutline} className="modal-icon" />
-                  </div>
-                  <div className="modal-text">
-                    <h1>Semester hinzufügen</h1>
-                    <p>Erstelle ein neues Semester</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <AddSemesterForm
-              onSubmit={onAdd}
-              onCancel={onClose}
-              isLoading={isLoading}
-              schools={schools}
-            />
-
-            <div className="modal-bottom-spacer" />
-          </div>
-        </IonContent>
-      </IonPage>
+      <div className={styles.modalContent}>
+        <h1>Semester hinzufügen</h1>
+      </div>
+      <IonContent scrollY={true}>
+        <div className={styles.formFields}>
+          <AddSemesterForm
+            onSubmit={onAdd}
+            onCancel={onClose}
+            isLoading={isLoading}
+            schools={schools}
+          />
+        </div>
+      </IonContent>
     </IonModal>
   );
 };

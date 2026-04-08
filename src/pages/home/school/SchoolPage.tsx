@@ -1,21 +1,32 @@
 import React, { useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { IonButtons, IonContent, IonIcon, IonPage } from '@ionic/react';
-import { add, person, createOutline, trashOutline } from 'ionicons/icons';
+import {
+  add,
+  person,
+  createOutline,
+  trashOutline,
+  chevronBack,
+  chevronForward,
+  trash,
+} from 'ionicons/icons';
 import SubjectSelectionModal from '@/features/add-subject/subject-selection-modal';
 import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
-import { Subject } from '@/db/entities';
+import { Semester, Subject } from '@/db/entities';
 import {
   useAddSubject,
   useDeleteSubject,
   useSchool,
   useSchoolSubjects,
   useUpdateSubject,
+  useSemesters,
+  useDeleteSemester,
 } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import EditSubjectModal from '@/features/edit-subject/edit-subject-modal';
 import './SchoolPage.css';
+import '../main/MainPage.css';
 
 const calculateSubjectAverage = (subject: Subject): number | undefined => {
   const grades = subject.exams
@@ -39,15 +50,23 @@ const SchoolPage: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [subjectToEdit, setSubjectToEdit] = useState<Subject | null>(null);
+  const [activeSemesterIndex, setActiveSemesterIndex] = useState(0);
   const { schoolId } = useParams<{ schoolId: string }>();
   const history = useHistory();
 
   const { data: school } = useSchool(schoolId);
   const { data: subjects } = useSchoolSubjects(schoolId);
+  const { data: allSemesters } = useSemesters();
 
   const addSubjectMutation = useAddSubject();
   const updateSubjectMutation = useUpdateSubject();
   const deleteSubjectMutation = useDeleteSubject();
+  const deleteSemesterMutation = useDeleteSemester();
+
+  const semesters = allSemesters?.filter((s) => s.schoolId === schoolId) ?? [];
+  const activeSemester = semesters[activeSemesterIndex];
+  const filteredSubjects =
+    subjects?.filter((s) => s.semesterId === activeSemester?.id) ?? [];
 
   const goToGradesPage = (subject: Subject) => {
     history.push(
@@ -56,12 +75,10 @@ const SchoolPage: React.FC = () => {
   };
 
   const addSubjectToStore = (subjectData: Subject) => {
-    const defaultSemesterId = school!.semesters[0].id;
-
     addSubjectMutation.mutate(
       {
         name: subjectData.name,
-        semesterId: defaultSemesterId,
+        semesterId: activeSemester!.id,
         teacher: null,
         weight: 1.0,
       },
@@ -78,8 +95,22 @@ const SchoolPage: React.FC = () => {
     });
   };
 
+  const handleRemoveSemester = (semester: Semester) => {
+    const confirmed = window.confirm(
+      `Semester "${semester.name}" wirklich löschen? Alle Fächer und Noten gehen verloren.`,
+    );
+
+    if (!confirmed) return;
+    deleteSemesterMutation.mutate(semester.id, {
+      onSuccess: () => {
+        setActiveSemesterIndex((i) => Math.max(0, i - 1));
+      },
+      onError: (error) => console.error('Failed to remove semester:', error),
+    });
+  };
+
   return (
-    <IonPage>
+    <IonPage className="home-page">
       <Header
         title={school!.name}
         backButton={true}
@@ -93,12 +124,43 @@ const SchoolPage: React.FC = () => {
           </IonButtons>
         }
       />
-      <IonContent>
-        <div className="subjects-container">
-          {subjects!.length > 0 ? (
-            subjects!.map((subject: Subject) => {
-              const average = calculateSubjectAverage(subject);
+      <IonContent className="home-content">
+        <div className="school-semester-selector">
+          <button
+            className="school-semester-arrow"
+            onClick={() => setActiveSemesterIndex((i) => i - 1)}
+            disabled={activeSemesterIndex === 0}
+          >
+            <IonIcon icon={chevronBack} />
+          </button>
+          <span className="school-semester-name">
+            {activeSemester?.name ?? '—'}
+          </span>
+          <button
+            className="school-semester-arrow"
+            onClick={() => setActiveSemesterIndex((i) => i + 1)}
+            disabled={activeSemesterIndex === semesters.length - 1}
+          >
+            <IonIcon icon={chevronForward} />
+          </button>
+          <button
+            className="school-semester-delete"
+            disabled={semesters.length <= 1}
+            aria-label="Semester löschen"
+            title="Semester löschen"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRemoveSemester(semesters[activeSemesterIndex]);
+            }}
+          >
+            <IonIcon icon={trash} />
+          </button>
+        </div>
 
+        <div className="subjects-container">
+          {filteredSubjects.length > 0 ? (
+            filteredSubjects.map((subject: Subject) => {
+              const average = calculateSubjectAverage(subject);
               return (
                 <div key={subject.id} className="subject-item-container">
                   <div
@@ -110,7 +172,6 @@ const SchoolPage: React.FC = () => {
                         {subject.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
-
                     <div className="subject-info">
                       <h3 className="subject-name">{subject.name}</h3>
                       <div className="subject-teacher-text">
@@ -126,7 +187,6 @@ const SchoolPage: React.FC = () => {
                         {average !== undefined ? `${average}` : '—'}
                       </div>
                     </div>
-
                     <div className="subject-actions">
                       <button
                         className="subject-action-button edit"
@@ -167,7 +227,7 @@ const SchoolPage: React.FC = () => {
           isOpen={isModalOpen}
           setIsOpen={setModalOpen}
           isModule={false}
-          subjectsOrModules={subjects!}
+          subjectsOrModules={filteredSubjects}
           addToSubjectsOrModules={addSubjectToStore}
           removeFromSubjectsOrModules={(id: string) =>
             deleteSubjectMutation.mutate(id, {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { IonContent, IonToast, useIonViewWillEnter } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAddExam, useSchools, useSchoolSubjects } from '@/hooks';
 import { useAppForm } from '@/shared/components/form';
@@ -9,6 +10,7 @@ import BottomNavigation from '@/components/bottom-navigation/bottom-navigation';
 import SubmitButton from '@/shared/components/buttons/submitt-button/submit-button';
 import FormContainer from '@/shared/components/form-layout/form-container';
 import SuccessOverlay from '@/shared/components/form-layout/succes-overlay';
+import { Routes } from '@/routes';
 import {
   examFormSchema,
   type ExamFormData,
@@ -19,6 +21,7 @@ interface AddExamFormProps {
 }
 
 const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
+  const history = useHistory();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('danger');
@@ -98,7 +101,7 @@ const AddExamForm: React.FC<AddExamFormProps> = ({ onSuccess }) => {
       <Header
         title="Prüfung hinzufügen"
         backButton
-        onBack={() => window.history.back()}
+        onBack={() => history.replace(Routes.HOME)}
       />
 
       <IonContent className="add-exam-content" scrollY>
