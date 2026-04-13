@@ -4,6 +4,7 @@ import {
   ExportOptions,
   ExportResult,
 } from '@/services/DataManagementService';
+import { PDFService, PdfExportResult } from '@/services/PDFService';
 
 export const useResetAllDataMutation = () => {
   const queryClient = useQueryClient();
@@ -24,6 +25,18 @@ export const useExportData = () => {
   return useMutation<ExportResult, Error, { options: ExportOptions }>({
     mutationFn: async ({ options }) => {
       return await DataManagementService.exportData(options);
+    },
+  });
+};
+
+export const useExportPDF = () => {
+  return useMutation<
+    PdfExportResult,
+    Error,
+    { schoolId: string | 'all'; filename: string }
+  >({
+    mutationFn: async ({ schoolId, filename }) => {
+      return await PDFService.exportSchoolReport(schoolId, filename);
     },
   });
 };

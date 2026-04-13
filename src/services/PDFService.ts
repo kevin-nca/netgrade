@@ -11,21 +11,15 @@ export interface PdfExportResult {
   filename?: string;
 }
 
-export class ExportErrorPDF extends Error {
-  constructor(
-    message: string,
-    public code:
-      | 'INVALID_DATA'
-      | 'SAVE_FAILED'
-      | 'SHARE_FAILED'
-      | 'PARSE_FAILED'
-      | 'UNKNOWN',
-  ) {
-    super(message);
-    this.name = 'ExportError';
-  }
-}
 export class PDFService {
+  /**
+   * Exports a school report as a PDF file.
+   * On native platforms the PDF is saved to the Documents directory and shared via the system share sheet.
+   * On web it is downloaded directly in the browser.
+   * @param schoolId - The ID of the school to export, or 'all' to include every school.
+   * @param filename - The filename for the exported PDF (without extension).
+   * @returns A PdfExportResult indicating success or failure and an optional filename.
+   */
   static async exportSchoolReport(
     schoolId: string | 'all',
     filename: string,
@@ -44,16 +38,13 @@ export class PDFService {
               where: { id: schoolId },
               relations,
             });
-            if (!found)
-              throw new ExportErrorPDF(
-                'Schule nicht gefunden.',
-                'INVALID_DATA',
-              );
+            if (!found) throw new Error('Schule nicht gefunden.');
             return [found];
           })();
 
-    if (schools.length === 0)
-      throw new ExportErrorPDF('Keine Daten vorhanden.', 'INVALID_DATA');
+    if (schools.length === 0) {
+      throw new Error('Keine Daten vorhanden.');
+    }
 
     const pdfBytes = await PDFService.build(schools);
     return Capacitor.isNativePlatform()
@@ -257,7 +248,12 @@ export class PDFService {
     filename: string,
   ): Promise<PdfExportResult> {
     try {
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(pdfBytes)));
+      const bytes = new Uint8Array(pdfBytes);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i += 8192) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+      }
+      const base64 = btoa(binary);
       await Filesystem.writeFile({
         path: filename,
         data: base64,

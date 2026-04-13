@@ -40,13 +40,15 @@ import {
   useUserName,
 } from '@/hooks/queries';
 import { useAddSemester } from '@/hooks/queries/useSemesterQueries';
-import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
+import {
+  useResetAllDataMutation,
+  useExportPDF,
+} from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import AddSemesterModal from '@/components/modals/AddSemesterModal';
 import Header from '@/components/Header/Header';
 import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
 import { DataManagementService } from '@/services/DataManagementService';
-import { PDFService } from '@/services/PDFService';
 import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
 import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
 import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
@@ -72,6 +74,7 @@ const SettingsPage: React.FC = () => {
   const addSemesterMutation = useAddSemester();
   const saveUserNameMutation = useSaveUserName();
   const resetAllDataMutation = useResetAllDataMutation();
+  const exportPDFMutation = useExportPDF();
   const deleteSchoolMutation = useDeleteSchool();
   const updateSchoolMutation = useUpdateSchool();
 
@@ -262,16 +265,14 @@ const SettingsPage: React.FC = () => {
     }
   };
 
-  const handleExportPDF = async () => {
-    try {
-      const result = await PDFService.exportSchoolReport(
-        'all',
-        'netgrade-export',
-      );
-      showToast(result.message, result.success);
-    } catch {
-      showToast('Export fehlgeschlagen', false);
-    }
+  const handleExportPDF = () => {
+    exportPDFMutation.mutate(
+      { schoolId: 'all', filename: 'netgrade-export' },
+      {
+        onSuccess: (result) => showToast(result.message, result.success),
+        onError: () => showToast('Export fehlgeschlagen', false),
+      },
+    );
   };
 
   const handleFileSelect = async (
