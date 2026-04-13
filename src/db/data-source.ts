@@ -13,6 +13,7 @@ import { DropDescriptionFromSubject1761134134122 } from './migrations/1761134134
 import { AddSemester1745400000000 } from '@/db/migrations/1745400000000-add-semester';
 import { AddSchoolIdToSemester1771847976332 } from './migrations/1771847976332-add-schoolId-to-semester';
 import { AddFkSemesterSchool1771848100000 } from './migrations/1771848100000-add-fk-semester-school';
+import { SqljsDriver } from 'typeorm/driver/sqljs/SqljsDriver';
 
 // Reference: https://github.com/sql-js/react-sqljs-demo/blob/master/src/App.js
 (window as { localforage?: typeof localforage }).localforage = localforage;
@@ -123,7 +124,18 @@ export const initializeDatabase = async (): Promise<DataSource> => {
 
     AppDataSource = new DataSource(options);
     await AppDataSource.initialize();
-    await AppDataSource.query('PRAGMA foreign_keys = ON');
+    await AppDataSource.query('PRAGMA foreign_keys = ON;');
+    const driver = AppDataSource.driver as SqljsDriver;
+    const db = driver.databaseConnection;
+
+    db.run('PRAGMA foreign_keys = ON;');
+    console.log('PRAGMA foreign_keys set via db.run() [web]');
+
+    const [{ foreign_keys }] = await AppDataSource.query('PRAGMA foreign_keys');
+    console.log(
+      `PRAGMA foreign_keys = ${foreign_keys} (${foreign_keys === 1 ? 'ON' : 'OFF'}) [${isNative ? 'native' : 'web'}]`,
+    );
+
     console.log('Data Source has been initialized successfully.');
 
     repositories = {
