@@ -94,6 +94,11 @@ const initializeWebDb = async (): Promise<DataSourceOptions> => {
     synchronize: true,
     logging: ['error', 'warn', 'query'],
     autoSave: true,
+    autoSaveCallback: async () => {
+      (AppDataSource!.driver as SqljsDriver).databaseConnection.run(
+        'PRAGMA foreign_keys = ON;',
+      );
+    },
     useLocalForage: true,
     driver: SQL, // Provide the SQL.js instance directly to the driver
     sqlJsConfig: {
@@ -124,15 +129,6 @@ export const initializeDatabase = async (): Promise<DataSource> => {
 
     AppDataSource = new DataSource(options);
     await AppDataSource.initialize();
-
-    const driver = AppDataSource.driver as SqljsDriver;
-    driver.databaseConnection.run('PRAGMA foreign_keys = ON;');
-
-    const originalAutoSave = driver.autoSave.bind(driver);
-    driver.autoSave = async () => {
-      await originalAutoSave();
-      driver.databaseConnection.run('PRAGMA foreign_keys = ON;');
-    };
 
     const [{ foreign_keys }] = await AppDataSource.query('PRAGMA foreign_keys');
     console.log(
