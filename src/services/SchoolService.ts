@@ -1,4 +1,4 @@
-import { getDataSource, getRepositories } from '@/db/data-source';
+import { getRepositories } from '@/db/data-source';
 import { School } from '@/db/entities/School';
 import { Grade } from '@/db/entities';
 import { Subject } from '@/db/entities/Subject';
@@ -106,12 +106,6 @@ export class SchoolService {
   static async delete(schoolId: string): Promise<string> {
     try {
       const { school: schoolRepo } = getRepositories();
-      const [{ foreign_keys }] = await getDataSource().query(
-        'PRAGMA foreign_keys',
-      );
-      console.log(
-        `PRAGMA foreign_keys = ${foreign_keys} (${foreign_keys === 1 ? 'ON' : 'OFF'}) before deleting school ${schoolId}`,
-      );
       const deleteResult = await schoolRepo.delete(schoolId);
       if (deleteResult.affected === 0) {
         throw new Error(`School with ID ${schoolId} not found for deletion.`);
