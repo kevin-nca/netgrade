@@ -27,6 +27,9 @@ export class Exam extends BaseEntity {
   @Column({ type: 'uuid' })
   subjectId!: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  photoPath!: string | null;
+
   @ManyToOne(() => Subject, (subject) => subject.exams, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'subjectId' })
   subject!: Subject;

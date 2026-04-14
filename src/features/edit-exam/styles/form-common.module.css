@@ -122,6 +122,12 @@ ion-label.formItemLabel {
   opacity: 0.9;
 }
 
+.photoPreview {
+  margin: 8px 16px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 @media (prefers-color-scheme: dark) {
   .formCard {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);

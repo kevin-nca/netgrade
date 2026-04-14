@@ -1,13 +1,12 @@
 /// <reference types="vitest" />
 
-import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react';
 import wasm from 'vite-plugin-wasm';
 import { defineConfig } from 'vitest/config';
 import * as path from 'path';
 
 export default defineConfig({
-  plugins: [wasm(), react(), legacy()],
+  plugins: [wasm(), react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
