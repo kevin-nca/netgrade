@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SchoolService } from '@/services/SchoolService';
 import { School } from '@/db/entities/School';
+import { examKeys } from '@/hooks';
 import { semesterKeys } from '@/hooks';
 
 // Query keys
@@ -84,6 +85,7 @@ export const useDeleteSchool = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
       queryClient.invalidateQueries({ queryKey: semesterKeys.all });
+      queryClient.invalidateQueries({ queryKey: examKeys.all });
     },
   });
 };
