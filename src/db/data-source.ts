@@ -126,19 +126,23 @@ export const initializeDatabase = async (): Promise<DataSource> => {
     AppDataSource = new DataSource(options);
     await AppDataSource.initialize();
 
-    const driver = AppDataSource.driver as SqljsDriver;
-    driver.databaseConnection.run('PRAGMA foreign_keys = ON;');
-
-    const originalAutoSave = driver.autoSave.bind(driver);
-    driver.autoSave = async () => {
-      await originalAutoSave();
+    if (!isNative) {
+      const driver = AppDataSource.driver as SqljsDriver;
       driver.databaseConnection.run('PRAGMA foreign_keys = ON;');
-    };
 
-    const [{ foreign_keys }] = await AppDataSource.query('PRAGMA foreign_keys');
-    console.log(
-      `PRAGMA foreign_keys = ${foreign_keys} (${foreign_keys === 1 ? 'ON' : 'OFF'}) [${isNative ? 'native' : 'web'}]`,
-    );
+      const originalAutoSave = driver.autoSave.bind(driver);
+      driver.autoSave = async () => {
+        await originalAutoSave();
+        driver.databaseConnection.run('PRAGMA foreign_keys = ON;');
+      };
+
+      const [{ foreign_keys }] = await AppDataSource.query(
+        'PRAGMA foreign_keys',
+      );
+      console.log(
+        `PRAGMA foreign_keys = ${foreign_keys} (${foreign_keys === 1 ? 'ON' : 'OFF'}) [web]`,
+      );
+    }
 
     console.log('Data Source has been initialized successfully.');
 

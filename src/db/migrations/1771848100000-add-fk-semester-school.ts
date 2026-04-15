@@ -18,6 +18,8 @@ export class AddFkSemesterSchool1771848100000 {
         CONSTRAINT "FK_semester_school" FOREIGN KEY ("schoolId") REFERENCES "school" ("id") ON DELETE CASCADE ON UPDATE NO ACTION
       )
     `);
+
+    await queryRunner.query(`DELETE FROM "semester" WHERE "schoolId" IS NULL`);
     await queryRunner.query(`
       INSERT INTO "temporary_semester" ("id", "createdAt", "updatedAt", "version", "appInstanceId", "name", "startDate", "endDate", "schoolId")
       SELECT "id", "createdAt", "updatedAt", "version", "appInstanceId", "name", "startDate", "endDate", "schoolId"
