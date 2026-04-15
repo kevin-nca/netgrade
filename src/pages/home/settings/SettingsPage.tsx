@@ -24,6 +24,7 @@ import {
   schoolOutline,
   settingsOutline,
   trashOutline,
+  documentTextOutline,
 } from 'ionicons/icons';
 import popupStyles from '@/components/modals/popup-modal.module.css';
 import { Routes } from '@/routes';
@@ -39,7 +40,10 @@ import {
   useUserName,
 } from '@/hooks/queries';
 import { useAddSemester } from '@/hooks/queries/useSemesterQueries';
-import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
+import {
+  useResetAllDataMutation,
+  useExportPDF,
+} from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import AddSemesterModal from '@/components/modals/AddSemesterModal';
 import Header from '@/components/Header/Header';
@@ -70,6 +74,7 @@ const SettingsPage: React.FC = () => {
   const addSemesterMutation = useAddSemester();
   const saveUserNameMutation = useSaveUserName();
   const resetAllDataMutation = useResetAllDataMutation();
+  const exportPDFMutation = useExportPDF();
   const deleteSchoolMutation = useDeleteSchool();
   const updateSchoolMutation = useUpdateSchool();
 
@@ -258,6 +263,16 @@ const SettingsPage: React.FC = () => {
     } catch {
       showToast('Export fehlgeschlagen', false);
     }
+  };
+
+  const handleExportPDF = () => {
+    exportPDFMutation.mutate(
+      { schoolId: 'all', filename: 'netgrade-export' },
+      {
+        onSuccess: (result) => showToast(result.message, result.success),
+        onError: () => showToast('Export fehlgeschlagen', false),
+      },
+    );
   };
 
   const handleFileSelect = async (
@@ -495,7 +510,7 @@ const SettingsPage: React.FC = () => {
                 onClick={handleExportJSON}
               >
                 <div className="item-content">
-                  <div className="item-icon export">
+                  <div className="item-icon json">
                     <IonIcon icon={downloadOutline} />
                   </div>
                   <div className="item-text">
@@ -509,10 +524,27 @@ const SettingsPage: React.FC = () => {
 
               <div
                 className="settings-item glass-card"
+                onClick={handleExportPDF}
+              >
+                <div className="item-content">
+                  <div className="item-icon pdf">
+                    <IonIcon icon={documentTextOutline} />
+                  </div>
+                  <div className="item-text">
+                    <h3 className="item-title">PDF Export</h3>
+                    <p className="item-subtitle">
+                      App-Daten als PDF exportieren
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="settings-item glass-card"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <div className="item-content">
-                  <div className="item-icon import">
+                  <div className="item-icon json">
                     <IonIcon icon={cloudUploadOutline} />
                   </div>
                   <div className="item-text">
