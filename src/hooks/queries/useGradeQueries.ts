@@ -58,6 +58,10 @@ export const useAddGradeWithExam = () => {
       queryClient.invalidateQueries({
         queryKey: subjectKeys.all,
       });
+
+      queryClient.invalidateQueries({
+        queryKey: examKeys.all,
+      });
     },
   });
 };
