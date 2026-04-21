@@ -13,6 +13,8 @@ import { DropDescriptionFromSubject1761134134122 } from './migrations/1761134134
 import { AddSemester1745400000000 } from '@/db/migrations/1745400000000-add-semester';
 import { AddSchoolIdToSemester1771847976332 } from './migrations/1771847976332-add-schoolId-to-semester';
 import { AddPhotoPathToExam1765400000004 } from './migrations/1765400000004-add-photopath';
+import { AddFkSemesterSchool1771848100000 } from './migrations/1771848100000-add-fk-semester-school';
+import { SqljsDriver } from 'typeorm/driver/sqljs/SqljsDriver';
 
 // Reference: https://github.com/sql-js/react-sqljs-demo/blob/master/src/App.js
 (window as { localforage?: typeof localforage }).localforage = localforage;
@@ -68,6 +70,7 @@ const initializeNativeDb = async (): Promise<DataSourceOptions> => {
       AddSemester1745400000000,
       AddPhotoPathToExam1765400000004,
       AddSchoolIdToSemester1771847976332,
+      AddFkSemesterSchool1771848100000,
     ],
     migrationsTableName: 'migrations',
     mode: 'no-encryption',
@@ -93,6 +96,7 @@ const initializeWebDb = async (): Promise<DataSourceOptions> => {
     synchronize: true,
     logging: ['error', 'warn', 'query'],
     autoSave: true,
+
     useLocalForage: true,
     driver: SQL, // Provide the SQL.js instance directly to the driver
     sqlJsConfig: {
@@ -123,6 +127,25 @@ export const initializeDatabase = async (): Promise<DataSource> => {
 
     AppDataSource = new DataSource(options);
     await AppDataSource.initialize();
+
+    if (!isNative) {
+      const driver = AppDataSource.driver as SqljsDriver;
+      driver.databaseConnection.run('PRAGMA foreign_keys = ON;');
+
+      const originalAutoSave = driver.autoSave.bind(driver);
+      driver.autoSave = async () => {
+        await originalAutoSave();
+        driver.databaseConnection.run('PRAGMA foreign_keys = ON;');
+      };
+
+      const [{ foreign_keys }] = await AppDataSource.query(
+        'PRAGMA foreign_keys',
+      );
+      console.log(
+        `PRAGMA foreign_keys = ${foreign_keys} (${foreign_keys === 1 ? 'ON' : 'OFF'}) [web]`,
+      );
+    }
+
     console.log('Data Source has been initialized successfully.');
 
     repositories = {
