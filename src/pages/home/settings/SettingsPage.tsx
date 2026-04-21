@@ -1,11 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
-  IonAlert,
-  IonButton,
-  IonButtons,
   IonContent,
   IonIcon,
-  IonInput,
   IonModal,
   IonPage,
   useIonAlert,
@@ -15,14 +11,11 @@ import { useAppForm } from '@/shared/components/form';
 import { useHistory } from 'react-router-dom';
 import {
   addOutline,
-  calendarOutline,
   checkmarkOutline,
   downloadOutline,
   cloudUploadOutline,
   informationCircleOutline,
   trashOutline,
-  closeOutline,
-  pencilOutline,
 } from 'ionicons/icons';
 import popupStyles from '@/components/modals/popup-modal.module.css';
 import { Routes } from '@/routes';
@@ -55,6 +48,9 @@ import SettingsHeader from '@/pages/home/settings/components/settingsHeader/Sett
 import ProfileCard from '@/pages/home/settings/components/profileCard/ProfileCard';
 import SchoolCard from '@/pages/home/settings/components/schoolCard/SchoolCard';
 import EmptySchoolCard from '@/pages/home/settings/components/emptySchoolCard/EmptySchoolCard';
+import SemesterCard from '@/pages/home/settings/components/semesterCard/SemesterCard';
+import EmptySemesterCard from '@/pages/home/settings/components/emptySemesterCard/EmptySemesterCard';
+import AlertSemesterButton from '@/pages/home/settings/components/alertSemesterButton/AlertSemesterButton';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -437,150 +433,38 @@ const SettingsPage: React.FC = () => {
             </div>
 
             <div className="settings-list">
-              {semesters &&
-                semesters.length > 0 &&
-                semesters.map((semester, index) => {
-                  const isExpanded = expandedSemesterId === semester.id;
-                  const isEditing = editingSemesterId === semester.id;
-                  const SemesterCount = semesters!.filter(
-                    (s) => s.school?.id === semester.school?.id,
-                  ).length;
-
-                  return (
-                    <div
-                      key={semester.id}
-                      className={`settings-item glass-card ${isExpanded ? 'expanded' : ''}`}
-                      onClick={() => toggleSemester(semester.id)}
-                    >
-                      <div className="item-content">
-                        <div className={`item-icon school-${index % 4}`}>
-                          {semester.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="item-text">
-                          {isEditing && (
-                            <div className="edit-school-input">
-                              <IonInput
-                                value={editSemesterName}
-                                placeholder="Semestername..."
-                                onIonChange={(e) =>
-                                  setEditSemesterName(e.detail.value || '')
-                                }
-                                onClick={(e) => e.stopPropagation()}
-                                className="school-edit-field"
-                                clearInput
-                                autoFocus
-                              />
-                            </div>
-                          )}
-                          {!isEditing && (
-                            <>
-                              <h3 className="item-title">{semester.name}</h3>
-                              {semester.school && (
-                                <p className="item-subtitle">
-                                  {semester.school.name}
-                                </p>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      {isExpanded && (
-                        <div
-                          className="item-extra"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <IonButtons slot="end">
-                            {isEditing && (
-                              <div className="edit-buttons">
-                                <IonButton
-                                  className="save-button"
-                                  color="success"
-                                  onClick={(e) =>
-                                    handleSaveSemesterEdit(semester.id, e)
-                                  }
-                                  disabled={
-                                    updateSemesterMutation.isPending ||
-                                    !editSemesterName.trim() ||
-                                    editSemesterName.trim() === semester.name
-                                  }
-                                >
-                                  <IonIcon
-                                    slot="icon-only"
-                                    icon={checkmarkOutline}
-                                  />
-                                  <p className="save-text">Speichern</p>
-                                </IonButton>
-                                <IonButton
-                                  className="cancel-button"
-                                  color="medium"
-                                  onClick={handleCancelSemesterEdit}
-                                  disabled={updateSemesterMutation.isPending}
-                                >
-                                  <IonIcon
-                                    slot="icon-only"
-                                    icon={closeOutline}
-                                  />
-                                  <p className="cancel-text">Abbrechen</p>
-                                </IonButton>
-                              </div>
-                            )}
-                            {!isEditing && (
-                              <>
-                                <IonButton
-                                  className="edit-button"
-                                  color="primary"
-                                  onClick={(e) =>
-                                    handleEditSemester(
-                                      semester.id,
-                                      semester.name,
-                                      e,
-                                    )
-                                  }
-                                >
-                                  <IonIcon
-                                    slot="icon-only"
-                                    icon={pencilOutline}
-                                  />
-                                  <p className="edit-text">Bearbeiten</p>
-                                </IonButton>
-                                <IonButton
-                                  className="delete-button"
-                                  color="danger"
-                                  onClick={() => {
-                                    setSemesterIdToDelete(semester.id);
-                                    setShowDeleteSemesterAlert(true);
-                                  }}
-                                  disabled={SemesterCount <= 1}
-                                >
-                                  <IonIcon
-                                    slot="icon-only"
-                                    icon={trashOutline}
-                                  />
-                                  <p className="delete-text">Löschen</p>
-                                </IonButton>
-                              </>
-                            )}
-                          </IonButtons>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              {(!semesters || semesters.length === 0) && (
-                <div className="settings-item glass-card empty-item">
-                  <div className="item-content">
-                    <div className="item-icon empty">
-                      <IonIcon icon={calendarOutline} />
-                    </div>
-                    <div className="item-text">
-                      <h3 className="item-title">Keine Semester</h3>
-                      <p className="item-subtitle">
-                        Tippe auf + um ein Semester hinzuzufügen
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              {semesters && semesters.length > 0 ? (
+                semesters.map((semester, index) => (
+                  <SemesterCard
+                    key={semester.id}
+                    semester={semester}
+                    index={index}
+                    isExpanded={expandedSemesterId === semester.id}
+                    isEditing={editingSemesterId === semester.id}
+                    editSemesterName={editSemesterName}
+                    isSavePending={updateSemesterMutation.isPending}
+                    isDeleteDisabled={
+                      semesters.filter(
+                        (s) => s.school?.id === semester.school?.id,
+                      ).length <= 1
+                    }
+                    onToggle={() => toggleSemester(semester.id)}
+                    onEditSemesterNameChange={(value) =>
+                      setEditSemesterName(value)
+                    }
+                    onSave={(e) => handleSaveSemesterEdit(semester.id, e)}
+                    onCancel={handleCancelSemesterEdit}
+                    onEdit={(e) =>
+                      handleEditSemester(semester.id, semester.name, e)
+                    }
+                    onDelete={() => {
+                      setSemesterIdToDelete(semester.id);
+                      setShowDeleteSemesterAlert(true);
+                    }}
+                  />
+                ))
+              ) : (
+                <EmptySemesterCard />
               )}
             </div>
           </div>
@@ -755,29 +639,13 @@ const SettingsPage: React.FC = () => {
         onDelete={handleDeleteSchool}
       />
 
-      <IonAlert
+      <AlertSemesterButton
         isOpen={showDeleteSemesterAlert}
-        onDidDismiss={() => {
+        onDismiss={() => {
           setShowDeleteSemesterAlert(false);
           setSemesterIdToDelete(null);
         }}
-        header="Semester löschen?"
-        message="Möchtest du das Semester wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
-        buttons={[
-          {
-            text: 'Abbrechen',
-            role: 'cancel',
-            handler: () => {
-              setShowDeleteSemesterAlert(false);
-              setSemesterIdToDelete(null);
-            },
-          },
-          {
-            text: 'Löschen',
-            role: 'destructive',
-            handler: handleDeleteSemester,
-          },
-        ]}
+        onDelete={handleDeleteSemester}
       />
 
       <ExportDialog
