@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
+  IonAlert,
+  IonButton,
+  IonButtons,
   IonContent,
   IonIcon,
+  IonInput,
   IonModal,
   IonPage,
   useIonAlert,
@@ -17,6 +21,8 @@ import {
   cloudUploadOutline,
   informationCircleOutline,
   trashOutline,
+  closeOutline,
+  pencilOutline,
 } from 'ionicons/icons';
 import popupStyles from '@/components/modals/popup-modal.module.css';
 import { Routes } from '@/routes';
