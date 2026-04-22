@@ -1120,6 +1120,67 @@ describe('DataManagementService', () => {
 
       findSpy.mockRestore();
     });
+
+    it('should include exam photos in ZIP when photoPath is set', async () => {
+      const schoolRepo = dataSource.getRepository(School);
+      const mockSchool = {
+        id: 'photo-school-id',
+        name: 'Photo School',
+        semesters: [
+          {
+            subjects: [
+              {
+                exams: [{ photoPath: 'photos/exam1.jpg' }, { photoPath: null }],
+              },
+            ],
+          },
+        ],
+      } as unknown as School;
+
+      const findSpy = vi
+        .spyOn(schoolRepo, 'find')
+        .mockResolvedValue([mockSchool]);
+      vi.mocked(Filesystem.readFile).mockResolvedValueOnce({
+        data: 'dGVzdA==',
+      });
+
+      (global.URL.createObjectURL as Mock).mockClear();
+      await DataManagementService.exportAsZIP();
+
+      expect(Filesystem.readFile).toHaveBeenCalledWith(
+        expect.objectContaining({ path: 'photos/exam1.jpg' }),
+      );
+
+      findSpy.mockRestore();
+    });
+
+    it('should skip photo and warn if readFile fails during ZIP export', async () => {
+      const schoolRepo = dataSource.getRepository(School);
+      const mockSchool = {
+        id: 'photo-fail-school-id',
+        name: 'Photo Fail School',
+        semesters: [
+          { subjects: [{ exams: [{ photoPath: 'photos/missing.jpg' }] }] },
+        ],
+      } as unknown as School;
+
+      const findSpy = vi
+        .spyOn(schoolRepo, 'find')
+        .mockResolvedValue([mockSchool]);
+      vi.mocked(Filesystem.readFile).mockRejectedValueOnce(
+        new Error('not found'),
+      );
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await DataManagementService.exportAsZIP();
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('photos/missing.jpg'),
+      );
+
+      findSpy.mockRestore();
+      warnSpy.mockRestore();
+    });
   });
 
   describe('importFromZIP', () => {
@@ -1256,6 +1317,38 @@ describe('DataManagementService', () => {
 
       await expect(DataManagementService.importFromZIP(blob)).rejects.toThrow(
         ExportError,
+      );
+    });
+
+    it('should extract and write photos from ZIP during import', async () => {
+      const zip = new JSZip();
+      zip.file('data.json', JSON.stringify({ schools: [] }));
+      zip.file('photos/exam.jpg', 'base64photodata');
+      const blob = await zip.generateAsync({ type: 'blob' });
+
+      vi.mocked(Filesystem.writeFile).mockResolvedValue({ uri: '' });
+
+      vi.spyOn(dataSource, 'transaction').mockImplementation(
+        async <T>(
+          runInTransaction: ((em: EntityManager) => Promise<T>) | string,
+          maybeRun?: (em: EntityManager) => Promise<T>,
+        ) => {
+          const cb =
+            typeof runInTransaction === 'function'
+              ? runInTransaction
+              : maybeRun!;
+          const mockManager = {
+            query: vi.fn(),
+            getRepository: () => ({ save: vi.fn() }),
+          } as unknown as EntityManager;
+          return cb(mockManager);
+        },
+      );
+
+      await DataManagementService.importFromZIP(blob);
+
+      expect(Filesystem.writeFile).toHaveBeenCalledWith(
+        expect.objectContaining({ path: 'photos/exam.jpg' }),
       );
     });
 
