@@ -359,27 +359,32 @@ describe('GradeService', () => {
     expect(weightedAverage).toBeCloseTo(86.67, 1);
   });
 
-  it('should set photoPath on existing exam when addWithExam is called again', async () => {
-    const examName = 'Photo Exam Existing';
-    const date = new Date('2025-01-15T10:00:00.000Z');
+  it('should set photoPath on existing exam when addWithExam finds it', async () => {
+    const dataSourceModule = await import('@/db/data-source');
+    const { exam: examRepo } = dataSourceModule.getRepositories();
 
-    await GradeService.addWithExam({
+    const examDate = new Date('2025-03-10T00:00:00.000Z');
+    const examName = 'Existing Photo Exam';
+
+    const existingExam = examRepo.create({
+      name: examName,
+      date: examDate,
       subjectId: testData.subject.id,
-      examName,
-      date,
-      score: 75,
+      isCompleted: false,
       weight: 1.0,
     });
+    await examRepo.save(existingExam);
 
     const grade = await GradeService.addWithExam({
       subjectId: testData.subject.id,
       examName,
-      date,
-      score: 80,
+      date: examDate,
+      score: 85,
       weight: 1.0,
       photoPath: 'photos/test.jpg',
     });
 
     expect(grade.exam.photoPath).toBe('photos/test.jpg');
+    expect(grade.exam.isCompleted).toBe(true);
   });
 });
