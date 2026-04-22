@@ -1,11 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
-  IonAlert,
-  IonButton,
-  IonButtons,
   IonContent,
   IonIcon,
-  IonInput,
   IonModal,
   IonPage,
   useIonAlert,
@@ -16,13 +12,9 @@ import { useHistory } from 'react-router-dom';
 import {
   addOutline,
   checkmarkOutline,
-  closeOutline,
   downloadOutline,
   cloudUploadOutline,
   informationCircleOutline,
-  pencilOutline,
-  schoolOutline,
-  settingsOutline,
   trashOutline,
   documentTextOutline,
 } from 'ionicons/icons';
@@ -38,21 +30,33 @@ import {
   useSchools,
   useUpdateSchool,
   useUserName,
+  useAddSemester,
+  useSemesters,
+  useUpdateSemester,
+  useDeleteSemester,
 } from '@/hooks/queries';
 import { useAddSemester } from '@/hooks/queries/useSemesterQueries';
 import {
   useResetAllDataMutation,
   useExportPDF,
 } from '@/hooks/queries/useDataManagementQueries';
+import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import AddSemesterModal from '@/components/modals/AddSemesterModal';
-import Header from '@/components/Header/Header';
-import NotificationSettings from '@/pages/home/settings/notification/NotificationSettings';
+import NotificationSettings from '@/pages/home/settings/components/notification/NotificationSettings';
 import { DataManagementService } from '@/services/DataManagementService';
 import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
 import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
 import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
 import './SettingsPage.css';
+import AlertButton from '@/pages/home/settings/components/alertButton/AlertButton';
+import SettingsHeader from '@/pages/home/settings/components/settingsHeader/SettingsHeader';
+import ProfileCard from '@/pages/home/settings/components/profileCard/ProfileCard';
+import SchoolCard from '@/pages/home/settings/components/schoolCard/SchoolCard';
+import EmptySchoolCard from '@/pages/home/settings/components/emptySchoolCard/EmptySchoolCard';
+import SemesterCard from '@/pages/home/settings/components/semesterCard/SemesterCard';
+import EmptySemesterCard from '@/pages/home/settings/components/emptySemesterCard/EmptySemesterCard';
+import AlertSemesterButton from '@/pages/home/settings/components/alertSemesterButton/AlertSemesterButton';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -69,6 +73,7 @@ const SettingsPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: schools } = useSchools();
+  const { data: semesters } = useSemesters();
   const { data: userName } = useUserName();
   const addSchoolMutation = useAddSchool();
   const addSemesterMutation = useAddSemester();
@@ -77,13 +82,88 @@ const SettingsPage: React.FC = () => {
   const exportPDFMutation = useExportPDF();
   const deleteSchoolMutation = useDeleteSchool();
   const updateSchoolMutation = useUpdateSchool();
+  const updateSemesterMutation = useUpdateSemester();
+  const deleteSemesterMutation = useDeleteSemester();
 
   const [expandedSchoolId, setExpandedSchoolId] = useState<string | null>(null);
   const [editingSchoolId, setEditingSchoolId] = useState<string | null>(null);
   const [editSchoolName, setEditSchoolName] = useState('');
 
+  const [expandedSemesterId, setExpandedSemesterId] = useState<string | null>(
+    null,
+  );
+  const [editingSemesterId, setEditingSemesterId] = useState<string | null>(
+    null,
+  );
+  const [editSemesterName, setEditSemesterName] = useState('');
+  const [showDeleteSemesterAlert, setShowDeleteSemesterAlert] = useState(false);
+  const [semesterIdToDelete, setSemesterIdToDelete] = useState<string | null>(
+    null,
+  );
+
   const toggleSchool = (id: string) => {
     setExpandedSchoolId((prev) => (prev === id ? null : id));
+  };
+
+  const toggleSemester = (id: string) => {
+    setExpandedSemesterId((prev) => (prev === id ? null : id));
+  };
+
+  const handleEditSemester = (
+    semesterId: string,
+    currentName: string,
+    e: React.MouseEvent,
+  ) => {
+    e.stopPropagation();
+    setEditingSemesterId(semesterId);
+    setEditSemesterName(currentName);
+  };
+
+  const handleSaveSemesterEdit = (semesterId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (editSemesterName.trim()) {
+      updateSemesterMutation.mutate(
+        { id: semesterId, name: editSemesterName.trim() },
+        {
+          onSuccess: () => {
+            setEditingSemesterId(null);
+            setEditSemesterName('');
+            showToast('Semestername erfolgreich geändert');
+          },
+          onError: (error) => {
+            showToast(
+              `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+              false,
+            );
+          },
+        },
+      );
+    }
+  };
+
+  const handleCancelSemesterEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingSemesterId(null);
+    setEditSemesterName('');
+  };
+
+  const handleDeleteSemester = () => {
+    if (!semesterIdToDelete) return;
+    deleteSemesterMutation.mutate(semesterIdToDelete, {
+      onSuccess: () => {
+        showToast('Semester wurde gelöscht', true);
+        setShowDeleteSemesterAlert(false);
+        setSemesterIdToDelete(null);
+      },
+      onError: (error) => {
+        showToast(
+          `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+          false,
+        );
+        setShowDeleteSemesterAlert(false);
+        setSemesterIdToDelete(null);
+      },
+    });
   };
 
   const handleEditSchool = (
@@ -311,40 +391,14 @@ const SettingsPage: React.FC = () => {
 
   return (
     <IonPage className="settings-page">
-      <Header
-        title="Einstellungen"
-        backButton={true}
-        defaultHref={Routes.HOME}
-        onBack={() => history.replace(Routes.HOME)}
-      />
+      <SettingsHeader />
 
       <IonContent className="settings-content" scrollY={true}>
         <div className="content-wrapper">
-          <div className="profile-section">
-            <div className="gradient-orb" />
-            <div className="profile-card glass-card">
-              <div className="profile-content">
-                <div className="profile-avatar">
-                  {userName ? userName.charAt(0).toUpperCase() : 'U'}
-                </div>
-                <div className="profile-info">
-                  <h1 className="profile-name">{userName || 'Benutzer'}</h1>
-                  <p className="profile-subtitle">
-                    Verwalte deine App-Einstellungen
-                  </p>
-                </div>
-                <div
-                  className="profile-edit-button"
-                  onClick={() => setShowNameEditModal(true)}
-                >
-                  <IonIcon
-                    icon={settingsOutline}
-                    className="profile-edit-icon"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <ProfileCard
+            userName={userName}
+            onEditClick={() => setShowNameEditModal(true)}
+          />
 
           <div className="settings-section">
             <div className="section-header">
@@ -359,143 +413,76 @@ const SettingsPage: React.FC = () => {
 
             <div className="settings-list">
               {schools!.length > 0 ? (
-                schools!.map((school, index) => {
-                  const isExpanded = expandedSchoolId === school.id;
-                  const isEditing = editingSchoolId === school.id;
-
-                  return (
-                    <div
-                      key={school.id}
-                      className={`settings-item glass-card ${isExpanded ? 'expanded' : ''}`}
-                      onClick={() => toggleSchool(school.id)}
-                    >
-                      <div className="item-content">
-                        <div className={`item-icon school-${index % 4}`}>
-                          {school.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="item-text">
-                          {isEditing ? (
-                            <div className="edit-school-input">
-                              <IonInput
-                                value={editSchoolName}
-                                placeholder="Schulname..."
-                                onIonChange={(e) =>
-                                  setEditSchoolName(e.detail.value || '')
-                                }
-                                onClick={(e) => e.stopPropagation()}
-                                className="school-edit-field"
-                                clearInput
-                                autoFocus
-                              />
-                            </div>
-                          ) : (
-                            <h3 className="item-title">{school.name}</h3>
-                          )}
-                        </div>
-                      </div>
-
-                      {isExpanded && (
-                        <div
-                          className="item-extra"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <IonButtons slot="end">
-                            {isEditing ? (
-                              <div className="edit-buttons">
-                                <IonButton
-                                  className="save-button"
-                                  color="success"
-                                  onClick={(e) =>
-                                    handleSaveSchoolEdit(school.id, e)
-                                  }
-                                  disabled={
-                                    updateSchoolMutation.isPending ||
-                                    !editSchoolName.trim() ||
-                                    editSchoolName.trim() === school.name
-                                  }
-                                >
-                                  <IonIcon
-                                    slot="icon-only"
-                                    icon={checkmarkOutline}
-                                  />
-                                  <p className="save-text">Speichern</p>
-                                </IonButton>
-                                <IonButton
-                                  className="cancel-button"
-                                  color="medium"
-                                  onClick={handleCancelSchoolEdit}
-                                  disabled={updateSchoolMutation.isPending}
-                                >
-                                  <IonIcon
-                                    slot="icon-only"
-                                    icon={closeOutline}
-                                  />
-                                  <p className="cancel-text">Abbrechen</p>
-                                </IonButton>
-                              </div>
-                            ) : (
-                              <>
-                                <IonButton
-                                  className="edit-button"
-                                  color="primary"
-                                  onClick={(e) =>
-                                    handleEditSchool(school.id, school.name, e)
-                                  }
-                                >
-                                  <IonIcon
-                                    slot="icon-only"
-                                    icon={pencilOutline}
-                                  />
-                                  <p className="edit-text">Bearbeiten</p>
-                                </IonButton>
-                                <IonButton
-                                  className="delete-button"
-                                  color="danger"
-                                  onClick={() => {
-                                    setSchoolIdToDelete(school.id);
-                                    setShowDeleteAlert(true);
-                                  }}
-                                >
-                                  <IonIcon
-                                    slot="icon-only"
-                                    icon={trashOutline}
-                                  />
-                                  <p className="delete-text">Löschen</p>
-                                </IonButton>
-                              </>
-                            )}
-                          </IonButtons>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
+                schools!.map((school, index) => (
+                  <SchoolCard
+                    key={school.id}
+                    school={school}
+                    index={index}
+                    isExpanded={expandedSchoolId === school.id}
+                    isEditing={editingSchoolId === school.id}
+                    editSchoolName={editSchoolName}
+                    isSavePending={updateSchoolMutation.isPending}
+                    onToggle={() => toggleSchool(school.id)}
+                    onEditSchoolNameChange={(value) => setEditSchoolName(value)}
+                    onSave={(e) => handleSaveSchoolEdit(school.id, e)}
+                    onCancel={handleCancelSchoolEdit}
+                    onEdit={(e) => handleEditSchool(school.id, school.name, e)}
+                    onDelete={() => {
+                      setSchoolIdToDelete(school.id);
+                      setShowDeleteAlert(true);
+                    }}
+                  />
+                ))
               ) : (
-                <div className="settings-item glass-card empty-item">
-                  <div className="item-content">
-                    <div className="item-icon empty">
-                      <IonIcon icon={schoolOutline} />
-                    </div>
-                    <div className="item-text">
-                      <h3 className="item-title">Keine Schulen</h3>
-                      <p className="item-subtitle">
-                        Tippe auf + um eine Schule hinzuzufügen
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <EmptySchoolCard />
               )}
             </div>
           </div>
           <div className="settings-section">
             <div className="section-header">
-              <h2 className="section-title">Semester hinzufügen</h2>
+              <h2 className="section-title">Deine Semester</h2>
               <div
                 className="section-add-button"
                 onClick={() => setShowAddSemesterModal(true)}
               >
                 <IonIcon icon={addOutline} className="section-add-icon" />
               </div>
+            </div>
+
+            <div className="settings-list">
+              {semesters && semesters.length > 0 ? (
+                semesters.map((semester, index) => (
+                  <SemesterCard
+                    key={semester.id}
+                    semester={semester}
+                    index={index}
+                    isExpanded={expandedSemesterId === semester.id}
+                    isEditing={editingSemesterId === semester.id}
+                    editSemesterName={editSemesterName}
+                    isSavePending={updateSemesterMutation.isPending}
+                    isDeleteDisabled={
+                      semesters.filter(
+                        (s) => s.school?.id === semester.school?.id,
+                      ).length <= 1
+                    }
+                    onToggle={() => toggleSemester(semester.id)}
+                    onEditSemesterNameChange={(value) =>
+                      setEditSemesterName(value)
+                    }
+                    onSave={(e) => handleSaveSemesterEdit(semester.id, e)}
+                    onCancel={handleCancelSemesterEdit}
+                    onEdit={(e) =>
+                      handleEditSemester(semester.id, semester.name, e)
+                    }
+                    onDelete={() => {
+                      setSemesterIdToDelete(semester.id);
+                      setShowDeleteSemesterAlert(true);
+                    }}
+                  />
+                ))
+              ) : (
+                <EmptySemesterCard />
+              )}
             </div>
           </div>
           <NotificationSettings />
@@ -677,29 +664,22 @@ const SettingsPage: React.FC = () => {
           </ModalButtonGroup>
         </IonContent>
       </IonModal>
-      <IonAlert
+      <AlertButton
         isOpen={showDeleteAlert}
-        onDidDismiss={() => {
+        onDismiss={() => {
           setShowDeleteAlert(false);
           setSchoolIdToDelete(null);
         }}
-        header="Schule löschen?"
-        message={`Möchtest du die Schule wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
-        buttons={[
-          {
-            text: 'Abbrechen',
-            role: 'cancel',
-            handler: () => {
-              setShowDeleteAlert(false);
-              setSchoolIdToDelete(null);
-            },
-          },
-          {
-            text: 'Löschen',
-            role: 'destructive',
-            handler: handleDeleteSchool,
-          },
-        ]}
+        onDelete={handleDeleteSchool}
+      />
+
+      <AlertSemesterButton
+        isOpen={showDeleteSemesterAlert}
+        onDismiss={() => {
+          setShowDeleteSemesterAlert(false);
+          setSemesterIdToDelete(null);
+        }}
+        onDelete={handleDeleteSemester}
       />
 
       <ExportDialog
