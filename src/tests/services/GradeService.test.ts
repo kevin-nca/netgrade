@@ -358,4 +358,28 @@ describe('GradeService', () => {
     // With scores 80 (weight 1) and 90 (weight 2), weighted average should be 86.67
     expect(weightedAverage).toBeCloseTo(86.67, 1);
   });
+
+  it('should set photoPath on existing exam when addWithExam is called again', async () => {
+    const examName = 'Photo Exam Existing';
+    const date = new Date('2025-01-15T10:00:00.000Z');
+
+    await GradeService.addWithExam({
+      subjectId: testData.subject.id,
+      examName,
+      date,
+      score: 75,
+      weight: 1.0,
+    });
+
+    const grade = await GradeService.addWithExam({
+      subjectId: testData.subject.id,
+      examName,
+      date,
+      score: 80,
+      weight: 1.0,
+      photoPath: 'photos/test.jpg',
+    });
+
+    expect(grade.exam.photoPath).toBe('photos/test.jpg');
+  });
 });
