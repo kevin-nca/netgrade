@@ -13,6 +13,7 @@ export class SemesterService {
         order: { startDate: 'DESC' },
         relations: {
           subjects: true,
+          school: true,
         },
       });
     } catch (error) {

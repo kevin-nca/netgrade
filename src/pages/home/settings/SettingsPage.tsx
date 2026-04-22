@@ -29,8 +29,11 @@ import {
   useSchools,
   useUpdateSchool,
   useUserName,
+  useAddSemester,
+  useSemesters,
+  useUpdateSemester,
+  useDeleteSemester,
 } from '@/hooks/queries';
-import { useAddSemester } from '@/hooks/queries/useSemesterQueries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import AddSemesterModal from '@/components/modals/AddSemesterModal';
@@ -45,6 +48,9 @@ import SettingsHeader from '@/pages/home/settings/components/settingsHeader/Sett
 import ProfileCard from '@/pages/home/settings/components/profileCard/ProfileCard';
 import SchoolCard from '@/pages/home/settings/components/schoolCard/SchoolCard';
 import EmptySchoolCard from '@/pages/home/settings/components/emptySchoolCard/EmptySchoolCard';
+import SemesterCard from '@/pages/home/settings/components/semesterCard/SemesterCard';
+import EmptySemesterCard from '@/pages/home/settings/components/emptySemesterCard/EmptySemesterCard';
+import AlertSemesterButton from '@/pages/home/settings/components/alertSemesterButton/AlertSemesterButton';
 
 const SettingsPage: React.FC = () => {
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
@@ -61,6 +67,7 @@ const SettingsPage: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: schools } = useSchools();
+  const { data: semesters } = useSemesters();
   const { data: userName } = useUserName();
   const addSchoolMutation = useAddSchool();
   const addSemesterMutation = useAddSemester();
@@ -68,13 +75,88 @@ const SettingsPage: React.FC = () => {
   const resetAllDataMutation = useResetAllDataMutation();
   const deleteSchoolMutation = useDeleteSchool();
   const updateSchoolMutation = useUpdateSchool();
+  const updateSemesterMutation = useUpdateSemester();
+  const deleteSemesterMutation = useDeleteSemester();
 
   const [expandedSchoolId, setExpandedSchoolId] = useState<string | null>(null);
   const [editingSchoolId, setEditingSchoolId] = useState<string | null>(null);
   const [editSchoolName, setEditSchoolName] = useState('');
 
+  const [expandedSemesterId, setExpandedSemesterId] = useState<string | null>(
+    null,
+  );
+  const [editingSemesterId, setEditingSemesterId] = useState<string | null>(
+    null,
+  );
+  const [editSemesterName, setEditSemesterName] = useState('');
+  const [showDeleteSemesterAlert, setShowDeleteSemesterAlert] = useState(false);
+  const [semesterIdToDelete, setSemesterIdToDelete] = useState<string | null>(
+    null,
+  );
+
   const toggleSchool = (id: string) => {
     setExpandedSchoolId((prev) => (prev === id ? null : id));
+  };
+
+  const toggleSemester = (id: string) => {
+    setExpandedSemesterId((prev) => (prev === id ? null : id));
+  };
+
+  const handleEditSemester = (
+    semesterId: string,
+    currentName: string,
+    e: React.MouseEvent,
+  ) => {
+    e.stopPropagation();
+    setEditingSemesterId(semesterId);
+    setEditSemesterName(currentName);
+  };
+
+  const handleSaveSemesterEdit = (semesterId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (editSemesterName.trim()) {
+      updateSemesterMutation.mutate(
+        { id: semesterId, name: editSemesterName.trim() },
+        {
+          onSuccess: () => {
+            setEditingSemesterId(null);
+            setEditSemesterName('');
+            showToast('Semestername erfolgreich geändert');
+          },
+          onError: (error) => {
+            showToast(
+              `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+              false,
+            );
+          },
+        },
+      );
+    }
+  };
+
+  const handleCancelSemesterEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingSemesterId(null);
+    setEditSemesterName('');
+  };
+
+  const handleDeleteSemester = () => {
+    if (!semesterIdToDelete) return;
+    deleteSemesterMutation.mutate(semesterIdToDelete, {
+      onSuccess: () => {
+        showToast('Semester wurde gelöscht', true);
+        setShowDeleteSemesterAlert(false);
+        setSemesterIdToDelete(null);
+      },
+      onError: (error) => {
+        showToast(
+          `Fehler: ${error instanceof Error ? error.message : String(error)}`,
+          false,
+        );
+        setShowDeleteSemesterAlert(false);
+        setSemesterIdToDelete(null);
+      },
+    });
   };
 
   const handleEditSchool = (
@@ -341,13 +423,49 @@ const SettingsPage: React.FC = () => {
           </div>
           <div className="settings-section">
             <div className="section-header">
-              <h2 className="section-title">Semester hinzufügen</h2>
+              <h2 className="section-title">Deine Semester</h2>
               <div
                 className="section-add-button"
                 onClick={() => setShowAddSemesterModal(true)}
               >
                 <IonIcon icon={addOutline} className="section-add-icon" />
               </div>
+            </div>
+
+            <div className="settings-list">
+              {semesters && semesters.length > 0 ? (
+                semesters.map((semester, index) => (
+                  <SemesterCard
+                    key={semester.id}
+                    semester={semester}
+                    index={index}
+                    isExpanded={expandedSemesterId === semester.id}
+                    isEditing={editingSemesterId === semester.id}
+                    editSemesterName={editSemesterName}
+                    isSavePending={updateSemesterMutation.isPending}
+                    isDeleteDisabled={
+                      semesters.filter(
+                        (s) => s.school?.id === semester.school?.id,
+                      ).length <= 1
+                    }
+                    onToggle={() => toggleSemester(semester.id)}
+                    onEditSemesterNameChange={(value) =>
+                      setEditSemesterName(value)
+                    }
+                    onSave={(e) => handleSaveSemesterEdit(semester.id, e)}
+                    onCancel={handleCancelSemesterEdit}
+                    onEdit={(e) =>
+                      handleEditSemester(semester.id, semester.name, e)
+                    }
+                    onDelete={() => {
+                      setSemesterIdToDelete(semester.id);
+                      setShowDeleteSemesterAlert(true);
+                    }}
+                  />
+                ))
+              ) : (
+                <EmptySemesterCard />
+              )}
             </div>
           </div>
           <NotificationSettings />
@@ -519,6 +637,15 @@ const SettingsPage: React.FC = () => {
           setSchoolIdToDelete(null);
         }}
         onDelete={handleDeleteSchool}
+      />
+
+      <AlertSemesterButton
+        isOpen={showDeleteSemesterAlert}
+        onDismiss={() => {
+          setShowDeleteSemesterAlert(false);
+          setSemesterIdToDelete(null);
+        }}
+        onDelete={handleDeleteSemester}
       />
 
       <ExportDialog
