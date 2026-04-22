@@ -35,11 +35,7 @@ import {
   useUpdateSemester,
   useDeleteSemester,
 } from '@/hooks/queries';
-import { useAddSemester } from '@/hooks/queries/useSemesterQueries';
-import {
-  useResetAllDataMutation,
-  useExportPDF,
-} from '@/hooks/queries/useDataManagementQueries';
+import { useExportPDF } from '@/hooks/queries/useDataManagementQueries';
 import { useResetAllDataMutation } from '@/hooks/queries/useDataManagementQueries';
 import AddSchoolModal from '@/components/modals/AddSchoolModal';
 import AddSemesterModal from '@/components/modals/AddSemesterModal';
