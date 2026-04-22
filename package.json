@@ -32,6 +32,7 @@
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/share": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2",
+    "@databricks/sql": "^1.13.0",
     "@ionic-native/social-sharing": "^5.36.0",
     "@ionic/core": "^8.7.17",
     "@ionic/react": "^8.7.17",
