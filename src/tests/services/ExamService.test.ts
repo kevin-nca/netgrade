@@ -5,8 +5,8 @@ import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Exam } from '@/db/entities/Exam';
 import { Grade, School, Semester, Subject } from '@/db/entities';
 import { Capacitor } from '@capacitor/core';
-import { Camera, CameraResultType } from '@capacitor/camera';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { DocumentScanner, ResponseType, ScanDocumentResponseStatus } from '@capgo/capacitor-document-scanner';
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
@@ -15,9 +15,10 @@ vi.mock('@capacitor/core', () => ({
   },
 }));
 
-vi.mock('@capacitor/camera', () => ({
-  Camera: { getPhoto: vi.fn() },
-  CameraResultType: { Uri: 'uri', Base64: 'base64' },
+vi.mock('@capgo/capacitor-document-scanner', () => ({
+  DocumentScanner: { scanDocument: vi.fn() },
+  ResponseType: { ImageFilePath: 'imageFilePath', Base64: 'base64' },
+  ScanDocumentResponseStatus: { Success: 'success', Cancel: 'cancel' },
 }));
 
 vi.mock('@capacitor/filesystem', () => ({
@@ -182,10 +183,10 @@ describe('ExamService', () => {
   describe('takeExamPhoto', () => {
     it('should save photo via writeFile on web and return path', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
-      vi.mocked(Camera.getPhoto).mockResolvedValue({
-        base64String: 'abc123',
-        format: 'jpeg',
-        saved: false,
+      vi.mocked(DocumentScanner.scanDocument).mockResolvedValue({
+        status: ScanDocumentResponseStatus.Success,
+        scannedImages: ['abc123'],
+        getPluginVersion: vi.fn(),
       });
 
       const path = await ExamService.takeExamPhoto();
@@ -198,17 +199,17 @@ describe('ExamService', () => {
           recursive: true,
         }),
       );
-      expect(Camera.getPhoto).toHaveBeenCalledWith(
-        expect.objectContaining({ resultType: CameraResultType.Base64 }),
+      expect(DocumentScanner.scanDocument).toHaveBeenCalledWith(
+        expect.objectContaining({ responseType: ResponseType.Base64 }),
       );
     });
 
     it('should copy photo via Filesystem.copy on native and return path', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
-      vi.mocked(Camera.getPhoto).mockResolvedValue({
-        path: '/tmp/photo.jpg',
-        format: 'jpeg',
-        saved: false,
+      vi.mocked(DocumentScanner.scanDocument).mockResolvedValue({
+        status: ScanDocumentResponseStatus.Success,
+        scannedImages: ['/tmp/photo.jpg'],
+        getPluginVersion: vi.fn(),
       });
 
       const path = await ExamService.takeExamPhoto();
@@ -220,17 +221,21 @@ describe('ExamService', () => {
           toDirectory: Directory.Data,
         }),
       );
-      expect(Camera.getPhoto).toHaveBeenCalledWith(
-        expect.objectContaining({ resultType: CameraResultType.Uri }),
+      expect(DocumentScanner.scanDocument).toHaveBeenCalledWith(
+        expect.objectContaining({ responseType: ResponseType.ImageFilePath }),
       );
 
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     });
 
-    it('should throw if Camera.getPhoto fails', async () => {
-      vi.mocked(Camera.getPhoto).mockRejectedValue(new Error('Camera denied'));
+    it('should throw if scanDocument fails', async () => {
+      vi.mocked(DocumentScanner.scanDocument).mockResolvedValue({
+        status: ScanDocumentResponseStatus.Cancel,
+        scannedImages: [],
+        getPluginVersion: vi.fn(),
+      });
       await expect(ExamService.takeExamPhoto()).rejects.toThrow(
-        'Camera denied',
+        'Scan abgebrochen oder fehlgeschlagen.',
       );
     });
   });

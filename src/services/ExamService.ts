@@ -1,8 +1,8 @@
 import { getRepositories } from '@/db/data-source';
 import { Exam } from '@/db/entities/Exam';
-import { Camera, CameraResultType } from '@capacitor/camera';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
+import { DocumentScanner, ResponseType } from '@capgo/capacitor-document-scanner';
 
 export class ExamService {
   /**
@@ -163,26 +163,29 @@ export class ExamService {
    * @returns Promise<string> - The saved file path
    */
   static async takeExamPhoto(): Promise<string> {
-    const image = await Camera.getPhoto({
-      quality: 100,
-      allowEditing: true,
-      resultType: Capacitor.isNativePlatform()
-        ? CameraResultType.Uri
-        : CameraResultType.Base64,
+    const result = await DocumentScanner.scanDocument({
+      responseType: Capacitor.isNativePlatform()
+        ? ResponseType.ImageFilePath
+        : ResponseType.Base64,
     });
 
+    if (result.status !== 'success' || !result.scannedImages?.length) {
+      throw new Error('Scan abgebrochen oder fehlgeschlagen.');
+    }
+
+    const scanned = result.scannedImages[0];
     const destPath = `photos/${crypto.randomUUID()}.jpg`;
 
     if (Capacitor.isNativePlatform()) {
       await Filesystem.copy({
-        from: image.path!,
+        from: scanned,
         to: destPath,
         toDirectory: Directory.Data,
       });
     } else {
       await Filesystem.writeFile({
         path: destPath,
-        data: image.base64String!,
+        data: scanned,
         directory: Directory.Data,
         recursive: true,
       });

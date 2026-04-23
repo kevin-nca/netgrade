@@ -1,15 +1,16 @@
 PODS:
-  - Capacitor (8.3.0):
+  - Capacitor (8.3.1):
     - CapacitorCordova
   - CapacitorApp (8.1.0):
     - Capacitor
-  - CapacitorCamera (8.0.2):
+  - CapacitorCamera (8.1.0):
     - Capacitor
+    - IONCameraLib (~> 1.0.0)
   - CapacitorCommunitySqlite (8.1.0):
     - Capacitor
     - SQLCipher
     - ZIPFoundation
-  - CapacitorCordova (8.3.0)
+  - CapacitorCordova (8.3.1)
   - CapacitorDevice (8.0.2):
     - Capacitor
   - CapacitorFilesystem (8.1.2):
@@ -27,8 +28,11 @@ PODS:
     - Capacitor
   - CapacitorStatusBar (8.0.2):
     - Capacitor
-  - CordovaPlugins (8.3.0):
+  - CapgoCapacitorDocumentScanner (8.3.25):
+    - Capacitor
+  - CordovaPlugins (8.3.1):
     - CapacitorCordova
+  - IONCameraLib (1.0.3)
   - IONFilesystemLib (1.1.1)
   - SQLCipher (4.7.0):
     - SQLCipher/standard (= 4.7.0)
@@ -51,10 +55,12 @@ DEPENDENCIES:
   - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
   - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - "CapgoCapacitorDocumentScanner (from `../../node_modules/@capgo/capacitor-document-scanner`)"
   - CordovaPlugins (from `../capacitor-cordova-ios-plugins`)
 
 SPEC REPOS:
   trunk:
+    - IONCameraLib
     - IONFilesystemLib
     - SQLCipher
     - ZIPFoundation
@@ -86,15 +92,17 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/share"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
+  CapgoCapacitorDocumentScanner:
+    :path: "../../node_modules/@capgo/capacitor-document-scanner"
   CordovaPlugins:
     :path: "../capacitor-cordova-ios-plugins"
 
 SPEC CHECKSUMS:
-  Capacitor: 22e541237135648c9aa736232bb4d2eec35fddcb
+  Capacitor: 46dbaa89c1d1cd121b9fc2dc839c1f39cc49e326
   CapacitorApp: 449ffe26375e96f8aaaee625ac6e01e5c57c8650
-  CapacitorCamera: 66bb9c4ea1703a5acf2a328bac0e613d278c399c
+  CapacitorCamera: 6e43e76d276ba69b45639a4e61365e3d56324c6c
   CapacitorCommunitySqlite: eac6acfb852f46e7988fc59604d7f900498d354e
-  CapacitorCordova: 2e1e2bb93b2f365309dc4ff18b72b9a69a7814a9
+  CapacitorCordova: 9010447fe25e869705fcf525e5f490facde87608
   CapacitorDevice: 14cba6f88d1c3074cbf825fea977c8c526453ff8
   CapacitorFilesystem: 2db285a1ac6e475cc27cae2e1bea999000f9e2be
   CapacitorHaptics: 296f771ecd89c7a1bd92a7b6826a7d268e2e70f5
@@ -103,11 +111,13 @@ SPEC CHECKSUMS:
   CapacitorPreferences: cca2021f386efb75947c850334447d9ff22b14f1
   CapacitorShare: 0c58305114538568059bfc07111f22dcb9cb2a82
   CapacitorStatusBar: 01d5763b4ed720de5ce2edbc938de6a98f4c8f32
-  CordovaPlugins: 3a9bddd7494699e706390d9cc5986af06fa73185
+  CapgoCapacitorDocumentScanner: 8dae4e47ed30f62c253b25a6c4a57038132f52e5
+  CordovaPlugins: 24045b05ddc0fa132ec356e52971430fb9b92e18
+  IONCameraLib: 739067fcf12f242f2ca8443412fcf621a3dce6ca
   IONFilesystemLib: dfa8706539ac9ab77ccfd6e5b3830ce9b5e57f6c
   SQLCipher: ba9d0076041ed767c5bd3d3f77098318d04a403c
   ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
 
-PODFILE CHECKSUM: c91de17625e1f64739738a836dfa0a4b555c255a
+PODFILE CHECKSUM: 1588fcd52ec7d2252044917ac94f7938139652cd
 
 COCOAPODS: 1.16.2
