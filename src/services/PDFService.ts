@@ -48,7 +48,7 @@ export class PDFService {
 
     const pdfBytes = await PDFService.build(schools);
     return Capacitor.isNativePlatform()
-      ? PDFService.saveNative(pdfBytes, pdfFilename)
+      ? PDFService.saveAndShareNative(pdfBytes, pdfFilename)
       : PDFService.saveWeb(pdfBytes, pdfFilename);
   }
 
@@ -243,25 +243,28 @@ export class PDFService {
     }
   }
 
-  private static async saveNative(
+  private static async saveAndShareNative(
     pdfBytes: Uint8Array,
     filename: string,
   ): Promise<PdfExportResult> {
     try {
-      const bytes = new Uint8Array(pdfBytes);
-      let binary = '';
-      for (let i = 0; i < bytes.length; i += 8192) {
-        binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
-      }
-      const base64 = btoa(binary);
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve((reader.result as string).split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(new Blob([pdfBytes.buffer as ArrayBuffer]));
+      });
+
+      const uniqueFilename = `${Date.now()}_${filename}`;
+
       await Filesystem.writeFile({
-        path: filename,
+        path: uniqueFilename,
         data: base64,
-        directory: Directory.Documents,
+        directory: Directory.Data,
       });
       const { uri } = await Filesystem.getUri({
-        path: filename,
-        directory: Directory.Documents,
+        path: uniqueFilename,
+        directory: Directory.Data,
       });
       try {
         await Share.share({
@@ -281,7 +284,7 @@ export class PDFService {
       return {
         success: true,
         message: 'PDF erfolgreich gespeichert.',
-        filename,
+        filename: uniqueFilename,
       };
     } catch (error) {
       console.error('PDF native export failed:', error);
