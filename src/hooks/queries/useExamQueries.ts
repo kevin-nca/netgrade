@@ -94,3 +94,18 @@ export const useDeleteExam = () => {
     },
   });
 };
+
+export const useTakeExamPhoto = () => {
+  return useMutation({
+    mutationFn: () => ExamService.takeExamPhoto(),
+  });
+};
+
+export const usePhotoSrc = (photoPath: string | null) => {
+  return useQuery({
+    queryKey: ['photo', photoPath],
+    queryFn: () => ExamService.resolvePhotoSrc(photoPath!),
+    enabled: !!photoPath,
+    staleTime: Infinity,
+  });
+};

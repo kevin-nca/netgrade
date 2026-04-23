@@ -334,7 +334,7 @@ const SettingsPage: React.FC = () => {
 
   const handleExportJSON = async () => {
     try {
-      await DataManagementService.exportAsJSON();
+      await DataManagementService.exportAsZIP();
       showToast('JSON Export erfolgreich!', true);
     } catch {
       showToast('Export fehlgeschlagen', false);
@@ -368,8 +368,7 @@ const SettingsPage: React.FC = () => {
           role: 'destructive',
           handler: async () => {
             try {
-              const text = await file.text();
-              await DataManagementService.importFromJSON(text);
+              await DataManagementService.importFromZIP(file);
               showToast('Import erfolgreich!', true);
               setTimeout(() => {
                 window.location.reload();
@@ -601,7 +600,7 @@ const SettingsPage: React.FC = () => {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".json"
+        accept=".zip"
         style={{ display: 'none' }}
         onChange={handleFileSelect}
       />

@@ -9,10 +9,13 @@ import {
   IonTextarea,
   IonButton,
   IonIcon,
+  IonImg,
   IonRange,
   IonInput,
+  IonSpinner,
 } from '@ionic/react';
 import {
+  cameraOutline,
   checkmarkCircleOutline,
   trophyOutline,
   scaleOutline,
@@ -29,6 +32,9 @@ interface GradeFormProps {
   ) => void;
   getGradeColor: (grade: number) => string;
   onSubmit: () => void;
+  onTakePhoto?: () => void;
+  isTakingPhoto?: boolean;
+  photoPath?: string | null;
 }
 
 export const GradeForm: React.FC<GradeFormProps> = ({
@@ -36,6 +42,9 @@ export const GradeForm: React.FC<GradeFormProps> = ({
   onFieldChange,
   getGradeColor,
   onSubmit,
+  onTakePhoto,
+  isTakingPhoto,
+  photoPath,
 }) => {
   return (
     <>
@@ -160,7 +169,35 @@ export const GradeForm: React.FC<GradeFormProps> = ({
           </IonItemGroup>
         </IonList>
 
+        {photoPath && (
+          <div className={styles.photoPreview}>
+            <IonImg src={photoPath} />
+          </div>
+        )}
+
         <div className={styles.formCardFooter}>
+          {onTakePhoto && (
+            <IonButton
+              expand="block"
+              fill="outline"
+              className={styles.formButton}
+              onClick={onTakePhoto}
+              disabled={isTakingPhoto}
+            >
+              {isTakingPhoto ? (
+                <div className={styles.buttonContent}>
+                  <IonSpinner name="crescent" className={styles.saveIcon} />
+                  Kamera wird geöffnet...
+                </div>
+              ) : (
+                <div className={styles.buttonContent}>
+                  <IonIcon icon={cameraOutline} className={styles.saveIcon} />
+                  Foto aufnehmen
+                </div>
+              )}
+            </IonButton>
+          )}
+
           <IonButton
             expand="block"
             className={styles.formButton}
@@ -171,7 +208,7 @@ export const GradeForm: React.FC<GradeFormProps> = ({
                 icon={checkmarkCircleOutline}
                 className={styles.saveIcon}
               />
-              Note eintragen
+              Speichern
             </div>
           </IonButton>
         </div>
