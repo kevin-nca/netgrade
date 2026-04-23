@@ -106,6 +106,7 @@ export const useDeleteSubject = () => {
     onSuccess: () => {
       // Invalidate and refetch subjects list
       queryClient.invalidateQueries({ queryKey: subjectKeys.all });
+      queryClient.invalidateQueries({ queryKey: schoolKeys.all });
     },
   });
 };
