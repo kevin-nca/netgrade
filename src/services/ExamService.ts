@@ -2,7 +2,10 @@ import { getRepositories } from '@/db/data-source';
 import { Exam } from '@/db/entities/Exam';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
-import { DocumentScanner, ResponseType } from '@capgo/capacitor-document-scanner';
+import {
+  DocumentScanner,
+  ResponseType,
+} from '@capgo/capacitor-document-scanner';
 
 export class ExamService {
   /**

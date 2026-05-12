@@ -6,7 +6,11 @@ import { Exam } from '@/db/entities/Exam';
 import { Grade, School, Semester, Subject } from '@/db/entities';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { DocumentScanner, ResponseType, ScanDocumentResponseStatus } from '@capgo/capacitor-document-scanner';
+import {
+  DocumentScanner,
+  ResponseType,
+  ScanDocumentResponseStatus,
+} from '@capgo/capacitor-document-scanner';
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: {

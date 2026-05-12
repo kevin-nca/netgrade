@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
+  IonAlert,
   IonCard,
   IonList,
   IonItem,
@@ -20,6 +21,7 @@ import {
   trophyOutline,
   scaleOutline,
   chatbubbleOutline,
+  trashOutline,
 } from 'ionicons/icons';
 import { GradeFormData } from './types';
 import styles from './styles/grade-form.module.css';
@@ -33,6 +35,7 @@ interface GradeFormProps {
   getGradeColor: (grade: number) => string;
   onSubmit: () => void;
   onTakePhoto?: () => void;
+  onDeletePhoto?: () => void;
   isTakingPhoto?: boolean;
   photoPath?: string | null;
 }
@@ -43,9 +46,12 @@ export const GradeForm: React.FC<GradeFormProps> = ({
   getGradeColor,
   onSubmit,
   onTakePhoto,
+  onDeletePhoto,
   isTakingPhoto,
   photoPath,
 }) => {
+  const [showDeletePhotoAlert, setShowDeletePhotoAlert] = useState(false);
+
   return (
     <>
       <IonCard className={styles.formCard}>
@@ -172,6 +178,17 @@ export const GradeForm: React.FC<GradeFormProps> = ({
         {photoPath && (
           <div className={styles.photoPreview}>
             <IonImg src={photoPath} />
+            {onDeletePhoto && (
+              <IonButton
+                fill="clear"
+                color="danger"
+                size="small"
+                className={styles.deletePhotoButton}
+                onClick={() => setShowDeletePhotoAlert(true)}
+              >
+                <IonIcon slot="icon-only" icon={trashOutline} />
+              </IonButton>
+            )}
           </div>
         )}
 
@@ -213,6 +230,25 @@ export const GradeForm: React.FC<GradeFormProps> = ({
           </IonButton>
         </div>
       </IonCard>
+
+      <IonAlert
+        isOpen={showDeletePhotoAlert}
+        onDidDismiss={() => setShowDeletePhotoAlert(false)}
+        header="Scan löschen?"
+        message="Möchtest du den Scan wirklich löschen?"
+        buttons={[
+          {
+            text: 'Abbrechen',
+            role: 'cancel',
+            handler: () => setShowDeletePhotoAlert(false),
+          },
+          {
+            text: 'Löschen',
+            role: 'destructive',
+            handler: () => onDeletePhoto?.(),
+          },
+        ]}
+      />
     </>
   );
 };

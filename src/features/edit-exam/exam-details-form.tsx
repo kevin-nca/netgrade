@@ -85,7 +85,8 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
   const [toastColor, setToastColor] = useState('primary');
   const [showToast, setShowToast] = useState(false);
   const [newPhotoPath, setNewPhotoPath] = useState<string | null>(null);
-  const photoPath = newPhotoPath ?? exam?.photoPath ?? null;
+  const photoPath =
+    newPhotoPath === null ? (exam?.photoPath ?? null) : newPhotoPath || null;
   const { data: photoSrc } = usePhotoSrc(photoPath);
 
   const gradeForm = useForm({
@@ -113,7 +114,7 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
 
   const gradeFormValues = gradeForm.state.values as GradeFormData;
 
-  const addGradeWithExamMutation = useAddGradeWithExam();
+  const addGradeWithExamMutation = useAddGradeWithExam()
   const deleteExamMutation = useDeleteExam();
   const takePhotoMutation = useTakeExamPhoto();
 
@@ -121,6 +122,10 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
     setToastMessage(message);
     setToastColor(color);
     setShowToast(true);
+  };
+
+  const handleDeletePhoto = () => {
+    setNewPhotoPath('');
   };
 
   const handleTakePhoto = () => {
@@ -297,6 +302,7 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
               getGradeColor={getGradeColor}
               onSubmit={gradeForm.handleSubmit}
               onTakePhoto={handleTakePhoto}
+              onDeletePhoto={handleDeletePhoto}
               isTakingPhoto={takePhotoMutation.isPending}
               photoPath={photoSrc ?? null}
             />
