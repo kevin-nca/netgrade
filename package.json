@@ -49,6 +49,7 @@
     "ionicons": "^8.0.13",
     "jszip": "^3.10.1",
     "localforage": "^1.10.0",
+    "pdf-lib": "^1.17.1",
     "react": "^19.2.5",
     "react-calendar": "^6.0.1",
     "react-dom": "^19.2.5",
@@ -61,7 +62,7 @@
     "typeorm": "^0.3.22",
     "uuid": "^14.0.0",
     "xlsx": "^0.18.5",
-    "zod": "^4.3.6"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.3.1",
