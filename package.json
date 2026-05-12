@@ -35,9 +35,9 @@
     "@ionic/core": "^8.7.17",
     "@ionic/react": "^8.7.17",
     "@ionic/react-router": "^8.7.17",
-    "@tanstack/react-form": "^1.29.0",
-    "@tanstack/react-query": "^5.99.2",
-    "@tanstack/react-query-devtools": "^5.99.2",
+    "@tanstack/react-form": "^1.29.1",
+    "@tanstack/react-query": "^5.100.5",
+    "@tanstack/react-query-devtools": "^5.100.5",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
     "cordova-plugin-x-socialsharing": "^6.0.4",
@@ -58,7 +58,7 @@
     "typeorm": "^0.3.22",
     "uuid": "^14.0.0",
     "xlsx": "^0.18.5",
-    "zod": "^4.3.6"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.3.1",
@@ -74,7 +74,7 @@
     "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-react": "^5.1.4",
     "@vitest/coverage-v8": "^4.1.5",
-    "cypress": "^15.14.0",
+    "cypress": "^15.14.1",
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.1",
