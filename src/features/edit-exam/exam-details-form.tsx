@@ -114,7 +114,7 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
 
   const gradeFormValues = gradeForm.state.values as GradeFormData;
 
-  const addGradeWithExamMutation = useAddGradeWithExam()
+  const addGradeWithExamMutation = useAddGradeWithExam();
   const deleteExamMutation = useDeleteExam();
   const takePhotoMutation = useTakeExamPhoto();
 
