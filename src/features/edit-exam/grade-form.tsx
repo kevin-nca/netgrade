@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
+  IonAlert,
   IonCard,
   IonList,
   IonItem,
@@ -9,14 +10,18 @@ import {
   IonTextarea,
   IonButton,
   IonIcon,
+  IonImg,
   IonRange,
   IonInput,
+  IonSpinner,
 } from '@ionic/react';
 import {
+  cameraOutline,
   checkmarkCircleOutline,
   trophyOutline,
   scaleOutline,
   chatbubbleOutline,
+  trashOutline,
 } from 'ionicons/icons';
 import { GradeFormData } from './types';
 import styles from './styles/grade-form.module.css';
@@ -29,6 +34,10 @@ interface GradeFormProps {
   ) => void;
   getGradeColor: (grade: number) => string;
   onSubmit: () => void;
+  onTakePhoto?: () => void;
+  onDeletePhoto?: () => void;
+  isTakingPhoto?: boolean;
+  photoPath?: string | null;
 }
 
 export const GradeForm: React.FC<GradeFormProps> = ({
@@ -36,7 +45,13 @@ export const GradeForm: React.FC<GradeFormProps> = ({
   onFieldChange,
   getGradeColor,
   onSubmit,
+  onTakePhoto,
+  onDeletePhoto,
+  isTakingPhoto,
+  photoPath,
 }) => {
+  const [showDeletePhotoAlert, setShowDeletePhotoAlert] = useState(false);
+
   return (
     <>
       <IonCard className={styles.formCard}>
@@ -160,7 +175,46 @@ export const GradeForm: React.FC<GradeFormProps> = ({
           </IonItemGroup>
         </IonList>
 
+        {photoPath && (
+          <div className={styles.photoPreview}>
+            <IonImg src={photoPath} />
+            {onDeletePhoto && (
+              <IonButton
+                fill="clear"
+                color="danger"
+                size="small"
+                className={styles.deletePhotoButton}
+                onClick={() => setShowDeletePhotoAlert(true)}
+              >
+                <IonIcon slot="icon-only" icon={trashOutline} />
+              </IonButton>
+            )}
+          </div>
+        )}
+
         <div className={styles.formCardFooter}>
+          {onTakePhoto && (
+            <IonButton
+              expand="block"
+              fill="outline"
+              className={styles.formButton}
+              onClick={onTakePhoto}
+              disabled={isTakingPhoto}
+            >
+              {isTakingPhoto ? (
+                <div className={styles.buttonContent}>
+                  <IonSpinner name="crescent" className={styles.saveIcon} />
+                  Kamera wird geöffnet...
+                </div>
+              ) : (
+                <div className={styles.buttonContent}>
+                  <IonIcon icon={cameraOutline} className={styles.saveIcon} />
+                  Foto aufnehmen
+                </div>
+              )}
+            </IonButton>
+          )}
+
           <IonButton
             expand="block"
             className={styles.formButton}
@@ -171,11 +225,30 @@ export const GradeForm: React.FC<GradeFormProps> = ({
                 icon={checkmarkCircleOutline}
                 className={styles.saveIcon}
               />
-              Note eintragen
+              Speichern
             </div>
           </IonButton>
         </div>
       </IonCard>
+
+      <IonAlert
+        isOpen={showDeletePhotoAlert}
+        onDidDismiss={() => setShowDeletePhotoAlert(false)}
+        header="Scan löschen?"
+        message="Möchtest du den Scan wirklich löschen?"
+        buttons={[
+          {
+            text: 'Abbrechen',
+            role: 'cancel',
+            handler: () => setShowDeletePhotoAlert(false),
+          },
+          {
+            text: 'Löschen',
+            role: 'destructive',
+            handler: () => onDeletePhoto?.(),
+          },
+        ]}
+      />
     </>
   );
 };

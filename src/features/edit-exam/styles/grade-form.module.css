@@ -73,3 +73,14 @@
     background: #2c2c36;
   }
 }
+
+.photoPreview {
+  position: relative;
+  padding: 8px;
+}
+
+.deletePhotoButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}

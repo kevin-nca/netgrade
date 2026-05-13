@@ -39,6 +39,8 @@ import {
   useDeleteExam,
   useExam,
   useSubjects,
+  useTakeExamPhoto,
+  usePhotoSrc,
 } from '@/hooks';
 import {
   percentageToDecimal,
@@ -82,6 +84,10 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState('primary');
   const [showToast, setShowToast] = useState(false);
+  const [newPhotoPath, setNewPhotoPath] = useState<string | null>(null);
+  const photoPath =
+    newPhotoPath === null ? (exam?.photoPath ?? null) : newPhotoPath || null;
+  const { data: photoSrc } = usePhotoSrc(photoPath);
 
   const gradeForm = useForm({
     defaultValues: {
@@ -110,11 +116,28 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
 
   const addGradeWithExamMutation = useAddGradeWithExam();
   const deleteExamMutation = useDeleteExam();
+  const takePhotoMutation = useTakeExamPhoto();
 
   const showMessage = (message: string, color: string = 'primary') => {
     setToastMessage(message);
     setToastColor(color);
     setShowToast(true);
+  };
+
+  const handleDeletePhoto = () => {
+    setNewPhotoPath('');
+  };
+
+  const handleTakePhoto = () => {
+    takePhotoMutation.mutate(undefined, {
+      onSuccess: (path) => {
+        setNewPhotoPath(path);
+        showMessage('Foto aufgenommen!', 'success');
+      },
+      onError: (error: Error) => {
+        showMessage(`Fehler: ${error.message}`, 'danger');
+      },
+    });
   };
 
   const handleAddGrade = () => {
@@ -127,6 +150,7 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
       score: gradeFormValues.score,
       weight: percentageToDecimal(gradeFormValues.weight),
       comment: gradeFormValues.comment.trim() || undefined,
+      photoPath: photoPath ?? null,
     };
 
     addGradeWithExamMutation.mutate(gradePayload, {
@@ -277,6 +301,10 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
               }
               getGradeColor={getGradeColor}
               onSubmit={gradeForm.handleSubmit}
+              onTakePhoto={handleTakePhoto}
+              onDeletePhoto={handleDeletePhoto}
+              isTakingPhoto={takePhotoMutation.isPending}
+              photoPath={photoSrc ?? null}
             />
           )}
         </div>

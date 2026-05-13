@@ -1,4 +1,5 @@
 import { describe, it, vi, expect, beforeAll, afterAll, Mock } from 'vitest';
+import JSZip from 'jszip';
 import { DataSource, EntityManager } from 'typeorm';
 import * as XLSX from 'xlsx';
 import { Capacitor } from '@capacitor/core';
@@ -11,6 +12,12 @@ import {
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Exam, Grade, School, Subject, Semester } from '@/db/entities';
 
+const makeZipBlob = async (jsonString: string): Promise<Blob> => {
+  const zip = new JSZip();
+  zip.file('data.json', jsonString);
+  return zip.generateAsync({ type: 'blob' });
+};
+
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
     isNativePlatform: vi.fn().mockReturnValue(false),
@@ -20,8 +27,10 @@ vi.mock('@capacitor/core', () => ({
 vi.mock('@capacitor/filesystem', () => ({
   Filesystem: {
     writeFile: vi.fn(),
+    readFile: vi.fn().mockResolvedValue({ data: '' }),
     stat: vi.fn(),
     getUri: vi.fn(),
+    copy: vi.fn(),
   },
   Directory: {
     Documents: 'DOCUMENTS',
@@ -893,14 +902,14 @@ describe('DataManagementService', () => {
     });
   });
 
-  describe('exportAsJSON', () => {
-    it('should export data as JSON on web', async () => {
-      const result = await DataManagementService.exportAsJSON();
+  describe('exportAsZIP', () => {
+    it('should export data as ZIP on web', async () => {
+      const result = await DataManagementService.exportAsZIP();
 
       expect(result).toEqual({
         success: true,
         message: 'Backup erfolgreich heruntergeladen.',
-        filename: expect.stringMatching(/netgrade_backup_.*\.json/),
+        filename: expect.stringMatching(/netgrade_backup_.*\.zip/),
       });
     });
 
@@ -908,14 +917,14 @@ describe('DataManagementService', () => {
       const schoolRepo = dataSource.getRepository(School);
       const findSpy = vi.spyOn(schoolRepo, 'find').mockResolvedValue([]);
 
-      await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
+      await expect(DataManagementService.exportAsZIP()).rejects.toThrow(
         ExportError,
       );
 
       findSpy.mockRestore();
     });
 
-    it('should serialize Date objects as YYYY-MM-DD strings in JSON output', async () => {
+    it('should serialize Date objects as YYYY-MM-DD strings in ZIP data.json', async () => {
       const originalToJSON = Date.prototype.toJSON;
       Object.defineProperty(Date.prototype, 'toJSON', {
         value: undefined,
@@ -953,20 +962,19 @@ describe('DataManagementService', () => {
 
       (global.URL.createObjectURL as Mock).mockClear();
 
-      await DataManagementService.exportAsJSON();
+      await DataManagementService.exportAsZIP();
 
       Date.prototype.toJSON = originalToJSON;
 
       expect(anchorClickSpy).toHaveBeenCalled();
       expect(global.URL.createObjectURL).toHaveBeenCalled();
-      const blob = (global.URL.createObjectURL as Mock).mock
+      const zipBlob = (global.URL.createObjectURL as Mock).mock
         .calls[0][0] as Blob;
-      const text = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsText(blob);
-      });
+
+      const zip = await JSZip.loadAsync(zipBlob);
+      const dataJsonFile = zip.file('data.json');
+      expect(dataJsonFile).not.toBeNull();
+      const text = await dataJsonFile!.async('string');
       const parsed = JSON.parse(text);
 
       expect(parsed.schools[0].semesters[0].startDate).toBe('2025-06-15');
@@ -976,23 +984,23 @@ describe('DataManagementService', () => {
       createElementSpy.mockRestore();
     });
 
-    it('should use native export functionality for JSON on native platform', async () => {
+    it('should use native export functionality for ZIP on native platform', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
       vi.mocked(Filesystem.getUri).mockResolvedValue({
-        uri: 'file://path/to/backup.json',
+        uri: 'file://path/to/backup.zip',
       });
 
-      const result = await DataManagementService.exportAsJSON();
+      const result = await DataManagementService.exportAsZIP();
 
       expect(Filesystem.writeFile).toHaveBeenCalledWith(
         expect.objectContaining({
-          path: expect.stringMatching(/netgrade_backup_.*\.json/),
+          path: expect.stringMatching(/netgrade_backup_.*\.zip/),
           directory: 'DOCUMENTS',
         }),
       );
       expect(Share.share).toHaveBeenCalledWith(
         expect.objectContaining({
-          url: 'file://path/to/backup.json',
+          url: 'file://path/to/backup.zip',
         }),
       );
       expect(result.success).toBe(true);
@@ -1000,21 +1008,21 @@ describe('DataManagementService', () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     });
 
-    it('should handle cancelled share correctly on native platform (JSON)', async () => {
+    it('should handle cancelled share correctly on native platform (ZIP)', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
       vi.mocked(Filesystem.getUri).mockResolvedValue({
-        uri: 'file://path/to/backup.json',
+        uri: 'file://path/to/backup.zip',
       });
       vi.mocked(Share.share).mockRejectedValueOnce(
         new Error('Share cancelled by user'),
       );
 
-      const result = await DataManagementService.exportAsJSON();
+      const result = await DataManagementService.exportAsZIP();
 
       expect(result).toEqual({
         success: true,
         message: 'Vorgang abgebrochen. Backup wurde gespeichert.',
-        filename: expect.stringMatching(/netgrade_backup_.*\.json/),
+        filename: expect.stringMatching(/netgrade_backup_.*\.zip/),
       });
 
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
@@ -1022,7 +1030,7 @@ describe('DataManagementService', () => {
 
     it.each([
       {
-        desc: 'should throw ExportError when share fails (not cancelled) on native platform (JSON)',
+        desc: 'should throw ExportError when share fails (not cancelled) on native platform (ZIP)',
         mockShare: () =>
           vi
             .mocked(Share.share)
@@ -1032,7 +1040,7 @@ describe('DataManagementService', () => {
         expectedMsg: 'Datei wurde gespeichert, Teilen war nicht möglich.',
       },
       {
-        desc: 'should throw ExportError when file write fails on native platform (JSON)',
+        desc: 'should throw ExportError when file write fails on native platform (ZIP)',
         mockShare: () => {},
         mockFs: () =>
           vi
@@ -1044,17 +1052,17 @@ describe('DataManagementService', () => {
     ])('$desc', async ({ mockShare, mockFs, expectedCode, expectedMsg }) => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
       vi.mocked(Filesystem.getUri).mockResolvedValue({
-        uri: 'file://path/to/backup.json',
+        uri: 'file://path/to/backup.zip',
       });
       mockShare();
       mockFs();
 
-      await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
+      await expect(DataManagementService.exportAsZIP()).rejects.toThrow(
         ExportError,
       );
 
       try {
-        await DataManagementService.exportAsJSON();
+        await DataManagementService.exportAsZIP();
       } catch (error) {
         if (error instanceof ExportError) {
           expect(error.code).toBe(expectedCode);
@@ -1065,19 +1073,19 @@ describe('DataManagementService', () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
     });
 
-    it('should throw SAVE_FAILED error when web export JSON fails', async () => {
+    it('should throw SAVE_FAILED error when web export ZIP fails', async () => {
       const createElementSpy = vi
         .spyOn(document, 'createElement')
         .mockImplementation(() => {
           throw new Error('DOM Error JSON');
         });
 
-      await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
+      await expect(DataManagementService.exportAsZIP()).rejects.toThrow(
         ExportError,
       );
 
       try {
-        await DataManagementService.exportAsJSON();
+        await DataManagementService.exportAsZIP();
       } catch (error) {
         if (error instanceof ExportError) {
           expect(error.code).toBe('SAVE_FAILED');
@@ -1094,12 +1102,12 @@ describe('DataManagementService', () => {
         .spyOn(schoolRepo, 'find')
         .mockRejectedValue(new Error('Unexpected DB Error'));
 
-      await expect(DataManagementService.exportAsJSON()).rejects.toThrow(
+      await expect(DataManagementService.exportAsZIP()).rejects.toThrow(
         ExportError,
       );
 
       try {
-        await DataManagementService.exportAsJSON();
+        await DataManagementService.exportAsZIP();
       } catch (error) {
         expect(error).toBeInstanceOf(ExportError);
         if (error instanceof ExportError) {
@@ -1112,9 +1120,70 @@ describe('DataManagementService', () => {
 
       findSpy.mockRestore();
     });
+
+    it('should include exam photos in ZIP when photoPath is set', async () => {
+      const schoolRepo = dataSource.getRepository(School);
+      const mockSchool = {
+        id: 'photo-school-id',
+        name: 'Photo School',
+        semesters: [
+          {
+            subjects: [
+              {
+                exams: [{ photoPath: 'photos/exam1.jpg' }, { photoPath: null }],
+              },
+            ],
+          },
+        ],
+      } as unknown as School;
+
+      const findSpy = vi
+        .spyOn(schoolRepo, 'find')
+        .mockResolvedValue([mockSchool]);
+      vi.mocked(Filesystem.readFile).mockResolvedValueOnce({
+        data: 'dGVzdA==',
+      });
+
+      (global.URL.createObjectURL as Mock).mockClear();
+      await DataManagementService.exportAsZIP();
+
+      expect(Filesystem.readFile).toHaveBeenCalledWith(
+        expect.objectContaining({ path: 'photos/exam1.jpg' }),
+      );
+
+      findSpy.mockRestore();
+    });
+
+    it('should skip photo and warn if readFile fails during ZIP export', async () => {
+      const schoolRepo = dataSource.getRepository(School);
+      const mockSchool = {
+        id: 'photo-fail-school-id',
+        name: 'Photo Fail School',
+        semesters: [
+          { subjects: [{ exams: [{ photoPath: 'photos/missing.jpg' }] }] },
+        ],
+      } as unknown as School;
+
+      const findSpy = vi
+        .spyOn(schoolRepo, 'find')
+        .mockResolvedValue([mockSchool]);
+      vi.mocked(Filesystem.readFile).mockRejectedValueOnce(
+        new Error('not found'),
+      );
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await DataManagementService.exportAsZIP();
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('photos/missing.jpg'),
+      );
+
+      findSpy.mockRestore();
+      warnSpy.mockRestore();
+    });
   });
 
-  describe('importFromJSON', () => {
+  describe('importFromZIP', () => {
     it('should parse "date" fields as Date objects', async () => {
       const validJson = JSON.stringify({
         schools: [
@@ -1161,7 +1230,7 @@ describe('DataManagementService', () => {
         },
       );
 
-      await DataManagementService.importFromJSON(validJson);
+      await DataManagementService.importFromZIP(await makeZipBlob(validJson));
 
       const savedSchools = saveSpy.mock.calls[0][0];
       const examDate = savedSchools[0].subjects[0].exams[0].date;
@@ -1198,7 +1267,7 @@ describe('DataManagementService', () => {
         },
       );
 
-      await DataManagementService.importFromJSON(validJson);
+      await DataManagementService.importFromZIP(await makeZipBlob(validJson));
 
       expect(querySpy).toHaveBeenCalledWith('DELETE FROM grade');
       expect(querySpy).toHaveBeenCalledWith('DELETE FROM exam');
@@ -1213,10 +1282,10 @@ describe('DataManagementService', () => {
 
     it.each([
       {
-        desc: 'should throw PARSE_FAILED error for invalid JSON syntax',
+        desc: 'should throw UNKNOWN error for invalid JSON syntax in data.json',
         jsonInput: '{ invalid: json ',
-        expectedCode: 'PARSE_FAILED',
-        errorClass: SyntaxError,
+        expectedCode: 'UNKNOWN',
+        errorClass: ExportError,
       },
       {
         desc: 'should throw INVALID_DATA error if schools array is missing',
@@ -1225,12 +1294,14 @@ describe('DataManagementService', () => {
         errorClass: ExportError,
       },
     ])('$desc', async ({ jsonInput, expectedCode }) => {
+      const zipBlob = await makeZipBlob(jsonInput);
+
       await expect(
-        DataManagementService.importFromJSON(jsonInput),
+        DataManagementService.importFromZIP(zipBlob),
       ).rejects.toThrow(ExportError);
 
       try {
-        await DataManagementService.importFromJSON(jsonInput);
+        await DataManagementService.importFromZIP(await makeZipBlob(jsonInput));
       } catch (error) {
         if (error instanceof ExportError) {
           expect(error.code).toBe(expectedCode);
@@ -1238,6 +1309,47 @@ describe('DataManagementService', () => {
           throw error;
         }
       }
+    });
+
+    it('should throw INVALID_DATA error if data.json is missing from ZIP', async () => {
+      const emptyZip = new JSZip();
+      const blob = await emptyZip.generateAsync({ type: 'blob' });
+
+      await expect(DataManagementService.importFromZIP(blob)).rejects.toThrow(
+        ExportError,
+      );
+    });
+
+    it('should extract and write photos from ZIP during import', async () => {
+      const zip = new JSZip();
+      zip.file('data.json', JSON.stringify({ schools: [] }));
+      zip.file('photos/exam.jpg', 'base64photodata');
+      const blob = await zip.generateAsync({ type: 'blob' });
+
+      vi.mocked(Filesystem.writeFile).mockResolvedValue({ uri: '' });
+
+      vi.spyOn(dataSource, 'transaction').mockImplementation(
+        async <T>(
+          runInTransaction: ((em: EntityManager) => Promise<T>) | string,
+          maybeRun?: (em: EntityManager) => Promise<T>,
+        ) => {
+          const cb =
+            typeof runInTransaction === 'function'
+              ? runInTransaction
+              : maybeRun!;
+          const mockManager = {
+            query: vi.fn(),
+            getRepository: () => ({ save: vi.fn() }),
+          } as unknown as EntityManager;
+          return cb(mockManager);
+        },
+      );
+
+      await DataManagementService.importFromZIP(blob);
+
+      expect(Filesystem.writeFile).toHaveBeenCalledWith(
+        expect.objectContaining({ path: 'photos/exam.jpg' }),
+      );
     });
 
     it('should throw UNKNOWN error if database transaction fails', async () => {
@@ -1248,11 +1360,11 @@ describe('DataManagementService', () => {
       const validJson = JSON.stringify({ schools: [] });
 
       await expect(
-        DataManagementService.importFromJSON(validJson),
+        DataManagementService.importFromZIP(await makeZipBlob(validJson)),
       ).rejects.toThrow(ExportError);
 
       try {
-        await DataManagementService.importFromJSON(validJson);
+        await DataManagementService.importFromZIP(await makeZipBlob(validJson));
       } catch (error) {
         expect(error).toBeInstanceOf(ExportError);
         if (error instanceof ExportError) {

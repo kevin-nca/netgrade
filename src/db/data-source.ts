@@ -12,8 +12,12 @@ import { Initdb1745319232244 } from './migrations/1745319232244-initdb';
 import { DropDescriptionFromSubject1761134134122 } from './migrations/1761134134122-drop_description_from_subject';
 import { AddSemester1745400000000 } from '@/db/migrations/1745400000000-add-semester';
 import { AddSchoolIdToSemester1771847976332 } from './migrations/1771847976332-add-schoolId-to-semester';
+import { AddPhotoPathToExam1765400000004 } from './migrations/1765400000004-add-photopath';
 import { AddFkSemesterSchool1771848100000 } from './migrations/1771848100000-add-fk-semester-school';
-import { SqljsDriver } from 'typeorm/driver/sqljs/SqljsDriver';
+type SqljsDriver = {
+  databaseConnection: { run: (sql: string) => void };
+  autoSave: () => Promise<void>;
+};
 
 // Reference: https://github.com/sql-js/react-sqljs-demo/blob/master/src/App.js
 (window as { localforage?: typeof localforage }).localforage = localforage;
@@ -67,6 +71,7 @@ const initializeNativeDb = async (): Promise<DataSourceOptions> => {
       Initdb1745319232244,
       DropDescriptionFromSubject1761134134122,
       AddSemester1745400000000,
+      AddPhotoPathToExam1765400000004,
       AddSchoolIdToSemester1771847976332,
       AddFkSemesterSchool1771848100000,
     ],
@@ -127,7 +132,7 @@ export const initializeDatabase = async (): Promise<DataSource> => {
     await AppDataSource.initialize();
 
     if (!isNative) {
-      const driver = AppDataSource.driver as SqljsDriver;
+      const driver = AppDataSource.driver as unknown as SqljsDriver;
       driver.databaseConnection.run('PRAGMA foreign_keys = ON;');
 
       const originalAutoSave = driver.autoSave.bind(driver);
