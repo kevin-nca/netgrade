@@ -20,7 +20,12 @@ export class GradeService {
     try {
       const { grade: gradeRepo } = getRepositories();
       return await gradeRepo.find({
-        relations: ['exam', 'exam.subject', 'exam.subject.semester', 'exam.subject.semester.school'],
+        relations: [
+          'exam',
+          'exam.subject',
+          'exam.subject.semester',
+          'exam.subject.semester.school',
+        ],
         order: {
           date: 'DESC',
         },
