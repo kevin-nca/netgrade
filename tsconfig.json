@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "typeorm/driver/sqljs/SqljsDriver": ["./node_modules/typeorm/driver/sqljs/SqljsDriver"]
     },
     "target": "ESNext",
     "useDefineForClassFields": true,
