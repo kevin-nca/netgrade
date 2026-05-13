@@ -1,15 +1,12 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
-import { GradeService, AddExamAndGradePayload } from '@/services/GradeService';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
-import { Grade } from '@/db/entities/Grade';
-import { Exam } from '@/db/entities/Exam';
-import { School, Subject } from '@/db/entities';
-import { Semester } from '../../db/entities';
+import { Exam, Grade, School, Semester, Subject } from '../../db/entities';
+import { AddExamAndGradePayload, GradeService } from '../../services';
 
 describe('GradeService', () => {
   let dataSource: DataSource;
-  let testData: { school: School; subject: Subject; exam: Exam; grade: Grade };
+  let testData: Awaited<ReturnType<typeof seedTestData>>;
 
   // Set up the database before all tests
   beforeAll(async () => {
@@ -17,7 +14,7 @@ describe('GradeService', () => {
     dataSource = await initializeTestDatabase();
 
     // Mock the getRepositories function to use our test repositories
-    const dataSourceModule = await import('@/db/data-source');
+    const dataSourceModule = await import('../../db/data-source');
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
       school: dataSource.getRepository(School),
       subject: dataSource.getRepository(Subject),
@@ -74,7 +71,7 @@ describe('GradeService', () => {
 
     expect(newGrade.exam.gradeId).toBe(newGrade.id);
 
-    const dataSourceModule = await import('@/db/data-source');
+    const dataSourceModule = await import('../../db/data-source');
     const { exam: examRepo } = dataSourceModule.getRepositories();
     const examFromDb = await examRepo.findOne({
       where: { id: newGrade.exam.id },
@@ -131,7 +128,7 @@ describe('GradeService', () => {
     const fakeError = new Error('Mocked DB error');
     const subjectId = testData.subject.id;
 
-    const dataSourceModule = await import('@/db/data-source');
+    const dataSourceModule = await import('../../db/data-source');
     const { grade: gradeRepo } = dataSourceModule.getRepositories();
 
     // Spy auf console.error
@@ -192,7 +189,7 @@ describe('GradeService', () => {
 
     expect(updatedGrade.exam.id).toBe(originalExamId);
 
-    const dataSourceModule = await import('@/db/data-source');
+    const dataSourceModule = await import('../../db/data-source');
     const { exam: examRepo } = dataSourceModule.getRepositories();
     const examAfterUpdate = await examRepo.findOne({
       where: { id: originalExamId },
@@ -225,7 +222,7 @@ describe('GradeService', () => {
     const grade = await GradeService.findById(newGrade.id);
     expect(grade).toBeNull();
 
-    const dataSourceModule = await import('@/db/data-source');
+    const dataSourceModule = await import('../../db/data-source');
     const { exam: examRepo } = dataSourceModule.getRepositories();
     const examAfterDelete = await examRepo.findOne({
       where: { id: examId },
@@ -242,7 +239,7 @@ describe('GradeService', () => {
   });
 
   it('should handle exam without grade correctly', async () => {
-    const dataSourceModule = await import('@/db/data-source');
+    const dataSourceModule = await import('../../db/data-source');
     const { exam: examRepo } = dataSourceModule.getRepositories();
 
     const standaloneExam = examRepo.create({
@@ -298,7 +295,7 @@ describe('GradeService', () => {
 
     expect(updatedGrade.exam.gradeId).toBe(updatedGrade.id);
 
-    const dataSourceModule = await import('@/db/data-source');
+    const dataSourceModule = await import('../../db/data-source');
     const { exam: examRepo } = dataSourceModule.getRepositories();
     const examFromDb = await examRepo.findOne({
       where: { id: updatedGrade.exam.id },

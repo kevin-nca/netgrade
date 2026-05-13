@@ -1,23 +1,17 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
-import { SubjectService } from '@/services/SubjectService';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
-import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import { Exam, Grade, School, Semester, Subject } from '../../db/entities';
+import { SubjectService } from '../../services';
 
 describe('SubjectService', () => {
   let dataSource: DataSource;
-  let testData: {
-    school: School;
-    semester: Semester;
-    subject: Subject;
-    exam: Exam;
-    grade: Grade;
-  };
+  let testData: Awaited<ReturnType<typeof seedTestData>>;
 
   beforeAll(async () => {
     dataSource = await initializeTestDatabase();
 
-    const dataSourceModule = await import('@/db/data-source');
+    const dataSourceModule = await import('../../db/data-source');
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
       school: dataSource.getRepository(School),
       subject: dataSource.getRepository(Subject),

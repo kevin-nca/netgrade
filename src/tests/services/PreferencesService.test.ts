@@ -1,10 +1,10 @@
 // PreferencesService.test.ts
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { Preferences } from '@capacitor/preferences';
-import { PreferencesService } from '@/services/PreferencesService';
-import { getRepositories } from '@/db/data-source';
 import { createMockCurrentSemester } from './setup';
-import { Semester } from '@/db/entities';
+import { PreferencesService } from '../../services';
+import { getRepositories } from '../../db/data-source';
+import { Semester } from '../../db/entities';
 
 vi.mock('@capacitor/preferences', () => ({
   Preferences: {
