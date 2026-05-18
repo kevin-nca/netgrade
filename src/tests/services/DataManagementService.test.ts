@@ -34,8 +34,8 @@ vi.mock('@capacitor/share', () => ({
   },
 }));
 
-global.URL.createObjectURL = vi.fn(() => 'blob:mocked-url');
-global.URL.revokeObjectURL = vi.fn();
+globalThis.URL.createObjectURL = vi.fn(() => 'blob:mocked-url');
+globalThis.URL.revokeObjectURL = vi.fn();
 
 describe('DataManagementService', () => {
   let dataSource: DataSource;
@@ -951,15 +951,15 @@ describe('DataManagementService', () => {
         return element;
       });
 
-      (global.URL.createObjectURL as Mock).mockClear();
+      (globalThis.URL.createObjectURL as Mock).mockClear();
 
       await DataManagementService.exportAsJSON();
 
       Date.prototype.toJSON = originalToJSON;
 
       expect(anchorClickSpy).toHaveBeenCalled();
-      expect(global.URL.createObjectURL).toHaveBeenCalled();
-      const blob = (global.URL.createObjectURL as Mock).mock
+      expect(globalThis.URL.createObjectURL).toHaveBeenCalled();
+      const blob = (globalThis.URL.createObjectURL as Mock).mock
         .calls[0][0] as Blob;
       const text = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -1495,15 +1495,12 @@ describe('DataManagementService', () => {
 
       const fullSchool = await schoolRepo.findOne({
         where: { id: school.id },
-        relations: {
-          semesters: {
-            subjects: {
-              exams: {
-                grade: true,
-              },
-            },
-          },
-        },
+        relations: [
+          'semesters',
+          'semesters.subjects',
+          'semesters.subjects.exams',
+          'semesters.subjects.exams.grade',
+        ],
       });
 
       expect(fullSchool).toBeTruthy();
@@ -1599,15 +1596,12 @@ describe('DataManagementService', () => {
 
       const fullSchool = await schoolRepo.findOne({
         where: { id: school.id },
-        relations: {
-          semesters: {
-            subjects: {
-              exams: {
-                grade: true,
-              },
-            },
-          },
-        },
+        relations: [
+          'semesters',
+          'semesters.subjects',
+          'semesters.subjects.exams',
+          'semesters.subjects.exams.grade',
+        ],
       });
       expect(fullSchool).toBeTruthy();
 
