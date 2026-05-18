@@ -1,8 +1,8 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
-import { Exam, Grade, School, Semester, Subject } from '../../db/entities';
-import { ExamService } from '../../services';
+import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import { ExamService } from '@/services';
 
 describe('ExamService', () => {
   let dataSource: DataSource;
@@ -14,7 +14,7 @@ describe('ExamService', () => {
     dataSource = await initializeTestDatabase();
 
     // Mock the getRepositories function to use our test repositories
-    const dataSourceModule = await import('../../db/data-source');
+    const dataSourceModule = await import('@/db/data-source');
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
       school: dataSource.getRepository(School),
       semester: dataSource.getRepository(Semester),

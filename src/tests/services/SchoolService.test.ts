@@ -13,8 +13,8 @@ import {
   createMockSubjectWithZeroWeight,
   createMockSubjectWithMissingGrade,
 } from './setup';
-import { Exam, Grade, School, Semester, Subject } from '../../db/entities';
-import { SchoolService } from '../../services';
+import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import { SchoolService } from '@/services';
 
 describe('SchoolService', () => {
   let dataSource: DataSource;
@@ -26,7 +26,7 @@ describe('SchoolService', () => {
     dataSource = await initializeTestDatabase();
 
     // Mock the getRepositories function to use our test repositories
-    const dataSourceModule = await import('../../db/data-source');
+    const dataSourceModule = await import('@/db/data-source');
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
       school: dataSource.getRepository(School),
       subject: dataSource.getRepository(Subject),

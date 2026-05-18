@@ -2,9 +2,9 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { Preferences } from '@capacitor/preferences';
 import { createMockCurrentSemester } from './setup';
-import { PreferencesService } from '../../services';
-import { getRepositories } from '../../db/data-source';
-import { Semester } from '../../db/entities';
+import { PreferencesService } from '@/services';
+import { getRepositories } from '@/db/data-source';
+import { Semester } from '@/db/entities';
 
 vi.mock('@capacitor/preferences', () => ({
   Preferences: {

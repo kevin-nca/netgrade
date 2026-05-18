@@ -4,8 +4,8 @@ import { Capacitor } from '@capacitor/core';
 import { Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
-import { Exam, Grade, School, Semester, Subject } from '../../db/entities';
-import { PDFService } from '../../services';
+import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import { PDFService } from '@/services';
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
@@ -39,7 +39,7 @@ describe('PDFService', () => {
   beforeAll(async () => {
     dataSource = await initializeTestDatabase();
 
-    const dataSourceModule = await import('../../db/data-source');
+    const dataSourceModule = await import('@/db/data-source');
     vi.spyOn(dataSourceModule, 'getDataSource').mockReturnValue(dataSource);
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
       school: dataSource.getRepository(School),

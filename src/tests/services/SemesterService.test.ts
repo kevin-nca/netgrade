@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { DataSource } from 'typeorm';
 import { cleanupTestData, initializeTestDatabase, seedTestData } from './setup';
-import { Exam, Grade, School, Semester, Subject } from '../../db/entities';
-import { SemesterService } from '../../services/SemesterService';
+import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import { SemesterService } from '@/services/SemesterService';
 
 describe('SemesterService', () => {
   let dataSource: DataSource;
@@ -42,7 +42,7 @@ describe('SemesterService', () => {
   it('should throw error and log when fetchAll fails', async () => {
     const testError = new Error('Database fetch error');
     const consoleSpy = vi.spyOn(console, 'error');
-    const dataSourceModule = await import('../../db/data-source');
+    const dataSourceModule = await import('@/db/data-source');
 
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValueOnce({
       semester: {
@@ -84,7 +84,7 @@ describe('SemesterService', () => {
     // Arrange
     const testError = new Error('Database add error');
     const consoleSpy = vi.spyOn(console, 'error');
-    const dataSourceModule = await import('../../db/data-source');
+    const dataSourceModule = await import('@/db/data-source');
 
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValueOnce({
       semester: {
