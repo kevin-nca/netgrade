@@ -49,8 +49,5 @@ jobs:
       - name: Build Project
         run: npm run build
 
-      - name: Start Dev Server
-        run: npm run dev & sleep 10
-
       - name: Run Cypress Tests
-        run: npx cypress run
+        run: npx --yes start-server-and-test dev http://localhost:5173 'cypress run'
