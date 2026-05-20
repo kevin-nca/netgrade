@@ -11,7 +11,7 @@ export class SubjectService {
       const { subject: subjectRepo } = getRepositories();
       return await subjectRepo.find({
         order: { name: 'ASC' },
-        relations: ['semester', 'semester.school', 'exams', 'exams.grade'],
+        relations: { semester: { school: true }, exams: { grade: true } },
       });
     } catch (error) {
       console.error('Failed to fetch subjects:', error);
@@ -36,7 +36,7 @@ export class SubjectService {
 
       return (await subjectRepo.findOne({
         where: { id: newSubject.id },
-        relations: ['semester'],
+        relations: { semester: true },
       })) as Subject;
     } catch (error) {
       console.error('Failed to add subject:', error);

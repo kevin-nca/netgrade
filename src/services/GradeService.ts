@@ -20,15 +20,8 @@ export class GradeService {
     try {
       const { grade: gradeRepo } = getRepositories();
       return await gradeRepo.find({
-        relations: [
-          'exam',
-          'exam.subject',
-          'exam.subject.semester',
-          'exam.subject.semester.school',
-        ],
-        order: {
-          date: 'DESC',
-        },
+        relations: { exam: { subject: { semester: { school: true } } } },
+        order: { date: 'DESC' },
       });
     } catch (error) {
       console.error('Failed to fetch grades:', error);
@@ -83,7 +76,7 @@ export class GradeService {
         await transactionManager.save(savedExam);
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
-          relations: ['exam', 'exam.subject', 'exam.subject.semester'],
+          relations: { exam: { subject: { semester: true } } },
         });
 
         if (!finalGrade) {
@@ -113,7 +106,7 @@ export class GradeService {
 
       const existingGrade = await gradeRepo.findOne({
         where: { id: updatedGradeData.id },
-        relations: ['exam'],
+        relations: { exam: true },
       });
 
       if (!existingGrade) {
@@ -163,7 +156,7 @@ export class GradeService {
       const { grade: gradeRepo } = getRepositories();
       return await gradeRepo.findOne({
         where: { id },
-        relations: ['exam'],
+        relations: { exam: true },
       });
     } catch (error) {
       console.error(`Failed to find grade with ID ${id}:`, error);
@@ -250,7 +243,7 @@ export class GradeService {
         // Update grade
         const existingGrade = await transactionManager.findOne(Grade, {
           where: { id: gradeData.id },
-          relations: ['exam'],
+          relations: { exam: true },
         });
 
         if (!existingGrade) {
@@ -269,7 +262,7 @@ export class GradeService {
         // Return with relations
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
-          relations: ['exam'],
+          relations: { exam: true },
         });
 
         if (!finalGrade) {

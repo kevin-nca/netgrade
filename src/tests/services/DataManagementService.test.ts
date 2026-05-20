@@ -1495,12 +1495,7 @@ describe('DataManagementService', () => {
 
       const fullSchool = await schoolRepo.findOne({
         where: { id: school.id },
-        relations: [
-          'semesters',
-          'semesters.subjects',
-          'semesters.subjects.exams',
-          'semesters.subjects.exams.grade',
-        ],
+        relations: { semesters: { subjects: { exams: { grade: true } } } },
       });
 
       expect(fullSchool).toBeTruthy();
@@ -1596,12 +1591,7 @@ describe('DataManagementService', () => {
 
       const fullSchool = await schoolRepo.findOne({
         where: { id: school.id },
-        relations: [
-          'semesters',
-          'semesters.subjects',
-          'semesters.subjects.exams',
-          'semesters.subjects.exams.grade',
-        ],
+        relations: { semesters: { subjects: { exams: { grade: true } } } },
       });
       expect(fullSchool).toBeTruthy();
 

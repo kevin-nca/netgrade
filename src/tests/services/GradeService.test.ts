@@ -75,7 +75,7 @@ describe('GradeService', () => {
     const { exam: examRepo } = dataSourceModule.getRepositories();
     const examFromDb = await examRepo.findOne({
       where: { id: newGrade.exam.id },
-      relations: ['grade'],
+      relations: { grade: true },
     });
 
     expect(examFromDb).toBeDefined();
@@ -229,7 +229,7 @@ describe('GradeService', () => {
     const { exam: examRepo } = dataSourceModule.getRepositories();
     const examAfterDelete = await examRepo.findOne({
       where: { id: examId },
-      relations: ['grade'],
+      relations: { grade: true },
     });
 
     expect(examAfterDelete).toBeDefined();

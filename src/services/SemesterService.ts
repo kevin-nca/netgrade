@@ -11,7 +11,7 @@ export class SemesterService {
       const { semester: semesterRepo } = getRepositories();
       return await semesterRepo.find({
         order: { startDate: 'DESC' },
-        relations: ['subjects', 'school'],
+        relations: { subjects: true, school: true },
       });
     } catch (error) {
       console.error('Failed to fetch semesters:', error);
