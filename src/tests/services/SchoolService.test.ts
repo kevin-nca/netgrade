@@ -1,6 +1,5 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
-import { SchoolService } from '@/services/SchoolService';
 import {
   initializeTestDatabase,
   cleanupTestData,
@@ -14,12 +13,12 @@ import {
   createMockSubjectWithZeroWeight,
   createMockSubjectWithMissingGrade,
 } from './setup';
-import { School } from '@/db/entities/School';
-import { Exam, Grade, Semester, Subject } from '@/db/entities';
+import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import { SchoolService } from '@/services';
 
 describe('SchoolService', () => {
   let dataSource: DataSource;
-  let testData: { school: School; subject: Subject; exam: Exam; grade: Grade };
+  let testData: Awaited<ReturnType<typeof seedTestData>>;
 
   // Set up the database before all tests
   beforeAll(async () => {

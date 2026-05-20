@@ -1,25 +1,19 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { DataSource } from 'typeorm';
-import { SemesterService } from '@/services/SemesterService';
 import { cleanupTestData, initializeTestDatabase, seedTestData } from './setup';
-import { Semester } from '@/db/entities/Semester';
-import { Exam, Grade, School, Subject } from '@/db/entities';
+import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import { SemesterService } from '@/services/SemesterService';
 
 describe('SemesterService', () => {
   let dataSource: DataSource;
-  let testData: {
-    school: School;
-    semester: Semester;
-    subject: Subject;
-    exam: Exam;
-    grade: Grade;
-  };
+  let testData: Awaited<ReturnType<typeof seedTestData>>;
+
   // Set up the database before all tests
   beforeAll(async () => {
     // Initialize the test database
     dataSource = await initializeTestDatabase();
 
-    const dataSourceModule = await import('@/db/data-source');
+    const dataSourceModule = await import('../../db/data-source');
     // Mock the getRepositories function to use our test repositories
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
       school: dataSource.getRepository(School),
@@ -125,7 +119,7 @@ describe('SemesterService', () => {
   it('should throw error and log when findById fails', async () => {
     const testError = new Error('Database findById error');
     const consoleSpy = vi.spyOn(console, 'error');
-    const dataSourceModule = await import('@/db/data-source');
+    const dataSourceModule = await import('../../db/data-source');
 
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValueOnce({
       semester: {

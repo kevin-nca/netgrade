@@ -85,15 +85,12 @@ export class DataManagementService {
 
       if (options.schoolId === 'all') {
         schools = await schoolRepo.find({
-          relations: {
-            semesters: {
-              subjects: {
-                exams: {
-                  grade: true,
-                },
-              },
-            },
-          },
+          relations: [
+            'semesters',
+            'semesters.subjects',
+            'semesters.subjects.exams',
+            'semesters.subjects.exams.grade',
+          ],
           order: { name: 'ASC' },
         });
 
@@ -103,15 +100,12 @@ export class DataManagementService {
       } else {
         const school = await schoolRepo.findOne({
           where: { id: options.schoolId },
-          relations: {
-            semesters: {
-              subjects: {
-                exams: {
-                  grade: true,
-                },
-              },
-            },
-          },
+          relations: [
+            'semesters',
+            'semesters.subjects',
+            'semesters.subjects.exams',
+            'semesters.subjects.exams.grade',
+          ],
         });
 
         if (!school) {
@@ -149,7 +143,12 @@ export class DataManagementService {
   static async exportAsJSON(): Promise<ExportResult> {
     try {
       const schools = await getRepositories().school.find({
-        relations: { semesters: { subjects: { exams: { grade: true } } } },
+        relations: [
+          'semesters',
+          'semesters.subjects',
+          'semesters.subjects.exams',
+          'semesters.subjects.exams.grade',
+        ],
       });
 
       if (schools.length === 0) {

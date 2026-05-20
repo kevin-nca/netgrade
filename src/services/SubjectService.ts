@@ -11,14 +11,7 @@ export class SubjectService {
       const { subject: subjectRepo } = getRepositories();
       return await subjectRepo.find({
         order: { name: 'ASC' },
-        relations: {
-          semester: {
-            school: true,
-          },
-          exams: {
-            grade: true,
-          },
-        },
+        relations: ['semester', 'semester.school', 'exams', 'exams.grade'],
       });
     } catch (error) {
       console.error('Failed to fetch subjects:', error);
@@ -43,7 +36,7 @@ export class SubjectService {
 
       return (await subjectRepo.findOne({
         where: { id: newSubject.id },
-        relations: { semester: true },
+        relations: ['semester'],
       })) as Subject;
     } catch (error) {
       console.error('Failed to add subject:', error);
@@ -127,16 +120,14 @@ export class SubjectService {
   static async findBySchoolId(schoolId: string): Promise<Subject[]> {
     try {
       const { subject: subjectRepo } = getRepositories();
-      return await subjectRepo.find({
-        where: { semester: { schoolId } },
-        order: { name: 'ASC' },
-        relations: {
-          semester: true,
-          exams: {
-            grade: true,
-          },
-        },
-      });
+      return await subjectRepo
+        .createQueryBuilder('subject')
+        .leftJoinAndSelect('subject.semester', 'semester')
+        .leftJoinAndSelect('subject.exams', 'exams')
+        .leftJoinAndSelect('exams.grade', 'grade')
+        .where('semester.schoolId = :schoolId', { schoolId })
+        .orderBy('subject.name', 'ASC')
+        .getMany();
     } catch (error) {
       console.error(
         `Failed to find subjects for school ID ${schoolId}:`,
