@@ -14,6 +14,14 @@ export default defineConfig({
       src: path.resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    exclude: ['expo-sqlite'],
+  },
+  build: {
+    rollupOptions: {
+      external: ['expo-sqlite'],
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',
