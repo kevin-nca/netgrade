@@ -28,7 +28,12 @@ export class PDFService {
       ? filename
       : `${filename}.pdf`;
     const { school: schoolRepo } = getRepositories();
-    const relations = { semesters: { subjects: { exams: { grade: true } } } };
+    const relations = [
+      'semesters',
+      'semesters.subjects',
+      'semesters.subjects.exams',
+      'semesters.subjects.exams.grade',
+    ];
 
     const schools: School[] =
       schoolId === 'all'

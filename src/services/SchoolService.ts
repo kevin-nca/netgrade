@@ -13,15 +13,12 @@ export class SchoolService {
       const { school: schoolRepo } = getRepositories();
       return await schoolRepo.find({
         order: { name: 'ASC' },
-        relations: {
-          semesters: {
-            subjects: {
-              exams: {
-                grade: true,
-              },
-            },
-          },
-        },
+        relations: [
+          'semesters',
+          'semesters.subjects',
+          'semesters.subjects.exams',
+          'semesters.subjects.exams.grade',
+        ],
       });
     } catch (error) {
       console.error('Failed to fetch schools:', error);

@@ -20,15 +20,12 @@ export class GradeService {
     try {
       const { grade: gradeRepo } = getRepositories();
       return await gradeRepo.find({
-        relations: {
-          exam: {
-            subject: {
-              semester: {
-                school: true,
-              },
-            },
-          },
-        },
+        relations: [
+          'exam',
+          'exam.subject',
+          'exam.subject.semester',
+          'exam.subject.semester.school',
+        ],
         order: {
           date: 'DESC',
         },
@@ -86,13 +83,7 @@ export class GradeService {
         await transactionManager.save(savedExam);
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
-          relations: {
-            exam: {
-              subject: {
-                semester: true,
-              },
-            },
-          },
+          relations: ['exam', 'exam.subject', 'exam.subject.semester'],
         });
 
         if (!finalGrade) {
@@ -122,9 +113,7 @@ export class GradeService {
 
       const existingGrade = await gradeRepo.findOne({
         where: { id: updatedGradeData.id },
-        relations: {
-          exam: true,
-        },
+        relations: ['exam'],
       });
 
       if (!existingGrade) {
@@ -174,9 +163,7 @@ export class GradeService {
       const { grade: gradeRepo } = getRepositories();
       return await gradeRepo.findOne({
         where: { id },
-        relations: {
-          exam: true,
-        },
+        relations: ['exam'],
       });
     } catch (error) {
       console.error(`Failed to find grade with ID ${id}:`, error);
@@ -192,14 +179,11 @@ export class GradeService {
   static async findByExamId(examId: string): Promise<Grade[]> {
     try {
       const { grade: gradeRepo } = getRepositories();
-      return await gradeRepo.find({
-        where: {
-          exam: { id: examId },
-        },
-        relations: {
-          exam: true,
-        },
-      });
+      return await gradeRepo
+        .createQueryBuilder('grade')
+        .leftJoinAndSelect('grade.exam', 'exam')
+        .where('exam.id = :examId', { examId })
+        .getMany();
     } catch (error) {
       console.error(`Failed to find grades for exam ID ${examId}:`, error);
       throw error;
@@ -216,18 +200,13 @@ export class GradeService {
   static async findBySubjectId(subjectId: string): Promise<Grade[]> {
     try {
       const { grade: gradeRepo } = getRepositories();
-      return await gradeRepo.find({
-        where: {
-          exam: { subjectId },
-        },
-        relations: {
-          exam: {
-            subject: {
-              semester: true,
-            },
-          },
-        },
-      });
+      return await gradeRepo
+        .createQueryBuilder('grade')
+        .leftJoinAndSelect('grade.exam', 'exam')
+        .leftJoinAndSelect('exam.subject', 'subject')
+        .leftJoinAndSelect('subject.semester', 'semester')
+        .where('exam.subjectId = :subjectId', { subjectId })
+        .getMany();
     } catch (error) {
       console.error(
         `Failed to find grades for subject ID ${subjectId}:`,
@@ -271,9 +250,7 @@ export class GradeService {
         // Update grade
         const existingGrade = await transactionManager.findOne(Grade, {
           where: { id: gradeData.id },
-          relations: {
-            exam: true,
-          },
+          relations: ['exam'],
         });
 
         if (!existingGrade) {
@@ -292,9 +269,7 @@ export class GradeService {
         // Return with relations
         const finalGrade = await transactionManager.findOne(Grade, {
           where: { id: savedGrade.id },
-          relations: {
-            exam: true,
-          },
+          relations: ['exam'],
         });
 
         if (!finalGrade) {
