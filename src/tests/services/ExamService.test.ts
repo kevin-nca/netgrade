@@ -1,6 +1,5 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
-import { ExamService } from '@/services/ExamService';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Exam } from '@/db/entities/Exam';
 import { Grade, School, Semester, Subject } from '@/db/entities';
@@ -34,10 +33,12 @@ vi.mock('@capacitor/filesystem', () => ({
   },
   Directory: { Data: 'DATA', Documents: 'DOCUMENTS' },
 }));
+import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import { ExamService } from '@/services';
 
 describe('ExamService', () => {
   let dataSource: DataSource;
-  let testData: { school: School; subject: Subject; exam: Exam; grade: Grade };
+  let testData: Awaited<ReturnType<typeof seedTestData>>;
 
   // Set up the database before all tests
   beforeAll(async () => {
@@ -48,6 +49,7 @@ describe('ExamService', () => {
     const dataSourceModule = await import('@/db/data-source');
     vi.spyOn(dataSourceModule, 'getRepositories').mockReturnValue({
       school: dataSource.getRepository(School),
+      semester: dataSource.getRepository(Semester),
       subject: dataSource.getRepository(Subject),
       exam: dataSource.getRepository(Exam),
       grade: dataSource.getRepository(Grade),

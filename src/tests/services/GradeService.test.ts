@@ -1,15 +1,12 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
-import { GradeService, AddExamAndGradePayload } from '@/services/GradeService';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
-import { Grade } from '@/db/entities/Grade';
-import { Exam } from '@/db/entities/Exam';
-import { School, Subject } from '@/db/entities';
-import { Semester } from '../../db/entities';
+import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import { AddExamAndGradePayload, GradeService } from '@/services';
 
 describe('GradeService', () => {
   let dataSource: DataSource;
-  let testData: { school: School; subject: Subject; exam: Exam; grade: Grade };
+  let testData: Awaited<ReturnType<typeof seedTestData>>;
 
   // Set up the database before all tests
   beforeAll(async () => {
@@ -134,26 +131,29 @@ describe('GradeService', () => {
     const dataSourceModule = await import('@/db/data-source');
     const { grade: gradeRepo } = dataSourceModule.getRepositories();
 
-    // Spy auf console.error
     const consoleErrorSpy = vi
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    // Mock gradeRepo.find to throw error
-    const findSpy = vi.spyOn(gradeRepo, 'find').mockRejectedValue(fakeError);
+    const createQueryBuilderSpy = vi
+      .spyOn(gradeRepo, 'createQueryBuilder')
+      .mockImplementation(() => {
+        throw fakeError;
+      });
 
-    await expect(GradeService.findBySubjectId(subjectId)).rejects.toThrow(
-      'Mocked DB error',
-    );
+    try {
+      await expect(GradeService.findBySubjectId(subjectId)).rejects.toThrow(
+        'Mocked DB error',
+      );
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      `Failed to find grades for subject ID ${subjectId}:`,
-      fakeError,
-    );
-
-    // Cleanup
-    findSpy.mockRestore();
-    consoleErrorSpy.mockRestore();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        `Failed to find grades for subject ID ${subjectId}:`,
+        fakeError,
+      );
+    } finally {
+      createQueryBuilderSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
+    }
   });
 
   // Test findByExamId method
