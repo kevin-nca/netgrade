@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  IonAlert,
   IonCard,
   IonList,
   IonItem,
@@ -23,6 +22,7 @@ import {
   chatbubbleOutline,
   trashOutline,
 } from 'ionicons/icons';
+import { ExamScan } from '@/db/entities/ExamScan';
 import { GradeFormData } from './types';
 import styles from './styles/grade-form.module.css';
 
@@ -35,9 +35,10 @@ interface GradeFormProps {
   getGradeColor: (grade: number) => string;
   onSubmit: () => void;
   onTakePhoto?: () => void;
-  onDeletePhoto?: () => void;
+  onDeletePhoto?: (scanId: string) => void;
   isTakingPhoto?: boolean;
-  photoPath?: string | null;
+  scans?: ExamScan[];
+  photoSrcs?: string[];
 }
 
 export const GradeForm: React.FC<GradeFormProps> = ({
@@ -48,10 +49,9 @@ export const GradeForm: React.FC<GradeFormProps> = ({
   onTakePhoto,
   onDeletePhoto,
   isTakingPhoto,
-  photoPath,
+  scans = [],
+  photoSrcs = [],
 }) => {
-  const [showDeletePhotoAlert, setShowDeletePhotoAlert] = useState(false);
-
   return (
     <>
       <IonCard className={styles.formCard}>
@@ -175,20 +175,23 @@ export const GradeForm: React.FC<GradeFormProps> = ({
           </IonItemGroup>
         </IonList>
 
-        {photoPath && (
-          <div className={styles.photoPreview}>
-            <IonImg src={photoPath} />
-            {onDeletePhoto && (
-              <IonButton
-                fill="clear"
-                color="danger"
-                size="small"
-                className={styles.deletePhotoButton}
-                onClick={() => setShowDeletePhotoAlert(true)}
-              >
-                <IonIcon slot="icon-only" icon={trashOutline} />
-              </IonButton>
-            )}
+        {scans.length > 0 && (
+          <div className={styles.photoGallery}>
+            {scans.map((scan, i) => (
+              <div key={scan.id} className={styles.photoPreview}>
+                <IonImg src={photoSrcs[i]} />
+                <IonButton
+                  fill="clear"
+                  color="danger"
+                  size="small"
+                  className={styles.deletePhotoButton}
+                  onClick={() => onDeletePhoto?.(scan.id)}
+                >
+                  <IonIcon slot="icon-only" icon={trashOutline} />
+                </IonButton>
+                <div className={styles.pageLabel}>Seite {i + 1}</div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -230,25 +233,6 @@ export const GradeForm: React.FC<GradeFormProps> = ({
           </IonButton>
         </div>
       </IonCard>
-
-      <IonAlert
-        isOpen={showDeletePhotoAlert}
-        onDidDismiss={() => setShowDeletePhotoAlert(false)}
-        header="Scan löschen?"
-        message="Möchtest du den Scan wirklich löschen?"
-        buttons={[
-          {
-            text: 'Abbrechen',
-            role: 'cancel',
-            handler: () => setShowDeletePhotoAlert(false),
-          },
-          {
-            text: 'Löschen',
-            role: 'destructive',
-            handler: () => onDeletePhoto?.(),
-          },
-        ]}
-      />
     </>
   );
 };

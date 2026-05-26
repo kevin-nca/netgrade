@@ -9,7 +9,6 @@ export interface AddExamAndGradePayload {
   score: number;
   weight: number;
   comment?: string;
-  photoPath?: string | null;
 }
 
 export class GradeService {
@@ -62,9 +61,6 @@ export class GradeService {
         if (existingExam) {
           existingExam.isCompleted = true;
           existingExam.weight = payload.weight;
-          if (payload.photoPath !== undefined) {
-            existingExam.photoPath = payload.photoPath;
-          }
           savedExam = await transactionManager.save(existingExam);
         } else {
           const newExamData: Partial<Exam> = {
@@ -73,7 +69,6 @@ export class GradeService {
             subjectId: payload.subjectId,
             weight: payload.weight,
             isCompleted: true,
-            photoPath: payload.photoPath ?? null,
           };
           const newExam = transactionManager.create(Exam, newExamData);
           savedExam = await transactionManager.save(newExam);

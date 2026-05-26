@@ -91,6 +91,7 @@ export class DataManagementService {
               subjects: {
                 exams: {
                   grade: true,
+                  scans: true,
                 },
               },
             },
@@ -109,6 +110,7 @@ export class DataManagementService {
               subjects: {
                 exams: {
                   grade: true,
+                  scans: true,
                 },
               },
             },
@@ -150,7 +152,9 @@ export class DataManagementService {
   static async exportAsZIP(): Promise<ExportResult> {
     try {
       const schools = await getRepositories().school.find({
-        relations: { semesters: { subjects: { exams: { grade: true } } } },
+        relations: {
+          semesters: { subjects: { exams: { grade: true, scans: true } } },
+        },
       });
 
       if (schools.length === 0) {
@@ -178,15 +182,15 @@ export class DataManagementService {
         for (const semester of school.semesters) {
           for (const subject of semester.subjects) {
             for (const exam of subject.exams) {
-              if (exam.photoPath) {
+              for (const scan of exam.scans ?? []) {
                 try {
                   const { data } = await Filesystem.readFile({
-                    path: exam.photoPath,
+                    path: scan.photoPath,
                     directory: Directory.Data,
                   });
-                  zip.file(exam.photoPath, data as string, { base64: true });
+                  zip.file(scan.photoPath, data as string, { base64: true });
                 } catch {
-                  console.warn(`Foto nicht gefunden: ${exam.photoPath}`);
+                  console.warn(`Foto nicht gefunden: ${scan.photoPath}`);
                 }
               }
             }

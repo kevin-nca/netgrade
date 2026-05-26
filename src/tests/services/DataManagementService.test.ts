@@ -1121,7 +1121,7 @@ describe('DataManagementService', () => {
       findSpy.mockRestore();
     });
 
-    it('should include exam photos in ZIP when photoPath is set', async () => {
+    it('should include exam scan photos in ZIP', async () => {
       const schoolRepo = dataSource.getRepository(School);
       const mockSchool = {
         id: 'photo-school-id',
@@ -1130,7 +1130,15 @@ describe('DataManagementService', () => {
           {
             subjects: [
               {
-                exams: [{ photoPath: 'photos/exam1.jpg' }, { photoPath: null }],
+                exams: [
+                  {
+                    scans: [
+                      { photoPath: 'photos/exam1.jpg' },
+                      { photoPath: 'photos/exam2.jpg' },
+                    ],
+                  },
+                  { scans: [] },
+                ],
               },
             ],
           },
@@ -1140,7 +1148,7 @@ describe('DataManagementService', () => {
       const findSpy = vi
         .spyOn(schoolRepo, 'find')
         .mockResolvedValue([mockSchool]);
-      vi.mocked(Filesystem.readFile).mockResolvedValueOnce({
+      vi.mocked(Filesystem.readFile).mockResolvedValue({
         data: 'dGVzdA==',
       });
 
@@ -1149,6 +1157,9 @@ describe('DataManagementService', () => {
 
       expect(Filesystem.readFile).toHaveBeenCalledWith(
         expect.objectContaining({ path: 'photos/exam1.jpg' }),
+      );
+      expect(Filesystem.readFile).toHaveBeenCalledWith(
+        expect.objectContaining({ path: 'photos/exam2.jpg' }),
       );
 
       findSpy.mockRestore();
@@ -1160,7 +1171,11 @@ describe('DataManagementService', () => {
         id: 'photo-fail-school-id',
         name: 'Photo Fail School',
         semesters: [
-          { subjects: [{ exams: [{ photoPath: 'photos/missing.jpg' }] }] },
+          {
+            subjects: [
+              { exams: [{ scans: [{ photoPath: 'photos/missing.jpg' }] }] },
+            ],
+          },
         ],
       } as unknown as School;
 

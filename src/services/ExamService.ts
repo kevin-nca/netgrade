@@ -1,5 +1,6 @@
-import { getRepositories } from '@/db/data-source';
+import { getRepositories, getDataSource } from '@/db/data-source';
 import { Exam } from '@/db/entities/Exam';
+import { ExamScan } from '@/db/entities/ExamScan';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 import {
@@ -112,7 +113,11 @@ export class ExamService {
   static async findById(id: string): Promise<Exam | null> {
     try {
       const { exam: examRepo } = getRepositories();
-      return await examRepo.findOne({ where: { id } });
+      return await examRepo.findOne({
+        where: { id },
+        relations: { scans: true },
+        order: { scans: { createdAt: 'ASC' } },
+      });
     } catch (error) {
       console.error(`Failed to find exam with ID ${id}:`, error);
       throw error;
@@ -160,12 +165,7 @@ export class ExamService {
     }
   }
 
-  /**
-   * Takes a picture of an exam and saves it to the filesystem
-   * @param examId - The ID of the exam to attach the photo to
-   * @returns Promise<string> - The saved file path
-   */
-  static async takeExamPhoto(): Promise<string> {
+  static async takeExamPhoto(): Promise<string[]> {
     const result = await DocumentScanner.scanDocument({
       responseType: Capacitor.isNativePlatform()
         ? ResponseType.ImageFilePath
@@ -176,25 +176,50 @@ export class ExamService {
       throw new Error('Scan abgebrochen oder fehlgeschlagen.');
     }
 
-    const scanned = result.scannedImages[0];
-    const destPath = `photos/${crypto.randomUUID()}.jpg`;
+    const savedPaths: string[] = [];
 
-    if (Capacitor.isNativePlatform()) {
-      await Filesystem.copy({
-        from: scanned,
-        to: destPath,
-        toDirectory: Directory.Data,
-      });
-    } else {
-      await Filesystem.writeFile({
-        path: destPath,
-        data: scanned,
-        directory: Directory.Data,
-        recursive: true,
-      });
+    for (const scanned of result.scannedImages) {
+      const destPath = `photos/${crypto.randomUUID()}.jpg`;
+
+      if (Capacitor.isNativePlatform()) {
+        await Filesystem.copy({
+          from: scanned,
+          to: destPath,
+          toDirectory: Directory.Data,
+        });
+      } else {
+        await Filesystem.writeFile({
+          path: destPath,
+          data: scanned,
+          directory: Directory.Data,
+          recursive: true,
+        });
+      }
+
+      savedPaths.push(destPath);
     }
 
-    return destPath;
+    return savedPaths;
+  }
+
+  static async addScans(
+    examId: string,
+    photoPaths: string[],
+  ): Promise<ExamScan[]> {
+    const scanRepo = getDataSource().getRepository(ExamScan);
+    const scans = photoPaths.map((photoPath) =>
+      scanRepo.create({ examId, photoPath }),
+    );
+    return scanRepo.save(scans);
+  }
+
+  static async deleteScan(scanId: string): Promise<string> {
+    const scanRepo = getDataSource().getRepository(ExamScan);
+    const result = await scanRepo.delete(scanId);
+    if (result.affected === 0) {
+      throw new Error(`ExamScan with ID ${scanId} not found.`);
+    }
+    return scanId;
   }
 
   static async resolvePhotoSrc(photoPath: string): Promise<string> {
@@ -210,5 +235,9 @@ export class ExamService {
       directory: Directory.Data,
     });
     return `data:image/jpeg;base64,${data as string}`;
+  }
+
+  static async resolvePhotoSrcs(photoPaths: string[]): Promise<string[]> {
+    return Promise.all(photoPaths.map((p) => ExamService.resolvePhotoSrc(p)));
   }
 }

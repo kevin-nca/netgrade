@@ -74,13 +74,36 @@
   }
 }
 
+.photoGallery {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
 .photoPreview {
   position: relative;
-  padding: 8px;
+  flex: 0 0 auto;
+  width: 80%;
+  max-width: 300px;
+  scroll-snap-align: start;
+}
+
+.photoPreview ion-img {
+  border-radius: 8px;
 }
 
 .deletePhotoButton {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 4px;
+  right: 4px;
+}
+
+.pageLabel {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--ion-color-medium);
+  margin-top: 4px;
 }

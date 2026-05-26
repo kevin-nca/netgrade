@@ -46,7 +46,6 @@ export function EditExamForm({ exam, onSuccess }: EditExamFormProps) {
         date: new Date(value.date),
         subjectId: value.subject,
         description: value.description.trim(),
-        photoPath: exam.photoPath,
       };
 
       updateExamMutation.mutate(updatedExam, {

@@ -185,7 +185,7 @@ describe('ExamService', () => {
   });
 
   describe('takeExamPhoto', () => {
-    it('should save photo via writeFile on web and return path', async () => {
+    it('should save photo via writeFile on web and return paths', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
       vi.mocked(DocumentScanner.scanDocument).mockResolvedValue({
         status: ScanDocumentResponseStatus.Success,
@@ -193,9 +193,10 @@ describe('ExamService', () => {
         getPluginVersion: vi.fn(),
       });
 
-      const path = await ExamService.takeExamPhoto();
+      const paths = await ExamService.takeExamPhoto();
 
-      expect(path).toMatch(/^photos\/.+\.jpg$/);
+      expect(paths).toHaveLength(1);
+      expect(paths[0]).toMatch(/^photos\/.+\.jpg$/);
       expect(Filesystem.writeFile).toHaveBeenCalledWith(
         expect.objectContaining({
           data: 'abc123',
@@ -208,7 +209,7 @@ describe('ExamService', () => {
       );
     });
 
-    it('should copy photo via Filesystem.copy on native and return path', async () => {
+    it('should copy photo via Filesystem.copy on native and return paths', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
       vi.mocked(DocumentScanner.scanDocument).mockResolvedValue({
         status: ScanDocumentResponseStatus.Success,
@@ -216,9 +217,10 @@ describe('ExamService', () => {
         getPluginVersion: vi.fn(),
       });
 
-      const path = await ExamService.takeExamPhoto();
+      const paths = await ExamService.takeExamPhoto();
 
-      expect(path).toMatch(/^photos\/.+\.jpg$/);
+      expect(paths).toHaveLength(1);
+      expect(paths[0]).toMatch(/^photos\/.+\.jpg$/);
       expect(Filesystem.copy).toHaveBeenCalledWith(
         expect.objectContaining({
           from: '/tmp/photo.jpg',

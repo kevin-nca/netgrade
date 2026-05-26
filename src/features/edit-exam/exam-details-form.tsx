@@ -36,11 +36,13 @@ import {
 import { useForm } from '@tanstack/react-form';
 import {
   useAddGradeWithExam,
+  useAddExamScans,
   useDeleteExam,
+  useDeleteExamScan,
   useExam,
   useSubjects,
   useTakeExamPhoto,
-  usePhotoSrc,
+  usePhotoSrcs,
 } from '@/hooks';
 import {
   percentageToDecimal,
@@ -84,10 +86,9 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState('primary');
   const [showToast, setShowToast] = useState(false);
-  const [newPhotoPath, setNewPhotoPath] = useState<string | null>(null);
-  const photoPath =
-    newPhotoPath === null ? (exam?.photoPath ?? null) : newPhotoPath || null;
-  const { data: photoSrc } = usePhotoSrc(photoPath);
+
+  const scans = exam?.scans ?? [];
+  const { data: photoSrcs = [] } = usePhotoSrcs(scans.map((s) => s.photoPath));
 
   const gradeForm = useForm({
     defaultValues: {
@@ -114,7 +115,9 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
 
   const gradeFormValues = gradeForm.state.values as GradeFormData;
 
-  const addGradeWithExamMutation = useAddGradeWithExam()
+  const addGradeWithExamMutation = useAddGradeWithExam();
+  const addExamScansMutation = useAddExamScans();
+  const deleteExamScanMutation = useDeleteExamScan();
   const deleteExamMutation = useDeleteExam();
   const takePhotoMutation = useTakeExamPhoto();
 
@@ -124,20 +127,20 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
     setShowToast(true);
   };
 
-  const handleDeletePhoto = () => {
-    setNewPhotoPath('');
-  };
+  const handleDeletePhoto = (scanId: string) =>
+    deleteExamScanMutation.mutate(scanId);
 
-  const handleTakePhoto = () => {
-    takePhotoMutation.mutate(undefined, {
-      onSuccess: (path) => {
-        setNewPhotoPath(path);
-        showMessage('Foto aufgenommen!', 'success');
-      },
-      onError: (error: Error) => {
-        showMessage(`Fehler: ${error.message}`, 'danger');
-      },
-    });
+  const handleTakePhoto = async () => {
+    if (!exam) return;
+    try {
+      const paths = await takePhotoMutation.mutateAsync();
+      await addExamScansMutation.mutateAsync({
+        examId: exam.id,
+        photoPaths: paths,
+      });
+    } catch (err) {
+      showMessage(`Fehler: ${(err as Error).message}`, 'danger');
+    }
   };
 
   const handleAddGrade = () => {
@@ -150,7 +153,6 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
       score: gradeFormValues.score,
       weight: percentageToDecimal(gradeFormValues.weight),
       comment: gradeFormValues.comment.trim() || undefined,
-      photoPath: photoPath ?? null,
     };
 
     addGradeWithExamMutation.mutate(gradePayload, {
@@ -304,7 +306,8 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
               onTakePhoto={handleTakePhoto}
               onDeletePhoto={handleDeletePhoto}
               isTakingPhoto={takePhotoMutation.isPending}
-              photoPath={photoSrc ?? null}
+              scans={scans}
+              photoSrcs={photoSrcs}
             />
           )}
         </div>

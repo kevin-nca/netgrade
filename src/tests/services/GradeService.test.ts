@@ -359,7 +359,7 @@ describe('GradeService', () => {
     expect(weightedAverage).toBeCloseTo(86.67, 1);
   });
 
-  it('should set photoPath on existing exam when addWithExam finds it', async () => {
+  it('should mark existing exam as completed when addWithExam finds it', async () => {
     const dataSourceModule = await import('@/db/data-source');
     const { exam: examRepo } = dataSourceModule.getRepositories();
 
@@ -381,10 +381,8 @@ describe('GradeService', () => {
       date: examDate,
       score: 85,
       weight: 1.0,
-      photoPath: 'photos/test.jpg',
     });
 
-    expect(grade.exam.photoPath).toBe('photos/test.jpg');
     expect(grade.exam.isCompleted).toBe(true);
   });
 });
