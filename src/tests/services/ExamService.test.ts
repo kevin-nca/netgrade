@@ -28,10 +28,18 @@ vi.mock('@capacitor/filesystem', () => ({
     readFile: vi.fn().mockResolvedValue({ data: 'base64data' }),
     getUri: vi.fn().mockResolvedValue({ uri: 'file://data/photos/test.jpg' }),
     copy: vi.fn().mockResolvedValue({}),
+    deleteFile: vi.fn().mockResolvedValue({}),
   },
   Directory: { Data: 'DATA', Documents: 'DOCUMENTS' },
 }));
-import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import {
+  Exam,
+  ExamScan,
+  Grade,
+  School,
+  Semester,
+  Subject,
+} from '@/db/entities';
 import { ExamService } from '@/services';
 
 describe('ExamService', () => {
@@ -52,6 +60,7 @@ describe('ExamService', () => {
       exam: dataSource.getRepository(Exam),
       grade: dataSource.getRepository(Grade),
     });
+    vi.spyOn(dataSourceModule, 'getDataSource').mockReturnValue(dataSource);
 
     testData = await seedTestData(dataSource);
   });
@@ -241,6 +250,47 @@ describe('ExamService', () => {
       });
       await expect(ExamService.takeExamPhoto()).rejects.toThrow(
         'Scan abgebrochen oder fehlgeschlagen.',
+      );
+    });
+  });
+
+  describe('addScans', () => {
+    it('should create and save ExamScan entities', async () => {
+      const paths = ['photos/a.jpg', 'photos/b.jpg'];
+      const scans = await ExamService.addScans(testData.exam.id, paths);
+
+      expect(scans).toHaveLength(2);
+      expect(scans[0]).toBeInstanceOf(ExamScan);
+      expect(scans[0].examId).toBe(testData.exam.id);
+      expect(scans[0].photoPath).toBe('photos/a.jpg');
+      expect(scans[1].photoPath).toBe('photos/b.jpg');
+    });
+  });
+
+  describe('deleteScan', () => {
+    it('should delete scan and its file from filesystem', async () => {
+      const [scan] = await ExamService.addScans(testData.exam.id, [
+        'photos/to-delete.jpg',
+      ]);
+
+      const result = await ExamService.deleteScan(scan.id);
+
+      expect(result).toBe(scan.id);
+      expect(Filesystem.deleteFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: 'photos/to-delete.jpg',
+          directory: Directory.Data,
+        }),
+      );
+
+      const scanRepo = dataSource.getRepository(ExamScan);
+      const deleted = await scanRepo.findOneBy({ id: scan.id });
+      expect(deleted).toBeNull();
+    });
+
+    it('should throw if scan does not exist', async () => {
+      await expect(ExamService.deleteScan('non-existent-id')).rejects.toThrow(
+        'ExamScan with ID non-existent-id not found.',
       );
     });
   });
