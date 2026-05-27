@@ -4,10 +4,8 @@ export class AddExamScan1778700000001 {
   name = 'AddExamScan1778700000001';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP TABLE IF EXISTS "exam_scan"`);
-
     await queryRunner.query(`
-      CREATE TABLE "exam_scan" (
+      CREATE TABLE IF NOT EXISTS "exam_scan" (
         "id" varchar PRIMARY KEY NOT NULL,
         "examId" varchar NOT NULL,
         "photoPath" varchar(255) NOT NULL,

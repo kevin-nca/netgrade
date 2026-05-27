@@ -335,7 +335,7 @@ const SettingsPage: React.FC = () => {
   const handleExportJSON = async () => {
     try {
       await DataManagementService.exportAsZIP();
-      showToast('JSON Export erfolgreich!', true);
+      showToast('Backup Export erfolgreich!', true);
     } catch {
       showToast('Export fehlgeschlagen', false);
     }

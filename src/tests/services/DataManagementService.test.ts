@@ -971,7 +971,7 @@ describe('DataManagementService', () => {
       const blob = (globalThis.URL.createObjectURL as Mock).mock
         .calls[0][0] as Blob;
 
-      const zip = await JSZip.loadAsync(zipBlob);
+      const zip = await JSZip.loadAsync(blob);
       const dataJsonFile = zip.file('data.json');
       expect(dataJsonFile).not.toBeNull();
       const text = await dataJsonFile!.async('string');

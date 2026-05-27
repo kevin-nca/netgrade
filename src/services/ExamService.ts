@@ -215,10 +215,21 @@ export class ExamService {
 
   static async deleteScan(scanId: string): Promise<string> {
     const scanRepo = getDataSource().getRepository(ExamScan);
-    const result = await scanRepo.delete(scanId);
-    if (result.affected === 0) {
+    const scan = await scanRepo.findOneBy({ id: scanId });
+    if (!scan) {
       throw new Error(`ExamScan with ID ${scanId} not found.`);
     }
+
+    try {
+      await Filesystem.deleteFile({
+        path: scan.photoPath,
+        directory: Directory.Data,
+      });
+    } catch {
+      // file may already be gone
+    }
+
+    await scanRepo.delete(scanId);
     return scanId;
   }
 
@@ -235,9 +246,5 @@ export class ExamService {
       directory: Directory.Data,
     });
     return `data:image/jpeg;base64,${data as string}`;
-  }
-
-  static async resolvePhotoSrcs(photoPaths: string[]): Promise<string[]> {
-    return Promise.all(photoPaths.map((p) => ExamService.resolvePhotoSrc(p)));
   }
 }

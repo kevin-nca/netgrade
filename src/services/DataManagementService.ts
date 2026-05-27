@@ -58,6 +58,7 @@ export class DataManagementService {
     try {
       const dataSource = getDataSource();
       await dataSource.transaction(async (transactionManager) => {
+        await transactionManager.query('DELETE FROM exam_scan');
         await transactionManager.query('DELETE FROM grade');
         await transactionManager.query('DELETE FROM exam');
         await transactionManager.query('DELETE FROM subject');
@@ -149,6 +150,7 @@ export class DataManagementService {
           'semesters.subjects',
           'semesters.subjects.exams',
           'semesters.subjects.exams.grade',
+          'semesters.subjects.exams.scans',
         ],
       });
 
@@ -264,6 +266,7 @@ export class DataManagementService {
 
       const dataSource = getDataSource();
       await dataSource.transaction(async (transactionManager) => {
+        await transactionManager.query('DELETE FROM exam_scan');
         await transactionManager.query('DELETE FROM grade');
         await transactionManager.query('DELETE FROM exam');
         await transactionManager.query('DELETE FROM subject');

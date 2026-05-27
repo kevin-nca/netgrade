@@ -125,8 +125,9 @@ export const useDeleteExamScan = () => {
 
 export const usePhotoSrcs = (photoPaths: string[]) => {
   return useQuery({
-    queryKey: ['photos', ...photoPaths],
-    queryFn: () => ExamService.resolvePhotoSrcs(photoPaths),
+    queryKey: ['photos', photoPaths],
+    queryFn: () =>
+      Promise.all(photoPaths.map((p) => ExamService.resolvePhotoSrc(p))),
     enabled: photoPaths.length > 0,
     staleTime: Infinity,
   });

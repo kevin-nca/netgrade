@@ -1,8 +1,6 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
-import { Exam } from '@/db/entities/Exam';
-import { Grade, School, Semester, Subject } from '@/db/entities';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import {
@@ -53,7 +51,6 @@ describe('ExamService', () => {
       subject: dataSource.getRepository(Subject),
       exam: dataSource.getRepository(Exam),
       grade: dataSource.getRepository(Grade),
-      semester: dataSource.getRepository(Semester),
     });
 
     testData = await seedTestData(dataSource);
