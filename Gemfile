@@ -1,4 +1,5 @@
 source "https://rubygems.org"
 gem "fastlane"
 gem "cocoapods", "1.16.2"
+gem "xcodeproj", ">= 1.27.0"
 gem "fastlane-plugin-versioning"
