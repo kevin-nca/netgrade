@@ -13,6 +13,7 @@ import { AppInfo } from '@/AppInfo';
 import { notificationScheduler } from './notification-scheduler';
 import { QueryClient } from '@tanstack/react-query';
 import { prefetchData } from './prefetch-data';
+import { WidgetService } from '@/services/WidgetService';
 
 setupIonicReact({
   animated: true,
@@ -32,6 +33,7 @@ AppInfo.initialize()
         console.log('Database initialized successfully.');
         await notificationScheduler.start();
         await prefetchData(queryClient);
+        void WidgetService.sync();
 
         root.render(<App queryClient={queryClient} />);
       })
