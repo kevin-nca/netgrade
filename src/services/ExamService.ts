@@ -182,10 +182,12 @@ export class ExamService {
       const destPath = `photos/${crypto.randomUUID()}.jpg`;
 
       if (Capacitor.isNativePlatform()) {
-        await Filesystem.copy({
-          from: scanned,
-          to: destPath,
-          toDirectory: Directory.Data,
+        const { data } = await Filesystem.readFile({ path: scanned });
+        await Filesystem.writeFile({
+          path: destPath,
+          data,
+          directory: Directory.Data,
+          recursive: true,
         });
       } else {
         await Filesystem.writeFile({
