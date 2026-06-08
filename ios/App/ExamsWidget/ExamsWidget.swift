@@ -103,7 +103,7 @@ struct NextExamsWidgetView: View {
 }
 
 struct NextExamsWidget: Widget {
-    let kind: String = "NextExamsWidget"
+    let kind: String = "ExamsWidget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: ExamsProvider()) { entry in
