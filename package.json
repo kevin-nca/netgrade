@@ -78,7 +78,7 @@
     "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-react": "^5.2.0",
     "@types/react": "^19.2.15",
-    "@vitest/coverage-v8": "^4.1.7",
+    "@vitest/coverage-v8": "^4.1.8",
     "cypress": "^15.16.0",
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
