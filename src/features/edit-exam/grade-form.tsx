@@ -9,15 +9,20 @@ import {
   IonTextarea,
   IonButton,
   IonIcon,
+  IonImg,
   IonRange,
   IonInput,
+  IonSpinner,
 } from '@ionic/react';
 import {
+  cameraOutline,
   checkmarkCircleOutline,
   trophyOutline,
   scaleOutline,
   chatbubbleOutline,
+  trashOutline,
 } from 'ionicons/icons';
+import { ExamScan } from '@/db/entities/ExamScan';
 import { GradeFormData } from './types';
 import styles from './styles/grade-form.module.css';
 
@@ -29,6 +34,11 @@ interface GradeFormProps {
   ) => void;
   getGradeColor: (grade: number) => string;
   onSubmit: () => void;
+  onTakePhoto?: () => void;
+  onDeletePhoto?: (scanId: string) => void;
+  isTakingPhoto?: boolean;
+  scans?: ExamScan[];
+  photoSrcs?: string[];
 }
 
 export const GradeForm: React.FC<GradeFormProps> = ({
@@ -36,6 +46,11 @@ export const GradeForm: React.FC<GradeFormProps> = ({
   onFieldChange,
   getGradeColor,
   onSubmit,
+  onTakePhoto,
+  onDeletePhoto,
+  isTakingPhoto,
+  scans = [],
+  photoSrcs = [],
 }) => {
   return (
     <>
@@ -160,7 +175,49 @@ export const GradeForm: React.FC<GradeFormProps> = ({
           </IonItemGroup>
         </IonList>
 
+        {scans.length > 0 && (
+          <div className={styles.photoGallery}>
+            {scans.map((scan, i) => (
+              <div key={scan.id} className={styles.photoPreview}>
+                <IonImg src={photoSrcs[i]} />
+                <IonButton
+                  fill="clear"
+                  color="danger"
+                  size="small"
+                  className={styles.deletePhotoButton}
+                  onClick={() => onDeletePhoto?.(scan.id)}
+                >
+                  <IonIcon slot="icon-only" icon={trashOutline} />
+                </IonButton>
+                <div className={styles.pageLabel}>Seite {i + 1}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className={styles.formCardFooter}>
+          {onTakePhoto && (
+            <IonButton
+              expand="block"
+              fill="outline"
+              className={styles.formButton}
+              onClick={onTakePhoto}
+              disabled={isTakingPhoto}
+            >
+              {isTakingPhoto ? (
+                <div className={styles.buttonContent}>
+                  <IonSpinner name="crescent" className={styles.saveIcon} />
+                  Kamera wird geöffnet...
+                </div>
+              ) : (
+                <div className={styles.buttonContent}>
+                  <IonIcon icon={cameraOutline} className={styles.saveIcon} />
+                  Foto aufnehmen
+                </div>
+              )}
+            </IonButton>
+          )}
+
           <IonButton
             expand="block"
             className={styles.formButton}
@@ -171,7 +228,7 @@ export const GradeForm: React.FC<GradeFormProps> = ({
                 icon={checkmarkCircleOutline}
                 className={styles.saveIcon}
               />
-              Note eintragen
+              Speichern
             </div>
           </IonButton>
         </div>

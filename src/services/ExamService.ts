@@ -1,5 +1,12 @@
-import { getRepositories } from '@/db/data-source';
+import { getRepositories, getDataSource } from '@/db/data-source';
 import { Exam } from '@/db/entities/Exam';
+import { ExamScan } from '@/db/entities/ExamScan';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Capacitor } from '@capacitor/core';
+import {
+  DocumentScanner,
+  ResponseType,
+} from '@capgo/capacitor-document-scanner';
 
 export class ExamService {
   /**
@@ -106,7 +113,11 @@ export class ExamService {
   static async findById(id: string): Promise<Exam | null> {
     try {
       const { exam: examRepo } = getRepositories();
-      return await examRepo.findOne({ where: { id } });
+      return await examRepo.findOne({
+        where: { id },
+        relations: { scans: true },
+        order: { scans: { createdAt: 'ASC' } },
+      });
     } catch (error) {
       console.error(`Failed to find exam with ID ${id}:`, error);
       throw error;
@@ -144,7 +155,6 @@ export class ExamService {
         .createQueryBuilder('exam')
         .leftJoin('exam.grade', 'grade')
         .where('exam.date >= :now', { now })
-        .andWhere('grade.id IS NULL')
         .orderBy('exam.date', 'ASC')
         .getMany();
 
@@ -153,5 +163,90 @@ export class ExamService {
       console.error('Failed to fetch upcoming exams:', error);
       throw error;
     }
+  }
+
+  static async takeExamPhoto(): Promise<string[]> {
+    const result = await DocumentScanner.scanDocument({
+      responseType: Capacitor.isNativePlatform()
+        ? ResponseType.ImageFilePath
+        : ResponseType.Base64,
+    });
+
+    if (result.status !== 'success' || !result.scannedImages?.length) {
+      throw new Error('Scan abgebrochen oder fehlgeschlagen.');
+    }
+
+    const savedPaths: string[] = [];
+
+    for (const scanned of result.scannedImages) {
+      const destPath = `photos/${crypto.randomUUID()}.jpg`;
+
+      if (Capacitor.isNativePlatform()) {
+        const { data } = await Filesystem.readFile({ path: scanned });
+        await Filesystem.writeFile({
+          path: destPath,
+          data,
+          directory: Directory.Data,
+          recursive: true,
+        });
+      } else {
+        await Filesystem.writeFile({
+          path: destPath,
+          data: scanned,
+          directory: Directory.Data,
+          recursive: true,
+        });
+      }
+
+      savedPaths.push(destPath);
+    }
+
+    return savedPaths;
+  }
+
+  static async addScans(
+    examId: string,
+    photoPaths: string[],
+  ): Promise<ExamScan[]> {
+    const scanRepo = getDataSource().getRepository(ExamScan);
+    const scans = photoPaths.map((photoPath) =>
+      scanRepo.create({ examId, photoPath }),
+    );
+    return scanRepo.save(scans);
+  }
+
+  static async deleteScan(scanId: string): Promise<string> {
+    const scanRepo = getDataSource().getRepository(ExamScan);
+    const scan = await scanRepo.findOneBy({ id: scanId });
+    if (!scan) {
+      throw new Error(`ExamScan with ID ${scanId} not found.`);
+    }
+
+    try {
+      await Filesystem.deleteFile({
+        path: scan.photoPath,
+        directory: Directory.Data,
+      });
+    } catch {
+      // file may already be gone
+    }
+
+    await scanRepo.delete(scanId);
+    return scanId;
+  }
+
+  static async resolvePhotoSrc(photoPath: string): Promise<string> {
+    if (Capacitor.isNativePlatform()) {
+      const { uri } = await Filesystem.getUri({
+        path: photoPath,
+        directory: Directory.Data,
+      });
+      return Capacitor.convertFileSrc(uri);
+    }
+    const { data } = await Filesystem.readFile({
+      path: photoPath,
+      directory: Directory.Data,
+    });
+    return `data:image/jpeg;base64,${data as string}`;
   }
 }

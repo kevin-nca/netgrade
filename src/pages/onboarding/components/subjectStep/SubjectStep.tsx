@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { IonButton, IonIcon } from '@ionic/react';
 import {
   bookOutline,
@@ -39,27 +39,18 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
   generateId,
   onNext,
 }) => {
-  const [selectedSchool, setSelectedSchool] = useState<TempSchool | null>(
-    data.schools.find((s) => s.id === selectedSchoolId) ||
-      data.schools[0] ||
-      null,
-  );
-
-  const initialSchool =
+  const selectedSchool =
     data.schools.find((s) => s.id === selectedSchoolId) ||
     data.schools[0] ||
     null;
-  const initialSemester =
+
+  const selectedSemester =
     data.semesters.find(
-      (s) =>
-        s.id === selectedSemesterId && s.schoolId === (initialSchool?.id ?? ''),
+      (s) => s.id === selectedSemesterId && s.schoolId === selectedSchool?.id,
     ) ||
-    data.semesters.find((s) => s.schoolId === (initialSchool?.id ?? '')) ||
+    data.semesters.find((s) => s.schoolId === selectedSchool?.id) ||
     null;
 
-  const [selectedSemester, setSelectedSemester] = useState<TempSemester | null>(
-    initialSemester,
-  );
   const [showAddForm, setShowAddForm] = useState(false);
 
   const form = useAppForm({
@@ -89,27 +80,17 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
     },
   });
 
-  useEffect(() => {
-    if (selectedSchool) {
-      setSelectedSchoolId(selectedSchool.id);
-      const firstSemesterOfSchool = data.semesters.find(
-        (s) => s.schoolId === selectedSchool.id,
-      );
-      if (
-        firstSemesterOfSchool &&
-        selectedSemester?.schoolId !== selectedSchool.id
-      ) {
-        setSelectedSemester(firstSemesterOfSchool);
-      }
+  const handleSelectSchool = (school: TempSchool) => {
+    setSelectedSchoolId(school.id);
+    const firstSemester = data.semesters.find((s) => s.schoolId === school.id);
+    if (firstSemester) {
+      setSelectedSemesterId(firstSemester.id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSchool, setSelectedSchoolId]);
+  };
 
-  useEffect(() => {
-    if (selectedSemester) {
-      setSelectedSemesterId(selectedSemester.id);
-    }
-  }, [selectedSemester, setSelectedSemesterId]);
+  const handleSelectSemester = (semester: TempSemester) => {
+    setSelectedSemesterId(semester.id);
+  };
 
   const handleRemoveSubject = (subjectId: string) => {
     setData((prev) => ({
@@ -162,7 +143,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                   <div
                     key={semester.id}
                     className={`glass-card semester-selector-item ${semester.id === selectedSemester!.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedSemester(semester)}
+                    onClick={() => handleSelectSemester(semester)}
                   >
                     <div className={`semester-avatar semester-${index % 4}`}>
                       <IonIcon icon={calendarOutline} />
@@ -196,7 +177,7 @@ const SubjectStep: React.FC<SubjectStepProps> = ({
                 <div
                   key={school.id}
                   className={`glass-card school-selector-item ${school.id === selectedSchool!.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedSchool(school)}
+                  onClick={() => handleSelectSchool(school)}
                 >
                   <div className={`school-avatar school-${index % 4}`}>
                     {school.name.charAt(0).toUpperCase()}

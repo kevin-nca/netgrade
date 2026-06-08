@@ -128,7 +128,6 @@
 					504EC3031FED79650016851F = {
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 1100;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -195,6 +194,7 @@
 				"${PODS_ROOT}/Target Support Files/Pods-App/Pods-App-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Capacitor/Capacitor.framework",
 				"${BUILT_PRODUCTS_DIR}/CapacitorApp/CapacitorApp.framework",
+				"${BUILT_PRODUCTS_DIR}/CapacitorCamera/CapacitorCamera.framework",
 				"${BUILT_PRODUCTS_DIR}/CapacitorCommunitySqlite/CapacitorCommunitySqlite.framework",
 				"${BUILT_PRODUCTS_DIR}/CapacitorCordova/Cordova.framework",
 				"${BUILT_PRODUCTS_DIR}/CapacitorDevice/CapacitorDevice.framework",
@@ -205,7 +205,9 @@
 				"${BUILT_PRODUCTS_DIR}/CapacitorPreferences/CapacitorPreferences.framework",
 				"${BUILT_PRODUCTS_DIR}/CapacitorShare/CapacitorShare.framework",
 				"${BUILT_PRODUCTS_DIR}/CapacitorStatusBar/CapacitorStatusBar.framework",
+				"${BUILT_PRODUCTS_DIR}/CapgoCapacitorDocumentScanner/CapgoCapacitorDocumentScanner.framework",
 				"${BUILT_PRODUCTS_DIR}/CordovaPlugins/CordovaPlugins.framework",
+				"${BUILT_PRODUCTS_DIR}/IONCameraLib/IONCameraLib.framework",
 				"${BUILT_PRODUCTS_DIR}/SQLCipher/SQLCipher.framework",
 				"${BUILT_PRODUCTS_DIR}/ZIPFoundation/ZIPFoundation.framework",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/IONFilesystemLib/IONFilesystemLib.framework/IONFilesystemLib",
@@ -214,6 +216,7 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Capacitor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorApp.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorCamera.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorCommunitySqlite.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cordova.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorDevice.framework",
@@ -224,7 +227,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorPreferences.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorShare.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapacitorStatusBar.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CapgoCapacitorDocumentScanner.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CordovaPlugins.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/IONCameraLib.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SQLCipher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ZIPFoundation.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/IONFilesystemLib.framework",
@@ -381,7 +386,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+        CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SS7TV4273L;
 				INFOPLIST_FILE = App/Info.plist;
@@ -408,7 +413,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+        CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SS7TV4273L;
 				INFOPLIST_FILE = App/Info.plist;

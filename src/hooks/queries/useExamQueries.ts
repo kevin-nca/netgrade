@@ -94,3 +94,41 @@ export const useDeleteExam = () => {
     },
   });
 };
+
+export const useTakeExamPhoto = () => {
+  return useMutation({
+    mutationFn: () => ExamService.takeExamPhoto(),
+  });
+};
+
+export const useAddExamScans = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      examId,
+      photoPaths,
+    }: {
+      examId: string;
+      photoPaths: string[];
+    }) => ExamService.addScans(examId, photoPaths),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: examKeys.all }),
+  });
+};
+
+export const useDeleteExamScan = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (scanId: string) => ExamService.deleteScan(scanId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: examKeys.all }),
+  });
+};
+
+export const usePhotoSrcs = (photoPaths: string[]) => {
+  return useQuery({
+    queryKey: ['photos', photoPaths],
+    queryFn: () =>
+      Promise.all(photoPaths.map((p) => ExamService.resolvePhotoSrc(p))),
+    enabled: photoPaths.length > 0,
+    staleTime: Infinity,
+  });
+};
