@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core';
+import JSZip from 'jszip';
 
 /**
  * Result of an export operation
@@ -58,6 +59,7 @@ export class DataManagementService {
     try {
       const dataSource = getDataSource();
       await dataSource.transaction(async (transactionManager) => {
+        await transactionManager.query('DELETE FROM exam_scan');
         await transactionManager.query('DELETE FROM grade');
         await transactionManager.query('DELETE FROM exam');
         await transactionManager.query('DELETE FROM subject');
@@ -142,7 +144,7 @@ export class DataManagementService {
   /**
    * Export all data as JSON backup
    */
-  static async exportAsJSON(): Promise<ExportResult> {
+  static async exportAsZIP(): Promise<ExportResult> {
     try {
       const schools = await getRepositories().school.find({
         relations: [
@@ -150,6 +152,7 @@ export class DataManagementService {
           'semesters.subjects',
           'semesters.subjects.exams',
           'semesters.subjects.exams.grade',
+          'semesters.subjects.exams.scans',
         ],
       });
 
@@ -159,6 +162,8 @@ export class DataManagementService {
           'INVALID_DATA',
         );
       }
+
+      const zip = new JSZip();
 
       const json = JSON.stringify(
         { schools },
@@ -170,9 +175,30 @@ export class DataManagementService {
         },
         2,
       );
+      zip.file('data.json', json);
 
-      const filename = `netgrade_backup_${new Date().toISOString().split('T')[0]}.json`;
-      const blob = new Blob([json], { type: 'application/json' });
+      for (const school of schools) {
+        for (const semester of school.semesters) {
+          for (const subject of semester.subjects) {
+            for (const exam of subject.exams) {
+              for (const scan of exam.scans ?? []) {
+                try {
+                  const { data } = await Filesystem.readFile({
+                    path: scan.photoPath,
+                    directory: Directory.Data,
+                  });
+                  zip.file(scan.photoPath, data as string, { base64: true });
+                } catch {
+                  console.warn(`Foto nicht gefunden: ${scan.photoPath}`);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      const filename = `netgrade_backup_${new Date().toISOString().split('T')[0]}.zip`;
+      const blob = await zip.generateAsync({ type: 'blob' });
 
       if (Capacitor.isNativePlatform()) {
         return await this.exportNativeJSON(blob, filename);
@@ -196,8 +222,31 @@ export class DataManagementService {
   /**
    * Import data from JSON backup
    */
-  static async importFromJSON(jsonString: string): Promise<void> {
+  static async importFromZIP(zipBlob: Blob): Promise<void> {
     try {
+      const zip = await JSZip.loadAsync(zipBlob);
+
+      const dataFile = zip.file('data.json');
+      if (!dataFile) {
+        throw new ExportError(
+          'Ungültiges Backup-Format. data.json nicht gefunden.',
+          'INVALID_DATA',
+        );
+      }
+
+      for (const [path, file] of Object.entries(zip.files)) {
+        if (path.startsWith('photos/') && !file.dir) {
+          const base64 = await file.async('base64');
+          await Filesystem.writeFile({
+            path,
+            data: base64,
+            directory: Directory.Data,
+            recursive: true,
+          });
+        }
+      }
+
+      const jsonString = await dataFile.async('string');
       const parsed = JSON.parse(jsonString, (key, value) => {
         if (
           (key === 'date' || key === 'startDate' || key === 'endDate') &&
@@ -219,6 +268,7 @@ export class DataManagementService {
 
       const dataSource = getDataSource();
       await dataSource.transaction(async (transactionManager) => {
+        await transactionManager.query('DELETE FROM exam_scan');
         await transactionManager.query('DELETE FROM grade');
         await transactionManager.query('DELETE FROM exam');
         await transactionManager.query('DELETE FROM subject');
@@ -228,17 +278,10 @@ export class DataManagementService {
       });
       await WidgetService.sync();
     } catch (error) {
-      console.error('JSON import failed:', error);
+      console.error('ZIP import failed:', error);
 
       if (error instanceof ExportError) {
         throw error;
-      }
-
-      if (error instanceof SyntaxError) {
-        throw new ExportError(
-          'Die Backup-Datei ist beschädigt oder ungültig.',
-          'PARSE_FAILED',
-        );
       }
 
       throw new ExportError(

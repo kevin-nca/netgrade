@@ -36,9 +36,13 @@ import {
 import { useForm } from '@tanstack/react-form';
 import {
   useAddGradeWithExam,
+  useAddExamScans,
   useDeleteExam,
+  useDeleteExamScan,
   useExam,
   useSubjects,
+  useTakeExamPhoto,
+  usePhotoSrcs,
 } from '@/hooks';
 import {
   percentageToDecimal,
@@ -83,6 +87,9 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
   const [toastColor, setToastColor] = useState('primary');
   const [showToast, setShowToast] = useState(false);
 
+  const scans = exam?.scans ?? [];
+  const { data: photoSrcs = [] } = usePhotoSrcs(scans.map((s) => s.photoPath));
+
   const gradeForm = useForm({
     defaultValues: {
       score: 5.5,
@@ -109,12 +116,31 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
   const gradeFormValues = gradeForm.state.values as GradeFormData;
 
   const addGradeWithExamMutation = useAddGradeWithExam();
+  const addExamScansMutation = useAddExamScans();
+  const deleteExamScanMutation = useDeleteExamScan();
   const deleteExamMutation = useDeleteExam();
+  const takePhotoMutation = useTakeExamPhoto();
 
   const showMessage = (message: string, color: string = 'primary') => {
     setToastMessage(message);
     setToastColor(color);
     setShowToast(true);
+  };
+
+  const handleDeletePhoto = (scanId: string) =>
+    deleteExamScanMutation.mutate(scanId);
+
+  const handleTakePhoto = async () => {
+    if (!exam) return;
+    try {
+      const paths = await takePhotoMutation.mutateAsync();
+      await addExamScansMutation.mutateAsync({
+        examId: exam.id,
+        photoPaths: paths,
+      });
+    } catch (err) {
+      showMessage(`Fehler: ${(err as Error).message}`, 'danger');
+    }
   };
 
   const handleAddGrade = () => {
@@ -277,6 +303,11 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
               }
               getGradeColor={getGradeColor}
               onSubmit={gradeForm.handleSubmit}
+              onTakePhoto={handleTakePhoto}
+              onDeletePhoto={handleDeletePhoto}
+              isTakingPhoto={takePhotoMutation.isPending}
+              scans={scans}
+              photoSrcs={photoSrcs}
             />
           )}
         </div>

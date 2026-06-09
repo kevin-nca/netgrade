@@ -1,7 +1,15 @@
-import { Entity, Column, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  OneToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { BaseEntity } from './BaseEntity';
 import { Subject } from './Subject';
 import { Grade } from './Grade';
+import { ExamScan } from './ExamScan';
 import { dateTransformer } from '../utils';
 
 @Entity('exam')
@@ -26,6 +34,9 @@ export class Exam extends BaseEntity {
 
   @Column({ type: 'uuid' })
   subjectId!: string;
+
+  @OneToMany(() => ExamScan, (scan) => scan.exam, { cascade: true })
+  scans!: ExamScan[];
 
   @ManyToOne(() => Subject, (subject) => subject.exams, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'subjectId' })

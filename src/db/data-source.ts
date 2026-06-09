@@ -1,7 +1,7 @@
 import { DataSource, DataSourceOptions, Repository } from 'typeorm'; // Import Repository
 import { Capacitor } from '@capacitor/core';
 import { CapacitorSQLite, SQLiteConnection } from '@capacitor-community/sqlite';
-import { Exam, Grade, School, Semester, Subject } from './entities';
+import { Exam, ExamScan, Grade, School, Semester, Subject } from './entities';
 import localforage from 'localforage';
 
 // @ts-expect-error SQL.js is not typed
@@ -13,7 +13,11 @@ import { DropDescriptionFromSubject1761134134122 } from './migrations/1761134134
 import { AddSemester1745400000000 } from '@/db/migrations/1745400000000-add-semester';
 import { AddSchoolIdToSemester1771847976332 } from './migrations/1771847976332-add-schoolId-to-semester';
 import { AddFkSemesterSchool1771848100000 } from './migrations/1771848100000-add-fk-semester-school';
-import { SqljsDriver } from 'typeorm/driver/sqljs/SqljsDriver';
+import { AddExamScan1778700000001 } from './migrations/1778700000001-add-exam-scan';
+type SqljsDriver = {
+  databaseConnection: { run: (sql: string) => void };
+  autoSave: () => Promise<void>;
+};
 
 // Reference: https://github.com/sql-js/react-sqljs-demo/blob/master/src/App.js
 (window as { localforage?: typeof localforage }).localforage = localforage;
@@ -23,7 +27,7 @@ import { SqljsDriver } from 'typeorm/driver/sqljs/SqljsDriver';
 const DATABASE_NAME = 'netgrade-db';
 const BROWSER_DB_LOCATION = 'netgrade-db-browser';
 
-export const ENTITIES = [Exam, Grade, School, Subject, Semester];
+export const ENTITIES = [Exam, ExamScan, Grade, School, Subject, Semester];
 
 let AppDataSource: DataSource | null = null;
 
@@ -69,6 +73,7 @@ const initializeNativeDb = async (): Promise<DataSourceOptions> => {
       AddSemester1745400000000,
       AddSchoolIdToSemester1771847976332,
       AddFkSemesterSchool1771848100000,
+      AddExamScan1778700000001,
     ],
     migrationsTableName: 'migrations',
     mode: 'no-encryption',
@@ -127,7 +132,7 @@ export const initializeDatabase = async (): Promise<DataSource> => {
     await AppDataSource.initialize();
 
     if (!isNative) {
-      const driver = AppDataSource.driver as SqljsDriver;
+      const driver = AppDataSource.driver as unknown as SqljsDriver;
       driver.databaseConnection.run('PRAGMA foreign_keys = ON;');
 
       const originalAutoSave = driver.autoSave.bind(driver);

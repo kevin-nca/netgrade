@@ -1,7 +1,45 @@
 import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
 import { DataSource } from 'typeorm';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
-import { Exam, Grade, School, Semester, Subject } from '@/db/entities';
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import {
+  DocumentScanner,
+  ResponseType,
+  ScanDocumentResponseStatus,
+} from '@capgo/capacitor-document-scanner';
+
+vi.mock('@capacitor/core', () => ({
+  Capacitor: {
+    isNativePlatform: vi.fn().mockReturnValue(false),
+    convertFileSrc: vi.fn((uri: string) => `capacitor://localhost/${uri}`),
+  },
+}));
+
+vi.mock('@capgo/capacitor-document-scanner', () => ({
+  DocumentScanner: { scanDocument: vi.fn() },
+  ResponseType: { ImageFilePath: 'imageFilePath', Base64: 'base64' },
+  ScanDocumentResponseStatus: { Success: 'success', Cancel: 'cancel' },
+}));
+
+vi.mock('@capacitor/filesystem', () => ({
+  Filesystem: {
+    writeFile: vi.fn().mockResolvedValue({}),
+    readFile: vi.fn().mockResolvedValue({ data: 'base64data' }),
+    getUri: vi.fn().mockResolvedValue({ uri: 'file://data/photos/test.jpg' }),
+    copy: vi.fn().mockResolvedValue({}),
+    deleteFile: vi.fn().mockResolvedValue({}),
+  },
+  Directory: { Data: 'DATA', Documents: 'DOCUMENTS' },
+}));
+import {
+  Exam,
+  ExamScan,
+  Grade,
+  School,
+  Semester,
+  Subject,
+} from '@/db/entities';
 import { ExamService } from '@/services';
 
 describe('ExamService', () => {
@@ -22,6 +60,7 @@ describe('ExamService', () => {
       exam: dataSource.getRepository(Exam),
       grade: dataSource.getRepository(Grade),
     });
+    vi.spyOn(dataSourceModule, 'getDataSource').mockReturnValue(dataSource);
 
     testData = await seedTestData(dataSource);
   });
@@ -132,5 +171,171 @@ describe('ExamService', () => {
   // Test error handling for delete method
   it('should throw an error when deleting a non-existent exam', async () => {
     await expect(ExamService.delete('non-existent-id')).rejects.toThrow();
+  });
+
+  it('should throw if add exam fails', async () => {
+    const examRepo = dataSource.getRepository(Exam);
+    vi.spyOn(examRepo, 'save').mockRejectedValueOnce(new Error('DB error'));
+
+    await expect(
+      ExamService.add({
+        schoolId: testData.school.id,
+        subjectId: testData.subject.id,
+        title: 'Fail Exam',
+        date: new Date(),
+      }),
+    ).rejects.toThrow('DB error');
+  });
+
+  it('should fetch upcoming exams regardless of grade status', async () => {
+    const exams = await ExamService.fetchUpcoming();
+    expect(exams).toBeInstanceOf(Array);
+  });
+
+  describe('takeExamPhoto', () => {
+    it('should save photo via writeFile on web and return paths', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+      vi.mocked(DocumentScanner.scanDocument).mockResolvedValue({
+        status: ScanDocumentResponseStatus.Success,
+        scannedImages: ['abc123'],
+        getPluginVersion: vi.fn(),
+      });
+
+      const paths = await ExamService.takeExamPhoto();
+
+      expect(paths).toHaveLength(1);
+      expect(paths[0]).toMatch(/^photos\/.+\.jpg$/);
+      expect(Filesystem.writeFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: 'abc123',
+          directory: Directory.Data,
+          recursive: true,
+        }),
+      );
+      expect(DocumentScanner.scanDocument).toHaveBeenCalledWith(
+        expect.objectContaining({ responseType: ResponseType.Base64 }),
+      );
+    });
+
+    it('should read and write photo on native and return paths', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+      vi.mocked(Filesystem.readFile).mockResolvedValue({ data: 'base64data' });
+      vi.mocked(DocumentScanner.scanDocument).mockResolvedValue({
+        status: ScanDocumentResponseStatus.Success,
+        scannedImages: ['/tmp/photo.jpg'],
+        getPluginVersion: vi.fn(),
+      });
+
+      const paths = await ExamService.takeExamPhoto();
+
+      expect(paths).toHaveLength(1);
+      expect(paths[0]).toMatch(/^photos\/.+\.jpg$/);
+      expect(Filesystem.readFile).toHaveBeenCalledWith(
+        expect.objectContaining({ path: '/tmp/photo.jpg' }),
+      );
+      expect(Filesystem.writeFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: 'base64data',
+          directory: Directory.Data,
+          recursive: true,
+        }),
+      );
+      expect(DocumentScanner.scanDocument).toHaveBeenCalledWith(
+        expect.objectContaining({ responseType: ResponseType.ImageFilePath }),
+      );
+
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+    });
+
+    it('should throw if scanDocument fails', async () => {
+      vi.mocked(DocumentScanner.scanDocument).mockResolvedValue({
+        status: ScanDocumentResponseStatus.Cancel,
+        scannedImages: [],
+        getPluginVersion: vi.fn(),
+      });
+      await expect(ExamService.takeExamPhoto()).rejects.toThrow(
+        'Scan abgebrochen oder fehlgeschlagen.',
+      );
+    });
+  });
+
+  describe('addScans', () => {
+    it('should create and save ExamScan entities', async () => {
+      const paths = ['photos/a.jpg', 'photos/b.jpg'];
+      const scans = await ExamService.addScans(testData.exam.id, paths);
+
+      expect(scans).toHaveLength(2);
+      expect(scans[0]).toBeInstanceOf(ExamScan);
+      expect(scans[0].examId).toBe(testData.exam.id);
+      expect(scans[0].photoPath).toBe('photos/a.jpg');
+      expect(scans[1].photoPath).toBe('photos/b.jpg');
+    });
+  });
+
+  describe('deleteScan', () => {
+    it('should delete scan and its file from filesystem', async () => {
+      const [scan] = await ExamService.addScans(testData.exam.id, [
+        'photos/to-delete.jpg',
+      ]);
+
+      const result = await ExamService.deleteScan(scan.id);
+
+      expect(result).toBe(scan.id);
+      expect(Filesystem.deleteFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: 'photos/to-delete.jpg',
+          directory: Directory.Data,
+        }),
+      );
+
+      const scanRepo = dataSource.getRepository(ExamScan);
+      const deleted = await scanRepo.findOneBy({ id: scan.id });
+      expect(deleted).toBeNull();
+    });
+
+    it('should throw if scan does not exist', async () => {
+      await expect(ExamService.deleteScan('non-existent-id')).rejects.toThrow(
+        'ExamScan with ID non-existent-id not found.',
+      );
+    });
+  });
+
+  describe('resolvePhotoSrc', () => {
+    it('should return base64 data URI on web', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+      vi.mocked(Filesystem.readFile).mockResolvedValue({ data: 'base64data' });
+
+      const src = await ExamService.resolvePhotoSrc('photos/test.jpg');
+
+      expect(src).toBe('data:image/jpeg;base64,base64data');
+      expect(Filesystem.readFile).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: 'photos/test.jpg',
+          directory: Directory.Data,
+        }),
+      );
+    });
+
+    it('should return convertFileSrc URI on native', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Capacitor.convertFileSrc).mockReturnValue(
+        'capacitor://localhost/photos/test.jpg',
+      );
+
+      const src = await ExamService.resolvePhotoSrc('photos/test.jpg');
+
+      expect(src).toBe('capacitor://localhost/photos/test.jpg');
+      expect(Filesystem.getUri).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: 'photos/test.jpg',
+          directory: Directory.Data,
+        }),
+      );
+
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+    });
   });
 });
