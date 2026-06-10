@@ -3,11 +3,12 @@ import { Exam } from '@/db/entities/Exam';
 import { ExamScan } from '@/db/entities/ExamScan';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
+
+import { Ocr, type RecognitionResults } from '@jcesarmobile/capacitor-ocr';
 import {
   DocumentScanner,
   ResponseType,
 } from '@capgo/capacitor-document-scanner';
-
 export class ExamService {
   /**
    * Fetches all exams from the database
@@ -200,6 +201,29 @@ export class ExamService {
     }
 
     return savedPaths;
+  }
+
+  /**
+   * Reads a scanned photo via OCR and extracts the grade directly from the
+   * recognized text. Returns the grade (1-6) or null if none was found.
+   */
+  static async extractNoteFromScan(photoPath: string): Promise<number | null> {
+    const { uri } = await Filesystem.getUri({
+      path: photoPath,
+      directory: Directory.Data,
+    });
+    const ocr: RecognitionResults = await Ocr.process({ image: uri });
+    const ocrText = ocr.results.map((r) => r.text).join(' ');
+
+    const matches = [
+      ...ocrText.matchAll(/Note\s*:?\s*([1-6](?:[.,]\d+)?)/gi),
+    ].map((m) => Number(m[1].replace(',', '.')));
+
+    if (matches.length === 0) return null;
+
+    return (
+      matches.find((n) => !Number.isInteger(n)) ?? matches[matches.length - 1]
+    );
   }
 
   static async addScans(

@@ -1,13 +1,14 @@
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
 platform :ios, '15.0'
-use_frameworks!
+use_frameworks! :linkage => :static
 
 install! 'cocoapods'
 
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  pod 'CapacitorCommunityImageToText', :path => '../../node_modules/@capacitor-community/image-to-text'
   pod 'CapacitorCommunitySqlite', :path => '../../node_modules/@capacitor-community/sqlite'
   pod 'CapacitorApp', :path => '../../node_modules/@capacitor/app'
   pod 'CapacitorCamera', :path => '../../node_modules/@capacitor/camera'
@@ -20,6 +21,8 @@ def capacitor_pods
   pod 'CapacitorShare', :path => '../../node_modules/@capacitor/share'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
   pod 'CapgoCapacitorDocumentScanner', :path => '../../node_modules/@capgo/capacitor-document-scanner'
+  pod 'CapgoCapacitorLlm', :path => '../../node_modules/@capgo/capacitor-llm'
+  pod 'JcesarmobileCapacitorOcr', :path => '../../node_modules/@jcesarmobile/capacitor-ocr'
   pod 'CordovaPlugins', :path => '../capacitor-cordova-ios-plugins'
 end
 
