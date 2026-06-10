@@ -8,14 +8,7 @@ struct WidgetExamEntry: Decodable, Identifiable {
     let id: String
     let name: String
     let subjectName: String
-    let date: String
-
-    var parsedDate: Date? {
-        let withFractional = ISO8601DateFormatter()
-        withFractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let d = withFractional.date(from: date) { return d }
-        return ISO8601DateFormatter().date(from: date)
-    }
+    let date: Date
 }
 
 struct ExamsTimelineEntry: TimelineEntry {
@@ -46,13 +39,23 @@ struct ExamsProvider: TimelineProvider {
         else {
             return []
         }
-        return (try? JSONDecoder().decode([WidgetExamEntry].self, from: data)) ?? []
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .formatted(formatter)
+        return (try? decoder.decode([WidgetExamEntry].self, from: data)) ?? []
     }
 
     private var sampleExams: [WidgetExamEntry] {
         [
-            WidgetExamEntry(id: "1", name: "Brüche", subjectName: "Mathematik", date: "2026-06-12T00:00:00Z"),
-            WidgetExamEntry(id: "2", name: "Lektüre", subjectName: "Deutsch", date: "2026-06-16T00:00:00Z"),
+            WidgetExamEntry(id: "1", name: "Brüche", subjectName: "Mathematik",
+                            date: Calendar.current.date(byAdding: .day, value: 2, to: Date()) ?? Date()),
+            WidgetExamEntry(id: "2", name: "Lektüre", subjectName: "Deutsch",
+                            date: Calendar.current.date(byAdding: .day, value: 6, to: Date()) ?? Date()),
         ]
     }
 }
@@ -165,12 +168,12 @@ struct NextExamsWidgetView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 0) {
-                Text(relativeText(for: exam.parsedDate))
+                Text(relativeText(for: exam.date))
                     .font(.caption2.weight(.semibold))
                 HStack(spacing: 3) {
                     Image(systemName: "clock")
                         .font(.system(size: 9))
-                    Text(absoluteText(for: exam.parsedDate))
+                    Text(absoluteText(for: exam.date))
                         .font(.system(size: 10))
                 }
                 .foregroundStyle(.secondary)
@@ -178,13 +181,11 @@ struct NextExamsWidgetView: View {
         }
     }
 
-    private func absoluteText(for date: Date?) -> String {
-        guard let date else { return "—" }
-        return Self.dayMonthFormatter.string(from: date)
+    private func absoluteText(for date: Date) -> String {
+        Self.dayMonthFormatter.string(from: date)
     }
 
-    private func relativeText(for date: Date?) -> String {
-        guard let date else { return "" }
+    private func relativeText(for date: Date) -> String {
         let cal = Calendar.current
         let start = cal.startOfDay(for: Date())
         let target = cal.startOfDay(for: date)
