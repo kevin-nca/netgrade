@@ -16,6 +16,12 @@ struct ExamsTimelineEntry: TimelineEntry {
     let exams: [WidgetExamEntry]
 }
 
+private let isoFormatter: ISO8601DateFormatter = {
+    let f = ISO8601DateFormatter()
+    f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    return f
+}()
+
 struct ExamsProvider: TimelineProvider {
     func placeholder(in context: Context) -> ExamsTimelineEntry {
         ExamsTimelineEntry(date: Date(), exams: sampleExams)
@@ -36,26 +42,22 @@ struct ExamsProvider: TimelineProvider {
             let defaults = UserDefaults(suiteName: appGroupId),
             let raw = defaults.string(forKey: storageKey),
             let data = raw.data(using: .utf8)
-        else {
-            return []
-        }
-
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        else { return [] }
 
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .formatted(formatter)
+        decoder.dateDecodingStrategy = .custom { decoder in
+            let s = try decoder.singleValueContainer().decode(String.self)
+            return isoFormatter.date(from: s) ?? Date()
+        }
         return (try? decoder.decode([WidgetExamEntry].self, from: data)) ?? []
     }
 
     private var sampleExams: [WidgetExamEntry] {
-        [
-            WidgetExamEntry(id: "1", name: "Brüche", subjectName: "Mathematik",
-                            date: Calendar.current.date(byAdding: .day, value: 2, to: Date()) ?? Date()),
-            WidgetExamEntry(id: "2", name: "Lektüre", subjectName: "Deutsch",
-                            date: Calendar.current.date(byAdding: .day, value: 6, to: Date()) ?? Date()),
+        let now = Date()
+        let day: (Int) -> Date = { Calendar.current.date(byAdding: .day, value: $0, to: now) ?? now }
+        return [
+            WidgetExamEntry(id: "1", name: "Brüche", subjectName: "Mathematik", date: day(2)),
+            WidgetExamEntry(id: "2", name: "Lektüre", subjectName: "Deutsch", date: day(6)),
         ]
     }
 }
@@ -71,16 +73,8 @@ private let avatarPalette: [Color] = [
 ]
 
 private func colorForSubject(_ name: String) -> Color {
-    guard !name.isEmpty else { return avatarPalette[0] }
-    var hash = 5381
-    for ch in name.unicodeScalars {
-        hash = ((hash << 5) &+ hash) &+ Int(ch.value)
-    }
+    let hash = name.unicodeScalars.reduce(5381) { ($0 &* 33) &+ Int($1.value) }
     return avatarPalette[abs(hash) % avatarPalette.count]
-}
-
-private func initialLetter(_ name: String) -> String {
-    String(name.trimmingCharacters(in: .whitespaces).prefix(1)).uppercased()
 }
 
 struct SubjectAvatar: View {
@@ -103,12 +97,8 @@ struct SubjectAvatar: View {
 struct NextExamsWidgetView: View {
     let entry: ExamsTimelineEntry
 
-    private static let dayMonthFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.locale = Locale(identifier: "de_DE")
-        f.dateFormat = "d. MMMM"
-        return f
-    }()
+    private static let dateFormat: Date.FormatStyle =
+        .dateTime.day().month(.wide).locale(Locale(identifier: "de_DE"))
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -121,11 +111,10 @@ struct NextExamsWidgetView: View {
                     .foregroundStyle(.secondary)
                 Spacer()
             } else {
-                ForEach(Array(entry.exams.prefix(3).enumerated()), id: \.element.id) { index, exam in
-                    if index > 0 {
-                        Divider()
-                    }
-                    examRow(exam)
+                let shown = Array(entry.exams.prefix(3))
+                ForEach(shown.indices, id: \.self) { idx in
+                    if idx > 0 { Divider() }
+                    examRow(shown[idx])
                 }
                 Spacer(minLength: 0)
             }
@@ -146,12 +135,11 @@ struct NextExamsWidgetView: View {
     }
 
     private func examRow(_ exam: WidgetExamEntry) -> some View {
-        HStack(alignment: .center, spacing: 8) {
-            SubjectAvatar(
-                text: initialLetter(exam.subjectName.isEmpty ? exam.name : exam.subjectName),
-                color: colorForSubject(exam.subjectName.isEmpty ? exam.name : exam.subjectName),
-                size: 26
-            )
+        let primary = exam.subjectName.isEmpty ? exam.name : exam.subjectName
+        let initial = String(primary.prefix(1)).uppercased()
+
+        return HStack(alignment: .center, spacing: 8) {
+            SubjectAvatar(text: initial, color: colorForSubject(primary), size: 26)
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(exam.name.isEmpty ? exam.subjectName : exam.name)
@@ -173,7 +161,7 @@ struct NextExamsWidgetView: View {
                 HStack(spacing: 3) {
                     Image(systemName: "clock")
                         .font(.system(size: 9))
-                    Text(absoluteText(for: exam.date))
+                    Text(exam.date, format: Self.dateFormat)
                         .font(.system(size: 10))
                 }
                 .foregroundStyle(.secondary)
@@ -181,15 +169,9 @@ struct NextExamsWidgetView: View {
         }
     }
 
-    private func absoluteText(for date: Date) -> String {
-        Self.dayMonthFormatter.string(from: date)
-    }
-
     private func relativeText(for date: Date) -> String {
         let cal = Calendar.current
-        let start = cal.startOfDay(for: Date())
-        let target = cal.startOfDay(for: date)
-        let days = cal.dateComponents([.day], from: start, to: target).day ?? 0
+        let days = cal.dateComponents([.day], from: cal.startOfDay(for: Date()), to: cal.startOfDay(for: date)).day ?? 0
         switch days {
         case ..<0: return "vorbei"
         case 0:    return "heute"
