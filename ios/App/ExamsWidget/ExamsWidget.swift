@@ -11,9 +11,15 @@ struct WidgetExamEntry: Decodable, Identifiable {
     let date: Date
 }
 
+struct WidgetPayload: Decodable {
+    let exams: [WidgetExamEntry]
+    let totalCount: Int
+}
+
 struct ExamsTimelineEntry: TimelineEntry {
     let date: Date
     let exams: [WidgetExamEntry]
+    let totalCount: Int
 }
 
 private let isoFormatter: ISO8601DateFormatter = {
@@ -24,32 +30,34 @@ private let isoFormatter: ISO8601DateFormatter = {
 
 struct ExamsProvider: TimelineProvider {
     func placeholder(in context: Context) -> ExamsTimelineEntry {
-        ExamsTimelineEntry(date: Date(), exams: sampleExams)
+        ExamsTimelineEntry(date: Date(), exams: sampleExams, totalCount: sampleExams.count)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (ExamsTimelineEntry) -> Void) {
-        completion(ExamsTimelineEntry(date: Date(), exams: loadExams()))
+        let payload = loadPayload()
+        completion(ExamsTimelineEntry(date: Date(), exams: payload.exams, totalCount: payload.totalCount))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<ExamsTimelineEntry>) -> Void) {
-        let entry = ExamsTimelineEntry(date: Date(), exams: loadExams())
+        let payload = loadPayload()
+        let entry = ExamsTimelineEntry(date: Date(), exams: payload.exams, totalCount: payload.totalCount)
         let next = Calendar.current.date(byAdding: .hour, value: 1, to: Date()) ?? Date()
         completion(Timeline(entries: [entry], policy: .after(next)))
     }
 
-    private func loadExams() -> [WidgetExamEntry] {
+    private func loadPayload() -> WidgetPayload {
         guard
             let defaults = UserDefaults(suiteName: appGroupId),
             let raw = defaults.string(forKey: storageKey),
             let data = raw.data(using: .utf8)
-        else { return [] }
+        else { return WidgetPayload(exams: [], totalCount: 0) }
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .custom { decoder in
             let s = try decoder.singleValueContainer().decode(String.self)
             return isoFormatter.date(from: s) ?? Date()
         }
-        return (try? decoder.decode([WidgetExamEntry].self, from: data)) ?? []
+        return (try? decoder.decode(WidgetPayload.self, from: data)) ?? WidgetPayload(exams: [], totalCount: 0)
     }
 
     private var sampleExams: [WidgetExamEntry] {
@@ -128,7 +136,7 @@ struct NextExamsWidgetView: View {
             Text("Prüfungen")
                 .font(.subheadline.weight(.semibold))
             Spacer()
-            Text("\(entry.exams.count) anstehend")
+            Text("\(entry.totalCount) anstehend")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

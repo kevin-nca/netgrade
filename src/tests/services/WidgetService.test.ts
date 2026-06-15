@@ -79,20 +79,23 @@ describe('WidgetService', () => {
       expect(mockSetItem).toHaveBeenCalledWith({
         key: 'next_exams',
         group: 'group.com.netgrade.app',
-        value: JSON.stringify([
-          {
-            id: 'exam-1',
-            name: 'Mathematik Klausur',
-            subjectName: 'Mathematik',
-            date: new Date('2026-06-10T10:00:00.000Z').toISOString(),
-          },
-          {
-            id: 'exam-2',
-            name: 'Physik Test',
-            subjectName: 'Physik',
-            date: new Date('2026-06-15T14:00:00.000Z').toISOString(),
-          },
-        ]),
+        value: JSON.stringify({
+          exams: [
+            {
+              id: 'exam-1',
+              name: 'Mathematik Klausur',
+              subjectName: 'Mathematik',
+              date: new Date('2026-06-10T10:00:00.000Z').toISOString(),
+            },
+            {
+              id: 'exam-2',
+              name: 'Physik Test',
+              subjectName: 'Physik',
+              date: new Date('2026-06-15T14:00:00.000Z').toISOString(),
+            },
+          ],
+          totalCount: 2,
+        }),
       });
       expect(mockReloadTimelines).toHaveBeenCalledTimes(1);
       expect(mockReloadTimelines).toHaveBeenCalledWith({
@@ -113,10 +116,11 @@ describe('WidgetService', () => {
 
       // Assert
       const writtenValue = JSON.parse(mockSetItem.mock.calls.at(-1)![0].value);
-      expect(writtenValue).toHaveLength(3);
-      expect(writtenValue[0].id).toBe('exam-1');
-      expect(writtenValue[1].id).toBe('exam-2');
-      expect(writtenValue[2].id).toBe('exam-3');
+      expect(writtenValue.exams).toHaveLength(3);
+      expect(writtenValue.exams[0].id).toBe('exam-1');
+      expect(writtenValue.exams[1].id).toBe('exam-2');
+      expect(writtenValue.exams[2].id).toBe('exam-3');
+      expect(writtenValue.totalCount).toBe(4);
     });
 
     it('should use empty string for subjectName when subject is missing', async () => {
@@ -132,7 +136,7 @@ describe('WidgetService', () => {
 
       // Assert
       const writtenValue = JSON.parse(mockSetItem.mock.calls.at(-1)![0].value);
-      expect(writtenValue[0].subjectName).toBe('');
+      expect(writtenValue.exams[0].subjectName).toBe('');
     });
 
     it('should log error and not throw when sync fails', async () => {
@@ -186,7 +190,7 @@ describe('WidgetService', () => {
       expect(mockSetItem).toHaveBeenCalledWith({
         key: 'next_exams',
         group: 'group.com.netgrade.app',
-        value: JSON.stringify([]),
+        value: JSON.stringify({ exams: [], totalCount: 0 }),
       });
       expect(mockReloadTimelines).toHaveBeenCalledTimes(1);
       expect(mockReloadTimelines).toHaveBeenCalledWith({

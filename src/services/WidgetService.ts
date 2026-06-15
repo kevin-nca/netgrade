@@ -14,25 +14,31 @@ interface WidgetExamEntry {
   date: string;
 }
 
+interface WidgetPayload {
+  exams: WidgetExamEntry[];
+  totalCount: number;
+}
+
 export class WidgetService {
   static async sync(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
 
     try {
       const upcoming = await ExamService.fetchUpcoming();
-      const entries: WidgetExamEntry[] = upcoming
-        .slice(0, MAX_EXAMS)
-        .map((exam) => ({
+      const payload: WidgetPayload = {
+        exams: upcoming.slice(0, MAX_EXAMS).map((exam) => ({
           id: exam.id,
           name: exam.name,
           subjectName: exam.subject?.name ?? '',
           date: new Date(exam.date).toISOString(),
-        }));
+        })),
+        totalCount: upcoming.length,
+      };
 
       await WidgetBridgePlugin.setItem({
         key: STORAGE_KEY,
         group: APP_GROUP,
-        value: JSON.stringify(entries),
+        value: JSON.stringify(payload),
       });
 
       await WidgetBridgePlugin.reloadTimelines({ ofKind: WIDGET_KIND });
@@ -45,10 +51,11 @@ export class WidgetService {
     if (!Capacitor.isNativePlatform()) return;
 
     try {
+      const payload: WidgetPayload = { exams: [], totalCount: 0 };
       await WidgetBridgePlugin.setItem({
         key: STORAGE_KEY,
         group: APP_GROUP,
-        value: JSON.stringify([]),
+        value: JSON.stringify(payload),
       });
       await WidgetBridgePlugin.reloadTimelines({ ofKind: WIDGET_KIND });
     } catch (error) {
