@@ -6,8 +6,6 @@ PODS:
   - CapacitorCamera (8.1.0):
     - Capacitor
     - IONCameraLib (~> 1.0.0)
-  - CapacitorCommunityImageToText (8.0.0):
-    - Capacitor
   - CapacitorCommunitySqlite (8.1.0):
     - Capacitor
     - SQLCipher
@@ -130,7 +128,7 @@ SPEC CHECKSUMS:
   CapacitorFilesystem: 2db285a1ac6e475cc27cae2e1bea999000f9e2be
   CapacitorHaptics: 296f771ecd89c7a1bd92a7b6826a7d268e2e70f5
   CapacitorKeyboard: 31c8285d92c9d1410071d52449f16d2c6673b6f4
-  CapacitorLocalNotifications: 2615aa008f608b95d3921a778ee1988abf1e6148
+  CapacitorLocalNotifications: 4db83a7f6bdd2f30dcedf5c6f92c415065467a24
   CapacitorPreferences: cca2021f386efb75947c850334447d9ff22b14f1
   CapacitorShare: 0c58305114538568059bfc07111f22dcb9cb2a82
   CapacitorStatusBar: 01d5763b4ed720de5ce2edbc938de6a98f4c8f32

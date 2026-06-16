@@ -218,8 +218,9 @@ describe('ExamService', () => {
       );
     });
 
-    it('should copy photo via Filesystem.copy on native and return paths', async () => {
+    it('should read and write photo on native and return paths', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+      vi.mocked(Filesystem.readFile).mockResolvedValue({ data: 'base64data' });
       vi.mocked(DocumentScanner.scanDocument).mockResolvedValue({
         status: ScanDocumentResponseStatus.Success,
         scannedImages: ['/tmp/photo.jpg'],
@@ -230,10 +231,14 @@ describe('ExamService', () => {
 
       expect(paths).toHaveLength(1);
       expect(paths[0]).toMatch(/^photos\/.+\.jpg$/);
-      expect(Filesystem.copy).toHaveBeenCalledWith(
+      expect(Filesystem.readFile).toHaveBeenCalledWith(
+        expect.objectContaining({ path: '/tmp/photo.jpg' }),
+      );
+      expect(Filesystem.writeFile).toHaveBeenCalledWith(
         expect.objectContaining({
-          from: '/tmp/photo.jpg',
-          toDirectory: Directory.Data,
+          data: 'base64data',
+          directory: Directory.Data,
+          recursive: true,
         }),
       );
       expect(DocumentScanner.scanDocument).toHaveBeenCalledWith(
