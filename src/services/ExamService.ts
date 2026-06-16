@@ -7,16 +7,11 @@ import {
   DocumentScanner,
   ResponseType,
 } from '@capgo/capacitor-document-scanner';
-
 import {
   Ocr,
   type RecognitionResult,
   type RecognitionResults,
 } from '@jcesarmobile/capacitor-ocr';
-import {
-  DocumentScanner,
-  ResponseType,
-} from '@capgo/capacitor-document-scanner';
 import { FoundationModels } from '@/plugins/foundationModels';
 export class ExamService {
   /**
