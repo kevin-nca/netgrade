@@ -8,6 +8,8 @@ import {
   ResponseType,
   ScanDocumentResponseStatus,
 } from '@capgo/capacitor-document-scanner';
+import { Ocr } from '@jcesarmobile/capacitor-ocr';
+import { FoundationModels } from '@/plugins/foundationModels';
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
@@ -21,6 +23,10 @@ vi.mock('@capgo/capacitor-document-scanner', () => ({
   DocumentScanner: { scanDocument: vi.fn() },
   ResponseType: { ImageFilePath: 'imageFilePath', Base64: 'base64' },
   ScanDocumentResponseStatus: { Success: 'success', Cancel: 'cancel' },
+}));
+
+vi.mock('@jcesarmobile/capacitor-ocr', () => ({
+  Ocr: { process: vi.fn() },
 }));
 
 vi.mock('@capacitor/filesystem', () => ({
@@ -337,6 +343,72 @@ describe('ExamService', () => {
       );
 
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+    });
+  });
+
+  describe('extractNoteFromScan', () => {
+    it('should return grade from AI response', async () => {
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Ocr.process).mockResolvedValue({
+        results: [{ text: 'Informatik Note: 5.5 Punkte: 19/20', confidence: 0.99 }],
+      });
+      vi.mocked(FoundationModels.generate).mockResolvedValue({
+        text: 'Note: 5.5\nDatum: 19.03.2026',
+      });
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBe(5.5);
+    });
+
+    it('should return grade with comma as decimal separator', async () => {
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Ocr.process).mockResolvedValue({
+        results: [{ text: 'Note: 4,5', confidence: 0.99 }],
+      });
+      vi.mocked(FoundationModels.generate).mockResolvedValue({
+        text: 'Note: 4,5',
+      });
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBe(4.5);
+    });
+
+    it('should return null when AI does not find a grade', async () => {
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Ocr.process).mockResolvedValue({
+        results: [{ text: 'kein relevanter text', confidence: 0.9 }],
+      });
+      vi.mocked(FoundationModels.generate).mockResolvedValue({
+        text: 'Kein Fach erkannt.',
+      });
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBeNull();
+    });
+
+    it('should return null when AI throws an error', async () => {
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Ocr.process).mockResolvedValue({
+        results: [{ text: 'Note: 5', confidence: 0.9 }],
+      });
+      vi.mocked(FoundationModels.generate).mockRejectedValue(
+        new Error('Model not ready'),
+      );
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBeNull();
     });
   });
 });
