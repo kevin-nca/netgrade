@@ -11,6 +11,7 @@ vi.mock('@capacitor/core', () => ({
   Capacitor: {
     isNativePlatform: vi.fn().mockReturnValue(false),
   },
+  registerPlugin: vi.fn(() => ({ generate: vi.fn() })),
 }));
 
 vi.mock('@capacitor/filesystem', () => ({
