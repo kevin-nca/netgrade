@@ -4,11 +4,16 @@ import { ExamScan } from '@/db/entities/ExamScan';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 
-import { Ocr, type RecognitionResults } from '@jcesarmobile/capacitor-ocr';
+import {
+  Ocr,
+  type RecognitionResult,
+  type RecognitionResults,
+} from '@jcesarmobile/capacitor-ocr';
 import {
   DocumentScanner,
   ResponseType,
 } from '@capgo/capacitor-document-scanner';
+import { FoundationModels } from '@/plugins/foundationModels';
 export class ExamService {
   /**
    * Fetches all exams from the database
@@ -204,8 +209,9 @@ export class ExamService {
   }
 
   /**
-   * Reads a scanned photo via OCR and extracts the grade directly from the
-   * recognized text. Returns the grade (1-6) or null if none was found.
+   * Reads a scanned photo via OCR, then asks Apple's on-device Foundation
+   * Models for the grade. Falls back to a plain regex on the OCR text if the
+   * model is unavailable or returns nothing usable. Returns the grade or null.
    */
   static async extractNoteFromScan(photoPath: string): Promise<number | null> {
     const { uri } = await Filesystem.getUri({
@@ -213,17 +219,34 @@ export class ExamService {
       directory: Directory.Data,
     });
     const ocr: RecognitionResults = await Ocr.process({ image: uri });
-    const ocrText = ocr.results.map((r) => r.text).join(' ');
+    const ocrText = ocr.results.map((r: RecognitionResult) => r.text).join(' ');
+    console.log('[OCR-Text]', ocrText);
 
-    const matches = [
-      ...ocrText.matchAll(/Note\s*:?\s*([1-6](?:[.,]\d+)?)/gi),
-    ].map((m) => Number(m[1].replace(',', '.')));
-
-    if (matches.length === 0) return null;
-
-    return (
-      matches.find((n) => !Number.isInteger(n)) ?? matches[matches.length - 1]
-    );
+    try {
+      const { text } = await FoundationModels.generate({
+        instructions:
+          'Du analysierst eine gescannte Schulprüfung. Lies alle Werte ' +
+          'DIREKT aus dem Text – erfinde oder berechne nichts. ' +
+          'Antworte auf Deutsch in zwei Teilen:\n\n' +
+          '1. DATEN (genau so wie sie im Text stehen):\n' +
+          '   Fach: <Wert>\n' +
+          '   Datum: <Wert>\n' +
+          '   Note: <Zahl 1–6, exakt wie auf dem Blatt>\n' +
+          '   Punkte: <erreichte Punkte>/<maximale Punkte>\n\n' +
+          '2. ANALYSE – für jede falsch beantwortete Aufgabe:\n' +
+          '   - Aufgabe <Nr.> (Seite <Nr.>): Was hat der Schüler falsch ' +
+          'gemacht? Warum ist es falsch? Was wäre die richtige Antwort ' +
+          'gewesen und warum ist diese richtig?\n\n' +
+          'Schreibe die Note unbedingt als Zeile "Note: X".',
+        prompt: ocrText,
+      });
+      console.log('[AI-Analyse]', text);
+      const m = text.match(/Note\s*:?\s*([1-6](?:[.,]\d+)?)/i);
+      if (m) return Number(m[1].replace(',', '.'));
+    } catch (err) {
+      console.log('[AI nicht verfügbar]', (err as Error).message);
+    }
+    return null;
   }
 
   static async addScans(

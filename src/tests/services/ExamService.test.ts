@@ -14,6 +14,7 @@ vi.mock('@capacitor/core', () => ({
     isNativePlatform: vi.fn().mockReturnValue(false),
     convertFileSrc: vi.fn((uri: string) => `capacitor://localhost/${uri}`),
   },
+  registerPlugin: vi.fn(() => ({ generate: vi.fn() })),
 }));
 
 vi.mock('@capgo/capacitor-document-scanner', () => ({

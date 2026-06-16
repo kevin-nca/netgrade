@@ -113,12 +113,12 @@ function MainPage() {
 
           <div className="bottom-spacer" />
         </div>
-
-        <NavigationModal
-          isOpen={showNavigationModal}
-          setIsOpen={setShowNavigationModal}
-        />
       </IonContent>
+
+      <NavigationModal
+        isOpen={showNavigationModal}
+        setIsOpen={setShowNavigationModal}
+      />
 
       <AddSchoolModal
         isOpen={showAddSchoolModal}

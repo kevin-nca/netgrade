@@ -1,11 +1,16 @@
 import React, { Dispatch, SetStateAction, useRef } from 'react';
-import { IonContent, IonIcon, IonItem, IonModal } from '@ionic/react';
+import {
+  IonContent,
+  IonIcon,
+  IonItem,
+  IonModal,
+  useIonRouter,
+} from '@ionic/react';
 import {
   ribbonOutline,
   documentTextOutline,
   calendarOutline,
 } from 'ionicons/icons';
-import { useHistory } from 'react-router-dom';
 import Header from '@/components/Header/Header';
 import './NavigationModal.css';
 
@@ -15,13 +20,13 @@ interface SlideUpProps {
 }
 
 const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
-  const history = useHistory();
+  const router = useIonRouter();
   const pendingNavigation = useRef<string | null>(null);
 
   const handleDismiss = () => {
     setIsOpen(false);
     if (pendingNavigation.current) {
-      history.push(pendingNavigation.current);
+      router.push(pendingNavigation.current, 'forward');
       pendingNavigation.current = null;
     }
   };
@@ -47,8 +52,7 @@ const NavigationModal: React.FC<SlideUpProps> = ({ isOpen, setIsOpen }) => {
     <IonModal
       isOpen={isOpen}
       onDidDismiss={handleDismiss}
-      breakpoints={[0, 0.5, 1]}
-      initialBreakpoint={0.8}
+      className="nav-modal"
     >
       <Header title={'Eintragen'} backButton={false}></Header>
       <IonContent>
