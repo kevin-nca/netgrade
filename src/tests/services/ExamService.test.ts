@@ -352,7 +352,9 @@ describe('ExamService', () => {
         uri: 'file://data/photos/test.jpg',
       });
       vi.mocked(Ocr.process).mockResolvedValue({
-        results: [{ text: 'Informatik Note: 5.5 Punkte: 19/20', confidence: 0.99 }],
+        results: [
+          { text: 'Informatik Note: 5.5 Punkte: 19/20', confidence: 0.99 },
+        ],
       });
       vi.mocked(FoundationModels.generate).mockResolvedValue({
         text: 'Note: 5.5\nDatum: 19.03.2026',
