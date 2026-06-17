@@ -27,7 +27,7 @@
     "@capacitor/filesystem": "^8.1.2",
     "@capacitor/haptics": "^8.0.2",
     "@capacitor/ios": "^8.4.0",
-    "@capacitor/keyboard": "^8.0.3",
+    "@capacitor/keyboard": "^8.0.5",
     "@capacitor/local-notifications": "^8.2.0",
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/share": "^8.0.1",
@@ -89,7 +89,7 @@
     "prettier": "^3.8.4",
     "terser": "^5.46.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.0",
+    "typescript-eslint": "^8.61.1",
     "vite": "^7.3.1",
     "vite-plugin-wasm": "^3.5.0",
     "vitest": "^4.0.16"
