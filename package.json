@@ -43,6 +43,7 @@
     "@tanstack/react-query-devtools": "^5.101.0",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
+    "capacitor-widget-bridge": "^8.1.0",
     "cordova-plugin-x-socialsharing": "^6.0.4",
     "date-fns": "^4.4.0",
     "es6-promise-plugin": "^4.2.2",
