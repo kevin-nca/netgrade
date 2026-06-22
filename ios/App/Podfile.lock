@@ -3,9 +3,9 @@ PODS:
     - CapacitorCordova
   - CapacitorApp (8.1.0):
     - Capacitor
-  - CapacitorCamera (8.1.0):
+  - CapacitorCamera (8.2.0):
     - Capacitor
-    - IONCameraLib (~> 1.0.0)
+    - IONCameraLib (~> 1.0.4)
   - CapacitorCommunitySqlite (8.1.0):
     - Capacitor
     - SQLCipher
@@ -18,7 +18,7 @@ PODS:
     - IONFilesystemLib (~> 1.1.1)
   - CapacitorHaptics (8.0.2):
     - Capacitor
-  - CapacitorKeyboard (8.0.3):
+  - CapacitorKeyboard (8.0.5):
     - Capacitor
   - CapacitorLocalNotifications (8.2.0):
     - Capacitor
@@ -34,7 +34,7 @@ PODS:
     - Capacitor
   - CordovaPlugins (8.4.0):
     - CapacitorCordova
-  - IONCameraLib (1.0.3)
+  - IONCameraLib (1.0.4)
   - IONFilesystemLib (1.1.1)
   - SQLCipher (4.10.0):
     - SQLCipher/standard (= 4.10.0)
@@ -105,13 +105,13 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Capacitor: 75bd117ba037a51bb0f19ded32c67f4b3bc16600
   CapacitorApp: 449ffe26375e96f8aaaee625ac6e01e5c57c8650
-  CapacitorCamera: 6e43e76d276ba69b45639a4e61365e3d56324c6c
+  CapacitorCamera: 8f6acf83664118321111e76acef86390211ccb08
   CapacitorCommunitySqlite: eac6acfb852f46e7988fc59604d7f900498d354e
   CapacitorCordova: 71d81f350e6c30bf2a846593b5c480fbd68e9bac
   CapacitorDevice: 14cba6f88d1c3074cbf825fea977c8c526453ff8
   CapacitorFilesystem: 2db285a1ac6e475cc27cae2e1bea999000f9e2be
   CapacitorHaptics: 296f771ecd89c7a1bd92a7b6826a7d268e2e70f5
-  CapacitorKeyboard: 31c8285d92c9d1410071d52449f16d2c6673b6f4
+  CapacitorKeyboard: b6b0744890cdb1d9a96e2cafcc9253fdcc55de3b
   CapacitorLocalNotifications: 2615aa008f608b95d3921a778ee1988abf1e6148
   CapacitorPreferences: cca2021f386efb75947c850334447d9ff22b14f1
   CapacitorShare: 0c58305114538568059bfc07111f22dcb9cb2a82
@@ -119,7 +119,7 @@ SPEC CHECKSUMS:
   CapacitorWidgetBridge: fb5430e41bd19671fa882fbbb532cb74cc664fef
   CapgoCapacitorDocumentScanner: 8dae4e47ed30f62c253b25a6c4a57038132f52e5
   CordovaPlugins: 3f77581a2db361efcbcccb61463940ef150ae7e2
-  IONCameraLib: 739067fcf12f242f2ca8443412fcf621a3dce6ca
+  IONCameraLib: f2349804460bd9e3f892e42109b8d996ab3fa19d
   IONFilesystemLib: dfa8706539ac9ab77ccfd6e5b3830ce9b5e57f6c
   SQLCipher: 2e8a68aae3a479f3d86defede2c1f09a8594cf2d
   ZIPFoundation: dfd3d681c4053ff7e2f7350bc4e53b5dba3f5351
