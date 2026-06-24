@@ -1,4 +1,5 @@
 import { PreferencesService } from './PreferencesService';
+import { WidgetService } from './WidgetService';
 import { getDataSource, getRepositories } from '@/db/data-source';
 import { School } from '@/db/entities';
 import * as XLSX from 'xlsx';
@@ -68,6 +69,7 @@ export class DataManagementService {
 
       await PreferencesService.setOnboardingCompleted(false);
       await PreferencesService.saveName('');
+      await WidgetService.clear();
     } catch (error) {
       console.error('Error resetting data:', error);
       throw error;
@@ -274,6 +276,7 @@ export class DataManagementService {
         await transactionManager.query('DELETE FROM school');
         await transactionManager.getRepository(School).save(schools);
       });
+      await WidgetService.sync();
     } catch (error) {
       console.error('ZIP import failed:', error);
 
