@@ -408,4 +408,60 @@ describe('ExamService', () => {
       expect(result.examName).toBeNull();
     });
   });
+
+  describe('createFromScan', () => {
+    it('should create exam, grade and scans when a score is present', async () => {
+      const examId = await ExamService.createFromScan({
+        subjectId: testData.subject.id,
+        name: 'Scanned Algebra',
+        date: new Date('2026-03-19T12:00:00'),
+        weight: 1,
+        score: 5.5,
+        pointsAchieved: 19,
+        pointsMax: 20,
+        photoPaths: ['photos/scan-1.jpg', 'photos/scan-2.jpg'],
+      });
+
+      expect(typeof examId).toBe('string');
+
+      const exam = await dataSource.getRepository(Exam).findOne({
+        where: { id: examId },
+        relations: { scans: true },
+      });
+      expect(exam).not.toBeNull();
+      expect(exam?.name).toBe('Scanned Algebra');
+      expect(exam?.isCompleted).toBe(true);
+      expect(exam?.pointsAchieved).toBe(19);
+      expect(exam?.pointsMax).toBe(20);
+      expect(exam?.gradeId).toBeTruthy();
+      expect(exam?.scans).toHaveLength(2);
+
+      const grade = await dataSource
+        .getRepository(Grade)
+        .findOneBy({ id: exam!.gradeId! });
+      expect(grade?.score).toBe(5.5);
+    });
+
+    it('should create exam without a grade when score is null', async () => {
+      const examId = await ExamService.createFromScan({
+        subjectId: testData.subject.id,
+        name: 'Scanned No Grade',
+        date: new Date('2026-03-20T12:00:00'),
+        weight: 1,
+        score: null,
+        pointsAchieved: null,
+        pointsMax: null,
+        photoPaths: [],
+      });
+
+      const exam = await dataSource.getRepository(Exam).findOne({
+        where: { id: examId },
+        relations: { scans: true },
+      });
+      expect(exam).not.toBeNull();
+      expect(exam?.isCompleted).toBe(false);
+      expect(exam?.gradeId).toBeFalsy();
+      expect(exam?.scans).toHaveLength(0);
+    });
+  });
 });
