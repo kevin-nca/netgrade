@@ -2,46 +2,72 @@ import Foundation
 import Capacitor
 import FoundationModels
 
+@available(iOS 26.0, *)
+@Generable
+struct ExamScanData {
+    @Guide(description: "Das Schulfach der Prüfung, exakt wie auf dem Blatt")
+    var subjectName: String?
+
+    @Guide(description: "Datum der Prüfung im Format yyyy-MM-dd")
+    var date: String?
+
+    @Guide(description: "Titel bzw. Name der Prüfung")
+    var examName: String?
+
+    @Guide(description: "Note als Zahl von 1 bis 6, exakt wie auf dem Blatt")
+    var score: Double?
+
+    @Guide(description: "Erreichte Punkte")
+    var pointsAchieved: Double?
+
+    @Guide(description: "Maximal mögliche Punkte")
+    var pointsMax: Double?
+}
+
 /// Capacitor plugin that exposes Apple's on-device Foundation Models to JS.
-/// Usage from TS: FoundationModels.generate({ prompt, instructions })
 @objc(FoundationModelsPlugin)
 public class FoundationModelsPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "FoundationModelsPlugin"
     public let jsName = "FoundationModels"
     public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "generate", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "generateExamData", returnType: CAPPluginReturnPromise)
     ]
-
-    @objc func generate(_ call: CAPPluginCall) {
+    @objc func generateExamData(_ call: CAPPluginCall) {
         guard let prompt = call.getString("prompt") else {
             call.reject("prompt is required")
             return
         }
-        let instructions = call.getString("instructions")
 
         guard #available(iOS 26.0, *) else {
             call.reject("Foundation Models requires iOS 26 or later")
             return
         }
 
-        // Create a reference to the system language model.
         let model = SystemLanguageModel.default
-
         switch model.availability {
         case .available:
             Task {
                 do {
-                    // Create a session, optionally with instructions.
-                    let session: LanguageModelSession
-                    if let instructions {
-                        session = LanguageModelSession(instructions: instructions)
-                    } else {
-                        session = LanguageModelSession()
-                    }
+                    let instructions = """
+                    Du analysierst eine gescannte Schulprüfung. Lies alle Werte \
+                    DIREKT aus dem Text – erfinde oder berechne nichts. Lass \
+                    Felder weg, die du nicht sicher erkennst.
+                    """
+                    let session = LanguageModelSession(instructions: instructions)
+                    let response = try await session.respond(
+                        to: prompt,
+                        generating: ExamScanData.self
+                    )
+                    let d = response.content
 
-                    // Generate a response to the prompt.
-                    let response = try await session.respond(to: prompt)
-                    call.resolve(["text": response.content])
+                    var result: [String: Any] = [:]
+                    if let v = d.subjectName { result["subjectName"] = v }
+                    if let v = d.date { result["date"] = v }
+                    if let v = d.examName { result["examName"] = v }
+                    if let v = d.score { result["score"] = v }
+                    if let v = d.pointsAchieved { result["pointsAchieved"] = v }
+                    if let v = d.pointsMax { result["pointsMax"] = v }
+                    call.resolve(result)
                 } catch {
                     call.reject(error.localizedDescription)
                 }

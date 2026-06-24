@@ -32,6 +32,12 @@ export class Exam extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   isCompleted!: boolean;
 
+  @Column({ type: 'float', nullable: true })
+  pointsAchieved!: number | null;
+
+  @Column({ type: 'float', nullable: true })
+  pointsMax!: number | null;
+
   @Column({ type: 'uuid' })
   subjectId!: string;
 

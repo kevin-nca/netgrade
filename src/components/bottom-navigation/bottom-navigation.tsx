@@ -11,13 +11,11 @@ import {
 import { Routes } from '@/routes';
 
 interface BottomNavigationProps {
-  showNavigationModal: boolean;
-  setShowNavigationModal: (show: boolean) => void;
+  showNavigationModal?: boolean;
+  setShowNavigationModal?: (show: boolean) => void;
 }
 
-const BottomNavigation: React.FC<BottomNavigationProps> = ({
-  setShowNavigationModal,
-}) => {
+const BottomNavigation: React.FC<BottomNavigationProps> = () => {
   const history = useHistory();
   const location = useLocation();
 
@@ -63,11 +61,11 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
           <div className="tab-fab">
             <button
               className="tab-fab-button"
-              onClick={() => setShowNavigationModal(true)}
+              onClick={() => history.push(Routes.EXAMS_SCAN)}
             >
               <IonIcon icon={add} className="tab-fab-icon" />
             </button>
-            <span className="tab-fab-label">Neu</span>
+            <span className="tab-fab-label">Scannen</span>
           </div>
           <div
             className={`tab-item ${activeTab === 'grades' ? 'active' : ''}`}

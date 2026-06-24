@@ -1,6 +1,7 @@
 import { getRepositories, getDataSource } from '@/db/data-source';
 import { Exam } from '@/db/entities/Exam';
 import { ExamScan } from '@/db/entities/ExamScan';
+import { Grade } from '@/db/entities/Grade';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 import {
@@ -13,6 +14,30 @@ import {
   type RecognitionResults,
 } from '@jcesarmobile/capacitor-ocr';
 import { FoundationModels } from '@/plugins/foundationModels';
+
+/** Structured data extracted from a scanned exam by OCR + on-device LLM. */
+export interface ScanAnalysis {
+  subjectName: string | null;
+  matchedSubjectId: string | null;
+  date: string | null;
+  examName: string | null;
+  score: number | null;
+  pointsAchieved: number | null;
+  pointsMax: number | null;
+}
+
+/** Payload to create a complete exam (with optional grade) from a scan. */
+export interface CreateExamFromScanPayload {
+  subjectId: string;
+  name: string;
+  date: Date;
+  weight: number;
+  score: number | null;
+  pointsAchieved: number | null;
+  pointsMax: number | null;
+  photoPaths: string[];
+}
+
 export class ExamService {
   /**
    * Fetches all exams from the database
@@ -214,7 +239,7 @@ export class ExamService {
    * Models for the grade. Falls back to a plain regex on the OCR text if the
    * model is unavailable or returns nothing usable. Returns the grade or null.
    */
-  static async extractNoteFromScan(photoPath: string): Promise<number | null> {
+  static async analyzeScan(photoPath: string): Promise<ScanAnalysis> {
     const { uri } = await Filesystem.getUri({
       path: photoPath,
       directory: Directory.Data,
@@ -223,31 +248,75 @@ export class ExamService {
     const ocrText = ocr.results.map((r: RecognitionResult) => r.text).join(' ');
     console.log('[OCR-Text]', ocrText);
 
+    const empty: ScanAnalysis = {
+      subjectName: null,
+      matchedSubjectId: null,
+      date: null,
+      examName: null,
+      score: null,
+      pointsAchieved: null,
+      pointsMax: null,
+    };
+
     try {
-      const { text } = await FoundationModels.generate({
-        instructions:
-          'Du analysierst eine gescannte Schulprüfung. Lies alle Werte ' +
-          'DIREKT aus dem Text – erfinde oder berechne nichts. ' +
-          'Antworte auf Deutsch in zwei Teilen:\n\n' +
-          '1. DATEN (genau so wie sie im Text stehen):\n' +
-          '   Fach: <Wert>\n' +
-          '   Datum: <Wert>\n' +
-          '   Note: <Zahl 1–6, exakt wie auf dem Blatt>\n' +
-          '   Punkte: <erreichte Punkte>/<maximale Punkte>\n\n' +
-          '2. ANALYSE – für jede falsch beantwortete Aufgabe:\n' +
-          '   - Aufgabe <Nr.> (Seite <Nr.>): Was hat der Schüler falsch ' +
-          'gemacht? Warum ist es falsch? Was wäre die richtige Antwort ' +
-          'gewesen und warum ist diese richtig?\n\n' +
-          'Schreibe die Note unbedingt als Zeile "Note: X".',
-        prompt: ocrText,
-      });
-      console.log('[AI-Analyse]', text);
-      const m = text.match(/Note\s*:?\s*([1-6](?:[.,]\d+)?)/i);
-      if (m) return Number(m[1].replace(',', '.'));
+      const data = await FoundationModels.generateExamData({ prompt: ocrText });
+      return {
+        subjectName: data.subjectName ?? null,
+        matchedSubjectId: null,
+        date: data.date ?? null,
+        examName: data.examName ?? null,
+        score: data.score ?? null,
+        pointsAchieved: data.pointsAchieved ?? null,
+        pointsMax: data.pointsMax ?? null,
+      };
     } catch (err) {
       console.log('[AI nicht verfügbar]', (err as Error).message);
+      return empty;
     }
-    return null;
+  }
+
+  /**
+   * Creates an exam together with its grade (if a score is present) and scans
+   * in a single transaction. Returns the created exam id.
+   */
+  static async createFromScan(
+    payload: CreateExamFromScanPayload,
+  ): Promise<string> {
+    const dataSource = getDataSource();
+
+    return await dataSource.transaction(async (manager) => {
+      const exam = manager.create(Exam, {
+        name: payload.name,
+        date: payload.date,
+        subjectId: payload.subjectId,
+        weight: payload.weight,
+        isCompleted: payload.score != null,
+        pointsAchieved: payload.pointsAchieved,
+        pointsMax: payload.pointsMax,
+      });
+      const savedExam = await manager.save(exam);
+
+      if (payload.score != null) {
+        const grade = manager.create(Grade, {
+          score: payload.score,
+          weight: payload.weight,
+          comment: null,
+          date: payload.date,
+        });
+        const savedGrade = await manager.save(grade);
+        savedExam.gradeId = savedGrade.id;
+        await manager.save(savedExam);
+      }
+
+      if (payload.photoPaths.length > 0) {
+        const scans = payload.photoPaths.map((photoPath) =>
+          manager.create(ExamScan, { examId: savedExam.id, photoPath }),
+        );
+        await manager.save(scans);
+      }
+
+      return savedExam.id;
+    });
   }
 
   static async addScans(

@@ -14,6 +14,7 @@ import { AddSemester1745400000000 } from '@/db/migrations/1745400000000-add-seme
 import { AddSchoolIdToSemester1771847976332 } from './migrations/1771847976332-add-schoolId-to-semester';
 import { AddFkSemesterSchool1771848100000 } from './migrations/1771848100000-add-fk-semester-school';
 import { AddExamScan1778700000001 } from './migrations/1778700000001-add-exam-scan';
+import { AddExamAnalysis1778700000002 } from './migrations/1778700000002-add-exam-analysis';
 type SqljsDriver = {
   databaseConnection: { run: (sql: string) => void };
   autoSave: () => Promise<void>;
@@ -74,6 +75,7 @@ const initializeNativeDb = async (): Promise<DataSourceOptions> => {
       AddSchoolIdToSemester1771847976332,
       AddFkSemesterSchool1771848100000,
       AddExamScan1778700000001,
+      AddExamAnalysis1778700000002,
     ],
     migrationsTableName: 'migrations',
     mode: 'no-encryption',

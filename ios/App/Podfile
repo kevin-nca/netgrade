@@ -21,7 +21,6 @@ def capacitor_pods
   pod 'CapacitorShare', :path => '../../node_modules/@capacitor/share'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
   pod 'CapgoCapacitorDocumentScanner', :path => '../../node_modules/@capgo/capacitor-document-scanner'
-  pod 'CapgoCapacitorLlm', :path => '../../node_modules/@capgo/capacitor-llm'
   pod 'JcesarmobileCapacitorOcr', :path => '../../node_modules/@jcesarmobile/capacitor-ocr'
   pod 'CordovaPlugins', :path => '../capacitor-cordova-ios-plugins'
 end

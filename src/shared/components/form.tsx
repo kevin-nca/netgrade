@@ -11,6 +11,7 @@ import { EditExamSubjectSelectField } from '@/features/edit-exam/fields/edit-exa
 import { AddSchoolField } from '@/features/add-school/fields/add-school-field';
 import { EditSubjectField } from '@/features/edit-subject/fields/edit-subject-field';
 import { NameField } from '@/features/form-fields/name-field';
+import { PointsField } from '@/features/form-fields/points-field';
 import { SchoolTypeField } from '@/features/add-school/fields/school-type-field';
 import { TeacherField } from '@/features/form-fields/teacher-field';
 
@@ -35,6 +36,7 @@ const { useAppForm, withForm } = createFormHook({
     AddSchoolField,
     EditSubjectField,
     NameField,
+    PointsField,
     SchoolTypeField,
     TeacherField,
     AddSemesterNameField,

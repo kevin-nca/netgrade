@@ -16,18 +16,24 @@ interface GradeListItemProps {
   index?: number;
   onEdit: () => void;
   onDelete: () => void;
+  onOpen?: () => void;
 }
 
 const GradeListItem: React.FC<GradeListItemProps> = ({
   grade,
   onEdit,
   onDelete,
+  onOpen,
 }) => {
   const weightPercentage = decimalToPercentage(grade.weight);
 
   return (
     <div className="grade-item-container">
-      <div className="grade-item">
+      <div
+        className="grade-item"
+        onClick={onOpen}
+        style={onOpen ? { cursor: 'pointer' } : undefined}
+      >
         <div className="grade-icon-badge">
           <span className="grade-score">{grade.score}</span>
         </div>

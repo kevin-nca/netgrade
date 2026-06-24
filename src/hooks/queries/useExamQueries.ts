@@ -1,5 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ExamService } from '@/services/ExamService';
+import {
+  ExamService,
+  type CreateExamFromScanPayload,
+} from '@/services/ExamService';
 import { Exam } from '@/db/entities/Exam';
 
 // Query keys
@@ -98,6 +101,23 @@ export const useDeleteExam = () => {
 export const useTakeExamPhoto = () => {
   return useMutation({
     mutationFn: () => ExamService.takeExamPhoto(),
+  });
+};
+
+export const useAnalyzeScan = () => {
+  return useMutation({
+    mutationFn: (photoPath: string) => ExamService.analyzeScan(photoPath),
+  });
+};
+
+export const useCreateExamFromScan = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateExamFromScanPayload) =>
+      ExamService.createFromScan(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: examKeys.all });
+    },
   });
 };
 

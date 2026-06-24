@@ -140,11 +140,11 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
         photoPaths: paths,
       });
 
-      const note = await ExamService.extractNoteFromScan(paths[0]);
-      if (note != null) {
-        gradeForm.setFieldValue('score', note);
+      const result = await ExamService.analyzeScan(paths[0]);
+      if (result.score != null) {
+        gradeForm.setFieldValue('score', result.score);
         showMessage(
-          `Note ${note} erkannt bitte prüfen und speichern`,
+          `Note ${result.score} erkannt bitte prüfen und speichern`,
           'success',
         );
       }

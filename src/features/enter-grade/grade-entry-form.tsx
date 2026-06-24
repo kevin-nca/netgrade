@@ -13,6 +13,7 @@ import Button from '@/components/Button/Button';
 import Header from '@/components/Header/Header';
 import GradeListItem from '@/components/List/GradeListItem';
 import { Grade } from '@/db/entities';
+import { Routes } from '@/routes';
 import {
   useDeleteGrade,
   useSubject,
@@ -164,6 +165,14 @@ const GradeEntryForm: React.FC<GradeEntryFormProps> = ({
                 grade={grade}
                 onEdit={() => startEdit(grade)}
                 onDelete={() => handleDelete(grade.id)}
+                onOpen={
+                  grade.exam
+                    ? () =>
+                        history.push(
+                          Routes.EXAM_EDIT.replace(':examId', grade.exam.id),
+                        )
+                    : undefined
+                }
               />
             ))}
           </IonList>

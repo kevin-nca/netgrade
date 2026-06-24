@@ -32,19 +32,12 @@ PODS:
     - Capacitor
   - CapgoCapacitorDocumentScanner (8.3.25):
     - Capacitor
-  - CapgoCapacitorLlm (8.0.14):
-    - Capacitor
-    - MediaPipeTasksGenAI
-    - MediaPipeTasksGenAIC
   - CordovaPlugins (8.4.0):
     - CapacitorCordova
   - IONCameraLib (1.0.4)
   - IONFilesystemLib (1.1.1)
   - JcesarmobileCapacitorOcr (0.3.0):
     - Capacitor
-  - MediaPipeTasksGenAI (0.10.35):
-    - MediaPipeTasksGenAIC (= 0.10.35)
-  - MediaPipeTasksGenAIC (0.10.35)
   - SQLCipher (4.7.0):
     - SQLCipher/standard (= 4.7.0)
   - SQLCipher/common (4.7.0)
@@ -68,7 +61,6 @@ DEPENDENCIES:
   - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - "CapgoCapacitorDocumentScanner (from `../../node_modules/@capgo/capacitor-document-scanner`)"
-  - "CapgoCapacitorLlm (from `../../node_modules/@capgo/capacitor-llm`)"
   - CordovaPlugins (from `../capacitor-cordova-ios-plugins`)
   - "JcesarmobileCapacitorOcr (from `../../node_modules/@jcesarmobile/capacitor-ocr`)"
 
@@ -76,8 +68,6 @@ SPEC REPOS:
   trunk:
     - IONCameraLib
     - IONFilesystemLib
-    - MediaPipeTasksGenAI
-    - MediaPipeTasksGenAIC
     - SQLCipher
     - ZIPFoundation
 
@@ -112,8 +102,6 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/status-bar"
   CapgoCapacitorDocumentScanner:
     :path: "../../node_modules/@capgo/capacitor-document-scanner"
-  CapgoCapacitorLlm:
-    :path: "../../node_modules/@capgo/capacitor-llm"
   CordovaPlugins:
     :path: "../capacitor-cordova-ios-plugins"
   JcesarmobileCapacitorOcr:
@@ -135,16 +123,13 @@ SPEC CHECKSUMS:
   CapacitorShare: 0c58305114538568059bfc07111f22dcb9cb2a82
   CapacitorStatusBar: 01d5763b4ed720de5ce2edbc938de6a98f4c8f32
   CapgoCapacitorDocumentScanner: 8dae4e47ed30f62c253b25a6c4a57038132f52e5
-  CapgoCapacitorLlm: 5de1d3ef2344b95d03508fbee86a8262cd4fd884
   CordovaPlugins: 3f77581a2db361efcbcccb61463940ef150ae7e2
   IONCameraLib: f2349804460bd9e3f892e42109b8d996ab3fa19d
   IONFilesystemLib: dfa8706539ac9ab77ccfd6e5b3830ce9b5e57f6c
   JcesarmobileCapacitorOcr: d3668e104d7ad8968a9d00fd4766e18fea0fe305
-  MediaPipeTasksGenAI: e311d919ab79b2e615e381b65ad271b2c2617312
-  MediaPipeTasksGenAIC: fee4ffd93e57fd2022287bcce0340b3c68b537be
   SQLCipher: ba9d0076041ed767c5bd3d3f77098318d04a403c
   ZIPFoundation: b8c29ea7ae353b309bc810586181fd073cb3312c
 
-PODFILE CHECKSUM: eaf15c0964685dcc45cf4f05c58cea5e437d0163
+PODFILE CHECKSUM: 14c8c2cdc797e5ef68e2a2d0885ad561bd78d61a
 
 COCOAPODS: 1.16.2

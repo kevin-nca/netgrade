@@ -16,7 +16,9 @@ vi.mock('@capacitor/core', () => ({
     isNativePlatform: vi.fn().mockReturnValue(false),
     convertFileSrc: vi.fn((uri: string) => `capacitor://localhost/${uri}`),
   },
-  registerPlugin: vi.fn(() => ({ generate: vi.fn() })),
+  registerPlugin: vi.fn(() => ({
+    generateExamData: vi.fn(),
+  })),
 }));
 
 vi.mock('@capgo/capacitor-document-scanner', () => ({
@@ -346,71 +348,64 @@ describe('ExamService', () => {
     });
   });
 
-  describe('extractNoteFromScan', () => {
-    it('should return grade from AI response', async () => {
+  describe('analyzeScan', () => {
+    it('should map structured AI data to the result', async () => {
       vi.mocked(Filesystem.getUri).mockResolvedValue({
         uri: 'file://data/photos/test.jpg',
       });
       vi.mocked(Ocr.process).mockResolvedValue({
-        results: [
-          { text: 'Informatik Note: 5.5 Punkte: 19/20', confidence: 0.99 },
-        ],
+        results: [{ text: 'irgendein OCR text', confidence: 0.99 }],
       });
-      vi.mocked(FoundationModels.generate).mockResolvedValue({
-        text: 'Note: 5.5\nDatum: 19.03.2026',
+      vi.mocked(FoundationModels.generateExamData).mockResolvedValue({
+        subjectName: 'Mathematik',
+        date: '2026-03-19',
+        examName: 'Algebra Test',
+        score: 5.5,
+        pointsAchieved: 19,
+        pointsMax: 20,
       });
 
-      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+      const result = await ExamService.analyzeScan('photos/test.jpg');
 
-      expect(note).toBe(5.5);
+      expect(result.subjectName).toBe('Mathematik');
+      expect(result.date).toBe('2026-03-19');
+      expect(result.examName).toBe('Algebra Test');
+      expect(result.score).toBe(5.5);
+      expect(result.pointsAchieved).toBe(19);
+      expect(result.pointsMax).toBe(20);
     });
 
-    it('should return grade with comma as decimal separator', async () => {
+    it('should return null fields when the model omits them', async () => {
       vi.mocked(Filesystem.getUri).mockResolvedValue({
         uri: 'file://data/photos/test.jpg',
       });
       vi.mocked(Ocr.process).mockResolvedValue({
-        results: [{ text: 'Note: 4,5', confidence: 0.99 }],
+        results: [{ text: 'nichts', confidence: 0.9 }],
       });
-      vi.mocked(FoundationModels.generate).mockResolvedValue({
-        text: 'Note: 4,5',
-      });
+      vi.mocked(FoundationModels.generateExamData).mockResolvedValue({});
 
-      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+      const result = await ExamService.analyzeScan('photos/test.jpg');
 
-      expect(note).toBe(4.5);
+      expect(result.score).toBeNull();
+      expect(result.subjectName).toBeNull();
+      expect(result.pointsAchieved).toBeNull();
     });
 
-    it('should return null when AI does not find a grade', async () => {
-      vi.mocked(Filesystem.getUri).mockResolvedValue({
-        uri: 'file://data/photos/test.jpg',
-      });
-      vi.mocked(Ocr.process).mockResolvedValue({
-        results: [{ text: 'kein relevanter text', confidence: 0.9 }],
-      });
-      vi.mocked(FoundationModels.generate).mockResolvedValue({
-        text: 'Kein Fach erkannt.',
-      });
-
-      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
-
-      expect(note).toBeNull();
-    });
-
-    it('should return null when AI throws an error', async () => {
+    it('should return all-null when the model throws an error', async () => {
       vi.mocked(Filesystem.getUri).mockResolvedValue({
         uri: 'file://data/photos/test.jpg',
       });
       vi.mocked(Ocr.process).mockResolvedValue({
         results: [{ text: 'Note: 5', confidence: 0.9 }],
       });
-      vi.mocked(FoundationModels.generate).mockRejectedValue(
+      vi.mocked(FoundationModels.generateExamData).mockRejectedValue(
         new Error('Model not ready'),
       );
 
-      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+      const result = await ExamService.analyzeScan('photos/test.jpg');
 
-      expect(note).toBeNull();
+      expect(result.score).toBeNull();
+      expect(result.examName).toBeNull();
     });
   });
 });
