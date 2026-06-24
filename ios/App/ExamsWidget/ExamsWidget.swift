@@ -189,20 +189,79 @@ struct NextExamsWidgetView: View {
     }
 }
 
+struct LockScreenRectangularView: View {
+    let entry: ExamsTimelineEntry
+
+    private static let dateFormat: Date.FormatStyle =
+        .dateTime.day().month(.abbreviated).locale(Locale(identifier: "de_DE"))
+
+    var body: some View {
+        if let next = entry.exams.first {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(next.subjectName.isEmpty ? "Prüfung" : next.subjectName)
+                    .font(.caption2.weight(.semibold))
+                    .lineLimit(1)
+                Text(next.name.isEmpty ? next.subjectName : next.name)
+                    .font(.headline)
+                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Image(systemName: "clock")
+                    Text(next.date, format: Self.dateFormat)
+                    Text("·")
+                    Text(LockScreenRectangularView.relativeText(for: next.date))
+                }
+                .font(.caption2)
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 1) {
+                Text("Prüfungen")
+                    .font(.caption2.weight(.semibold))
+                Text("Keine anstehend")
+                    .font(.headline)
+            }
+        }
+    }
+
+    private static func relativeText(for date: Date) -> String {
+        let cal = Calendar.current
+        let days = cal.dateComponents([.day], from: cal.startOfDay(for: Date()), to: cal.startOfDay(for: date)).day ?? 0
+        switch days {
+        case ..<0: return "vorbei"
+        case 0:    return "heute"
+        case 1:    return "morgen"
+        default:   return "in \(days) T."
+        }
+    }
+}
+
+struct ExamsWidgetEntryView: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: ExamsTimelineEntry
+
+    var body: some View {
+        switch family {
+        case .accessoryRectangular:
+            LockScreenRectangularView(entry: entry)
+        default:
+            NextExamsWidgetView(entry: entry)
+        }
+    }
+}
+
 struct NextExamsWidget: Widget {
     let kind: String = "ExamsWidget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: ExamsProvider()) { entry in
             if #available(iOS 17.0, *) {
-                NextExamsWidgetView(entry: entry).containerBackground(.background, for: .widget)
+                ExamsWidgetEntryView(entry: entry).containerBackground(.background, for: .widget)
             } else {
-                NextExamsWidgetView(entry: entry).background(Color(.systemBackground))
+                ExamsWidgetEntryView(entry: entry).background(Color(.systemBackground))
             }
         }
         .configurationDisplayName("Nächste Prüfungen")
         .description("Zeigt deine nächsten anstehenden Prüfungen aus NetGrade.")
-        .supportedFamilies([.systemMedium])
+        .supportedFamilies([.systemMedium, .accessoryRectangular])
     }
 }
 
