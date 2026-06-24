@@ -3,6 +3,7 @@ import {
   ExamService,
   type CreateExamFromScanPayload,
 } from '@/services/ExamService';
+import { WidgetService } from '@/services/WidgetService';
 import { Exam } from '@/db/entities/Exam';
 
 // Query keys
@@ -67,8 +68,8 @@ export const useAddExam = () => {
   return useMutation({
     mutationFn: (payload: AddExamPayload) => ExamService.add(payload),
     onSuccess: () => {
-      // Invalidate exams list
       queryClient.invalidateQueries({ queryKey: examKeys.all });
+      void WidgetService.sync();
     },
   });
 };
@@ -80,8 +81,8 @@ export const useUpdateExam = () => {
     mutationFn: (examData: Partial<Exam> & { id: string }) =>
       ExamService.update(examData),
     onSuccess: () => {
-      // Invalidate exams list
       queryClient.invalidateQueries({ queryKey: examKeys.all });
+      void WidgetService.sync();
     },
   });
 };
@@ -92,8 +93,8 @@ export const useDeleteExam = () => {
   return useMutation({
     mutationFn: (examId: string) => ExamService.delete(examId),
     onSuccess: () => {
-      // Invalidate exams list
       queryClient.invalidateQueries({ queryKey: examKeys.all });
+      void WidgetService.sync();
     },
   });
 };

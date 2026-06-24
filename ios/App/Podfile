@@ -22,6 +22,7 @@ def capacitor_pods
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
   pod 'CapgoCapacitorDocumentScanner', :path => '../../node_modules/@capgo/capacitor-document-scanner'
   pod 'JcesarmobileCapacitorOcr', :path => '../../node_modules/@jcesarmobile/capacitor-ocr'
+  pod 'CapacitorWidgetBridge', :path => '../../node_modules/capacitor-widget-bridge'
   pod 'CordovaPlugins', :path => '../capacitor-cordova-ios-plugins'
 end
 

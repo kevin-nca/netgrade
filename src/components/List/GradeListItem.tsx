@@ -32,6 +32,15 @@ const GradeListItem: React.FC<GradeListItemProps> = ({
       <div
         className="grade-item"
         onClick={onOpen}
+        onKeyDown={(e) => {
+          if (!onOpen) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onOpen();
+          }
+        }}
+        role={onOpen ? 'button' : undefined}
+        tabIndex={onOpen ? 0 : undefined}
         style={onOpen ? { cursor: 'pointer' } : undefined}
       >
         <div className="grade-icon-badge">
