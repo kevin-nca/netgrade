@@ -1,4 +1,13 @@
-import { describe, it, vi, expect, beforeAll, afterAll } from 'vitest';
+import {
+  describe,
+  it,
+  vi,
+  expect,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+} from 'vitest';
 import { DataSource } from 'typeorm';
 import { initializeTestDatabase, cleanupTestData, seedTestData } from './setup';
 import { Capacitor } from '@capacitor/core';
@@ -345,6 +354,14 @@ describe('ExamService', () => {
   });
 
   describe('extractNoteFromScan', () => {
+    beforeEach(() => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+      vi.mocked(Ocr.process).mockClear();
+    });
+    afterEach(() => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+    });
+
     it('should extract the grade from the OCR text', async () => {
       vi.mocked(Filesystem.getUri).mockResolvedValue({
         uri: 'file://data/photos/test.jpg',
@@ -391,6 +408,26 @@ describe('ExamService', () => {
       vi.mocked(Ocr.process).mockResolvedValue({
         results: [{ text: 'kein lesbarer Wert', confidence: 0.5 }],
       });
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBeNull();
+    });
+
+    it('should return null on non-native platforms without calling OCR', async () => {
+      vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBeNull();
+      expect(Ocr.process).not.toHaveBeenCalled();
+    });
+
+    it('should return null (best-effort) when OCR throws', async () => {
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Ocr.process).mockRejectedValue(new Error('OCR unavailable'));
 
       const note = await ExamService.extractNoteFromScan('photos/test.jpg');
 

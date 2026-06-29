@@ -40,6 +40,7 @@ import {
   useDeleteExam,
   useDeleteExamScan,
   useExam,
+  useExtractNoteFromScan,
   useSubjects,
   useTakeExamPhoto,
   usePhotoSrcs,
@@ -50,7 +51,6 @@ import {
   validateWeight,
 } from '@/utils/validation';
 import { Routes } from '@/routes';
-import { ExamService } from '@/services';
 import ModalSubmitButton from '@/shared/components/buttons/submitt-button/modal-submit-button';
 import ModalCancelButton from '@/shared/components/buttons/cancel-button/modal-cancel-button';
 import ModalButtonGroup from '@/shared/components/buttons/modal-button-group';
@@ -121,6 +121,7 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
   const deleteExamScanMutation = useDeleteExamScan();
   const deleteExamMutation = useDeleteExam();
   const takePhotoMutation = useTakeExamPhoto();
+  const extractNoteMutation = useExtractNoteFromScan();
 
   const showMessage = (message: string, color: string = 'primary') => {
     setToastMessage(message);
@@ -140,7 +141,7 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
         photoPaths: paths,
       });
 
-      const note = await ExamService.extractNoteFromScan(paths[0]);
+      const note = await extractNoteMutation.mutateAsync(paths[0]);
       if (note != null) {
         gradeForm.setFieldValue('score', note);
         showMessage(

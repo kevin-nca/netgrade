@@ -212,26 +212,37 @@ export class ExamService {
 
   /**
    * Reads a scanned photo via Apple Vision OCR and extracts the grade ("Note")
-   * directly from the recognized text. Returns the grade or null if none found.
+   * directly from the recognized text. Best-effort: returns null on web/
+   * unsupported platforms or if OCR fails, so a failed read never breaks the
+   * surrounding scan-and-save flow.
    */
   static async extractNoteFromScan(photoPath: string): Promise<number | null> {
-    const { uri } = await Filesystem.getUri({
-      path: photoPath,
-      directory: Directory.Data,
-    });
-    const ocr: RecognitionResults = await Ocr.process({ image: uri });
-    const ocrText = ocr.results.map((r: RecognitionResult) => r.text).join(' ');
-    console.log('[OCR-Text]', ocrText);
+    if (!Capacitor.isNativePlatform()) return null;
 
-    const matches = [
-      ...ocrText.matchAll(/Note\s*:?\s*([1-6](?:[.,]\d+)?)/gi),
-    ].map((m) => Number(m[1].replace(',', '.')));
+    try {
+      const { uri } = await Filesystem.getUri({
+        path: photoPath,
+        directory: Directory.Data,
+      });
+      const ocr: RecognitionResults = await Ocr.process({ image: uri });
+      const ocrText = ocr.results
+        .map((r: RecognitionResult) => r.text)
+        .join(' ');
+      console.log('[OCR-Text]', ocrText);
 
-    if (matches.length === 0) return null;
+      const matches = [
+        ...ocrText.matchAll(/Note\s*:?\s*([1-6](?:[.,]\d+)?)/gi),
+      ].map((m) => Number(m[1].replace(',', '.')));
 
-    return (
-      matches.find((n) => !Number.isInteger(n)) ?? matches[matches.length - 1]
-    );
+      if (matches.length === 0) return null;
+
+      return (
+        matches.find((n) => !Number.isInteger(n)) ?? matches[matches.length - 1]
+      );
+    } catch {
+      console.error('OCR grade extraction failed');
+      return null;
+    }
   }
 
   static async addScans(

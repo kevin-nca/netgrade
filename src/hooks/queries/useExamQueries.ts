@@ -102,6 +102,13 @@ export const useTakeExamPhoto = () => {
   });
 };
 
+export const useExtractNoteFromScan = () => {
+  return useMutation({
+    mutationFn: (photoPath: string) =>
+      ExamService.extractNoteFromScan(photoPath),
+  });
+};
+
 export const useAddExamScans = () => {
   const queryClient = useQueryClient();
   return useMutation({
