@@ -1,0 +1,14 @@
+diff --git a/node_modules/@jcesarmobile/capacitor-ocr/ios/Sources/OcrPlugin/OcrPlugin.swift b/node_modules/@jcesarmobile/capacitor-ocr/ios/Sources/OcrPlugin/OcrPlugin.swift
+index 8eb5819..a029eb3 100644
+--- a/node_modules/@jcesarmobile/capacitor-ocr/ios/Sources/OcrPlugin/OcrPlugin.swift
++++ b/node_modules/@jcesarmobile/capacitor-ocr/ios/Sources/OcrPlugin/OcrPlugin.swift
+@@ -87,6 +87,9 @@ public class OcrPlugin: CAPPlugin, CAPBridgedPlugin {
+                     ])
+                 }
+             }
++            textDetectionRequest.recognitionLevel = .accurate
++            textDetectionRequest.recognitionLanguages = ["de-DE", "en-US"]
++            textDetectionRequest.usesLanguageCorrection = true
+             do {
+                 if let requestHandler {
+                     try requestHandler.perform([textDetectionRequest])

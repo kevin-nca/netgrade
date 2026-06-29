@@ -7,6 +7,11 @@ import {
   DocumentScanner,
   ResponseType,
 } from '@capgo/capacitor-document-scanner';
+import {
+  Ocr,
+  type RecognitionResult,
+  type RecognitionResults,
+} from '@jcesarmobile/capacitor-ocr';
 
 export class ExamService {
   /**
@@ -203,6 +208,30 @@ export class ExamService {
     }
 
     return savedPaths;
+  }
+
+  /**
+   * Reads a scanned photo via Apple Vision OCR and extracts the grade ("Note")
+   * directly from the recognized text. Returns the grade or null if none found.
+   */
+  static async extractNoteFromScan(photoPath: string): Promise<number | null> {
+    const { uri } = await Filesystem.getUri({
+      path: photoPath,
+      directory: Directory.Data,
+    });
+    const ocr: RecognitionResults = await Ocr.process({ image: uri });
+    const ocrText = ocr.results.map((r: RecognitionResult) => r.text).join(' ');
+    console.log('[OCR-Text]', ocrText);
+
+    const matches = [
+      ...ocrText.matchAll(/Note\s*:?\s*([1-6](?:[.,]\d+)?)/gi),
+    ].map((m) => Number(m[1].replace(',', '.')));
+
+    if (matches.length === 0) return null;
+
+    return (
+      matches.find((n) => !Number.isInteger(n)) ?? matches[matches.length - 1]
+    );
   }
 
   static async addScans(

@@ -8,6 +8,7 @@ import {
   ResponseType,
   ScanDocumentResponseStatus,
 } from '@capgo/capacitor-document-scanner';
+import { Ocr } from '@jcesarmobile/capacitor-ocr';
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
@@ -20,6 +21,10 @@ vi.mock('@capgo/capacitor-document-scanner', () => ({
   DocumentScanner: { scanDocument: vi.fn() },
   ResponseType: { ImageFilePath: 'imageFilePath', Base64: 'base64' },
   ScanDocumentResponseStatus: { Success: 'success', Cancel: 'cancel' },
+}));
+
+vi.mock('@jcesarmobile/capacitor-ocr', () => ({
+  Ocr: { process: vi.fn() },
 }));
 
 vi.mock('@capacitor/filesystem', () => ({
@@ -336,6 +341,47 @@ describe('ExamService', () => {
       );
 
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+    });
+  });
+
+  describe('extractNoteFromScan', () => {
+    it('should extract the grade from the OCR text', async () => {
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Ocr.process).mockResolvedValue({
+        results: [{ text: 'Mathematik Test Note: 4.5', confidence: 0.99 }],
+      });
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBe(4.5);
+    });
+
+    it('should prefer a decimal grade over an integer', async () => {
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Ocr.process).mockResolvedValue({
+        results: [{ text: 'Note: 6 Endnote Note 5,5', confidence: 0.9 }],
+      });
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBe(5.5);
+    });
+
+    it('should return null when no grade is found', async () => {
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Ocr.process).mockResolvedValue({
+        results: [{ text: 'kein lesbarer Wert', confidence: 0.5 }],
+      });
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBeNull();
     });
   });
 });
