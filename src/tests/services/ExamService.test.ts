@@ -371,6 +371,19 @@ describe('ExamService', () => {
       expect(note).toBe(5.5);
     });
 
+    it('should fall back to the last grade when only integers are found', async () => {
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Ocr.process).mockResolvedValue({
+        results: [{ text: 'Note: 4 Endnote Note: 5', confidence: 0.9 }],
+      });
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBe(5);
+    });
+
     it('should return null when no grade is found', async () => {
       vi.mocked(Filesystem.getUri).mockResolvedValue({
         uri: 'file://data/photos/test.jpg',
