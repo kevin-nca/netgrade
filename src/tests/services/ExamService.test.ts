@@ -201,6 +201,19 @@ describe('ExamService', () => {
     expect(exams).toBeInstanceOf(Array);
   });
 
+  it('should fetch all exams with subject ordered by date desc', async () => {
+    const exams = await ExamService.fetchAllWithSubject();
+    expect(exams).toBeInstanceOf(Array);
+    expect(exams.length).toBeGreaterThan(0);
+    expect(exams[0]).toBeInstanceOf(Exam);
+    expect(exams[0].subject).toBeDefined();
+    for (let i = 1; i < exams.length; i++) {
+      expect(new Date(exams[i - 1].date).getTime()).toBeGreaterThanOrEqual(
+        new Date(exams[i].date).getTime(),
+      );
+    }
+  });
+
   describe('takeExamPhoto', () => {
     it('should save photo via writeFile on web and return paths', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);

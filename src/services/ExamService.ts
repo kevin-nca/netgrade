@@ -54,6 +54,24 @@ export class ExamService {
   }
 
   /**
+   * Fetches all exams (past and upcoming) including their subject, ordered by
+   * date descending. Used by the "all exams" overview grouped by month.
+   * @returns Promise<Exam[]> - A promise that resolves to an array of exams
+   */
+  static async fetchAllWithSubject(): Promise<Exam[]> {
+    try {
+      const { exam: examRepo } = getRepositories();
+      return await examRepo.find({
+        relations: { subject: true, grade: true },
+        order: { date: 'DESC' },
+      });
+    } catch (error) {
+      console.error('Failed to fetch all exams:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Adds a new exam to the database
    * @param newExamData - The data for the new exam
    * @returns Promise<Exam> - A promise that resolves to the newly created exam

@@ -1,0 +1,182 @@
+.all-exams-content {
+  --background: #f2f2f7;
+}
+
+.all-exams-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+}
+
+.all-exams-empty {
+  color: var(--ion-color-medium);
+  font-size: 15px;
+  margin: 0;
+}
+
+.all-exams-list {
+  padding: 12px 16px 32px;
+}
+
+.all-exams-month {
+  margin-bottom: 24px;
+}
+
+.all-exams-month-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: var(--ion-color-medium);
+  letter-spacing: 0.2px;
+  margin: 0 4px 8px;
+}
+
+.all-exam-card {
+  --background: #ffffff;
+  --background-hover: #ffffff;
+  --background-activated: #f2f2f7;
+  --background-focused: #f2f2f7;
+  --color: inherit;
+  --border-radius: 14px;
+  --box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --ripple-color: rgba(0, 122, 255, 0.1);
+  margin: 0 0 8px;
+  text-transform: none;
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+.all-exam-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+}
+
+.all-exam-icon-wrapper {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #007aff 0%, #0051d5 100%);
+}
+
+.all-exam-icon {
+  font-size: 18px;
+  color: white;
+}
+
+.all-exam-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.all-exam-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #000000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.all-exam-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}
+
+.all-exam-subject {
+  font-weight: 600;
+  color: #007aff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 45%;
+}
+
+.all-exam-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.all-exam-meta-icon {
+  font-size: 13px;
+}
+
+.all-exam-grade {
+  flex-shrink: 0;
+  min-width: 34px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #007aff;
+}
+
+.all-exam-chevron {
+  flex-shrink: 0;
+  font-size: 16px;
+  color: var(--ion-color-medium);
+}
+
+@media (prefers-color-scheme: dark) {
+  .all-exams-content {
+    --background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  }
+
+  .all-exams-month-title {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .all-exam-card {
+    --background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 100%
+    );
+    --background-hover: rgba(255, 255, 255, 0.12);
+    --background-activated: rgba(255, 255, 255, 0.18);
+    --background-focused: rgba(255, 255, 255, 0.18);
+    --box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 14px;
+  }
+
+  .all-exam-title {
+    color: #ffffff;
+  }
+
+  .all-exam-meta,
+  .all-exam-chevron {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .all-exam-subject {
+    color: #4da3ff;
+  }
+
+  .all-exam-grade {
+    color: #4da3ff;
+  }
+
+  .all-exams-empty {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}

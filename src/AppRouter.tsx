@@ -6,6 +6,7 @@ import CalendarPage from '@/pages/home/calendar/CalendarPage';
 import SettingsPage from '@/pages/home/settings/SettingsPage';
 import AddExamPage from '@/pages/home/exams/AddExamPage';
 import ScanExamPage from '@/pages/home/exams/ScanExamPage/ScanExamPage';
+import AllExamsPage from '@/pages/home/exams/AllExamsPage/AllExamsPage';
 import OnboardingPage from '@/pages/onboarding/OnboardingPage';
 import SchoolPage from '@/pages/home/school/SchoolPage';
 import AddGradePage from '@/pages/home/grades/AddGradePage';
@@ -38,6 +39,7 @@ export function AppRouter() {
         <Route exact path={Routes.SETTINGS} component={SettingsPage} />
         <Route exact path={Routes.EXAMS_ADD} component={AddExamPage} />
         <Route exact path={Routes.EXAMS_SCAN} component={ScanExamPage} />
+        <Route exact path={Routes.EXAMS_ALL} component={AllExamsPage} />
         <Route exact path={Routes.EXAM_EDIT} component={EditExamPage} />
       </Switch>
 
