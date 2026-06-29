@@ -159,6 +159,7 @@ export class ExamService {
       const upcomingExams = await examRepo
         .createQueryBuilder('exam')
         .leftJoin('exam.grade', 'grade')
+        .leftJoinAndSelect('exam.subject', 'subject')
         .where('exam.date >= :now', { now })
         .orderBy('exam.date', 'ASC')
         .getMany();

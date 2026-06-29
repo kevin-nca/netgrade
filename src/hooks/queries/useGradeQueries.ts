@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AddExamAndGradePayload, GradeService } from '@/services/GradeService';
+import { WidgetService } from '@/services/WidgetService';
 import { Grade } from '@/db/entities/Grade';
 import { examKeys, schoolKeys, subjectKeys } from '@/hooks';
 import { Exam } from '@/db/entities';
@@ -62,6 +63,7 @@ export const useAddGradeWithExam = () => {
       queryClient.invalidateQueries({
         queryKey: examKeys.all,
       });
+      void WidgetService.sync();
     },
   });
 };
@@ -82,6 +84,7 @@ export const useDeleteGrade = () => {
       queryClient.invalidateQueries({
         queryKey: subjectKeys.all,
       });
+      void WidgetService.sync();
     },
   });
 };
@@ -113,6 +116,7 @@ export const useUpdateExamAndGrade = () => {
         });
       }
       queryClient.invalidateQueries({ queryKey: examKeys.all });
+      void WidgetService.sync();
     },
   });
 };

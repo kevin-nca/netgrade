@@ -355,6 +355,59 @@ export const createMockSchoolWithDifferentSubjectAverages = (): School => {
   } as School;
 };
 
+// ========== Mock Exams for Widget Tests ==========
+
+export const createMockWidgetExams = (): Partial<Exam>[] => [
+  {
+    id: 'exam-1',
+    name: 'Mathematik Klausur',
+    subject: { name: 'Mathematik' } as Subject,
+    date: new Date('2026-06-10T10:00:00.000Z'),
+  },
+  {
+    id: 'exam-2',
+    name: 'Physik Test',
+    subject: { name: 'Physik' } as Subject,
+    date: new Date('2026-06-15T14:00:00.000Z'),
+  },
+];
+
+export const createMockWidgetExamsOverLimit = (): Partial<Exam>[] => [
+  {
+    id: 'exam-1',
+    name: 'Exam 1',
+    subject: { name: 'Subject 1' } as Subject,
+    date: new Date('2026-06-10T00:00:00.000Z'),
+  },
+  {
+    id: 'exam-2',
+    name: 'Exam 2',
+    subject: { name: 'Subject 2' } as Subject,
+    date: new Date('2026-06-11T00:00:00.000Z'),
+  },
+  {
+    id: 'exam-3',
+    name: 'Exam 3',
+    subject: { name: 'Subject 3' } as Subject,
+    date: new Date('2026-06-12T00:00:00.000Z'),
+  },
+  {
+    id: 'exam-4',
+    name: 'Exam 4',
+    subject: { name: 'Subject 4' } as Subject,
+    date: new Date('2026-06-13T00:00:00.000Z'),
+  },
+];
+
+export const createMockWidgetExamWithoutSubject = (): Partial<Exam>[] => [
+  {
+    id: 'exam-1',
+    name: 'Exam without subject',
+    subject: null as unknown as Subject,
+    date: new Date('2026-06-10T00:00:00.000Z'),
+  },
+];
+
 // ========== Mock Semester for Semester Tests ==========
 
 // Helper function to create mock current semester
