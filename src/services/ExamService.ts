@@ -228,14 +228,16 @@ export class ExamService {
       const ocrText = ocr.results
         .map((r: RecognitionResult) => r.text)
         .join(' ');
-      console.log('[OCR-Text]', ocrText);
 
-      const matches = [
-        ...ocrText.matchAll(/Note\s*:?\s*([1-6](?:[.,]\d+)?)/gi),
-      ].map((m) => Number(m[1].replace(',', '.')));
+      // Keep only finite grades within the supported 1–6 range (OCR can read
+      // e.g. "6,5" → 6.5, which would later fail form validation).
+      const matches = [...ocrText.matchAll(/Note\s*:?\s*([1-6](?:[.,]\d+)?)/gi)]
+        .map((m) => Number(m[1].replace(',', '.')))
+        .filter((n) => Number.isFinite(n) && n >= 1 && n <= 6);
 
       if (matches.length === 0) return null;
 
+      // Prefer a decimal grade over a plain integer, else take the last.
       return (
         matches.find((n) => !Number.isInteger(n)) ?? matches[matches.length - 1]
       );

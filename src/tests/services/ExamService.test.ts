@@ -414,6 +414,19 @@ describe('ExamService', () => {
       expect(note).toBeNull();
     });
 
+    it('should ignore grades outside the 1-6 range', async () => {
+      vi.mocked(Filesystem.getUri).mockResolvedValue({
+        uri: 'file://data/photos/test.jpg',
+      });
+      vi.mocked(Ocr.process).mockResolvedValue({
+        results: [{ text: 'Note: 6,5', confidence: 0.9 }],
+      });
+
+      const note = await ExamService.extractNoteFromScan('photos/test.jpg');
+
+      expect(note).toBeNull();
+    });
+
     it('should return null on non-native platforms without calling OCR', async () => {
       vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
 
