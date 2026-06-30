@@ -40,6 +40,7 @@ import {
   useDeleteExam,
   useDeleteExamScan,
   useExam,
+  useExtractNoteFromScan,
   useSubjects,
   useTakeExamPhoto,
   usePhotoSrcs,
@@ -120,6 +121,7 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
   const deleteExamScanMutation = useDeleteExamScan();
   const deleteExamMutation = useDeleteExam();
   const takePhotoMutation = useTakeExamPhoto();
+  const extractNoteMutation = useExtractNoteFromScan();
 
   const showMessage = (message: string, color: string = 'primary') => {
     setToastMessage(message);
@@ -138,6 +140,15 @@ const ExamDetailsForm: React.FC<ExamDetailsFormProps> = ({
         examId: exam.id,
         photoPaths: paths,
       });
+
+      const note = await extractNoteMutation.mutateAsync(paths[0]);
+      if (note != null) {
+        gradeForm.setFieldValue('score', note);
+        showMessage(
+          `Note ${note} erkannt – bitte prüfen und speichern`,
+          'success',
+        );
+      }
     } catch (err) {
       showMessage(`Fehler: ${(err as Error).message}`, 'danger');
     }

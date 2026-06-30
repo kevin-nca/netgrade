@@ -7,6 +7,11 @@ import {
   DocumentScanner,
   ResponseType,
 } from '@capgo/capacitor-document-scanner';
+import {
+  Ocr,
+  type RecognitionResult,
+  type RecognitionResults,
+} from '@jcesarmobile/capacitor-ocr';
 
 export class ExamService {
   /**
@@ -203,6 +208,43 @@ export class ExamService {
     }
 
     return savedPaths;
+  }
+
+  /**
+   * Reads a scanned photo via Apple Vision OCR and extracts the grade ("Note")
+   * directly from the recognized text. Best-effort: returns null on web/
+   * unsupported platforms or if OCR fails, so a failed read never breaks the
+   * surrounding scan-and-save flow.
+   */
+  static async extractNoteFromScan(photoPath: string): Promise<number | null> {
+    if (!Capacitor.isNativePlatform()) return null;
+
+    try {
+      const { uri } = await Filesystem.getUri({
+        path: photoPath,
+        directory: Directory.Data,
+      });
+      const ocr: RecognitionResults = await Ocr.process({ image: uri });
+      const ocrText = ocr.results
+        .map((r: RecognitionResult) => r.text)
+        .join(' ');
+
+      // Keep only finite grades within the supported 1–6 range (OCR can read
+      // e.g. "6,5" → 6.5, which would later fail form validation).
+      const matches = [...ocrText.matchAll(/Note\s*:?\s*([1-6](?:[.,]\d+)?)/gi)]
+        .map((m) => Number(m[1].replace(',', '.')))
+        .filter((n) => Number.isFinite(n) && n >= 1 && n <= 6);
+
+      if (matches.length === 0) return null;
+
+      // Prefer a decimal grade over a plain integer, else take the last.
+      return (
+        matches.find((n) => !Number.isInteger(n)) ?? matches[matches.length - 1]
+      );
+    } catch {
+      console.error('OCR grade extraction failed');
+      return null;
+    }
   }
 
   static async addScans(
