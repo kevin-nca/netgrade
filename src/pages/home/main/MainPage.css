@@ -161,6 +161,18 @@
   letter-spacing: -0.3px;
 }
 
+.section-title-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.section-title-arrow {
+  font-size: 16px;
+  color: var(--ion-color-medium);
+}
+
 .header-action-button {
   width: 28px;
   height: 28px;
