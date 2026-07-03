@@ -27,5 +27,6 @@ export enum Routes {
   // Exams routes
   EXAMS_ADD = '/main/home/exams/add',
   EXAMS_SCAN = '/main/home/exams/scan',
+  EXAMS_ALL = '/main/home/exams/all',
   EXAM_EDIT = '/main/home/exams/:examId/edit',
 }

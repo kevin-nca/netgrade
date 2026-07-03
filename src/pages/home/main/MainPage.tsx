@@ -7,7 +7,7 @@ import {
   IonRefresherContent,
   useIonRouter,
 } from '@ionic/react';
-import { add, personCircleOutline } from 'ionicons/icons';
+import { add, chevronForward, personCircleOutline } from 'ionicons/icons';
 import { useAddSchool, useUserName } from '@/hooks/queries';
 import { Routes } from '@/routes';
 import NavigationModal from '@/components/navigation/home/NavigationModal';
@@ -99,7 +99,16 @@ function MainPage() {
 
           <div className="main-section">
             <div className="section-header">
-              <h2 className="section-title">Prüfungen</h2>
+              <div
+                className="section-title-link"
+                onClick={() => router.push(Routes.EXAMS_ALL, 'forward')}
+              >
+                <h2 className="section-title">Prüfungen</h2>
+                <IonIcon
+                  icon={chevronForward}
+                  className="section-title-arrow"
+                />
+              </div>
               <div
                 className="header-action-button"
                 onClick={() => router.push(Routes.EXAMS_ADD, 'forward')}
