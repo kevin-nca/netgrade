@@ -201,9 +201,34 @@ describe('ExamService', () => {
     ).rejects.toThrow('DB error');
   });
 
-  it('should fetch upcoming exams regardless of grade status', async () => {
+  it('should exclude exams that already have a grade', async () => {
+    const examRepo = dataSource.getRepository(Exam);
+    const future = new Date();
+    future.setDate(future.getDate() + 7);
+
+    const withoutGrade = await examRepo.save(
+      examRepo.create({
+        name: 'Ungraded upcoming',
+        date: future,
+        subjectId: testData.subject.id,
+        isCompleted: false,
+      }),
+    );
+    const withGrade = await examRepo.save(
+      examRepo.create({
+        name: 'Graded upcoming',
+        date: future,
+        subjectId: testData.subject.id,
+        isCompleted: true,
+        gradeId: testData.grade.id,
+      }),
+    );
+
     const exams = await ExamService.fetchUpcoming();
-    expect(exams).toBeInstanceOf(Array);
+    const ids = exams.map((e) => e.id);
+
+    expect(ids).toContain(withoutGrade.id);
+    expect(ids).not.toContain(withGrade.id);
   });
 
   describe('takeExamPhoto', () => {
