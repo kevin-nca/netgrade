@@ -78,7 +78,7 @@ describe('WidgetService', () => {
       expect(mockSetItem).toHaveBeenCalledTimes(1);
       expect(mockSetItem).toHaveBeenCalledWith({
         key: 'next_exams',
-        group: 'group.com.netgrade.app',
+        group: 'group.netgrade.app',
         value: JSON.stringify({
           exams: [
             {
@@ -189,7 +189,7 @@ describe('WidgetService', () => {
       expect(mockSetItem).toHaveBeenCalledTimes(1);
       expect(mockSetItem).toHaveBeenCalledWith({
         key: 'next_exams',
-        group: 'group.com.netgrade.app',
+        group: 'group.netgrade.app',
         value: JSON.stringify({ exams: [], totalCount: 0 }),
       });
       expect(mockReloadTimelines).toHaveBeenCalledTimes(1);
