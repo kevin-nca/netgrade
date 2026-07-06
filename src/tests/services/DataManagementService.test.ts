@@ -1226,8 +1226,7 @@ describe('DataManagementService', () => {
       vi.spyOn(dataSource, 'transaction').mockImplementation(
         async (
           runInTransactionOrIsolationLevel:
-            | ((entityManager: EntityManager) => Promise<unknown>)
-            | string,
+            ((entityManager: EntityManager) => Promise<unknown>) | string,
           maybeRunInTransaction?: (
             entityManager: EntityManager,
           ) => Promise<unknown>,
@@ -1265,8 +1264,7 @@ describe('DataManagementService', () => {
       vi.spyOn(dataSource, 'transaction').mockImplementation(
         async <T>(
           runInTransactionOrIsolationLevel:
-            | ((entityManager: EntityManager) => Promise<T>)
-            | string,
+            ((entityManager: EntityManager) => Promise<T>) | string,
           maybeRunInTransaction?: (entityManager: EntityManager) => Promise<T>,
         ) => {
           const cb =
