@@ -39,6 +39,7 @@ jobs:
           # Decode and write files
           echo "$APPLE_DIST_CERT_P12" | base64 --decode > dist.p12
           echo "$IOS_PROVISION_PROFILE" | base64 --decode > app.mobileprovision
+          echo "$IOS_WIDGET_PROVISION_PROFILE" | base64 --decode > widget.mobileprovision
 
           # Create a temporary keychain
           security create-keychain -p "" build.keychain
@@ -59,9 +60,11 @@ jobs:
           # Move provisioning profile to the correct location with the expected name
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           cp app.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/netgrade-provisioning.mobileprovision"
+          cp widget.mobileprovision "$HOME/Library/MobileDevice/Provisioning Profiles/netgrade-widget-provisioning.mobileprovision"
         env:
           APPLE_DIST_CERT_P12: ${{ secrets.APPLE_DIST_CERT_P12 }}
           IOS_PROVISION_PROFILE: ${{ secrets.IOS_PROVISION_PROFILE }}
+          IOS_WIDGET_PROVISION_PROFILE: ${{ secrets.IOS_WIDGET_PROVISION_PROFILE }}
           APPLE_DIST_CERT_PASS: ${{ secrets.APPLE_DIST_CERT_PASS }}
 
       - name: Set up Node.js

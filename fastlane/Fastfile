@@ -46,7 +46,8 @@ platform :ios do
       clean: true,
       export_options: {
         provisioningProfiles: {
-          "com.netgrade.app" => "netgrade-provisioning"
+          "com.netgrade.app" => "netgrade-provisioning",
+          "com.netgrade.app.ExamsWidget" => "netgrade-widget-provisioning"
         }
       }
     )

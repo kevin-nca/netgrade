@@ -278,10 +278,12 @@ export class PDFService {
           dialogTitle: 'PDF teilen',
         });
       } catch (e) {
-        if (!(
-          e instanceof Error &&
-          (e.message.includes('cancelled') || e.message.includes('canceled'))
-        ))
+        if (
+          !(
+            e instanceof Error &&
+            (e.message.includes('cancelled') || e.message.includes('canceled'))
+          )
+        )
           throw e;
       }
       return {
