@@ -3,6 +3,7 @@ import { SchoolService } from '@/services/SchoolService';
 import { School } from '@/db/entities/School';
 import { examKeys } from '@/hooks';
 import { semesterKeys } from '@/hooks';
+import { WidgetService } from '@/services/WidgetService';
 
 // Query keys
 
@@ -86,6 +87,7 @@ export const useDeleteSchool = () => {
       queryClient.invalidateQueries({ queryKey: schoolKeys.lists() });
       queryClient.invalidateQueries({ queryKey: semesterKeys.all });
       queryClient.invalidateQueries({ queryKey: examKeys.all });
+      void WidgetService.sync();
     },
   });
 };

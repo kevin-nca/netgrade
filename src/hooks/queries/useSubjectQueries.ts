@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SubjectService } from '@/services/SubjectService';
 import { Subject } from '@/db/entities/Subject';
-import { schoolKeys } from '@/hooks';
+import { schoolKeys, examKeys } from '@/hooks';
+import { WidgetService } from '@/services/WidgetService';
 
 // Query keys
 export const subjectKeys = {
@@ -107,6 +108,8 @@ export const useDeleteSubject = () => {
       // Invalidate and refetch subjects list
       queryClient.invalidateQueries({ queryKey: subjectKeys.all });
       queryClient.invalidateQueries({ queryKey: schoolKeys.all });
+      queryClient.invalidateQueries({ queryKey: examKeys.all });
+      void WidgetService.sync();
     },
   });
 };

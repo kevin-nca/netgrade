@@ -2,7 +2,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { SemesterService } from '@/services/SemesterService';
 import { Semester } from '@/db/entities/Semester';
-import { subjectKeys } from '@/hooks';
+import { subjectKeys, examKeys } from '@/hooks';
+import { WidgetService } from '@/services/WidgetService';
 
 export const semesterKeys = {
   all: ['semesters'] as const,
@@ -91,6 +92,8 @@ export const useDeleteSemester = () => {
       // Invalidate and refetch all semester queries
       queryClient.invalidateQueries({ queryKey: semesterKeys.all });
       queryClient.invalidateQueries({ queryKey: subjectKeys.all });
+      queryClient.invalidateQueries({ queryKey: examKeys.all });
+      void WidgetService.sync();
     },
   });
 };
