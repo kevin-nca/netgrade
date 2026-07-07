@@ -161,6 +161,7 @@ export class ExamService {
         .leftJoin('exam.grade', 'grade')
         .leftJoinAndSelect('exam.subject', 'subject')
         .where('exam.date >= :now', { now })
+        .andWhere('exam.gradeId IS NULL')
         .orderBy('exam.date', 'ASC')
         .getMany();
 
