@@ -2,7 +2,7 @@ import { Capacitor } from '@capacitor/core';
 import { WidgetBridgePlugin } from 'capacitor-widget-bridge';
 import { ExamService } from './ExamService';
 
-const APP_GROUP = 'group.com.netgrade.app';
+const APP_GROUP = 'group.netgrade.app';
 const WIDGET_KIND = 'ExamsWidget';
 const STORAGE_KEY = 'next_exams';
 const MAX_EXAMS = 3;

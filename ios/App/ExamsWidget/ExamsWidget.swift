@@ -1,7 +1,7 @@
 import WidgetKit
 import SwiftUI
 
-private let appGroupId = "group.com.netgrade.app"
+private let appGroupId = "group.netgrade.app"
 private let storageKey = "next_exams"
 
 struct WidgetExamEntry: Decodable, Identifiable {
