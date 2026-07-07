@@ -71,7 +71,9 @@ const ScanExamForm: React.FC = () => {
           examName: value.examName.trim(),
           date: new Date(value.date + 'T12:00:00'),
           score: value.score,
-          weight: percentageToDecimal(Number(value.weight) || 100),
+          weight: percentageToDecimal(
+            Number.isFinite(Number(value.weight)) ? Number(value.weight) : 100,
+          ),
         });
 
         if (photoPaths.length > 0 && grade.exam?.id) {
