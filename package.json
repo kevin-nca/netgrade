@@ -61,7 +61,7 @@
     "reflect-metadata": "^0.2.2",
     "reselect": "^5.2.0",
     "sql.js": "^1.14.1",
-    "swiper": "^14.0.1",
+    "swiper": "^14.0.5",
     "typeorm": "^0.3.29",
     "uuid": "^14.0.1",
     "xlsx": "^0.18.5",
