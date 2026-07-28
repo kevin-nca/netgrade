@@ -1,6 +1,6 @@
 # NetGrade
 
-[![Coverage Status](https://codecov.io/gh/kevin-nca/netgrade/branch/main/graph/badge.svg)](https://codecov.io/gh/kevin-nca/netgrade)
+[![Coverage Status](https://codecov.io/gh/nca-apprentices/netgrade/branch/main/graph/badge.svg)](https://codecov.io/gh/nca-apprentices/netgrade)
 
 ## Overview
 
